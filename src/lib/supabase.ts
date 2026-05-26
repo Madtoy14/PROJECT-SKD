@@ -223,21 +223,67 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
       questions = data;
     }
 
-    // Mapping agar formatnya sesuai dengan interface di aplikasi
-    return questions.map(q => ({
-      id: q.id,
-      category: q.tipe,
-      question: q.pertanyaan,
-      options: Array.isArray(q.opsi) ? q.opsi : (typeof q.opsi === 'object' ? 
-        Object.keys(q.opsi).map(key => ({ id: key, text: q.opsi[key], score: q.tipe === 'TKP' ? (parseInt(key) || 1)*10 : (key === q.kunci ? 50 : 0) })) 
-        : []),
-      correct: q.kunci,
-      explanation: q.pembahasan
-    }));
+    // Jika database berhasil dihubungi tapi tabel masih KOSONG, gunakan data fallback lokal
+    if (!questions || questions.length === 0) {
+      console.warn('Tabel Supabase kosong, menggunakan data lokal.');
+      const { SOAL_SKD } = await import('../data/soal');
+      // Berikan sebagian saja agar mirip sesuai mode (atau semuanya jika tryout)
+      if (gameMode === 'latihan' || gameMode === 'survival') {
+        return SOAL_SKD.sort(() => 0.5 - Math.random()).slice(0, 10);
+      }
+      if (gameMode === 'pvp' || gameMode === 'pvp1v1') {
+        return SOAL_SKD.sort(() => 0.5 - Math.random()).slice(0, 15);
+      }
+      return SOAL_SKD;
+    }
+
+    // Mapping agar formatnya sesuai dengan interface Soal di aplikasi
+    return questions.map(q => {
+      let parsedOptions: any[] = [];
+      try {
+        const rawOpsi = typeof q.opsi === 'string' ? JSON.parse(q.opsi) : q.opsi;
+        
+        if (Array.isArray(rawOpsi)) {
+          if (typeof rawOpsi[0] === 'string') {
+             const labels = ['A', 'B', 'C', 'D', 'E'];
+             parsedOptions = rawOpsi.map((text, i) => ({
+               id: labels[i] || String(i),
+               text: text,
+               score: q.tipe === 'TKP' ? (i + 1) * 10 : (labels[i] === q.kunci ? 50 : 0)
+             }));
+          } else {
+             parsedOptions = rawOpsi;
+          }
+        } else if (typeof rawOpsi === 'object' && rawOpsi !== null) {
+          parsedOptions = Object.keys(rawOpsi).map(key => {
+            const val = rawOpsi[key];
+            if (typeof val === 'object' && val !== null) return { id: key, ...val };
+            return {
+              id: key,
+              text: String(val),
+              score: q.tipe === 'TKP' ? (parseInt(key) || 1) * 10 : (key === q.kunci ? 50 : 0)
+            };
+          }).sort((a, b) => a.id.localeCompare(b.id));
+        }
+      } catch (err) {
+        console.error('Failed parsing opsi', q.opsi, err);
+      }
+
+      return {
+        id: q.id,
+        category: q.tipe,
+        text: q.pertanyaan,
+        options: parsedOptions,
+        correct: q.kunci,
+        explanation: q.pembahasan
+      };
+    });
 
   } catch (err) {
     console.error('Gagal mengambil soal dari Supabase, fallback ke data lokal:', err);
     const { SOAL_SKD } = await import('../data/soal');
+    if (gameMode === 'latihan' || gameMode === 'survival') return SOAL_SKD.sort(() => 0.5 - Math.random()).slice(0, 10);
+    if (gameMode === 'pvp' || gameMode === 'pvp1v1') return SOAL_SKD.sort(() => 0.5 - Math.random()).slice(0, 15);
     return SOAL_SKD;
   }
 };

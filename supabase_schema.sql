@@ -18,12 +18,15 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Buat Kebijakan RLS (Profiles)
+DROP POLICY IF EXISTS "Semua orang bisa melihat profil" ON public.profiles;
 CREATE POLICY "Semua orang bisa melihat profil" ON public.profiles
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Pengguna bisa mengubah profil sendiri" ON public.profiles;
 CREATE POLICY "Pengguna bisa mengubah profil sendiri" ON public.profiles
     FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Pengguna bisa mendaftarkan profil baru" ON public.profiles;
 CREATE POLICY "Pengguna bisa mendaftarkan profil baru" ON public.profiles
     FOR INSERT WITH CHECK (auth.uid() = id);
 
@@ -42,12 +45,15 @@ CREATE TABLE IF NOT EXISTS public.pvp_rooms (
 ALTER TABLE public.pvp_rooms ENABLE ROW LEVEL SECURITY;
 
 -- Buat Kebijakan RLS (PvP Rooms)
+DROP POLICY IF EXISTS "Semua orang bisa melihat room aktif" ON public.pvp_rooms;
 CREATE POLICY "Semua orang bisa melihat room aktif" ON public.pvp_rooms
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Host bisa mengelola room sendiri" ON public.pvp_rooms;
 CREATE POLICY "Host bisa mengelola room sendiri" ON public.pvp_rooms
     FOR ALL USING (auth.uid() = host_id);
 
+DROP POLICY IF EXISTS "Pemain bisa membuat/bergabung room" ON public.pvp_rooms;
 CREATE POLICY "Pemain bisa membuat/bergabung room" ON public.pvp_rooms
     FOR INSERT WITH CHECK (true);
 
@@ -65,12 +71,15 @@ CREATE TABLE IF NOT EXISTS public.pvp_room_players (
 ALTER TABLE public.pvp_room_players ENABLE ROW LEVEL SECURITY;
 
 -- Buat Kebijakan RLS (PvP Room Players)
+DROP POLICY IF EXISTS "Semua orang bisa melihat daftar pemain" ON public.pvp_room_players;
 CREATE POLICY "Semua orang bisa melihat daftar pemain" ON public.pvp_room_players
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Pemain bisa mendaftar masuk" ON public.pvp_room_players;
 CREATE POLICY "Pemain bisa mendaftar masuk" ON public.pvp_room_players
     FOR INSERT WITH CHECK (auth.uid() = player_id);
 
+DROP POLICY IF EXISTS "Pemain bisa keluar room" ON public.pvp_room_players;
 CREATE POLICY "Pemain bisa keluar room" ON public.pvp_room_players
     FOR DELETE USING (auth.uid() = player_id);
 
@@ -116,6 +125,7 @@ CREATE INDEX IF NOT EXISTS idx_soal_skd_tipe ON public.soal_skd(tipe);
 -- Aktifkan RLS pada soal_skd
 ALTER TABLE public.soal_skd ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Semua orang bisa melihat soal" ON public.soal_skd;
 CREATE POLICY "Semua orang bisa melihat soal" ON public.soal_skd
     FOR SELECT USING (true);
 

@@ -19,17 +19,22 @@ export default function Quiz() {
   const location = useLocation();
   const gameMode = location.state?.mode || 'latihan';
   const opponentName = location.state?.opponent || 'ASN_Pro';
-  const TOTAL_TIME = gameMode === 'survival' ? 20 : 45;
+  const TOTAL_TIME = gameMode === 'survival' ? 20 : gameMode === 'tryout' ? 110 * 60 : 45;
 
   // --- Quiz state ---
   const [questions, setQuestions] = useState<any[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const selected = answers[currentQuestionIndex] || null;
   const [isGameOver, setIsGameOver] = useState(false);
   const [totalScore, setTotalScore] = useState(0);
   const [showRewardFloat, setShowRewardFloat] = useState<{ pts: number } | null>(null);
+  
+  // --- Explanation state ---
+  const [showExplanation, setShowExplanation] = useState(false);
+  const autoAdvanceTimer = useRef<NodeJS.Timeout | null>(null);
 
   // --- PvP live rank state ---
   const [liveRanks, setLiveRanks] = useState<RankEntry[]>(() => {
@@ -59,38 +64,36 @@ export default function Quiz() {
     return () => { mounted = false; };
   }, [gameMode]);
 
-  if (loadingQuestions) {
-    return (
-      <div className="min-h-screen bg-skd-bg flex flex-col items-center justify-center p-4">
-        <Loader2 className="animate-spin text-blue-500 mb-4" size={48} />
-        <h2 className="text-xl font-bold text-skd-text animate-pulse">Mempersiapkan Arena...</h2>
-      </div>
-    );
-  }
-
-  const currentQuestion = questions[currentQuestionIndex];
+  // Derived values – safely computed after hooks (not hooks themselves)
+  const currentQuestion = questions[currentQuestionIndex] ?? null;
   const totalQuestions = questions.length;
   const progress = (timeLeft / TOTAL_TIME) * 100;
   const strokeDashoffset = ((100 - progress) / 100) * 113.097;
   const timerColor = timeLeft <= 10 ? 'text-skd-danger' : timeLeft <= 20 ? 'text-skd-accent' : 'text-skd-success';
 
-  // Calculate score for a picked option
+  // Calculate score for a picked option (safe-guarded)
   const calcScore = (optionId: string): number => {
+    if (!currentQuestion) return 0;
     const opt = currentQuestion.options.find((o: any) => o.id === optionId);
     return opt?.score ?? 0;
   };
 
   // --- Timer ---
   useEffect(() => {
-    if (selected || isGameOver) return;
+    if (isGameOver) return;
+    if (gameMode !== 'tryout' && selected) return; // Pause timer in normal modes when answered
+
     if (timeLeft <= 0) {
-      // Auto-skip on timeout
-      goNextOrFinish(0);
+      if (gameMode === 'tryout') {
+        finishTryout();
+      } else {
+        goNextOrFinish(0); // Auto-skip
+      }
       return;
     }
     const t = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearTimeout(t);
-  }, [timeLeft, selected, isGameOver]);
+  }, [timeLeft, selected, isGameOver, gameMode]);
 
   // --- Simulate PvP bots answering in real-time ---
   useEffect(() => {
@@ -107,6 +110,7 @@ export default function Quiz() {
       const delay = Math.floor((1 - player.baseSpeed + Math.random() * 0.3) * TOTAL_TIME * 1000);
       const t = setTimeout(() => {
         // Bot picks a random option
+        if (!currentQuestion) return;
         const opts = currentQuestion.options;
         const picked = opts[Math.floor(Math.random() * opts.length)];
         const botPts = currentQuestion.category === 'TKP' ? picked.score : (picked.id === currentQuestion.correct ? 50 : 0);
@@ -131,8 +135,17 @@ export default function Quiz() {
 
   // --- Answer handler ---
   const handleSelect = (optionId: string) => {
-    if (selected || isGameOver) return;
-    setSelected(optionId);
+    if (isGameOver) return;
+    if (!currentQuestion) return;
+
+    if (gameMode === 'tryout') {
+      // In tryout, user can change answer freely, no auto-advance
+      setAnswers(prev => ({ ...prev, [currentQuestionIndex]: optionId }));
+      return;
+    }
+
+    if (selected) return; // Prevent changing in normal modes
+    setAnswers(prev => ({ ...prev, [currentQuestionIndex]: optionId }));
 
     const earned = calcScore(optionId);
     const isTKP = currentQuestion.category === 'TKP';
@@ -166,14 +179,32 @@ export default function Quiz() {
       });
     }
 
-    setTimeout(() => goNextOrFinish(newTotal), 1500);
+    // Auto advance if not tryout mode (so they have time to click Pembahasan)
+    autoAdvanceTimer.current = setTimeout(() => goNextOrFinish(newTotal), 3000); // 3s before auto next
+  };
+
+  const finishTryout = () => {
+    let finalScore = 0;
+    questions.forEach((q, idx) => {
+      const ansId = answers[idx];
+      if (ansId) {
+        const opt = q.options.find((o: any) => o.id === ansId);
+        finalScore += opt?.score ?? 0;
+      }
+    });
+    navigate('/result', { state: { score: finalScore, mode: gameMode } });
+  };
+
+  const handleShowExplanation = () => {
+    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+    setShowExplanation(true);
   };
 
   const goNextOrFinish = (scoreSnapshot: number) => {
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
-      setSelected(null);
-      setTimeLeft(TOTAL_TIME);
+      setShowExplanation(false);
+      if (gameMode !== 'tryout') setTimeLeft(TOTAL_TIME);
     } else {
       navigate('/result', { state: { score: scoreSnapshot, mode: gameMode, liveRanks } });
     }
@@ -181,6 +212,7 @@ export default function Quiz() {
 
   // --- Score label helper ---
   const scoreBadge = (optionId: string) => {
+    if (!currentQuestion) return null;
     const isTKP = currentQuestion.category === 'TKP';
     if (!isTKP) return null;
     const pts = calcScore(optionId);
@@ -189,6 +221,14 @@ export default function Quiz() {
 
   return (
     <div className="flex flex-col h-screen bg-skd-bg relative transition-colors">
+      {/* Loading Screen */}
+      {(loadingQuestions || !currentQuestion) && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-skd-bg gap-4">
+          <Loader2 className="animate-spin text-blue-500" size={48} />
+          <h2 className="text-xl font-bold text-skd-text animate-pulse">Mempersiapkan Arena...</h2>
+        </div>
+      )}
+
       {/* Floating Score Reward */}
       <AnimatePresence>
         {showRewardFloat && (
@@ -207,8 +247,8 @@ export default function Quiz() {
         )}
       </AnimatePresence>
 
-      {/* Main layout */}
-      <div className={`flex flex-1 overflow-hidden ${(gameMode === 'pvp' || gameMode === 'pvp1v1') ? 'flex-row' : 'flex-col items-center'}`}>
+      {/* Main layout — only render when data is ready */}
+      {currentQuestion && <div className={`flex flex-1 overflow-hidden ${(gameMode === 'pvp' || gameMode === 'pvp1v1') ? 'flex-row' : 'flex-col items-center'}`}>
 
         {/* === Quiz Panel === */}
         <div className="flex flex-col flex-1 h-full min-w-0">
@@ -242,18 +282,26 @@ export default function Quiz() {
               </div>
             </div>
 
-            {/* Circular Timer */}
+            {/* Circular Timer (or text for Tryout) */}
             <div className="relative w-11 h-11 flex items-center justify-center">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 40 40">
-                <circle cx="20" cy="20" r="18" fill="none" className="stroke-skd-muted/20" strokeWidth="3" />
-                <circle
-                  cx="20" cy="20" r="18" fill="none"
-                  className={`stroke-current transition-all duration-1000 ease-linear ${timerColor}`}
-                  strokeWidth="3" strokeDasharray="113.097" strokeDashoffset={strokeDashoffset}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span className={`absolute font-space font-bold text-sm ${timerColor}`}>{timeLeft}</span>
+              {gameMode === 'tryout' ? (
+                <div className={`font-space font-bold text-xs bg-skd-card px-2 py-1 rounded border border-skd-border ${timerColor}`}>
+                  {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+                </div>
+              ) : (
+                <>
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r="18" fill="none" className="stroke-skd-muted/20" strokeWidth="3" />
+                    <circle
+                      cx="20" cy="20" r="18" fill="none"
+                      className={`stroke-current transition-all duration-1000 ease-linear ${timerColor}`}
+                      strokeWidth="3" strokeDasharray="113.097" strokeDashoffset={strokeDashoffset}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className={`absolute font-space font-bold text-sm ${timerColor}`}>{timeLeft}</span>
+                </>
+              )}
             </div>
           </header>
 
@@ -300,38 +348,48 @@ export default function Quiz() {
                     const isTKP = currentQuestion.category === 'TKP';
 
                     let cardClass = 'bg-skd-card hover:bg-skd-muted/5 border-skd-border';
-                    if (showStatus) {
+                    let markerClass = 'bg-skd-muted/10 text-skd-text';
+                    
+                    if (gameMode === 'tryout') {
+                      if (isSelected) {
+                        cardClass = 'bg-blue-500/15 border-blue-400';
+                        markerClass = 'bg-blue-500 text-white';
+                      }
+                    } else if (showStatus) {
                       if (isTKP) {
-                        // TKP: highlight selected only, no strict right/wrong coloring
-                        if (isSelected) cardClass = 'bg-orange-500/15 border-orange-400';
+                        if (isSelected) {
+                          cardClass = 'bg-orange-500/15 border-orange-400';
+                          markerClass = 'bg-orange-400 text-white';
+                        }
                         else cardClass = 'bg-skd-card border-skd-border opacity-50';
                       } else {
-                        if (isCorrect)      cardClass = 'bg-skd-success/20 border-skd-success';
-                        else if (isSelected) cardClass = 'bg-skd-danger/20 border-skd-danger';
-                        else                cardClass = 'bg-skd-card border-skd-border opacity-40';
+                        if (isCorrect) {
+                          cardClass = 'bg-skd-success/20 border-skd-success';
+                          markerClass = 'bg-skd-success text-white';
+                        }
+                        else if (isSelected) {
+                          cardClass = 'bg-skd-danger/20 border-skd-danger';
+                          markerClass = 'bg-skd-danger text-white';
+                        }
+                        else cardClass = 'bg-skd-card border-skd-border opacity-40';
                       }
                     }
 
                     return (
                       <motion.button
                         key={opt.id}
-                        whileTap={!selected ? { scale: 0.98 } : {}}
+                        whileTap={(!selected || gameMode === 'tryout') ? { scale: 0.98 } : {}}
                         onClick={() => handleSelect(opt.id)}
-                        disabled={selected !== null}
+                        disabled={selected !== null && gameMode !== 'tryout'}
                         className={`w-full p-3.5 md:p-4 rounded-xl border text-left flex items-center gap-3 transition-all shadow-sm ${cardClass}`}
                       >
-                        <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base
-                          ${showStatus && !isTKP && isCorrect ? 'bg-skd-success text-white' :
-                            showStatus && !isTKP && isSelected ? 'bg-skd-danger text-white' :
-                            showStatus && isTKP && isSelected ? 'bg-orange-400 text-white' :
-                            'bg-skd-muted/10 text-skd-text'}`}
-                        >
+                        <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base ${markerClass}`}>
                           {opt.id}
                         </div>
                         <span className="flex-1 leading-snug text-sm md:text-base font-medium text-skd-text">{opt.text}</span>
 
-                        {/* TKP score badge revealed after answering */}
-                        {showStatus && isTKP && (
+                        {/* TKP score badge revealed after answering (not in tryout) */}
+                        {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
                             ${opt.score === 50 ? 'bg-skd-success/20 text-skd-success' :
                               opt.score >= 30 ? 'bg-orange-500/15 text-orange-400' :
@@ -340,14 +398,73 @@ export default function Quiz() {
                           </span>
                         )}
 
-                        {/* Score tag for TWK/TIU revealed after answering */}
-                        {showStatus && !isTKP && isCorrect && (
+                        {/* Score tag for TWK/TIU revealed after answering (not in tryout) */}
+                        {showStatus && !isTKP && isCorrect && gameMode !== 'tryout' && (
                           <span className="ml-auto shrink-0 text-xs font-bold bg-skd-success/20 text-skd-success px-2 py-1 rounded-lg">50 pts</span>
                         )}
                       </motion.button>
                     );
                   })}
                 </div>
+
+                {/* Explanation Box (Pembahasan) */}
+                {selected !== null && gameMode !== 'tryout' && (
+                  <div className="pt-4">
+                    {!showExplanation ? (
+                      <button
+                        onClick={handleShowExplanation}
+                        className="w-full py-3 bg-skd-primary/10 hover:bg-skd-primary/20 text-skd-primary rounded-xl font-bold text-sm transition-colors"
+                      >
+                        Lihat Pembahasan Soal
+                      </button>
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="bg-blue-500/10 border border-blue-500/20 p-5 rounded-xl space-y-3"
+                      >
+                        <h4 className="font-bold text-blue-400">Pembahasan:</h4>
+                        <p className="text-sm md:text-base text-skd-text leading-relaxed">
+                          {currentQuestion.explanation || 'Pembahasan tidak tersedia untuk soal ini.'}
+                        </p>
+                        <button
+                          onClick={() => goNextOrFinish(totalScoreRef.current)}
+                          className="mt-4 w-full py-3 bg-skd-primary hover:bg-skd-primary-hover text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
+                        >
+                          Lanjut ke Soal Berikutnya
+                        </button>
+                      </motion.div>
+                    )}
+                  </div>
+                )}
+                {/* Tryout Navigation Buttons */}
+                {gameMode === 'tryout' && (
+                  <div className="flex justify-between items-center pt-4 mt-6 border-t border-skd-border">
+                    <button
+                      onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                      disabled={currentQuestionIndex === 0}
+                      className="px-5 py-2.5 bg-skd-card border border-skd-border rounded-xl font-bold text-skd-text disabled:opacity-30 transition-all hover:bg-skd-muted/10"
+                    >
+                      Sebelumnya
+                    </button>
+                    
+                    {currentQuestionIndex < totalQuestions - 1 ? (
+                      <button
+                        onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
+                        className="px-5 py-2.5 bg-skd-primary hover:bg-skd-primary-hover text-white rounded-xl font-bold shadow-md transition-all active:scale-95"
+                      >
+                        Selanjutnya
+                      </button>
+                    ) : (
+                      <button
+                        onClick={finishTryout}
+                        className="px-6 py-2.5 bg-skd-success hover:bg-skd-success/90 text-white rounded-xl font-black shadow-lg shadow-skd-success/20 transition-all active:scale-95"
+                      >
+                        Kumpulkan Ujian
+                      </button>
+                    )}
+                  </div>
+                )}
               </motion.div>
             </AnimatePresence>
           </main>
@@ -410,7 +527,7 @@ export default function Quiz() {
             </div>
           </div>
         )}
-      </div>
+      </div>}
     </div>
   );
 }
