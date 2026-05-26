@@ -6,6 +6,7 @@ import {
   LogOut, UserPlus, Trash2, CheckCircle2, SquarePen, Lock
 } from 'lucide-react';
 import avatarPdh from '../assets/avatar_pdh.png';
+import RankBadge, { RankCard } from '../components/RankBadge';
 
 const MOCK_STATS = [
   { label: 'Total Soal Dijawab', value: '1,452', icon: Target, color: 'text-blue-400' },
@@ -315,7 +316,12 @@ export default function Profile() {
                 Pejuang SKD
               </div>
               <h2 className="text-4xl font-black mb-2 tracking-tight">Raden Saori</h2>
-              <p className="text-gray-400 mb-6 font-space">@raden.saori</p>
+              <p className="text-gray-400 mb-3 font-space">@raden.saori</p>
+              
+              {/* Rank Badge in Profile */}
+              <div className="mb-4">
+                <RankBadge score={3800} size="md" />
+              </div>
 
               <div className="flex items-center gap-6 mb-6 justify-center md:justify-start">
                 <div 
@@ -353,8 +359,17 @@ export default function Profile() {
           </motion.section>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Left Column: Stats & Pinned Badges */}
+            {/* Left Column: Rank Card + Stats + Pinned Badges */}
             <div className="md:col-span-2 space-y-8">
+
+              {/* ★ Season Rank Card */}
+              <motion.section variants={itemVariants}>
+                <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
+                  <Trophy size={24} className="text-skd-accent" />
+                  Rank Musim Ini
+                </h3>
+                <RankCard score={3800} />
+              </motion.section>
               
               {/* Statistics Grid */}
               <motion.section variants={itemVariants}>

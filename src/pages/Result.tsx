@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, CheckCircle2, XCircle, ArrowRight, Coins, Zap } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ChevronDown, ChevronUp, CheckCircle2, XCircle, ArrowRight, Coins, Zap, Trophy, Medal } from 'lucide-react';
 
 const DUMMY_REVIEW = [
   {
@@ -42,8 +42,24 @@ function AnimatedCounter({ end, duration = 2, suffix = '' }: { end: number, dura
 
 export default function Result() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showReview, setShowReview] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<number | null>(null);
+
+  const score = location.state?.score || 450;
+  const gameMode = location.state?.mode || 'latihan';
+  const receivedRanks: {name: string; score: number; isMe?: boolean}[] = location.state?.liveRanks || [];
+
+  // Final leaderboard for PvP — use real data if available
+  const finalRanks = receivedRanks.length > 0
+    ? [...receivedRanks].sort((a, b) => b.score - a.score)
+    : [
+        { name: 'Anda', score: score, isMe: true },
+        { name: 'Player44', score: 3200 },
+        { name: 'ASN_Pro', score: 2850 },
+        { name: 'JagoanSkd', score: 1500 },
+        { name: 'Mager', score: 800 }
+      ].sort((a, b) => b.score - a.score);
 
   return (
     <div className="min-h-screen bg-skd-bg flex flex-col items-center transition-colors">
@@ -54,21 +70,73 @@ export default function Result() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", bounce: 0.5 }}
-          className="bg-gradient-to-r from-skd-premium to-skd-accent p-1 rounded-full shadow-lg"
+          className={`bg-gradient-to-r p-1 rounded-full shadow-lg ${(gameMode === 'pvp' || gameMode === 'pvp1v1') ? 'from-blue-500 to-cyan-400' : 'from-skd-premium to-skd-accent'}`}
         >
-          <div className="bg-skd-bg px-6 py-2 rounded-full font-bold tracking-widest text-sm text-skd-text">
-            LATIHAN SELESAI
+          <div className="bg-skd-bg px-6 py-2 rounded-full font-bold tracking-widest text-sm text-skd-text uppercase">
+            {(gameMode === 'pvp' || gameMode === 'pvp1v1') ? 'PvP BATTLE SELESAI' : gameMode === 'survival' ? 'SURVIVAL BERAKHIR' : 'LATIHAN SELESAI'}
           </div>
         </motion.div>
 
-        {/* Big Score */}
-        <div className="text-center space-y-2 relative">
-          <div className="absolute inset-0 bg-skd-accent/20 blur-[60px] -z-10 rounded-full" />
-          <h1 className="text-7xl md:text-8xl font-black text-skd-text font-space tracking-tighter">
-            <AnimatedCounter end={450} />
-          </h1>
-          <p className="text-skd-muted font-bold tracking-widest">TOTAL SKOR</p>
-        </div>
+        {(gameMode === 'pvp' || gameMode === 'pvp1v1') ? (
+          <div className="w-full max-w-xl space-y-6">
+            <h2 className="text-3xl md:text-4xl font-black text-center text-skd-text mb-8">Papan Peringkat Akhir</h2>
+            
+            {/* Podium Top 3 */}
+            <div className="flex items-end justify-center gap-2 md:gap-4 h-48 mb-12">
+              {[finalRanks[1], finalRanks[0], finalRanks[2]].map((rank, idx) => {
+                const isFirst = idx === 1;
+                const isSecond = idx === 0;
+                const isThird = idx === 2;
+                if (!rank) return null;
+                
+                const height = isFirst ? 'h-40' : isSecond ? 'h-32' : 'h-24';
+                const color = isFirst ? 'bg-yellow-500' : isSecond ? 'bg-gray-300' : 'bg-amber-600';
+                
+                return (
+                  <motion.div 
+                    key={rank.name}
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: idx * 0.2, type: 'spring' }}
+                    className="flex flex-col items-center flex-1"
+                  >
+                    <div className="text-xs md:text-sm font-bold mb-2 text-center break-all">
+                      {rank.name === 'Anda' ? <span className="text-blue-500 font-black">ANDA</span> : rank.name}
+                    </div>
+                    <div className="text-xs font-bold text-skd-muted mb-2 font-space">{rank.score}</div>
+                    <div className={`w-full ${height} ${color} rounded-t-lg relative flex justify-center shadow-lg`}>
+                      <div className="absolute -top-5 bg-skd-card rounded-full p-1 border-2 border-skd-bg">
+                        {isFirst ? <Trophy size={20} className="text-yellow-600" /> : <Medal size={20} className={isSecond ? 'text-gray-600' : 'text-amber-800'} />}
+                      </div>
+                      <div className="mt-8 font-black text-2xl text-skd-bg/50">{isFirst ? '1' : isSecond ? '2' : '3'}</div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Other Ranks */}
+            <div className="space-y-3">
+              {finalRanks.slice(3).map((rank, index) => (
+                <div key={rank.name} className={`flex items-center justify-between p-4 rounded-xl border ${rank.isMe ? 'bg-blue-500/10 border-blue-500' : 'bg-skd-card border-skd-border'}`}>
+                   <div className="flex items-center gap-4">
+                     <span className="font-bold text-skd-muted w-6 text-center">{index + 4}</span>
+                     <span className={`font-bold ${rank.isMe ? 'text-blue-500' : 'text-skd-text'}`}>{rank.name}</span>
+                   </div>
+                   <span className="font-space font-bold text-skd-muted">{rank.score} pts</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center space-y-2 relative">
+            <div className="absolute inset-0 bg-skd-accent/20 blur-[60px] -z-10 rounded-full" />
+            <h1 className="text-7xl md:text-8xl font-black text-skd-text font-space tracking-tighter">
+              <AnimatedCounter end={score} />
+            </h1>
+            <p className="text-skd-muted font-bold tracking-widest">TOTAL SKOR</p>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 md:gap-6 w-full max-w-xl">
