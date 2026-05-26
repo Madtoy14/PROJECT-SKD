@@ -164,3 +164,80 @@ export const createPvpRoom = async (hostId: string, code: string): Promise<any> 
 
   return data;
 };
+
+// 5. Mengambil Soal dari Supabase (Soal SKD)
+export const fetchQuestionsFromSupabase = async (gameMode: string) => {
+  if (!isSupabaseConfigured()) {
+    // Fallback ke data statis jika Supabase belum disetup
+    const { SOAL_SKD } = await import('../data/soal');
+    return SOAL_SKD;
+  }
+
+  try {
+    let questions: any[] = [];
+    
+    if (gameMode === 'latihan' || gameMode === 'survival') {
+      // 10 soal acak
+      const { data, error } = await supabase!.rpc('get_random_soal', { limit_count: 10 });
+      if (error) {
+        // Fallback jika RPC belum ada
+        const res = await supabase!.from('soal_skd').select('*').limit(50);
+        if (res.error) throw res.error;
+        questions = res.data.sort(() => 0.5 - Math.random()).slice(0, 10);
+      } else {
+        questions = data;
+      }
+    } else if (gameMode === 'pvp' || gameMode === 'pvp1v1') {
+      // 15 soal acak
+      const { data, error } = await supabase!.rpc('get_random_soal', { limit_count: 15 });
+      if (error) {
+        const res = await supabase!.from('soal_skd').select('*').limit(50);
+        if (res.error) throw res.error;
+        questions = res.data.sort(() => 0.5 - Math.random()).slice(0, 15);
+      } else {
+        questions = data;
+      }
+    } else if (gameMode === 'tryout') {
+      // 110 soal berdasar kategori: 35 TIU, 30 TWK, 45 TKP
+      const fetchCategory = async (tipe: string, limit: number) => {
+        const { data, error } = await supabase!.rpc('get_random_soal_by_tipe', { soal_tipe: tipe, limit_count: limit });
+        if (error) {
+          const res = await supabase!.from('soal_skd').select('*').eq('tipe', tipe).limit(limit * 2);
+          if (res.error) throw res.error;
+          return res.data.sort(() => 0.5 - Math.random()).slice(0, limit);
+        }
+        return data;
+      };
+
+      const [tiu, twk, tkp] = await Promise.all([
+        fetchCategory('TIU', 35),
+        fetchCategory('TWK', 30),
+        fetchCategory('TKP', 45)
+      ]);
+      
+      questions = [...twk, ...tiu, ...tkp]; // Susunan biasa: TWK, TIU, TKP
+    } else {
+      // Default: ambil 10
+      const { data, error } = await supabase!.from('soal_skd').select('*').limit(10);
+      if (error) throw error;
+      questions = data;
+    }
+
+    // Mapping agar formatnya sesuai dengan interface di aplikasi
+    return questions.map(q => ({
+      id: q.id,
+      category: q.tipe,
+      question: q.pertanyaan,
+      options: Array.isArray(q.opsi) ? q.opsi : (typeof q.opsi === 'object' ? 
+        Object.keys(q.opsi).map(key => ({ id: key, text: q.opsi[key], score: q.tipe === 'TKP' ? (parseInt(key) || 1)*10 : (key === q.kunci ? 50 : 0) })) 
+        : []),
+      correct: q.kunci,
+      explanation: q.pembahasan
+    }));
+
+  } catch (err) {
+    console.error('Gagal mengambil soal dari Supabase, fallback ke data lokal:', err);
+    const { SOAL_SKD } = await import('../data/soal');
+    return SOAL_SKD;
+  }
+};

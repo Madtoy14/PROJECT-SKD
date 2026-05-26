@@ -98,3 +98,47 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 5. Tabel Soal SKD
+CREATE TABLE IF NOT EXISTS public.soal_skd (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    tipe TEXT NOT NULL, -- Isinya wajib: 'TWK', 'TIU', atau 'TKP'
+    pertanyaan TEXT NOT NULL,
+    opsi JSONB NOT NULL, -- Menyimpan array opsi atau object {"A": "...", "B": "..."}
+    kunci VARCHAR(2) NOT NULL, -- 'A', 'B', 'C', 'D', 'E'
+    pembahasan TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Buat index agar filter tipe cepat
+CREATE INDEX IF NOT EXISTS idx_soal_skd_tipe ON public.soal_skd(tipe);
+
+-- Aktifkan RLS pada soal_skd
+ALTER TABLE public.soal_skd ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Semua orang bisa melihat soal" ON public.soal_skd
+    FOR SELECT USING (true);
+
+-- 6. Fungsi RPC untuk Mengambil Soal Acak
+-- Digunakan untuk mode Latihan Harian, Survival, dan PvP (soal campuran acak)
+CREATE OR REPLACE FUNCTION get_random_soal(limit_count INT)
+RETURNS SETOF public.soal_skd AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM public.soal_skd
+    ORDER BY random()
+    LIMIT limit_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Digunakan untuk mode Try Out Akbar (soal per tipe acak)
+CREATE OR REPLACE FUNCTION get_random_soal_by_tipe(soal_tipe TEXT, limit_count INT)
+RETURNS SETOF public.soal_skd AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM public.soal_skd
+    WHERE tipe = soal_tipe
+    ORDER BY random()
+    LIMIT limit_count;
+END;
+$$ LANGUAGE plpgsql;

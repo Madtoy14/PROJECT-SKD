@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Trophy, Skull, Users, ChevronUp, ChevronDown } from 'lucide-react';
-import { SOAL_SKD } from '../data/soal';
+import { X, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2 } from 'lucide-react';
+import { fetchQuestionsFromSupabase } from '../lib/supabase';
 
 // --- Dummy PvP Players for simulation ---
 const DUMMY_PLAYERS = [
@@ -22,6 +22,8 @@ export default function Quiz() {
   const TOTAL_TIME = gameMode === 'survival' ? 20 : 45;
 
   // --- Quiz state ---
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [selected, setSelected] = useState<string | null>(null);
@@ -45,15 +47,36 @@ export default function Quiz() {
   const [myRankPosition, setMyRankPosition] = useState(1);
   const totalScoreRef = useRef(0); // keep a ref so setTimeout closures can read latest value
 
-  const currentQuestion = SOAL_SKD[currentQuestionIndex];
-  const totalQuestions = SOAL_SKD.length;
+  // Fetch questions on mount
+  useEffect(() => {
+    let mounted = true;
+    fetchQuestionsFromSupabase(gameMode).then(data => {
+      if (mounted) {
+        setQuestions(data);
+        setLoadingQuestions(false);
+      }
+    });
+    return () => { mounted = false; };
+  }, [gameMode]);
+
+  if (loadingQuestions) {
+    return (
+      <div className="min-h-screen bg-skd-bg flex flex-col items-center justify-center p-4">
+        <Loader2 className="animate-spin text-blue-500 mb-4" size={48} />
+        <h2 className="text-xl font-bold text-skd-text animate-pulse">Mempersiapkan Arena...</h2>
+      </div>
+    );
+  }
+
+  const currentQuestion = questions[currentQuestionIndex];
+  const totalQuestions = questions.length;
   const progress = (timeLeft / TOTAL_TIME) * 100;
   const strokeDashoffset = ((100 - progress) / 100) * 113.097;
   const timerColor = timeLeft <= 10 ? 'text-skd-danger' : timeLeft <= 20 ? 'text-skd-accent' : 'text-skd-success';
 
   // Calculate score for a picked option
   const calcScore = (optionId: string): number => {
-    const opt = currentQuestion.options.find(o => o.id === optionId);
+    const opt = currentQuestion.options.find((o: any) => o.id === optionId);
     return opt?.score ?? 0;
   };
 
