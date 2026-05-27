@@ -249,7 +249,7 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
              parsedOptions = rawOpsi.map((text, i) => ({
                id: labels[i] || String(i),
                text: text,
-               score: q.tipe === 'TKP' ? (i + 1) * 10 : (labels[i] === q.kunci ? 50 : 0)
+               score: q.tipe === 'TKP' ? (i + 1) * (gameMode === 'tryout' ? 1 : 10) : (labels[i] === q.kunci ? (gameMode === 'tryout' ? 5 : 50) : 0)
              }));
           } else {
              parsedOptions = rawOpsi;
@@ -261,7 +261,7 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
             return {
               id: key,
               text: String(val),
-              score: q.tipe === 'TKP' ? (parseInt(key) || 1) * 10 : (key === q.kunci ? 50 : 0)
+              score: q.tipe === 'TKP' ? (parseInt(key) || 1) * (gameMode === 'tryout' ? 1 : 10) : (key === q.kunci ? (gameMode === 'tryout' ? 5 : 50) : 0)
             };
           }).sort((a, b) => a.id.localeCompare(b.id));
         }
