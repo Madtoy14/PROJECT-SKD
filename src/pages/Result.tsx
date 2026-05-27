@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Coins, Zap, ArrowRight, Award, AlertTriangle 
+import {
+  Coins, Zap, ArrowRight, Award, AlertTriangle
 } from 'lucide-react';
 import { fetchProfile, updateProfile } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
@@ -16,7 +16,7 @@ function AnimatedCounter({ end, duration = 2, suffix = '' }: { end: number, dura
       if (!startTime) startTime = time;
       const progress = Math.min((time - startTime) / (duration * 1000), 1);
       const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      
+
       setCount(Math.floor(easeProgress * end));
       if (progress < 1) requestAnimationFrame(animate);
     };
@@ -35,48 +35,33 @@ export default function Result() {
   const isTryout = gameMode === 'tryout';
 
   const score = location.state?.score || 0;
-  
+
   // Try Out Score Breakdowns
   const twkScore = location.state?.twkScore || 0;
   const tiuScore = location.state?.tiuScore || 0;
   const tkpScore = location.state?.tkpScore || 0;
-  
+
   const userAnswers = location.state?.userAnswers;
   const quizQuestions = location.state?.quizQuestions;
 
-  const receivedRanks: {name: string; score: number; isMe?: boolean}[] = location.state?.liveRanks || [];
+  const receivedRanks: { name: string; score: number; isMe?: boolean }[] = location.state?.liveRanks || [];
   const earnedCoins = isTryout ? 300 : gameMode === 'survival' ? Math.floor(score * 0.2) : 50;
   const gainedXP = isTryout ? 500 : gameMode === 'survival' ? score : 150;
-
-  const [actualEarnedCoins, setActualEarnedCoins] = useState(earnedCoins);
-  const [boosterActive, setBoosterActive] = useState(false);
 
   // Load and update user profile dynamic reward on mount
   useEffect(() => {
     fetchProfile().then(async (p) => {
       setProfile(p);
-      
-      let finalEarnedCoins = earnedCoins;
-      let updatedInv = { ...p.inventory };
-      
-      if (p.inventory && typeof p.inventory.item_coin_booster === 'number' && p.inventory.item_coin_booster > 0) {
-        finalEarnedCoins = earnedCoins * 2;
-        updatedInv.item_coin_booster = p.inventory.item_coin_booster - 1;
-        setBoosterActive(true);
-        setActualEarnedCoins(finalEarnedCoins);
-      } else {
-        setActualEarnedCoins(earnedCoins);
-      }
-      
+
       // Award coins and XP
-      const updatedCoins = p.coins + finalEarnedCoins;
+      const updatedCoins = p.coins + earnedCoins;
       const updatedScore = p.score + gainedXP;
-      
+
       // Calculate level up
       const currentLevel = p.level;
       let newLevel = currentLevel;
       let tempXP = updatedScore;
-      
+
       while (tempXP >= newLevel * 1000) {
         tempXP -= newLevel * 1000;
         newLevel += 1;
@@ -84,7 +69,7 @@ export default function Result() {
 
       // Check daily quest triggers and update quests_progress
       let questsProgress = { ...(p.quests_progress || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }) };
-      
+
       if (quizQuestions && userAnswers) {
         let twkCorrectCount = 0;
         let tiuCompleted = false;
@@ -113,25 +98,24 @@ export default function Result() {
         coins: updatedCoins,
         score: updatedScore,
         level: newLevel,
-        quests_progress: questsProgress,
-        inventory: updatedInv as any
+        quests_progress: questsProgress
       });
     });
   }, [earnedCoins, gainedXP, gameMode, quizQuestions, userAnswers]);
 
   // Strict compiler workaround (read vars)
-  if (profile) {}
+  if (profile) { }
 
   // PvP Leaderboard rendering fallback
   const finalRanks = receivedRanks.length > 0
     ? [...receivedRanks].sort((a, b) => b.score - a.score)
     : [
-        { name: 'Anda', score: score, isMe: true },
-        { name: 'Player44', score: 3200 },
-        { name: 'ASN_Pro', score: 2850 },
-        { name: 'JagoanSkd', score: 1500 },
-        { name: 'Mager',    score: 800 }
-      ].sort((a, b) => b.score - a.score);
+      { name: 'Anda', score: score, isMe: true },
+      { name: 'Player44', score: 3200 },
+      { name: 'ASN_Pro', score: 2850 },
+      { name: 'JagoanSkd', score: 1500 },
+      { name: 'Mager', score: 800 }
+    ].sort((a, b) => b.score - a.score);
 
   // Dynamic Passing Grade Ambang Batas Calculations based on questions count
   const twkQuestionsCount = quizQuestions?.filter((q: any) => q.category === 'TWK').length || 30;
@@ -141,7 +125,7 @@ export default function Result() {
   // Scale passing grades proportionally if question count is less than CPNS standard
   const twkPassThreshold = twkQuestionsCount < 30 ? Math.ceil(twkQuestionsCount * 0.433 * 5) : 65;
   const tiuPassThreshold = tiuQuestionsCount < 35 ? Math.ceil(tiuQuestionsCount * 0.457 * 5) : 80;
-  const tkpPassThreshold = tkpQuestionsCount < 45 ? Math.ceil(tkpQuestionsCount * 0.293 * 5) : 66; // 66 Custom TKP threshold requested by user
+  const tkpPassThreshold = tkpQuestionsCount < 45 ? Math.ceil(tkpQuestionsCount * 0.293 * 5) : 166;
 
   const isTwkPass = twkScore >= twkPassThreshold;
   const isTiuPass = tiuScore >= tiuPassThreshold;
@@ -151,9 +135,9 @@ export default function Result() {
   return (
     <div className="min-h-screen bg-skd-bg flex flex-col items-center transition-colors pb-24">
       <div className="w-full max-w-3xl p-4 md:p-8 flex flex-col items-center pt-8 md:pt-12 space-y-8 md:space-y-12">
-        
+
         {/* Header Badges */}
-        <motion.div 
+        <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", bounce: 0.5 }}
@@ -169,16 +153,14 @@ export default function Result() {
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className={`w-full max-w-xl rounded-3xl p-[2px] overflow-hidden shadow-2xl relative ${
-              isLulusSkd 
-                ? 'bg-gradient-to-r from-skd-success via-emerald-400 to-green-500 shadow-skd-success/20' 
-                : 'bg-gradient-to-r from-skd-danger via-rose-500 to-red-600 shadow-skd-danger/20'
-            }`}
+            className={`w-full max-w-xl rounded-3xl p-[2px] overflow-hidden shadow-2xl relative ${isLulusSkd
+              ? 'bg-gradient-to-r from-skd-success via-emerald-400 to-green-500 shadow-skd-success/20'
+              : 'bg-gradient-to-r from-skd-danger via-rose-500 to-red-600 shadow-skd-danger/20'
+              }`}
           >
             <div className="bg-[#1A1924] rounded-[22px] p-6 text-center space-y-4">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border ${
-                isLulusSkd ? 'bg-skd-success/10 border-skd-success/20 text-skd-success' : 'bg-skd-danger/10 border-skd-danger/20 text-skd-danger'
-              }`}>
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border ${isLulusSkd ? 'bg-skd-success/10 border-skd-success/20 text-skd-success' : 'bg-skd-danger/10 border-skd-danger/20 text-skd-danger'
+                }`}>
                 {isLulusSkd ? <Award size={36} /> : <AlertTriangle size={36} />}
               </div>
               <div>
@@ -186,7 +168,7 @@ export default function Result() {
                   {isLulusSkd ? 'LULUS AMBANG BATAS!' : 'BELUM MEMENUHI AMBANG BATAS'}
                 </h2>
                 <p className="text-xs text-skd-muted mt-2 leading-relaxed max-w-md mx-auto">
-                  {isLulusSkd 
+                  {isLulusSkd
                     ? 'Luar biasa! Skor perolehan Anda pada semua kategori (TWK, TIU, TKP) berhasil melewati ambang batas nasional Seleksi Kompetensi Dasar BKN!'
                     : 'Jangan berkecil hati. Masih ada kategori nilai yang berada di bawah standar kelulusan nasional. Mari tinjau kembali pembahasan soal dan perbanyak latihan!'}
                 </p>
@@ -199,18 +181,18 @@ export default function Result() {
         {(gameMode === 'pvp' || gameMode === 'pvp1v1') ? (
           <div className="w-full max-w-xl space-y-6">
             <h2 className="text-3xl md:text-4xl font-black text-center text-skd-text mb-8">Papan Peringkat Akhir</h2>
-            
+
             <div className="flex items-end justify-center gap-2 md:gap-4 h-48 mb-12">
               {[finalRanks[1], finalRanks[0], finalRanks[2]].map((rank, idx) => {
                 const isFirst = idx === 1;
                 const isSecond = idx === 0;
                 if (!rank) return null;
-                
+
                 const height = isFirst ? 'h-40' : isSecond ? 'h-32' : 'h-24';
                 const color = isFirst ? 'bg-yellow-500 shadow-yellow-500/20' : isSecond ? 'bg-gray-300 shadow-white/10' : 'bg-amber-600 shadow-amber-500/10';
-                
+
                 return (
-                  <motion.div 
+                  <motion.div
                     key={rank.name}
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -230,11 +212,11 @@ export default function Result() {
             <div className="space-y-3">
               {finalRanks.slice(3).map((rank, index) => (
                 <div key={rank.name} className={`flex items-center justify-between p-4 rounded-xl border ${rank.isMe ? 'bg-blue-500/10 border-blue-500' : 'bg-skd-card border-skd-border'}`}>
-                   <div className="flex items-center gap-4">
-                     <span className="font-bold text-skd-muted w-6 text-center">{index + 4}</span>
-                     <span className={`font-bold ${rank.isMe ? 'text-blue-500' : 'text-skd-text'}`}>{rank.name}</span>
-                   </div>
-                   <span className="font-space font-bold text-skd-muted">{rank.score} pts</span>
+                  <div className="flex items-center gap-4">
+                    <span className="font-bold text-skd-muted w-6 text-center">{index + 4}</span>
+                    <span className={`font-bold ${rank.isMe ? 'text-blue-500' : 'text-skd-text'}`}>{rank.name}</span>
+                  </div>
+                  <span className="font-space font-bold text-skd-muted">{rank.score} pts</span>
                 </div>
               ))}
             </div>
@@ -260,7 +242,7 @@ export default function Result() {
                 {isTwkPass ? `Lolos (Min. ${twkPassThreshold})` : `Gagal (Min. ${twkPassThreshold})`}
               </span>
             </div>
-            
+
             {/* TIU Card */}
             <div className={`p-4 rounded-2xl border text-center bg-[#1A1924] ${isTiuPass ? 'border-skd-success/40' : 'border-skd-danger/40'}`}>
               <span className="block text-[9px] text-gray-400 font-bold uppercase mb-1">Inteligensia Umum</span>
@@ -298,28 +280,22 @@ export default function Result() {
         )}
 
         {/* Rewards section */}
-        <motion.div 
+        <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="w-full max-w-xl bg-skd-card/80 border border-skd-border rounded-3xl p-5 md:p-6 grid grid-cols-2 gap-4 md:flex md:justify-around md:items-center shadow-sm"
+          className="w-full max-w-xl bg-skd-card/80 border border-skd-border rounded-3xl p-5 md:p-6 flex justify-around items-center shadow-sm"
         >
           <div className="flex items-center gap-3 md:gap-4">
             <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-yellow-500/10 flex items-center justify-center">
               <Coins className="text-yellow-500 fill-yellow-500 w-6 h-6 md:w-8 md:h-8" />
             </div>
             <div>
-              <p className="text-xs md:text-sm text-skd-muted font-bold text-left">Koin Diperoleh</p>
-              <p className="font-bold font-space text-xl md:text-2xl text-yellow-500 flex items-center gap-1.5">
-                <span>+</span>
-                <AnimatedCounter end={actualEarnedCoins} duration={2.5} />
-                {boosterActive && (
-                  <span className="text-[9px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded-full font-bold animate-pulse">2X</span>
-                )}
-              </p>
+              <p className="text-xs md:text-sm text-skd-muted font-bold">Koin Diperoleh</p>
+              <p className="font-bold font-space text-xl md:text-2xl text-yellow-500">+<AnimatedCounter end={earnedCoins} duration={2.5} /></p>
             </div>
           </div>
-          <div className="hidden md:block w-px h-12 md:h-16 bg-skd-border" />
+          <div className="w-px h-12 md:h-16 bg-skd-border" />
           <div className="flex items-center gap-3 md:gap-4">
             <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-skd-premium/10 flex items-center justify-center">
               <Zap className="text-skd-premium fill-skd-premium w-6 h-6 md:w-8 md:h-8" />
@@ -333,13 +309,13 @@ export default function Result() {
 
         {/* Action Buttons */}
         <div className="w-full max-w-xl space-y-3 pt-4">
-          {gameMode === "tryout" && (<button 
+          <button
             onClick={() => navigate('/pembahasan-tryout', { state: { userAnswers, quizQuestions } })}
             className="w-full py-4 rounded-2xl border-2 border-skd-border text-skd-text font-bold hover:bg-skd-muted/5 transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all"
           >
             Tinjau Pembahasan Lembar Jawaban <ArrowRight size={20} />
-          </button>)}
-          <button 
+          </button>
+          <button
             onClick={() => navigate('/')}
             className="w-full py-4 rounded-2xl bg-skd-text text-skd-bg font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all"
           >
