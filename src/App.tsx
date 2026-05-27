@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Home, Trophy, BookOpen, Store, User } from 'lucide-react';
-import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { Home, Trophy, BookOpen, Store, User, BookOpenCheck } from 'lucide-react';
+import { ThemeProvider } from './context/ThemeContext';
 import Dashboard from './pages/Dashboard';
 import Quiz from './pages/Quiz';
 import Result from './pages/Result';
@@ -10,6 +10,7 @@ import Shop from './pages/Shop';
 import Profile from './pages/Profile';
 import Auth from './pages/Auth';
 import Onboarding from './pages/Onboarding';
+import PembahasanTryout from './pages/PembahasanTryout';
 import { DuelProvider } from './context/DuelContext';
 import { AudioProvider } from './context/AudioContext';
 import IncomingDuelRequest from './components/IncomingDuelRequest';
@@ -25,6 +26,7 @@ function Navigation() {
     { path: '/', icon: Home, label: 'Home' },
     { path: '/liga', icon: Trophy, label: 'Liga' },
     { path: '/quest', icon: BookOpen, label: 'Quest' },
+    { path: '/pembahasan-tryout', icon: BookOpenCheck, label: 'Pembahasan' },
     { path: '/toko', icon: Store, label: 'Toko' },
     { path: '/profil', icon: User, label: 'Profil' },
   ];
@@ -106,6 +108,7 @@ function AppLayout() {
             <Route path="/quest" element={<Quest />} />
             <Route path="/toko" element={<Shop />} />
             <Route path="/profil" element={<Profile />} />
+            <Route path="/pembahasan-tryout" element={<PembahasanTryout />} />
           </Routes>
         </div>
       </main>

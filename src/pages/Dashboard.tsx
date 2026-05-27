@@ -2,10 +2,21 @@ import { useState, useEffect } from 'react';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
 import { Zap, Coins, Plus, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Sun, Moon, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Share2, Copy, Volume2, VolumeX } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { fetchProfile, updateProfile } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
 import { useAudio } from '../context/AudioContext';
 import RankBadge from '../components/RankBadge';
 import { getRankForScore, getCurrentSeason } from '../data/ranks';
+import avatarPdh from '../assets/avatar_pdh.png';
+
+const AVATAR_FILTERS: Record<string, string> = {
+  stmkg: 'hue-rotate-0',
+  ipdn: 'hue-rotate-30',
+  stan: 'hue-rotate-[160deg]',
+  hitamputih: 'grayscale brightness-110',
+  korpri: 'hue-rotate-[220deg] saturate-125',
+  pdh_kemendagri: 'brightness-95 contrast-105 saturate-110',
+};
 
 const GAME_MODES = [
   { id: 'latihan', title: 'Latihan Harian', desc: 'Asah kemampuanmu setiap hari', cost: 3, costType: 'energy', icon: BrainCircuit, color: 'text-skd-success', bg: 'bg-skd-success/10', border: 'border-skd-success/20 hover:border-skd-success hover:bg-skd-success/5', badge: 'Santai' },
@@ -70,6 +81,54 @@ export default function Dashboard() {
   const [energy, setEnergy] = useState(24);
   const [energyTimer, setEnergyTimer] = useState(150); // 150s = 2.5 mins
   const [globalCoins, setGlobalCoins] = useState(1240);
+  const [equippedAvatarId, setEquippedAvatarId] = useState('stmkg');
+
+  useEffect(() => {
+    fetchProfile().then(p => {
+      if (p) {
+        setEnergy(p.energy);
+        setGlobalCoins(p.coins);
+        setEquippedAvatarId(p.equipped_avatar_id || 'stmkg');
+        
+        // Cek & Amankan Streak Harian (Streak Protector)!
+        const lastClaimStr = localStorage.getItem('skdquest_last_claim_date');
+        const now = new Date();
+        const todayStr = now.toDateString();
+        
+        if (lastClaimStr) {
+          const lastClaimDate = new Date(lastClaimStr);
+          const timeDiff = now.getTime() - lastClaimDate.getTime();
+          const daysDiff = Math.floor(timeDiff / (24 * 60 * 60 * 1000));
+          
+          if (daysDiff > 1) {
+            // Melewatkan lebih dari 1 hari! Streak terancam pecah!
+            if (p.inventory && typeof p.inventory.item_streak_protector === 'number' && p.inventory.item_streak_protector > 0) {
+              const updatedInv = { ...p.inventory, item_streak_protector: p.inventory.item_streak_protector - 1 } as any;
+              updateProfile({ inventory: updatedInv }).then(() => {
+                setToastMessage(`🛡️ Streak Protector Aktif! Rantai streak ${p.streak} hari Anda berhasil diselamatkan!`);
+                setTimeout(() => setToastMessage(''), 5000);
+              });
+              setTotalStreak(p.streak);
+            } else {
+              // Streak pecah/patah ke 0
+              updateProfile({ streak: 0 });
+              setTotalStreak(0);
+              setToastMessage(`💔 Streak Anda terputus karena absen belajar. Mulai lagi dari 0!`);
+              setTimeout(() => setToastMessage(''), 5000);
+            }
+          } else {
+            setTotalStreak(p.streak ?? 29);
+            if (daysDiff === 0) {
+              setIsStreakClaimed(true);
+            }
+          }
+        } else {
+          setTotalStreak(p.streak ?? 29);
+          localStorage.setItem('skdquest_last_claim_date', todayStr);
+        }
+      }
+    });
+  }, []);
 
   // Streak State
   const [totalStreak, setTotalStreak] = useState(29); // Simulate: 29 days completed. Today is day 30!
@@ -285,6 +344,15 @@ export default function Dashboard() {
   };
 
   const handlePlayGame = (e: React.MouseEvent, path: string, modeId?: string, extraState: any = {}) => {
+    // Verifikasi energi sebelum bermain
+    const cost = selectedMode?.cost || 0;
+    const costType = selectedMode?.costType || 'energy';
+    
+    if (costType === 'energy' && energy < cost) {
+      setToastMessage(`Energi Anda tidak cukup! Dibutuhkan ${cost} energi.`);
+      setTimeout(() => setToastMessage(''), 3000);
+      return;
+    }
     if (!isStreakClaimed) {
       e.preventDefault();
 
@@ -307,13 +375,21 @@ export default function Dashboard() {
           msg = 'Quest Selesai! +10 Koin Streak Mingguan!';
         }
 
-        setGlobalCoins(prev => prev + bonus);
-        setToastMessage(msg);
+        const newCoins = globalCoins + bonus;
+        const newStreak = totalStreak + 1;
 
-        setTimeout(() => {
-          setToastMessage('');
-          navigate(path, { state: { mode: modeId, ...extraState } });
-        }, 2000);
+        setGlobalCoins(newCoins);
+        setTotalStreak(newStreak);
+        setToastMessage(msg);
+        localStorage.setItem('skdquest_last_claim_date', new Date().toDateString());
+
+        // Simpan perolehan koin dan streak permanen ke Supabase/Profile
+        updateProfile({ coins: newCoins, streak: newStreak }).then(() => {
+          setTimeout(() => {
+            setToastMessage('');
+            navigate(path, { state: { mode: modeId, ...extraState } });
+          }, 2000);
+        });
       }, 1000);
     } else {
       navigate(path, { state: { mode: modeId, ...extraState } });
@@ -340,7 +416,7 @@ export default function Dashboard() {
         variants={containerVariants}
         initial="hidden"
         animate="show"
-        className="p-4 md:p-6 space-y-5 max-w-5xl mx-auto pb-28"
+        className="p-4 md:p-6 space-y-5 max-w-5xl mx-auto pb-8 md:pb-12"
       >
         {/* ── Top Header (Profile, XP, Resources) ── */}
         <motion.div
@@ -349,8 +425,12 @@ export default function Dashboard() {
         >
           {/* Profile & XP Inline */}
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-skd-premium to-skd-accent p-0.5 shadow-sm shrink-0">
-              <div className="w-full h-full bg-skd-card rounded-full flex items-center justify-center font-bold text-xs text-skd-text">US</div>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-skd-premium to-skd-accent p-0.5 shadow-sm shrink-0 overflow-hidden">
+              <img 
+                src={avatarPdh} 
+                alt="Avatar" 
+                className={`w-full h-full rounded-full object-cover ${AVATAR_FILTERS[equippedAvatarId] || ''}`} 
+              />
             </div>
             <div className="flex flex-col flex-1 min-w-[150px]">
               <div className="flex items-center gap-2">
