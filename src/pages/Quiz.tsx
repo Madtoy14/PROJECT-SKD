@@ -34,7 +34,7 @@ export default function Quiz() {
   
   // --- Explanation state ---
   const [showExplanation, setShowExplanation] = useState(false);
-  const autoAdvanceTimer = useRef<NodeJS.Timeout | null>(null);
+  const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // --- PvP live rank state ---
   const [liveRanks, setLiveRanks] = useState<RankEntry[]>(() => {
