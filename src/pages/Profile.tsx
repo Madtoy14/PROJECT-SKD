@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { 
   Swords, Medal, Target, Zap, Trophy, X, Edit3, 
-  LogOut, UserPlus, Trash2, CheckCircle2, SquarePen, Lock
+  LogOut, UserPlus, Trash2, CheckCircle2, SquarePen, Lock, Loader2, FlaskConical
 } from 'lucide-react';
+import { useDuelMatchmaking } from '../context/DuelContext';
 import avatarPdh from '../assets/avatar_pdh.png';
 import RankBadge, { RankCard } from '../components/RankBadge';
 
@@ -55,6 +56,7 @@ const itemVariants: Variants = {
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { inviteStatus, targetId, sendInvite, resetInviteState, simulateIncomingInvite } = useDuelMatchmaking();
   
   // Modals state
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -67,6 +69,35 @@ export default function Profile() {
   const [pinnedBadges, setPinnedBadges] = useState<number[]>([1, 2, 3]);
   const [friends, setFriends] = useState(INITIAL_FRIENDS);
   const [newFriendName, setNewFriendName] = useState('');
+
+  // Invite toast state
+  const [inviteToast, setInviteToast] = useState('');
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = (msg: string) => {
+    setInviteToast(msg);
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setInviteToast(''), 3500);
+  };
+
+  // Watch for invite status changes and show toast
+  useEffect(() => {
+    if (inviteStatus === 'rejected') {
+      const friend = friends.find(f => String(f.id) === targetId);
+      showToast(`😔 ${friend?.name ?? 'Pemain'} menolak duelmu.`);
+      setTimeout(resetInviteState, 3500);
+    } else if (inviteStatus === 'timeout') {
+      showToast('⏱️ Pemain tidak merespons.');
+      setTimeout(resetInviteState, 3500);
+    } else if (inviteStatus === 'accepted') {
+      const friend = friends.find(f => String(f.id) === targetId);
+      showToast(`✅ ${friend?.name ?? 'Pemain'} menerima tantanganmu!`);
+      setTimeout(() => {
+        resetInviteState();
+        navigate('/quiz', { state: { mode: 'pvp1v1', opponent: friend?.name } });
+      }, 1500);
+    }
+  }, [inviteStatus]);
 
   const handleAddFriend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +130,20 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-[#0F0E17] text-white p-4 md:p-8 pb-24 md:pb-8 font-syne relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-skd-accent/10 blur-[120px] rounded-full pointer-events-none" />
+
+      {/* ── Invite Status Toast ── */}
+      <AnimatePresence>
+        {inviteToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.9 }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#1A1924] border border-[#8B5CF6]/50 text-white font-bold px-6 py-3 rounded-full flex items-center gap-3 shadow-[0_0_20px_rgba(139,92,246,0.3)] backdrop-blur-md whitespace-nowrap"
+          >
+            <span>{inviteToast}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
 
       {/* Edit Profile Modal */}
@@ -475,9 +520,23 @@ export default function Profile() {
                         </div>
                         <div className="flex gap-1">
                           {friend.online && (
-                            <button title="Tantang" className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-colors border border-red-500/20">
-                              <Swords size={14} />
-                            </button>
+                            <motion.button
+                              whileTap={{ scale: 0.9 }}
+                              title="Tantang Duel PvP"
+                              onClick={() => sendInvite(String(friend.id), friend.name)}
+                              disabled={inviteStatus === 'inviting' && targetId === String(friend.id)}
+                              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border transition-all ${
+                                inviteStatus === 'inviting' && targetId === String(friend.id)
+                                  ? 'bg-[#8B5CF6]/20 border-[#8B5CF6]/40 text-[#8B5CF6] cursor-wait'
+                                  : 'bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border-red-500/20'
+                              }`}
+                            >
+                              {inviteStatus === 'inviting' && targetId === String(friend.id) ? (
+                                <><Loader2 size={13} className="animate-spin" /><span>Mengundang...</span></>
+                              ) : (
+                                <><Swords size={13} /><span>Tantang ⚔️</span></>
+                              )}
+                            </motion.button>
                           )}
                           <button 
                             title="Hapus Teman"
@@ -493,6 +552,18 @@ export default function Profile() {
                       <p className="text-center text-sm text-gray-500 py-4">Belum ada rival yang ditambahkan.</p>
                     )}
                   </AnimatePresence>
+                </div>
+
+                {/* ── Dev Test Button ── */}
+                <div className="mt-4 pt-4 border-t border-white/5">
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={simulateIncomingInvite}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-dashed border-[#8B5CF6]/40 text-[#8B5CF6]/70 hover:border-[#8B5CF6] hover:text-[#8B5CF6] hover:bg-[#8B5CF6]/5 transition-all text-xs font-bold"
+                  >
+                    <FlaskConical size={13} />
+                    <span>[DEV] Simulasi Undangan Duel</span>
+                  </motion.button>
                 </div>
 
               </div>

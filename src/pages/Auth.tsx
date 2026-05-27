@@ -3,12 +3,15 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Mail, User, Lock, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import authBg from '../assets/auth_bg.png';
+import { useAudio } from '../context/AudioContext';
 
 type AuthMode = 'login' | 'register' | 'forgot';
 
 export default function Auth() {
   const [mode, setMode] = useState<AuthMode>('login');
   const navigate = useNavigate();
+
+  const { playBGM } = useAudio();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,12 +22,14 @@ export default function Auth() {
       return;
     }
     if (mode === 'register') {
+      playBGM();
       localStorage.setItem('isProfileComplete', 'false');
       navigate('/onboarding');
       return;
     }
 
     if (mode === 'login') {
+      playBGM();
       const isComplete = localStorage.getItem('isProfileComplete');
       if (isComplete === 'true') {
         navigate('/');

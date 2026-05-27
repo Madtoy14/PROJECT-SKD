@@ -5,21 +5,21 @@ import { ChevronLeft, Users, Clock, Calendar, Star } from 'lucide-react';
 import { getRankForScore, getCurrentSeason, getSeasonDates, RANK_TIERS } from '../data/ranks';
 
 const LEADERBOARD_DATA = [
-  { rank: 1,  name: 'BudiSantoso',    xp: 9820 },
-  { rank: 2,  name: 'SitiRahma',      xp: 8640 },
-  { rank: 3,  name: 'AndiWijaya',     xp: 7910 },
-  { rank: 4,  name: 'Raden Saori',    xp: 3800, isMe: true },
-  { rank: 5,  name: 'DewiBulan',      xp: 3210 },
-  { rank: 6,  name: 'FajarPagi',      xp: 2870 },
-  { rank: 7,  name: 'NurHidayah',     xp: 2540 },
-  { rank: 8,  name: 'ArioSukma',      xp: 2200 },
-  { rank: 9,  name: 'MayaSari',       xp: 1980 },
-  { rank: 10, name: 'YudiPratama',    xp: 1750 },
-  { rank: 11, name: 'LestariPutri',   xp: 1480 },
-  { rank: 12, name: 'RizqiHakim',     xp: 1200 },
-  { rank: 13, name: 'CandraKusuma',   xp: 980  },
-  { rank: 14, name: 'PutriAyunda',    xp: 800  },
-  { rank: 15, name: 'HafizDarmawan',  xp: 620  },
+  { rank: 1, name: 'BudiSantoso', xp: 9820 },
+  { rank: 2, name: 'SitiRahma', xp: 8640 },
+  { rank: 3, name: 'AndiWijaya', xp: 7910 },
+  { rank: 4, name: 'Raden Saori', xp: 3800, isMe: true },
+  { rank: 5, name: 'DewiBulan', xp: 3210 },
+  { rank: 6, name: 'FajarPagi', xp: 2870 },
+  { rank: 7, name: 'NurHidayah', xp: 2540 },
+  { rank: 8, name: 'ArioSukma', xp: 2200 },
+  { rank: 9, name: 'MayaSari', xp: 1980 },
+  { rank: 10, name: 'YudiPratama', xp: 1750 },
+  { rank: 11, name: 'LestariPutri', xp: 1480 },
+  { rank: 12, name: 'RizqiHakim', xp: 1200 },
+  { rank: 13, name: 'CandraKusuma', xp: 980 },
+  { rank: 14, name: 'PutriAyunda', xp: 800 },
+  { rank: 15, name: 'HafizDarmawan', xp: 620 },
 ];
 
 const containerVariants: Variants = {
@@ -109,11 +109,10 @@ export default function Leaderboard() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
-                activeTab === tab
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === tab
                   ? 'bg-blue-500 text-white shadow-sm'
                   : 'text-skd-muted hover:text-skd-text'
-              }`}
+                }`}
             >
               {tab === 'all' ? '🌏 Semua Pemain' : '👥 Teman'}
             </button>
