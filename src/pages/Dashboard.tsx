@@ -3726,7 +3726,7 @@ export default function Dashboard() {
 
 
 
-              <div className="relative w-60 h-60 mt-2 flex items-center justify-center bg-black/40 rounded-full border-[6px] border-skd-border shadow-inner">
+              <div className="relative w-72 h-72 md:w-80 md:h-80 mt-2 flex items-center justify-center bg-black/40 rounded-full border-[6px] border-skd-border shadow-inner">
 
 
 
@@ -3920,12 +3920,50 @@ export default function Dashboard() {
 
                         const midAngle = idx * 45 + 22.5 - 90;
                         const textRad = Math.PI / 180;
-                        const tx = 128 + 78 * Math.cos(midAngle * textRad);
-                        const ty = 128 + 78 * Math.sin(midAngle * textRad);
+                        const tx = 128 + 80 * Math.cos(midAngle * textRad);
+                        const ty = 128 + 80 * Math.sin(midAngle * textRad);
                         
-                        const cleanTitle = prize.title.split(' (')[0];
-                        const firstWord = cleanTitle.split(' ')[0];
-                        const restOfWords = cleanTitle.split(' ').slice(1).join(' ');
+                        let displayFirst = "";
+                        let displaySecond = "";
+
+                        switch (prize.id) {
+                          case 'item_waktu_beku':
+                            displayFirst = "❄️ Waktu";
+                            displaySecond = "Beku";
+                            break;
+                          case 'item_skor_ganda':
+                            displayFirst = "🔥 Skor";
+                            displaySecond = "x2";
+                            break;
+                          case 'item_terawangan':
+                            displayFirst = "👁️ Teropong";
+                            displaySecond = "Sakti";
+                            break;
+                          case 'coins_100':
+                            displayFirst = "🪙 100";
+                            displaySecond = "Koin";
+                            break;
+                          case 'item_kesempatan_kedua':
+                            displayFirst = "🔄 Ksmptn";
+                            displaySecond = "Kedua";
+                            break;
+                          case 'item_coin_booster':
+                            displayFirst = "🚀 Koin";
+                            displaySecond = "Booster";
+                            break;
+                          case 'energy_5':
+                            displayFirst = "⚡ 5";
+                            displaySecond = "Energi";
+                            break;
+                          case 'coins_500':
+                            displayFirst = "👑 Jackpot";
+                            displaySecond = "500 Koin";
+                            break;
+                          default:
+                            const cleanTitle = prize.title.split(' (')[0];
+                            displayFirst = cleanTitle.split(' ')[0];
+                            displaySecond = cleanTitle.split(' ').slice(1).join(' ');
+                        }
                         
                         return (
                           <g key={prize.id}>
@@ -3935,12 +3973,12 @@ export default function Dashboard() {
                               y={ty} 
                               transform={`rotate(${midAngle + 90}, ${tx}, ${ty})`}
                               textAnchor="middle" 
-                              className="fill-white font-black font-space text-[10.5px]"
+                              className="fill-white font-black font-space text-[12px] tracking-tighter"
                             >
-                              <tspan x={tx} dy="-2">{firstWord}</tspan>
-                              {restOfWords && (
-                                <tspan x={tx} dy="10" className="fill-yellow-300 font-bold text-[8.5px]">
-                                  {restOfWords}
+                              <tspan x={tx} dy="-3">{displayFirst}</tspan>
+                              {displaySecond && (
+                                <tspan x={tx} dy="11" className="fill-yellow-300 font-bold text-[9.5px] tracking-tighter">
+                                  {displaySecond}
                                 </tspan>
                               )}
                             </text>

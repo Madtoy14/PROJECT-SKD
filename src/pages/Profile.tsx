@@ -57,13 +57,9 @@ const ALL_BADGES = [
 
 
 const INITIAL_FRIENDS = [
-
-  { id: 1, name: 'Budi Santoso', username: '@budi.s', online: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Budi' },
-
-  { id: 2, name: 'Siti Rahma', username: '@siti_r', online: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Siti' },
-
-  { id: 3, name: 'Andi Wijaya', username: '@andi.wijaya', online: false, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Andi' },
-
+  { id: '1', name: 'Budi Santoso', username: '@budi.s', online: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Budi' },
+  { id: '2', name: 'Siti Rahma', username: '@siti_r', online: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Siti' },
+  { id: '3', name: 'Andi Wijaya', username: '@andi.wijaya', online: false, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Andi' },
 ];
 
 
@@ -1136,15 +1132,15 @@ export default function Profile() {
                       <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
 
                         <button 
-
+                          disabled={inviteStatus === 'inviting'}
                           onClick={() => sendInvite(String(friend.id), friend.name)}
-
-                          className="px-3 py-1.5 bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] font-black rounded-lg text-[10px] transition-colors"
-
+                          className={`px-3 py-1.5 font-black rounded-lg text-[10px] transition-colors ${
+                            inviteStatus === 'inviting' && targetId === String(friend.id)
+                              ? 'bg-yellow-500 text-[#0F0E17] animate-pulse'
+                              : 'bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] disabled:opacity-50 disabled:cursor-not-allowed'
+                          }`}
                         >
-
-                          Duel
-
+                          {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Menunggu...' : 'Duel'}
                         </button>
 
                         <button 
