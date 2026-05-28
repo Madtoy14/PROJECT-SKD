@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-
 function cleanMathText(text: string): string {
   if (!text) return "";
   let cleaned = text;
@@ -52,21 +51,20 @@ function cleanMathText(text: string): string {
   
   return cleaned.trim();
 }
-
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
-
+import MathCard from '../components/MathCard';
 // Konfigurasi Power up yang diijinkan per mode kuis
 const ALLOWED_POWER_UPS: Record<string, string[]> = {
   latihan: ['item_5050', 'item_hint', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan'],
-  pvp: ['item_5050', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan'],
-  pvp1v1: ['item_5050', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan'],
-  survival: ['item_waktu_beku', 'item_terawangan', 'item_kesempatan_kedua', 'item_shield']
+  pvp: ['item_5050', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan', 'item_tinta_hitam', 'item_lompatan_kilat'],
+  pvp1v1: ['item_5050', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan', 'item_tinta_hitam', 'item_lompatan_kilat'],
+  survival: ['item_waktu_beku', 'item_terawangan', 'item_kesempatan_kedua', 'item_shield'],
+  catatansalah: ['item_5050', 'item_hint', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan']
 };
-
 // --- Dummy PvP Players for simulation ---
 const DUMMY_PLAYERS = [
   { name: 'Player44', baseSpeed: 0.7 },
@@ -74,25 +72,19 @@ const DUMMY_PLAYERS = [
   { name: 'JagoanSkd', baseSpeed: 0.5 },
   { name: 'Mager',    baseSpeed: 0.3 },
 ];
-
 type RankEntry = { name: string; score: number; isMe?: boolean; delta?: number };
-
 function getSurvivalTime(idx: number): number {
   return Math.max(10, 60 - idx * 5);
 }
-
 export default function Quiz() {
   const navigate = useNavigate();
   const location = useLocation();
   const gameMode = location.state?.mode || 'latihan';
   const opponentName = location.state?.opponent || 'ASN_Pro';
-
-
   // --- Quiz state ---
   const [questions, setQuestions] = useState<any[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-
   const TOTAL_TIME = gameMode === 'tryout' 
     ? 100 * 60 
     : gameMode === 'survival' 
@@ -105,16 +97,13 @@ export default function Quiz() {
   const [totalScore, setTotalScore] = useState(0);
   const [doubtful, setDoubtful] = useState<Record<number, boolean>>({});
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
-
   const [activePowerUps, setActivePowerUps] = useState<{
     waktuBeku: boolean;
     skorGanda: boolean;
     terawangan: boolean;
     secondChanceUsed: boolean;
   }>({ waktuBeku: false, skorGanda: false, terawangan: false, secondChanceUsed: false });
-
   const [profile, setProfile] = useState<any>(null);
-
   useEffect(() => {
     fetchProfile().then(p => {
       setProfile(p);
@@ -126,10 +115,26 @@ export default function Quiz() {
       }
     });
   }, [gameMode]);
-
   const [eliminatedOptions, setEliminatedOptions] = useState<string[]>([]);
   const [showHint, setShowHint] = useState(false);
+  const [tintaHitamActive, setTintaHitamActive] = useState(false);
+  const [lompatanKilatUsed, setLompatanKilatUsed] = useState(false);
 
+  const useTintaHitam = () => {
+    if (!profile || !profile.inventory || (profile.inventory.item_tinta_hitam || 0) <= 0) return;
+    const updatedInv = { ...profile.inventory, item_tinta_hitam: profile.inventory.item_tinta_hitam - 1 };
+    updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
+    broadcastPowerUp('item_tinta_hitam');
+  };
+
+  const useLompatanKilat = () => {
+    if (!profile || !profile.inventory || (profile.inventory.item_lompatan_kilat || 0) <= 0 || lompatanKilatUsed) return;
+    const updatedInv = { ...profile.inventory, item_lompatan_kilat: profile.inventory.item_lompatan_kilat - 1 };
+    updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
+    setLompatanKilatUsed(true);
+    broadcastPowerUp('item_lompatan_kilat');
+    goNextOrFinish(totalScore);
+  };
   const use5050 = () => {
     if (!profile || !profile.inventory || profile.inventory.item_5050 <= 0 || !currentQuestion) return;
     const updatedInv = { ...profile.inventory, item_5050: profile.inventory.item_5050 - 1 };
@@ -142,7 +147,6 @@ export default function Quiz() {
     setEliminatedOptions(shuffled.slice(0, 2));
     broadcastPowerUp('item_5050');
   };
-
   const useHint = () => {
     if (!profile || !profile.inventory || profile.inventory.item_hint <= 0) return;
     const updatedInv = { ...profile.inventory, item_hint: profile.inventory.item_hint - 1 };
@@ -150,7 +154,6 @@ export default function Quiz() {
     setShowHint(true);
     broadcastPowerUp('item_hint');
   };
-
   const useWaktuBeku = () => {
     if (!profile || !profile.inventory || profile.inventory.item_waktu_beku <= 0) return;
     const updatedInv = { ...profile.inventory, item_waktu_beku: profile.inventory.item_waktu_beku - 1 };
@@ -159,7 +162,6 @@ export default function Quiz() {
     setTimeout(() => setActivePowerUps(p => ({...p, waktuBeku: false})), 30000);
     broadcastPowerUp('item_waktu_beku');
   };
-
   const useSkorGanda = () => {
     if (!profile || !profile.inventory || profile.inventory.item_skor_ganda <= 0) return;
     const updatedInv = { ...profile.inventory, item_skor_ganda: profile.inventory.item_skor_ganda - 1 };
@@ -167,7 +169,6 @@ export default function Quiz() {
     setActivePowerUps(p => ({...p, skorGanda: true}));
     broadcastPowerUp('item_skor_ganda');
   };
-
   const useTerawangan = () => {
     if (!profile || !profile.inventory || profile.inventory.item_terawangan <= 0) return;
     const updatedInv = { ...profile.inventory, item_terawangan: profile.inventory.item_terawangan - 1 };
@@ -175,14 +176,11 @@ export default function Quiz() {
     setActivePowerUps(p => ({...p, terawangan: true}));
     broadcastPowerUp('item_terawangan');
   };
-
-
   const [showRewardFloat, setShowRewardFloat] = useState<{ pts: number } | null>(null);
   
   // --- Explanation state ---
   const [showExplanation, setShowExplanation] = useState(false);
   const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   // --- Sidebar category state (Try Out) ---
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({
     TWK: true,
@@ -190,7 +188,6 @@ export default function Quiz() {
     TKP: true
   });
   const toggleCategory = (cat: string) => setOpenCategories(prev => ({...prev, [cat]: !prev[cat]}));
-
   // --- PvP live rank state ---
   const [liveRanks, setLiveRanks] = useState<RankEntry[]>(() => {
     const isRealtime = isSupabaseConfigured() && !!location.state?.roomId;
@@ -212,31 +209,25 @@ export default function Quiz() {
   });
   const [myRankPosition, setMyRankPosition] = useState(1);
   const totalScoreRef = useRef(0); // keep a ref so setTimeout closures can read latest value
-
   // --- Real-time PvP Supabase Integration ---
   const [pvpNotification, setPvpNotification] = useState('');
   const channelRef = useRef<any>(null);
   const isRealtimePvP = isSupabaseConfigured() && !!location.state?.roomId;
-
   const showPvpToast = (msg: string) => {
     setPvpNotification(msg);
     setTimeout(() => setPvpNotification(''), 3500);
   };
-
   useEffect(() => {
     if (profile?.username) {
       setLiveRanks(prev => prev.map(r => r.isMe ? { ...r, name: profile.username } : r));
     }
   }, [profile]);
-
   useEffect(() => {
     const roomId = location.state?.roomId;
     if (!isRealtimePvP || !roomId) return;
-
     const myName = profile?.username || 'Anda';
     const channel = supabase!.channel(`pvp_room_${roomId}`);
     channelRef.current = channel;
-
     channel
       .on('broadcast', { event: 'join' }, (payload) => {
         const { name } = payload.payload;
@@ -250,7 +241,6 @@ export default function Quiz() {
           }
           return updated;
         });
-
         // Reply with our own status
         channel.send({
           type: 'broadcast',
@@ -261,7 +251,6 @@ export default function Quiz() {
       .on('broadcast', { event: 'presence_reply' }, (payload) => {
         const { name, score } = payload.payload;
         if (name === myName) return;
-
         setLiveRanks(prev => {
           const updated = prev.map(r => r.name === name ? { ...r, score } : r);
           if (!updated.some(r => r.name === name)) {
@@ -273,7 +262,6 @@ export default function Quiz() {
       .on('broadcast', { event: 'score_update' }, (payload) => {
         const { name, score } = payload.payload;
         if (name === myName) return;
-
         setLiveRanks(prev => {
           const updated = prev.map(r => r.name === name ? { ...r, score } : r);
           if (!updated.some(r => r.name === name)) {
@@ -285,13 +273,24 @@ export default function Quiz() {
       .on('broadcast', { event: 'powerup_use' }, (payload) => {
         const { name, powerUpName } = payload.payload;
         if (name === myName) return;
-
+        if (powerUpName === 'item_tinta_hitam') {
+          setTintaHitamActive(true);
+          setTimeout(() => setTintaHitamActive(false), 5000);
+          showPvpToast(`💀 ${name} menyiram layarmu dengan Tinta Hitam!`);
+          return;
+        }
+        if (powerUpName === 'item_lompatan_kilat') {
+          showPvpToast(`⚡ ${name} melakukan Lompatan Kilat (Lewati Soal)!`);
+          return;
+        }
         const cleanNames: Record<string, string> = {
           item_5050: '50:50',
           item_hint: 'Petunjuk',
           item_waktu_beku: 'Beku Waktu',
           item_skor_ganda: 'Skor Ganda',
-          item_terawangan: 'Teropong'
+          item_terawangan: 'Teropong',
+          item_tinta_hitam: 'Tinta Hitam',
+          item_lompatan_kilat: 'Lompatan Kilat'
         };
         showPvpToast(`${name} menggunakan Power Up ${cleanNames[powerUpName] || powerUpName}!`);
       })
@@ -305,12 +304,10 @@ export default function Quiz() {
           });
         }
       });
-
     return () => {
       channel.unsubscribe();
     };
   }, [profile, location.state?.roomId]);
-
   const broadcastPowerUp = (powerUpName: string) => {
     if (isRealtimePvP && channelRef.current) {
       channelRef.current.send({
@@ -320,26 +317,32 @@ export default function Quiz() {
       });
     }
   };
-
   // Fetch questions on mount
   useEffect(() => {
     let mounted = true;
-    fetchQuestionsFromSupabase(gameMode).then(data => {
+    if (gameMode === 'catatansalah') {
+      const stored = localStorage.getItem('skdquest_catatan_salah');
+      const data = stored ? JSON.parse(stored) : [];
       if (mounted) {
         setQuestions(data);
         setLoadingQuestions(false);
       }
-    });
+    } else {
+      fetchQuestionsFromSupabase(gameMode).then(data => {
+        if (mounted) {
+          setQuestions(data);
+          setLoadingQuestions(false);
+        }
+      });
+    }
     return () => { mounted = false; };
   }, [gameMode]);
-
   // Derived values – safely computed after hooks (not hooks themselves)
   const currentQuestion = questions[currentQuestionIndex] ?? null;
   const totalQuestions = questions.length;
   const progress = (timeLeft / TOTAL_TIME) * 100;
   const strokeDashoffset = ((100 - progress) / 100) * 113.097;
   const timerColor = timeLeft <= 10 ? 'text-skd-danger' : timeLeft <= 20 ? 'text-skd-accent' : 'text-skd-success';
-
   // Calculate score for a picked option (safe-guarded)
   const calcScore = (optionId: string): number => {
     if (!currentQuestion) return 0;
@@ -351,11 +354,9 @@ export default function Quiz() {
     }
     return pts;
   };
-
   // --- Timer ---
   useEffect(() => {
     if (isGameOver || activePowerUps.waktuBeku) return;
-
     if (timeLeft <= 0) {
       if (gameMode === 'tryout') {
         finishTryout();
@@ -367,18 +368,14 @@ export default function Quiz() {
     const t = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearTimeout(t);
   }, [timeLeft, isGameOver, gameMode]);
-
   // --- Simulate PvP bots answering in real-time ---
   useEffect(() => {
     if (gameMode !== 'pvp' && gameMode !== 'pvp1v1') return;
     if (isRealtimePvP) return;
-
     const timeouts: ReturnType<typeof setTimeout>[] = [];
-
     const activePlayers = gameMode === 'pvp1v1'
       ? [{ name: opponentName, baseSpeed: 0.75 }]
       : DUMMY_PLAYERS;
-
     activePlayers.forEach(player => {
       // Each bot answers at a random time within the round
       const delay = Math.floor((1 - player.baseSpeed + Math.random() * 0.3) * TOTAL_TIME * 1000);
@@ -388,43 +385,78 @@ export default function Quiz() {
         const opts = currentQuestion.options;
         const picked = opts[Math.floor(Math.random() * opts.length)];
         const botPts = currentQuestion.category === 'TKP' ? picked.score : (picked.id === currentQuestion.correct ? 50 : 0);
-
         setLiveRanks(prev => {
           const updated = prev.map(r => r.name === player.name ? { ...r, score: r.score + botPts } : r);
           return updated.sort((a, b) => b.score - a.score);
         });
       }, Math.min(delay, (TOTAL_TIME - 1) * 1000));
-
       timeouts.push(t);
     });
-
     return () => timeouts.forEach(clearTimeout);
   }, [currentQuestionIndex, gameMode]);
-
   // Sync my rank position when liveRanks changes
   useEffect(() => {
     const pos = liveRanks.findIndex(r => r.isMe) + 1;
     setMyRankPosition(pos);
   }, [liveRanks]);
-
   // --- Answer handler ---
   const handleSelect = (optionId: string) => {
     if (isGameOver) return;
     if (!currentQuestion) return;
-
     if (gameMode === 'tryout') {
       // In tryout, user can change answer freely, no auto-advance
       setAnswers(prev => ({ ...prev, [currentQuestionIndex]: optionId }));
       return;
     }
-
     if (selected) return; // Prevent changing in normal modes
     setAnswers(prev => ({ ...prev, [currentQuestionIndex]: optionId }));
-
     const earned = calcScore(optionId);
     const isTKP = currentQuestion.category === 'TKP';
     const isCorrect = optionId === currentQuestion.correct;
+    const isFullyCorrect = (!isTKP && isCorrect) || (isTKP && earned >= 50);
 
+    // Record accuracy in local storage
+    try {
+      const storedAkurasi = localStorage.getItem('skdquest_akurasi');
+      const akurasi = storedAkurasi ? JSON.parse(storedAkurasi) : { TWK: { correct: 0, total: 0 }, TIU: { correct: 0, total: 0 }, TKP: { correct: 0, total: 0 } };
+      if (!akurasi[currentQuestion.category]) akurasi[currentQuestion.category] = { correct: 0, total: 0 };
+      akurasi[currentQuestion.category].total += 1;
+      if (isFullyCorrect) akurasi[currentQuestion.category].correct += 1;
+      localStorage.setItem('skdquest_akurasi', JSON.stringify(akurasi));
+    } catch (e) {
+      console.error(e);
+    }
+
+    // Catatan Salah recording
+    try {
+      if (gameMode === 'catatansalah') {
+        const storedSalah = localStorage.getItem('skdquest_catatan_salah');
+        let parsedSalah = storedSalah ? JSON.parse(storedSalah) : [];
+        parsedSalah = parsedSalah.map((q: any) => {
+          if (q.id === currentQuestion.id) {
+            if (isFullyCorrect) {
+              return { ...q, consecutiveCorrect: (q.consecutiveCorrect || 0) + 1 };
+            } else {
+              return { ...q, consecutiveCorrect: 0 };
+            }
+          }
+          return q;
+        });
+        const remaining = parsedSalah.filter((q: any) => (q.consecutiveCorrect || 0) < 3);
+        localStorage.setItem('skdquest_catatan_salah', JSON.stringify(remaining));
+      } else {
+        if (!isFullyCorrect) {
+          const storedSalah = localStorage.getItem('skdquest_catatan_salah');
+          const parsedSalah = storedSalah ? JSON.parse(storedSalah) : [];
+          if (!parsedSalah.some((q: any) => q.id === currentQuestion.id)) {
+            parsedSalah.push({ ...currentQuestion, consecutiveCorrect: 0 });
+            localStorage.setItem('skdquest_catatan_salah', JSON.stringify(parsedSalah));
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
     // Survival: wrong = game over (TKP not applicable for survival)
     if (gameMode === 'survival' && ((!isTKP && !isCorrect) || (isTKP && earned < 50))) {
       if (!activePowerUps.secondChanceUsed) {
@@ -446,25 +478,21 @@ export default function Quiz() {
       }, 1800);
       return;
     }
-
     // Update my score
     const newTotal = totalScore + earned;
     setTotalScore(newTotal);
     totalScoreRef.current = newTotal;
-
     // Floating reward
     if (earned > 0) {
       setShowRewardFloat({ pts: earned });
       setTimeout(() => setShowRewardFloat(null), 1200);
     }
-
     // Update live rank for PvP
     if (gameMode === 'pvp' || gameMode === 'pvp1v1') {
       setLiveRanks(prev => {
         const updated = prev.map(r => r.isMe ? { ...r, score: r.score + earned } : r);
         return updated.sort((a, b) => b.score - a.score);
       });
-
       if (isRealtimePvP && channelRef.current) {
         channelRef.current.send({
           type: 'broadcast',
@@ -478,12 +506,33 @@ export default function Quiz() {
         goNextOrFinish(newTotal);
       }, 2000);
     }
-
     // Auto advance removed, user must manually proceed after seeing Pembahasan
   };
-
   const finishTryout = () => {
     let finalScore = 0, twkScore = 0, tiuScore = 0, tkpScore = 0;
+    
+    // Record tryout accuracy in local storage
+    try {
+      const storedAkurasi = localStorage.getItem('skdquest_akurasi');
+      const akurasi = storedAkurasi ? JSON.parse(storedAkurasi) : { TWK: { correct: 0, total: 0 }, TIU: { correct: 0, total: 0 }, TKP: { correct: 0, total: 0 } };
+      questions.forEach((q, idx) => {
+        const ansId = answers[idx];
+        if (ansId) {
+          const opt = q.options.find((o: any) => o.id === ansId);
+          const pts = opt?.score ?? 0;
+          const isTKP = q.category === 'TKP';
+          const isCorrect = ansId === q.correct;
+          const isFullyCorrect = (!isTKP && isCorrect) || (isTKP && pts >= 50);
+          if (!akurasi[q.category]) akurasi[q.category] = { correct: 0, total: 0 };
+          akurasi[q.category].total += 1;
+          if (isFullyCorrect) akurasi[q.category].correct += 1;
+        }
+      });
+      localStorage.setItem('skdquest_akurasi', JSON.stringify(akurasi));
+    } catch (e) {
+      console.error(e);
+    }
+
     questions.forEach((q, idx) => {
       const ansId = answers[idx];
       if (ansId) {
@@ -508,12 +557,10 @@ export default function Quiz() {
       } 
     });
   };
-
   const handleShowExplanation = () => {
     if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
     setShowExplanation(true);
   };
-
   const goNextOrFinish = (scoreSnapshot: number) => {
     const nextIdx = currentQuestionIndex + 1;
     if (nextIdx < totalQuestions) {
@@ -529,7 +576,6 @@ export default function Quiz() {
       }));
       setEliminatedOptions([]);
       setShowHint(false);
-
       if (gameMode === 'survival') {
         setTimeLeft(getSurvivalTime(nextIdx));
       } else if (gameMode !== 'tryout') {
@@ -539,7 +585,6 @@ export default function Quiz() {
       navigate('/result', { state: { score: scoreSnapshot, mode: gameMode, liveRanks } });
     }
   };
-
   // --- Score label helper ---
   /*
 const scoreBadge = (optionId: string) => {
@@ -550,7 +595,6 @@ const scoreBadge = (optionId: string) => {
     return pts;
   };
 */
-
   if (profile && (gameMode === 'survival' || gameMode === 'pvp' || gameMode === 'pvp1v1') && profile.energy <= 0) {
     return (
       <div className="min-h-screen bg-skd-bg flex flex-col items-center justify-center p-6 text-center font-syne">
@@ -575,10 +619,21 @@ const scoreBadge = (optionId: string) => {
             Kembali ke Beranda
           </button>
         </div>
+        {/* Tinta Hitam crisp overlay */}
+        {tintaHitamActive && (
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/75 backdrop-blur-md p-4 text-center">
+            <div className="bg-[#1A1924]/95 border-2 border-red-500/30 rounded-[2rem] p-8 shadow-[0_0_50px_rgba(239,68,68,0.4)] max-w-xs flex flex-col items-center gap-4 animate-bounce">
+              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 text-3xl font-black shadow-inner">
+                💀
+              </div>
+              <h3 className="text-xl font-black text-white">Efek Tinta Hitam!</h3>
+              <p className="text-xs text-gray-400 leading-relaxed font-medium">Lawan mengaburkan layarmu. Tunggu 5 detik hingga tinta memudar...</p>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
-
   return (
         <div className="flex flex-col h-screen bg-skd-bg relative transition-colors">
       {/* Real-time PvP Notifications */}
@@ -599,7 +654,6 @@ const scoreBadge = (optionId: string) => {
           <h2 className="text-xl font-bold text-skd-text animate-pulse">Mempersiapkan Arena...</h2>
         </div>
       )}
-
       {/* Floating Score Reward */}
       <AnimatePresence>
         {showRewardFloat && (
@@ -617,10 +671,8 @@ const scoreBadge = (optionId: string) => {
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Main layout — only render when data is ready */}
       {currentQuestion && <div className={`flex flex-1 overflow-hidden ${(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'tryout') ? 'flex-row' : 'flex-col items-center'}`}>
-
         {/* === Quiz Panel === */}
         <div className="flex flex-col flex-1 h-full min-w-0 w-full max-w-5xl mx-auto">
           {/* Header */}
@@ -628,7 +680,6 @@ const scoreBadge = (optionId: string) => {
             <button onClick={() => navigate('/')} className="p-2 hover:bg-skd-muted/10 rounded-full transition-colors text-skd-text">
               <X size={20} />
             </button>
-
             <div className="flex-1 px-4">
               <div className="flex justify-between items-center text-xs mb-1.5 font-space font-bold text-skd-muted">
                 <span>Soal {currentQuestionIndex + 1}{gameMode !== 'survival' && `/${totalQuestions}`}</span>
@@ -652,7 +703,6 @@ const scoreBadge = (optionId: string) => {
                 />
               </div>
             </div>
-
             {/* Circular Timer (or text for Tryout) */}
             <div className="flex items-center gap-2">
               <div className="relative w-16 h-11 flex items-center justify-center">
@@ -686,7 +736,6 @@ const scoreBadge = (optionId: string) => {
               )}
             </div>
                     </header>
-
           {/* Quick Slots */}
           {gameMode !== 'tryout' && profile && (
             <div className="flex gap-2 px-4 py-2 border-b border-skd-border bg-skd-card/30 overflow-x-auto shrink-0">
@@ -705,12 +754,17 @@ const scoreBadge = (optionId: string) => {
               {profile.inventory?.item_terawangan > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_terawangan') && (
                 <button onClick={useTerawangan} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 ${activePowerUps.terawangan ? 'bg-purple-500/30 text-purple-300' : 'bg-purple-500/10 text-purple-400 hover:bg-purple-500/20'}`}><Eye size={12}/> Terawangan ({profile.inventory.item_terawangan})</button>
               )}
+              {profile.inventory?.item_tinta_hitam > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_tinta_hitam') && (
+                <button onClick={useTintaHitam} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 shrink-0"><Skull size={12}/> Tinta Hitam ({profile.inventory.item_tinta_hitam})</button>
+              )}
+              {profile.inventory?.item_lompatan_kilat > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_lompatan_kilat') && !lompatanKilatUsed && (
+                <button onClick={useLompatanKilat} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 shrink-0"><Zap size={12}/> Lompatan Kilat ({profile.inventory.item_lompatan_kilat})</button>
+              )}
               {(profile.inventory?.item_kesempatan_kedua > 0 || profile.inventory?.item_shield > 0) && ALLOWED_POWER_UPS[gameMode]?.includes('item_kesempatan_kedua') && (
                 <div className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 shrink-0"><Shield size={12}/> Perisai Aktif ({(profile.inventory.item_kesempatan_kedua || 0) + (profile.inventory.item_shield || 0)})</div>
               )}
             </div>
           )}
-
           {/* PvP: My rank badge (mobile, under header) */}
           {(gameMode === 'pvp' || gameMode === 'pvp1v1') && (
             <div className="lg:hidden px-4 py-2 border-b border-skd-border bg-skd-card/30 flex items-center justify-between text-xs">
@@ -722,9 +776,9 @@ const scoreBadge = (optionId: string) => {
               <span className="font-space font-bold text-skd-text">{liveRanks.find(r => r.isMe)?.score ?? 0} pts</span>
             </div>
           )}
-
           {/* Question Body */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 pb-24">
+          <main className={`flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 pb-24 relative ${tintaHitamActive ? 'blur-md pointer-events-none transition-all duration-300' : 'transition-all duration-300'}`}>
+            {/* Tinta Hitam overlay inside main is blurred, but let's make an overlay outside it to be sharp */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQuestion.id}
@@ -741,11 +795,9 @@ const scoreBadge = (optionId: string) => {
                     <span className="text-skd-muted">Setiap pilihan memiliki bobot poin berbeda (10–50).</span>
                   </div>
                 )}
-
                 <div className="bg-skd-card p-5 md:p-7 rounded-2xl border border-skd-border shadow-sm">
                   <p className="text-base md:text-lg leading-relaxed text-skd-text font-medium" dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.text) }} />
                 </div>
-
                 {/* Bocoran Rumus Hint Box */}
                 {showHint && currentQuestion.explanation && (
                   <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-2xl text-yellow-400 text-xs sm:text-sm font-medium leading-relaxed shadow-sm">
@@ -753,7 +805,6 @@ const scoreBadge = (optionId: string) => {
                     <span dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.explanation.slice(0, 180) + '...') }} />
                   </div>
                 )}
-
                 <div className="space-y-2 md:space-y-3">
                   {currentQuestion.options.map((opt: any) => {
                     const isSelected = selected === opt.id;
@@ -763,7 +814,6 @@ const scoreBadge = (optionId: string) => {
                     const isCorrect  = opt.id === currentQuestion.correct;
                     const showStatus = selected !== null;
                     const isTKP = currentQuestion.category === 'TKP';
-
                     let cardClass = 'bg-skd-card hover:bg-skd-muted/5 border-skd-border';
                     let markerClass = 'bg-skd-muted/10 text-skd-text';
                     
@@ -791,7 +841,6 @@ const scoreBadge = (optionId: string) => {
                         else cardClass = 'bg-skd-card border-skd-border opacity-40';
                       }
                     }
-
                                         const terawanganPercent = activePowerUps.terawangan ? (isCorrect ? Math.floor(Math.random() * 20) + 60 : Math.floor(Math.random() * 30)) : 0;
                     return (
                       <motion.button
@@ -808,7 +857,6 @@ const scoreBadge = (optionId: string) => {
                           {opt.id}
                         </div>
                         <span className="flex-1 leading-snug text-sm md:text-base font-medium text-skd-text" dangerouslySetInnerHTML={{ __html: cleanMathText(opt.text) }} ></span>
-
                         {/* TKP score badge revealed after answering (not in tryout) */}
                         {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
@@ -818,7 +866,6 @@ const scoreBadge = (optionId: string) => {
                             {opt.score} pts
                           </span>
                         )}
-
                         {/* Score tag for TWK/TIU revealed after answering (not in tryout) */}
                         {showStatus && !isTKP && isCorrect && gameMode !== 'tryout' && (
                           <span className="ml-auto shrink-0 text-xs font-bold bg-skd-success/20 text-skd-success px-2 py-1 rounded-lg">50 pts</span>
@@ -827,7 +874,6 @@ const scoreBadge = (optionId: string) => {
                     );
                   })}
                 </div>
-
                 {/* Explanation Box (Pembahasan) */}
                 {selected !== null && gameMode !== 'tryout' && (
                   <div className="pt-4">
@@ -846,7 +892,7 @@ const scoreBadge = (optionId: string) => {
                       >
                         <h4 className="font-bold text-blue-400">Pembahasan:</h4>
                         <p className="text-sm md:text-base text-skd-text leading-relaxed">
-                          <span dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.explanation || "Pembahasan tidak tersedia untuk soal ini.") }} />
+                          <MathCard explanation={cleanMathText(currentQuestion.explanation || "Pembahasan tidak tersedia untuk soal ini.")} category={currentQuestion.category} />
                         </p>
                         <button
                           onClick={() => goNextOrFinish(totalScoreRef.current)}
@@ -904,7 +950,6 @@ const scoreBadge = (optionId: string) => {
             </AnimatePresence>
           </main>
         </div>
-
         {/* === PvP Live Leaderboard Sidebar (desktop) === */}
         {(gameMode === 'pvp' || gameMode === 'pvp1v1') && (
           <div className="hidden lg:flex flex-col w-64 xl:w-72 border-l border-skd-border bg-skd-card/40 backdrop-blur-sm">
@@ -913,7 +958,6 @@ const scoreBadge = (optionId: string) => {
                 <Users size={16} /> Live Ranking
               </h3>
             </div>
-
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
               <AnimatePresence>
                 {liveRanks.map((rank, idx) => {
@@ -951,7 +995,6 @@ const scoreBadge = (optionId: string) => {
                 })}
               </AnimatePresence>
             </div>
-
             {/* My score summary at bottom */}
             <div className="p-4 border-t border-skd-border bg-blue-500/5">
               <div className="text-center">
@@ -962,7 +1005,6 @@ const scoreBadge = (optionId: string) => {
             </div>
           </div>
         )}
-
         {/* === Try Out Sidebar (desktop & tablet) === */}
         {gameMode === 'tryout' && (
           <div className="hidden lg:flex flex-col w-72 xl:w-80 border-l border-skd-border bg-skd-card/40 backdrop-blur-sm">
@@ -1031,7 +1073,6 @@ const scoreBadge = (optionId: string) => {
             </div>
           </div>
         )}
-
         {/* === Try Out Sidebar (mobile drawer) === */}
         <AnimatePresence>
           {gameMode === 'tryout' && showSidebarMobile && (
@@ -1134,9 +1175,7 @@ const scoreBadge = (optionId: string) => {
             </>
           )}
         </AnimatePresence>
-
       </div>}
     </div>
   );
-
 }

@@ -6,9 +6,8 @@ import {
   Lock, Unlock, Sparkles, Coins, ArrowRight, BookOpenCheck
 } from 'lucide-react';
 import { fetchProfile, fetchQuestionsFromSupabase } from '../lib/supabase';
+import MathCard from '../components/MathCard';
 import type { UserProfile } from '../lib/supabase';
-
-
 function cleanMathText(text: string): string {
   if (!text) return "";
   let cleaned = text;
@@ -61,9 +60,6 @@ function cleanMathText(text: string): string {
   
   return cleaned.trim();
 }
-
-
-
 export default function PembahasanTryout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -72,20 +68,16 @@ export default function PembahasanTryout() {
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(() => {
     return location.state?.quizQuestions ? 'live_tryout' : null;
   });
-
   const [loadedQuestions, setLoadedQuestions] = useState<any[]>(() => location.state?.quizQuestions || []);
   const [loadedAnswers, setLoadedAnswers] = useState<Record<number, string>>(() => location.state?.userAnswers || {});
   const [loadedDoubtful, setLoadedDoubtful] = useState<Record<number, boolean>>(() => location.state?.doubtfulMap || {});
-
   const [activeIndex, setActiveIndex] = useState(0);
   const [filterCategory, setFilterCategory] = useState<'ALL' | 'TWK' | 'TIU' | 'TKP' | 'RAGU'>('ALL');
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   const [showLockedToast, setShowLockedToast] = useState<string | null>(null);
-
   useEffect(() => {
     fetchProfile().then(p => setProfile(p));
   }, []);
-
   const handleSelectPackage = async (pkgId: string) => {
     const isUnlocked = pkgId === 'paket_tryout_gratis' || profile?.unlocked_avatars?.includes(pkgId);
     if (!isUnlocked) {
@@ -93,7 +85,6 @@ export default function PembahasanTryout() {
       setTimeout(() => setShowLockedToast(null), 3000);
       return;
     }
-
     try {
       // Ambil data asli database Supabase!
       const questionsData = await fetchQuestionsFromSupabase('tryout');
@@ -109,7 +100,6 @@ export default function PembahasanTryout() {
       } else if (pkgId.includes('_twk')) {
         finalQuestions = questionsData.filter((q: any) => q.category === 'TWK');
       }
-
       // Customize questions dynamically per package to make them unique and catalog-ready!
       if (pkgId !== 'paket_tryout_gratis') {
         const pkgSuffix = pkgId === 'paket_premium_tkp_1' ? ' [TKP Premium HOTS 1]'
@@ -122,7 +112,6 @@ export default function PembahasanTryout() {
           : pkgId === 'paket_tryout_akbar_2' ? ' [TO Akbar CPNS 2]'
           : pkgId === 'paket_spesialis_bumn' ? ' [Simulasi BUMN]'
           : '';
-
         finalQuestions = finalQuestions.map((q: any, idx: number) => {
           const cloned = JSON.parse(JSON.stringify(q));
           cloned.id = cloned.id + `_${pkgId}`;
@@ -130,7 +119,6 @@ export default function PembahasanTryout() {
           return cloned;
         });
       }
-
       setLoadedQuestions(finalQuestions);
       setLoadedAnswers({});
       setLoadedDoubtful({});
@@ -141,7 +129,6 @@ export default function PembahasanTryout() {
       console.error("Failed to load questions", err);
     }
   };
-
   const PACKAGES = [
     { id: 'paket_tryout_gratis', title: 'CAT Try Out Standar', type: 'Gratis', description: 'Simulasi lengkap try out BKN standar nasional TWK, TIU, TKP.', cost: 0, isFree: true, gradient: 'from-blue-600/20 to-cyan-600/20', iconColor: 'text-blue-400' },
     { id: 'paket_premium_tkp_1', title: 'Paket Soal Rahasia TKP 1', type: 'Premium HOTS', description: 'Pembahasan 100 soal TKP HOTS pilar pelayanan publik & profesionalisme.', cost: 1000, isFree: false, gradient: 'from-amber-600/20 to-purple-600/20', iconColor: 'text-amber-400' },
@@ -154,7 +141,6 @@ export default function PembahasanTryout() {
     { id: 'paket_tryout_akbar_2', title: 'Try Out Akbar CPNS 2', type: 'Tryout Akbar', description: 'Pembahasan lengkap Try Out Akbar CAT serentak peringkat nasional 2.', cost: 1500, isFree: false, gradient: 'from-blue-600/20 to-violet-600/20', iconColor: 'text-blue-400' },
     { id: 'paket_spesialis_bumn', title: 'Simulasi Khusus BUMN', type: 'Spesialis BUMN', description: 'Materi soal pembahasan TKD & Core Values Akhlak persiapan BUMN.', cost: 2000, isFree: false, gradient: 'from-orange-600/20 to-yellow-600/20', iconColor: 'text-orange-400' },
   ];
-
   // Render Package Selection Dashboard if no package is selected
   if (!selectedPackageId) {
     return (
@@ -182,7 +168,6 @@ export default function PembahasanTryout() {
             </motion.div>
           )}
         </AnimatePresence>
-
         <header className="mb-8 text-center max-w-2xl mx-auto">
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
@@ -196,7 +181,6 @@ export default function PembahasanTryout() {
             Pilih paket pembahasan untuk memperdalam materi ujian CAT SKD. Konten premium terproteksi memerlukan pembelian terlebih dahulu.
           </p>
         </header>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
           {PACKAGES.map((pkg, idx) => {
             const isUnlocked = pkg.isFree || profile?.unlocked_avatars?.includes(pkg.id);
@@ -211,7 +195,6 @@ export default function PembahasanTryout() {
               >
                 {/* Background glow gradient */}
                 <div className={`absolute -inset-10 bg-gradient-to-br ${pkg.gradient} blur-2xl opacity-40 group-hover:opacity-60 transition-opacity pointer-events-none`} />
-
                 <div className="relative mt-2">
                   <div className="flex items-center justify-between mb-4">
                     <span className={`text-[10px] uppercase font-black tracking-wider px-3 py-1 rounded-full ${pkg.isFree ? 'bg-skd-success/15 text-skd-success border border-skd-success/20' : 'bg-skd-premium/10 text-skd-accent border border-skd-premium/20'}`}>
@@ -223,11 +206,9 @@ export default function PembahasanTryout() {
                       <Lock className="text-skd-muted" size={18} />
                     )}
                   </div>
-
                   <h3 className="text-lg font-bold text-skd-text mb-2 tracking-tight">{pkg.title}</h3>
                   <p className="text-xs text-skd-muted leading-relaxed mb-6 h-12 overflow-hidden">{pkg.description}</p>
                 </div>
-
                 <div className="relative pt-4 border-t border-skd-border/40 mt-4">
                   {isUnlocked ? (
                     <button
@@ -263,14 +244,11 @@ export default function PembahasanTryout() {
       </div>
     );
   }
-
   const userAnswers = loadedAnswers;
   const quizQuestions = loadedQuestions;
   const doubtfulMap = loadedDoubtful;
-
   const activeQuestion = quizQuestions[activeIndex];
   const totalQuestions = quizQuestions.length;
-
   // Filtered indices list
   const filteredIndices = quizQuestions
     .map((q: any, idx: number) => ({ q, idx }))
@@ -279,7 +257,6 @@ export default function PembahasanTryout() {
       if (filterCategory === 'RAGU') return doubtfulMap[item.idx] === true;
       return item.q.category === filterCategory;
     });
-
   // Status helpers
   const getQuestionStatus = (idx: number) => {
     const q = quizQuestions[idx];
@@ -287,11 +264,9 @@ export default function PembahasanTryout() {
     if (!userAns) return 'unanswered';
     return userAns === q.correct ? 'correct' : 'incorrect';
   };
-
   const answeredCorrectCount = quizQuestions.filter((q: any, idx: number) => userAnswers[idx] === q.correct).length;
   const answeredIncorrectCount = quizQuestions.filter((q: any, idx: number) => userAnswers[idx] && userAnswers[idx] !== q.correct).length;
   const unansweredCount = totalQuestions - (answeredCorrectCount + answeredIncorrectCount);
-
   // Radar Chart calculations for Try Out
   const isTryoutResult = !!location.state?.quizQuestions;
   let twkScore = 0;
@@ -300,17 +275,14 @@ export default function PembahasanTryout() {
   let twkQuestionsCount = 0;
   let tiuQuestionsCount = 0;
   let tkpQuestionsCount = 0;
-
   if (isTryoutResult) {
     quizQuestions.forEach((q: any, idx: number) => {
       const isTWK = q.category === 'TWK';
       const isTIU = q.category === 'TIU';
       const isTKP = q.category === 'TKP';
-
       if (isTWK) twkQuestionsCount++;
       if (isTIU) tiuQuestionsCount++;
       if (isTKP) tkpQuestionsCount++;
-
       const ans = userAnswers[idx];
       if (ans) {
         const opt = q.options.find((o: any) => o.id === ans);
@@ -322,13 +294,10 @@ export default function PembahasanTryout() {
       }
     });
   }
-
   const twkPassThreshold = twkQuestionsCount === 30 ? 65 : Math.round(twkQuestionsCount * 2.16);
   const tiuPassThreshold = tiuQuestionsCount === 35 ? 80 : Math.round(tiuQuestionsCount * 2.28);
   const tkpPassThreshold = tkpQuestionsCount === 45 ? 166 : Math.round(tkpQuestionsCount * 3.69);
-
   const isLulusSkd = twkScore >= twkPassThreshold && tiuScore >= tiuPassThreshold && tkpScore >= tkpPassThreshold;
-
   const getRadarPoint = (cx: number, cy: number, r: number, angleDeg: number, val: number, max: number) => {
     const factor = Math.min(1, Math.max(0, val / (max || 1)));
     const angleRad = (angleDeg * Math.PI) / 180;
@@ -336,7 +305,6 @@ export default function PembahasanTryout() {
     const y = cy + r * factor * Math.sin(angleRad);
     return { x, y };
   };
-
   // Next / Prev actions
   const handlePrev = () => {
     const currentFilteredPos = filteredIndices.findIndex((item: any) => item.idx === activeIndex);
@@ -344,14 +312,12 @@ export default function PembahasanTryout() {
       setActiveIndex(filteredIndices[currentFilteredPos - 1].idx);
     }
   };
-
   const handleNext = () => {
     const currentFilteredPos = filteredIndices.findIndex((item: any) => item.idx === activeIndex);
     if (currentFilteredPos < filteredIndices.length - 1) {
       setActiveIndex(filteredIndices[currentFilteredPos + 1].idx);
     }
   };
-
   return (
     <div className="flex flex-col h-screen bg-skd-bg text-skd-text font-syne overflow-hidden">
       
@@ -391,7 +357,6 @@ export default function PembahasanTryout() {
           </button>
         </div>
       </header>
-
       {/* Main Split Layout container */}
       <div className="flex flex-1 overflow-hidden flex-col lg:flex-row">
         
@@ -517,14 +482,12 @@ export default function PembahasanTryout() {
               ))}
             </div>
           </div>
-
           {/* Numbers Grid Container */}
           <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
             <div className="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-5 xl:grid-cols-6 gap-2">
               {filteredIndices.map(({ q, idx }: { q: any; idx: number }) => {
                 const status = getQuestionStatus(idx);
                 const isCurrent = activeIndex === idx;
-
                 let btnClass = 'bg-[#1A1924] border-skd-border text-gray-500 hover:border-white/20';
                 
                 if (isCurrent) {
@@ -534,7 +497,6 @@ export default function PembahasanTryout() {
                 } else if (status === 'incorrect') {
                   btnClass = 'bg-skd-danger/15 border-skd-danger/50 text-skd-danger font-black';
                 }
-
                 return (
                   <button
                     key={idx}
@@ -566,7 +528,6 @@ export default function PembahasanTryout() {
           </div>
         
         </aside>
-
         {/* Mobile Sidebar */}
         <AnimatePresence>
           {showSidebarMobile && (
@@ -604,14 +565,12 @@ export default function PembahasanTryout() {
               ))}
             </div>
           </div>
-
           {/* Numbers Grid Container */}
           <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
             <div className="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-5 xl:grid-cols-6 gap-2">
               {filteredIndices.map(({ q, idx }: { q: any; idx: number }) => {
                 const status = getQuestionStatus(idx);
                 const isCurrent = activeIndex === idx;
-
                 let btnClass = 'bg-[#1A1924] border-skd-border text-gray-500 hover:border-white/20';
                 
                 if (isCurrent) {
@@ -621,7 +580,6 @@ export default function PembahasanTryout() {
                 } else if (status === 'incorrect') {
                   btnClass = 'bg-skd-danger/15 border-skd-danger/50 text-skd-danger font-black';
                 }
-
                 return (
                   <button
                     key={idx}
@@ -657,7 +615,6 @@ export default function PembahasanTryout() {
           )}
         </AnimatePresence>
   
-
         {/* === MAIN PANEL: Soal & Teori Pembahasan (Right) === */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
           <AnimatePresence mode="wait">
@@ -704,12 +661,10 @@ export default function PembahasanTryout() {
                   </span>
                 )}
               </div>
-
               {/* Question Text Box */}
               <div className="bg-skd-card p-6 md:p-8 rounded-[1.5rem] border border-skd-border shadow-sm">
                 <p className="text-base md:text-lg leading-relaxed text-skd-text font-medium" dangerouslySetInnerHTML={{ __html: cleanMathText(activeQuestion.text) }} />
               </div>
-
               {/* Options comparison */}
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-gray-400 tracking-wide uppercase">Pilihan Jawaban & Hasil Analisis:</h3>
@@ -717,11 +672,9 @@ export default function PembahasanTryout() {
                   const isUserPick = userAnswers[activeIndex] === opt.id;
                   const isBestKey  = opt.id === activeQuestion.correct;
                   const isTKP = activeQuestion.category === 'TKP';
-
                   let cardClass = 'bg-skd-card border-skd-border opacity-40';
                   let markerClass = 'bg-skd-muted/10 text-skd-muted';
                   let statusLabel = null;
-
                   if (isBestKey) {
                     cardClass = 'bg-skd-success/15 border-skd-success shadow-sm';
                     markerClass = 'bg-skd-success text-white font-black';
@@ -756,7 +709,6 @@ export default function PembahasanTryout() {
                       );
                     }
                   }
-
                   return (
                     <div 
                       key={opt.id}
@@ -771,7 +723,6 @@ export default function PembahasanTryout() {
                   );
                 })}
               </div>
-
               {/* Theory Explanation Card */}
               <div className="bg-skd-card border border-skd-border rounded-3xl p-6 space-y-4">
                 <div className="flex items-center gap-2 border-b border-skd-border pb-3">
@@ -783,12 +734,10 @@ export default function PembahasanTryout() {
                     <p className="text-[10px] text-skd-muted font-bold font-space uppercase">Teori CAT CPNS BKN Standar Nasional</p>
                   </div>
                 </div>
-                <p className="text-xs md:text-sm text-skd-muted leading-relaxed font-medium" dangerouslySetInnerHTML={{ __html: activeQuestion.explanation ? cleanMathText(activeQuestion.explanation) : "Pembahasan terperinci belum tersedia untuk soal ini. Untuk penyelesaian kuis Try Out ini, bacalah rangkuman teori dasar CPNS mengenai kompetensi ini." }} />
+                <MathCard explanation={activeQuestion.explanation ? cleanMathText(activeQuestion.explanation) : "Pembahasan terperinci belum tersedia untuk soal ini. Untuk penyelesaian kuis Try Out ini, bacalah rangkuman teori dasar CPNS mengenai kompetensi ini."} category={activeQuestion.category} />
               </div>
-
             </motion.div>
           </AnimatePresence>
-
           {/* Navigation buttons at bottom of Right Panel */}
           <div className="max-w-4xl mx-auto flex items-center justify-between border-t border-skd-border pt-6 mt-8 shrink-0">
             <button
@@ -812,9 +761,7 @@ export default function PembahasanTryout() {
             </button>
           </div>
         </main>
-
       </div>
-
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 5px;

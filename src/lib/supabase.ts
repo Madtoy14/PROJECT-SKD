@@ -36,6 +36,8 @@ export interface UserProfile {
     item_energy_refill: number;
     item_streak_protector?: number;
     item_coin_booster?: number;
+    item_tinta_hitam?: number;
+    item_lompatan_kilat?: number;
   };
   quests_progress?: Record<number, number>;
   quests_claimed?: number[];
@@ -63,12 +65,12 @@ const getLocalProfile = (): UserProfile => {
     const updated = {
       equipped_avatar_id: 'stmkg',
       unlocked_avatars: ['stmkg', 'ipdn', 'stan'], // default free uniforms
-      inventory: { item_5050: 0, item_hint: 0, item_shield: 0, item_waktu_beku: 0, item_skor_ganda: 0, item_terawangan: 0, item_kesempatan_kedua: 0, item_energy_refill: 0, item_streak_protector: 0, item_coin_booster: 0 },
+      inventory: { item_5050: 0, item_hint: 0, item_shield: 0, item_waktu_beku: 0, item_skor_ganda: 0, item_terawangan: 0, item_kesempatan_kedua: 0, item_energy_refill: 0, item_streak_protector: 0, item_coin_booster: 0, item_tinta_hitam: 5, item_lompatan_kilat: 5 },
       quests_progress: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
       quests_claimed: [],
       ...parsed
     };
-    updated.coins = 999999999;    if (!updated.inventory) updated.inventory = { item_5050: 0, item_hint: 0, item_shield: 0, item_waktu_beku: 0, item_skor_ganda: 0, item_terawangan: 0, item_kesempatan_kedua: 0, item_energy_refill: 0 };
+    updated.coins = 999999999;    if (!updated.inventory) updated.inventory = { item_5050: 0, item_hint: 0, item_shield: 0, item_waktu_beku: 0, item_skor_ganda: 0, item_terawangan: 0, item_kesempatan_kedua: 0, item_energy_refill: 0, item_tinta_hitam: 5, item_lompatan_kilat: 5 };
     if (!updated.quests_progress) updated.quests_progress = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     if (!updated.quests_claimed) updated.quests_claimed = [];
     return updated;
@@ -94,7 +96,9 @@ const getLocalProfile = (): UserProfile => {
       item_kesempatan_kedua: 1,
       item_energy_refill: 1,
       item_streak_protector: 1,
-      item_coin_booster: 2
+      item_coin_booster: 2,
+      item_tinta_hitam: 5,
+      item_lompatan_kilat: 5
     },
     quests_progress: {
       1: 0,

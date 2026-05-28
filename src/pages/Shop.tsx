@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coins, Scale, Lightbulb, Zap, LockKeyhole, Sparkles, Check, Clock, Eye, Heart, Battery, Shield } from 'lucide-react';
+import { Coins, Scale, Lightbulb, Zap, LockKeyhole, Sparkles, Check, Clock, Eye, Heart, Battery, Shield, Skull } from 'lucide-react';
 import { fetchProfile, updateProfile } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
 import avatarPdh from '../assets/avatar_pdh.png';
@@ -16,6 +16,8 @@ const POWER_UPS = [
   { id: 'item_energy_refill', title: 'Isi Ulang Energi', description: 'Pulihkan 5 energi.', cost: 150, icon: Battery, color: 'text-green-400', bg: 'bg-green-500/10' },
   { id: 'item_streak_protector', title: 'Streak Protector', description: 'Melindungi streak harian belajar Anda jika lupa login.', cost: 500, icon: Shield, color: 'text-orange-400', bg: 'bg-orange-500/10' },
   { id: 'item_coin_booster', title: 'Koin Booster 2x', description: 'Gandakan koin yang didapat untuk 3 kuis berikutnya.', cost: 300, icon: Sparkles, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+  { id: 'item_tinta_hitam', title: 'Tinta Hitam (PvP)', description: 'Mengaburkan layar soal lawan selama 5 detik.', cost: 350, icon: Skull, color: 'text-red-500', bg: 'bg-red-500/10' },
+  { id: 'item_lompatan_kilat', title: 'Lompatan Kilat (PvP)', description: 'Lewati soal sulit tanpa penalti skor (1x match).', cost: 450, icon: Zap, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
 ];
 
 const PREMIUM_PACKAGES = [
@@ -74,7 +76,7 @@ export default function Shop() {
       if (itemId === 'item_energy_refill') {
         profileUpdate.energy = Math.min(24, (profile.energy || 0) + 5);
       } else {
-        const currentInv = profile.inventory || { item_5050: 0, item_hint: 0, item_shield: 0, item_waktu_beku: 0, item_skor_ganda: 0, item_terawangan: 0, item_kesempatan_kedua: 0, item_energy_refill: 0, item_streak_protector: 0, item_coin_booster: 0 };
+        const currentInv = profile.inventory || { item_5050: 0, item_hint: 0, item_shield: 0, item_waktu_beku: 0, item_skor_ganda: 0, item_terawangan: 0, item_kesempatan_kedua: 0, item_energy_refill: 0, item_streak_protector: 0, item_coin_booster: 0, item_tinta_hitam: 0, item_lompatan_kilat: 0 };
         const invKey = itemId as keyof NonNullable<typeof profile.inventory>;
         profileUpdate.inventory = {
           ...currentInv,
