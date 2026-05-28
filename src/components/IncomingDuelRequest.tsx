@@ -9,8 +9,9 @@ export default function IncomingDuelRequest() {
   const navigate = useNavigate();
 
   const handleAccept = () => {
-    acceptInvite();
-    navigate('/quiz', { state: { mode: 'pvp1v1', opponent: incomingRequest?.senderName } });
+    const roomId = 'R_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    acceptInvite(roomId);
+    navigate('/quiz', { state: { mode: 'pvp1v1', opponent: incomingRequest?.senderName, roomId: roomId, isHost: false } });
   };
 
   const handleReject = () => {
@@ -42,7 +43,7 @@ export default function IncomingDuelRequest() {
               </div>
 
               <h2 className="text-xl font-black text-white mb-2 leading-tight">
-                🔥 <span className="text-[#F5A623]">{incomingRequest.senderName}</span> menantangmu PvP Battle!
+                ðŸ”¥ <span className="text-[#F5A623]">{incomingRequest.senderName}</span> menantangmu PvP Battle!
               </h2>
               <p className="text-sm text-gray-400 mb-6 font-medium">Buktikan siapa yang terbaik sekarang juga.</p>
 

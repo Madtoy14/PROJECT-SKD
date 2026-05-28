@@ -292,6 +292,51 @@ export default function PembahasanTryout() {
   const answeredIncorrectCount = quizQuestions.filter((q: any, idx: number) => userAnswers[idx] && userAnswers[idx] !== q.correct).length;
   const unansweredCount = totalQuestions - (answeredCorrectCount + answeredIncorrectCount);
 
+  // Radar Chart calculations for Try Out
+  const isTryoutResult = !!location.state?.quizQuestions;
+  let twkScore = 0;
+  let tiuScore = 0;
+  let tkpScore = 0;
+  let twkQuestionsCount = 0;
+  let tiuQuestionsCount = 0;
+  let tkpQuestionsCount = 0;
+
+  if (isTryoutResult) {
+    quizQuestions.forEach((q: any, idx: number) => {
+      const isTWK = q.category === 'TWK';
+      const isTIU = q.category === 'TIU';
+      const isTKP = q.category === 'TKP';
+
+      if (isTWK) twkQuestionsCount++;
+      if (isTIU) tiuQuestionsCount++;
+      if (isTKP) tkpQuestionsCount++;
+
+      const ans = userAnswers[idx];
+      if (ans) {
+        const opt = q.options.find((o: any) => o.id === ans);
+        if (opt) {
+          if (isTWK) twkScore += opt.score;
+          if (isTIU) tiuScore += opt.score;
+          if (isTKP) tkpScore += opt.score;
+        }
+      }
+    });
+  }
+
+  const twkPassThreshold = twkQuestionsCount === 30 ? 65 : Math.round(twkQuestionsCount * 2.16);
+  const tiuPassThreshold = tiuQuestionsCount === 35 ? 80 : Math.round(tiuQuestionsCount * 2.28);
+  const tkpPassThreshold = tkpQuestionsCount === 45 ? 166 : Math.round(tkpQuestionsCount * 3.69);
+
+  const isLulusSkd = twkScore >= twkPassThreshold && tiuScore >= tiuPassThreshold && tkpScore >= tkpPassThreshold;
+
+  const getRadarPoint = (cx: number, cy: number, r: number, angleDeg: number, val: number, max: number) => {
+    const factor = Math.min(1, Math.max(0, val / (max || 1)));
+    const angleRad = (angleDeg * Math.PI) / 180;
+    const x = cx + r * factor * Math.cos(angleRad);
+    const y = cy + r * factor * Math.sin(angleRad);
+    return { x, y };
+  };
+
   // Next / Prev actions
   const handlePrev = () => {
     const currentFilteredPos = filteredIndices.findIndex((item: any) => item.idx === activeIndex);
@@ -315,7 +360,8 @@ export default function PembahasanTryout() {
         <button 
           onClick={() => {
             if (location.state?.quizQuestions) {
-              navigate(-1);
+              navigate('/pembahasan-tryout', { replace: true, state: null });
+              setSelectedPackageId(null);
             } else {
               setSelectedPackageId(null);
             }
@@ -323,7 +369,7 @@ export default function PembahasanTryout() {
           className="flex items-center gap-2 text-xs font-bold text-skd-muted hover:text-skd-text transition-colors"
         >
           <ArrowLeft size={16} />
-          <span>{location.state?.quizQuestions ? 'Kembali ke Hasil' : 'Kembali ke Katalog'}</span>
+          <span>{location.state?.quizQuestions ? 'Kembali ke Katalog' : 'Kembali ke Katalog'}</span>
         </button>
         <div className="text-center">
           <h1 className="text-xs md:text-base font-black tracking-tight uppercase flex items-center gap-1.5 justify-center">
@@ -353,6 +399,97 @@ export default function PembahasanTryout() {
         
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex flex-col w-80 xl:w-96 border-r border-skd-border bg-skd-card/30 backdrop-blur-sm h-full shrink-0">
+          
+          {/* Radar Chart Analysis if viewing live results */}
+          {isTryoutResult && (
+            <div className="p-4 border-b border-skd-border shrink-0 flex flex-col items-center gap-2 bg-white/5">
+              <h4 className="text-[10px] font-black text-skd-accent uppercase tracking-widest font-space">Rapor Kompetensi CAT</h4>
+              
+              <div className="relative w-40 h-40 flex items-center justify-center">
+                {(() => {
+                  const cx = 80;
+                  const cy = 80;
+                  const r = 50;
+                  
+                  const maxTWK = twkQuestionsCount * 5 || 150;
+                  const maxTIU = tiuQuestionsCount * 5 || 175;
+                  const maxTKP = tkpQuestionsCount * 5 || 225;
+                  
+                  const twkOuter = getRadarPoint(cx, cy, r, -90, maxTWK, maxTWK);
+                  const tiuOuter = getRadarPoint(cx, cy, r, 30, maxTIU, maxTIU);
+                  const tkpOuter = getRadarPoint(cx, cy, r, 150, maxTKP, maxTKP);
+                  
+                  const grids = [0.25, 0.5, 0.75, 1.0].map(scale => {
+                    const pTWK = getRadarPoint(cx, cy, r, -90, maxTWK * scale, maxTWK);
+                    const pTIU = getRadarPoint(cx, cy, r, 30, maxTIU * scale, maxTIU);
+                    const pTKP = getRadarPoint(cx, cy, r, 150, maxTKP * scale, maxTKP);
+                    return `${pTWK.x},${pTWK.y} ${pTIU.x},${pTIU.y} ${pTKP.x},${pTKP.y}`;
+                  });
+                  
+                  const twkMin = getRadarPoint(cx, cy, r, -90, twkPassThreshold, maxTWK);
+                  const tiuMin = getRadarPoint(cx, cy, r, 30, tiuPassThreshold, maxTIU);
+                  const tkpMin = getRadarPoint(cx, cy, r, 150, tkpPassThreshold, maxTKP);
+                  const minPoints = `${twkMin.x},${twkMin.y} ${tiuMin.x},${tiuMin.y} ${tkpMin.x},${tkpMin.y}`;
+                  
+                  const twkUser = getRadarPoint(cx, cy, r, -90, twkScore, maxTWK);
+                  const tiuUser = getRadarPoint(cx, cy, r, 30, tiuScore, maxTIU);
+                  const tkpUser = getRadarPoint(cx, cy, r, 150, tkpScore, maxTKP);
+                  const userPoints = `${twkUser.x},${twkUser.y} ${tiuUser.x},${tiuUser.y} ${tkpUser.x},${tkpUser.y}`;
+                  
+                  return (
+                    <svg className="w-full h-full overflow-visible" viewBox="0 0 160 160">
+                      {grids.map((pts, i) => (
+                        <polygon 
+                          key={i} 
+                          points={pts} 
+                          fill="none" 
+                          stroke="rgba(255,255,255,0.06)" 
+                          strokeWidth="1" 
+                        />
+                      ))}
+                      
+                      <line x1={cx} y1={cy} x2={twkOuter.x} y2={twkOuter.y} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                      <line x1={cx} y1={cy} x2={tiuOuter.x} y2={tiuOuter.y} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                      <line x1={cx} y1={cy} x2={tkpOuter.x} y2={tkpOuter.y} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                      
+                      <polygon 
+                        points={minPoints} 
+                        fill="rgba(239,68,68,0.05)" 
+                        stroke="#EF4444" 
+                        strokeWidth="1" 
+                        strokeDasharray="2,2" 
+                      />
+                      
+                      <polygon 
+                        points={userPoints} 
+                        fill={isLulusSkd ? "rgba(16,185,129,0.18)" : "rgba(245,166,35,0.18)"} 
+                        stroke={isLulusSkd ? "#10B981" : "#F5A623"} 
+                        strokeWidth="2" 
+                      />
+                      
+                      <circle cx={cx} cy={cy} r="2" fill="#FFF" opacity="0.3" />
+                      
+                      <text x={twkOuter.x} y={twkOuter.y - 6} textAnchor="middle" className="fill-purple-400 font-bold font-space text-[8px]">
+                        TWK ({twkScore})
+                      </text>
+                      
+                      <text x={tiuOuter.x + 6} y={tiuOuter.y + 3} textAnchor="start" className="fill-blue-400 font-bold font-space text-[8px]">
+                        TIU ({tiuScore})
+                      </text>
+                      
+                      <text x={tkpOuter.x - 6} y={tkpOuter.y + 3} textAnchor="end" className="fill-orange-400 font-bold font-space text-[8px]">
+                        TKP ({tkpScore})
+                      </text>
+                    </svg>
+                  );
+                })()}
+              </div>
+              <div className="flex gap-4 text-[9px] font-bold mt-1 text-skd-muted">
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-skd-accent rounded-full" /> Skor Anda</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-skd-danger rounded-full" /> Passing Grade</span>
+              </div>
+            </div>
+          )}
           
           {/* Category Filter buttons */}
           <div className="p-4 border-b border-skd-border shrink-0">

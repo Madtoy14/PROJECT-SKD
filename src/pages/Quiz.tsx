@@ -57,7 +57,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchQuestionsFromSupabase, fetchProfile, updateProfile } from '../lib/supabase';
+import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 
 // Konfigurasi Power up yang diijinkan per mode kuis
 const ALLOWED_POWER_UPS: Record<string, string[]> = {
@@ -140,6 +140,7 @@ export default function Quiz() {
     const incorrects = currentQuestion.options.filter((o: any) => o.id !== correctId).map((o: any) => o.id);
     const shuffled = incorrects.sort(() => 0.5 - Math.random());
     setEliminatedOptions(shuffled.slice(0, 2));
+    broadcastPowerUp('item_5050');
   };
 
   const useHint = () => {
@@ -147,6 +148,7 @@ export default function Quiz() {
     const updatedInv = { ...profile.inventory, item_hint: profile.inventory.item_hint - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     setShowHint(true);
+    broadcastPowerUp('item_hint');
   };
 
   const useWaktuBeku = () => {
@@ -155,6 +157,7 @@ export default function Quiz() {
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     setActivePowerUps(p => ({...p, waktuBeku: true}));
     setTimeout(() => setActivePowerUps(p => ({...p, waktuBeku: false})), 30000);
+    broadcastPowerUp('item_waktu_beku');
   };
 
   const useSkorGanda = () => {
@@ -162,6 +165,7 @@ export default function Quiz() {
     const updatedInv = { ...profile.inventory, item_skor_ganda: profile.inventory.item_skor_ganda - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     setActivePowerUps(p => ({...p, skorGanda: true}));
+    broadcastPowerUp('item_skor_ganda');
   };
 
   const useTerawangan = () => {
@@ -169,6 +173,7 @@ export default function Quiz() {
     const updatedInv = { ...profile.inventory, item_terawangan: profile.inventory.item_terawangan - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     setActivePowerUps(p => ({...p, terawangan: true}));
+    broadcastPowerUp('item_terawangan');
   };
 
 
@@ -188,6 +193,12 @@ export default function Quiz() {
 
   // --- PvP live rank state ---
   const [liveRanks, setLiveRanks] = useState<RankEntry[]>(() => {
+    const isRealtime = isSupabaseConfigured() && !!location.state?.roomId;
+    if (isRealtime) {
+      return [
+        { name: 'Anda', score: 0, isMe: true }
+      ];
+    }
     if (gameMode === 'pvp1v1') {
       return [
         { name: 'Anda', score: 0, isMe: true },
@@ -201,6 +212,114 @@ export default function Quiz() {
   });
   const [myRankPosition, setMyRankPosition] = useState(1);
   const totalScoreRef = useRef(0); // keep a ref so setTimeout closures can read latest value
+
+  // --- Real-time PvP Supabase Integration ---
+  const [pvpNotification, setPvpNotification] = useState('');
+  const channelRef = useRef<any>(null);
+  const isRealtimePvP = isSupabaseConfigured() && !!location.state?.roomId;
+
+  const showPvpToast = (msg: string) => {
+    setPvpNotification(msg);
+    setTimeout(() => setPvpNotification(''), 3500);
+  };
+
+  useEffect(() => {
+    if (profile?.username) {
+      setLiveRanks(prev => prev.map(r => r.isMe ? { ...r, name: profile.username } : r));
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    const roomId = location.state?.roomId;
+    if (!isRealtimePvP || !roomId) return;
+
+    const myName = profile?.username || 'Anda';
+    const channel = supabase!.channel(`pvp_room_${roomId}`);
+    channelRef.current = channel;
+
+    channel
+      .on('broadcast', { event: 'join' }, (payload) => {
+        const { name } = payload.payload;
+        if (name === myName) return;
+        
+        showPvpToast(`${name} bergabung ke Arena!`);
+        setLiveRanks(prev => {
+          const updated = [...prev];
+          if (!updated.some(r => r.name === name)) {
+            updated.push({ name, score: 0 });
+          }
+          return updated;
+        });
+
+        // Reply with our own status
+        channel.send({
+          type: 'broadcast',
+          event: 'presence_reply',
+          payload: { name: myName, score: totalScoreRef.current }
+        });
+      })
+      .on('broadcast', { event: 'presence_reply' }, (payload) => {
+        const { name, score } = payload.payload;
+        if (name === myName) return;
+
+        setLiveRanks(prev => {
+          const updated = prev.map(r => r.name === name ? { ...r, score } : r);
+          if (!updated.some(r => r.name === name)) {
+            updated.push({ name, score });
+          }
+          return updated.sort((a, b) => b.score - a.score);
+        });
+      })
+      .on('broadcast', { event: 'score_update' }, (payload) => {
+        const { name, score } = payload.payload;
+        if (name === myName) return;
+
+        setLiveRanks(prev => {
+          const updated = prev.map(r => r.name === name ? { ...r, score } : r);
+          if (!updated.some(r => r.name === name)) {
+            updated.push({ name, score });
+          }
+          return updated.sort((a, b) => b.score - a.score);
+        });
+      })
+      .on('broadcast', { event: 'powerup_use' }, (payload) => {
+        const { name, powerUpName } = payload.payload;
+        if (name === myName) return;
+
+        const cleanNames: Record<string, string> = {
+          item_5050: '50:50',
+          item_hint: 'Petunjuk',
+          item_waktu_beku: 'Beku Waktu',
+          item_skor_ganda: 'Skor Ganda',
+          item_terawangan: 'Teropong'
+        };
+        showPvpToast(`${name} menggunakan Power Up ${cleanNames[powerUpName] || powerUpName}!`);
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          // Broadcast our presence
+          channel.send({
+            type: 'broadcast',
+            event: 'join',
+            payload: { name: myName }
+          });
+        }
+      });
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [profile, location.state?.roomId]);
+
+  const broadcastPowerUp = (powerUpName: string) => {
+    if (isRealtimePvP && channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'powerup_use',
+        payload: { name: profile?.username || 'Lawan', powerUpName }
+      });
+    }
+  };
 
   // Fetch questions on mount
   useEffect(() => {
@@ -252,6 +371,7 @@ export default function Quiz() {
   // --- Simulate PvP bots answering in real-time ---
   useEffect(() => {
     if (gameMode !== 'pvp' && gameMode !== 'pvp1v1') return;
+    if (isRealtimePvP) return;
 
     const timeouts: ReturnType<typeof setTimeout>[] = [];
 
@@ -344,6 +464,14 @@ export default function Quiz() {
         const updated = prev.map(r => r.isMe ? { ...r, score: r.score + earned } : r);
         return updated.sort((a, b) => b.score - a.score);
       });
+
+      if (isRealtimePvP && channelRef.current) {
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'score_update',
+          payload: { name: profile?.username || 'Anda', score: newTotal }
+        });
+      }
       
       // Auto-advance in PvP/1v1 modes after 2 seconds for a fast-paced multiplayer experience!
       setTimeout(() => {
@@ -453,6 +581,13 @@ const scoreBadge = (optionId: string) => {
 
   return (
         <div className="flex flex-col h-screen bg-skd-bg relative transition-colors">
+      {/* Real-time PvP Notifications */}
+      {pvpNotification && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#8B5CF6]/95 border border-purple-500 text-white font-bold py-2 px-6 rounded-2xl shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-md text-xs animate-bounce flex items-center gap-2">
+          <Users size={14} className="text-[#F5A623]" />
+          <span>{pvpNotification}</span>
+        </div>
+      )}
       {activePowerUps.waktuBeku && (
         <div className="pointer-events-none fixed inset-0 z-50 rounded-none"
           style={{ boxShadow: 'inset 0 0 80px 20px rgba(34,211,238,0.25)' }} />
