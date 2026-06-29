@@ -68,7 +68,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
   }, [activeSession]);
 
   const createSession = useCallback(async (mode: string, questions: any[]): Promise<string> => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase!.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
     // Energy deduction is handled by Quiz.tsx (Deferred Deduction)
@@ -221,7 +221,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
   }, [activeSession]);
 
   const recoverSession = useCallback(async (): Promise<QuizSession | null> => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase!.auth.getUser();
     if (!user) return null;
 
     const { data, error } = await supabase

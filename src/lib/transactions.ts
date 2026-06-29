@@ -32,7 +32,7 @@ export async function recordTransaction(params: TransactionParams): Promise<stri
       return null;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase!.auth.getUser();
     if (!user) {
       console.error('No authenticated user for transaction');
       return null;
@@ -218,7 +218,7 @@ export async function getUserTransactions(
   category?: TransactionCategory
 ): Promise<any[]> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase!.auth.getUser();
     if (!user) return [];
 
     let query = supabase
@@ -258,7 +258,7 @@ export async function getTransactionStats(
   suspiciousActivity: boolean;
 }> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase!.auth.getUser();
     if (!user) {
       return { totalCoinsEarned: 0, totalCoinsSpent: 0, totalPurchases: 0, suspiciousActivity: false };
     }
@@ -321,7 +321,7 @@ export async function validatePurchase(
     }
 
     // Check recent purchases of the same item
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase!.auth.getUser();
 
     // Wajib auth
     if (authError || !user) {

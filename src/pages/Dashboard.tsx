@@ -130,7 +130,7 @@ export default function Dashboard() {
           updates.last_energy_update = now.toISOString();
         }
 
-        setEnergy(currentEnergy);
+        setEnergy(currentEnergy || 0);
         setEnergyTimer(nextTimer);
         setProfile(p);
         setGlobalCoins(p.coins);
@@ -270,7 +270,7 @@ export default function Dashboard() {
       }
       
       setGlobalCoins(newCoins);
-      setEnergy(newEnergy);
+      setEnergy(newEnergy || 0);
       
       updateProfile({
         coins: newCoins,
@@ -308,7 +308,7 @@ export default function Dashboard() {
     const interval = setInterval(() => {
       setEnergyTimer((prev) => {
         if (prev <= 1) {
-          setEnergy((e) => {
+          setEnergy((e || 0) => {
             const newE = Math.min(e + 1, 25);
             updateProfile({ energy: newE, last_energy_update: new Date().toISOString() });
             return newE;
@@ -500,7 +500,7 @@ export default function Dashboard() {
     const cost = modeConfig?.cost || 0;
     const costType = modeConfig?.costType || 'energy';
     
-    if (costType === 'energy' && energy < cost) {
+    if (costType === 'energy' && (energy || 0) < cost) {
       setToastMessage(`Energi Anda tidak cukup! Dibutuhkan ${cost} energi.`);
       setTimeout(() => setToastMessage(''), 3000);
       return;
