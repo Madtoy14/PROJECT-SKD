@@ -38,7 +38,7 @@ export async function recordTransaction(params: TransactionParams): Promise<stri
       return null;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('transactions')
       .insert({
         user_id: user.id,
@@ -221,7 +221,7 @@ export async function getUserTransactions(
     const { data: { user } } = await supabase!.auth.getUser();
     if (!user) return [];
 
-    let query = supabase
+    let query = supabase!
       .from('transactions')
       .select('*')
       .eq('user_id', user.id)
@@ -267,7 +267,7 @@ export async function getTransactionStats(
     const since = new Date();
     since.setDate(since.getDate() - timeframeDays);
 
-    const { data: transactions } = await supabase
+    const { data: transactions } = await supabase!
       .from('transactions')
       .select('type, category, amount')
       .eq('user_id', user.id)
@@ -331,7 +331,7 @@ export async function validatePurchase(
     const fiveMinutesAgo = new Date();
     fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
 
-    const { data: recentPurchases, error: queryError } = await supabase
+    const { data: recentPurchases, error: queryError } = await supabase!
       .from('transactions')
       .select('id')
       .eq('user_id', user.id)

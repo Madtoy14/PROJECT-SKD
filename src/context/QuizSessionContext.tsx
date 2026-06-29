@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface QuizSession {
@@ -74,7 +75,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     // Energy deduction is handled by Quiz.tsx (Deferred Deduction)
 
     // Create session
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('quiz_sessions')
       .insert({
         user_id: user.id,
@@ -121,7 +122,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     if (updates.usedPowerups !== undefined) updateData.used_powerups = updates.usedPowerups;
     if (updates.timeSpent !== undefined) updateData.time_spent_seconds = updates.timeSpent;
 
-    const { error } = await supabase
+    const { error } = await supabase!
       .from('quiz_sessions')
       .update(updateData)
       .eq('id', sessionId);
@@ -150,7 +151,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     if (!session) throw new Error('No active session');
 
     // Mark session as completed
-    const { error: sessionError } = await supabase
+    const { error: sessionError } = await supabase!
       .from('quiz_sessions')
       .update({
         status: 'completed',
@@ -186,7 +187,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     }
 
     // Create result record
-    const { data: resultData, error: resultError } = await supabase
+    const { data: resultData, error: resultError } = await supabase!
       .from('quiz_results')
       .insert({
         session_id: sessionId,
@@ -224,7 +225,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     const { data: { user } } = await supabase!.auth.getUser();
     if (!user) return null;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('quiz_sessions')
       .select('*')
       .eq('user_id', user.id)
@@ -255,7 +256,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const abandonSession = useCallback(async (sessionId: string) => {
-    const { error } = await supabase
+    const { error } = await supabase!
       .from('quiz_sessions')
       .update({ status: 'abandoned' })
       .eq('id', sessionId);

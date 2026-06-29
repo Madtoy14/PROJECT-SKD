@@ -264,7 +264,7 @@ export default function Dashboard() {
       if (prize.isCoins) {
         newCoins += prize.count;
       } else if (prize.isEnergy) {
-        newEnergy = Math.min(24, newEnergy + prize.count);
+        newEnergy = Math.min(24, (newEnergy || 0) + prize.count);
       } else {
         updatedInv[prize.id] = (updatedInv[prize.id] || 0) + prize.count;
       }
@@ -274,7 +274,7 @@ export default function Dashboard() {
       
       updateProfile({
         coins: newCoins,
-        energy: newEnergy,
+        energy: newEnergy || 0,
         inventory: updatedInv as any,
         last_spin_date: !hasSpunToday ? todayStr : undefined
       }).then(() => {
@@ -304,12 +304,12 @@ export default function Dashboard() {
   });
   // Timer Logic
   useEffect(() => {
-    if (energy >= 25) return;
+    if ((energy || 0) >= 25) return;
     const interval = setInterval(() => {
       setEnergyTimer((prev) => {
         if (prev <= 1) {
-          setEnergy((e || 0) => {
-            const newE = Math.min(e + 1, 25);
+          setEnergy((e) => {
+            const newE = Math.min((e || 0) + 1, 25);
             updateProfile({ energy: newE, last_energy_update: new Date().toISOString() });
             return newE;
           });
@@ -830,7 +830,7 @@ export default function Dashboard() {
               <div 
                 className="flex items-center gap-1 bg-skd-bg px-2.5 py-1.5 rounded-full border border-skd-border shadow-sm relative group cursor-pointer"
                 onClick={() => {
-                  if (energy < 25) {
+                  if ((energy || 0) < 25) {
                     setToastMessage(`+1 Energi dalam ${formatTime(energyTimer)}`);
                     setTimeout(() => setToastMessage(''), 3000);
                   }
@@ -838,7 +838,7 @@ export default function Dashboard() {
               >
                 <Zap className="w-3.5 h-3.5 text-skd-accent fill-skd-accent" />
                 <span className="font-space font-bold text-xs text-skd-text">{energy}/25</span>
-                {energy < 25 && (
+                {(energy || 0) < 25 && (
                   <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-[#1A1924] border border-white/10 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-lg">
                     +{formatTime(energyTimer)} mnt
                   </div>
