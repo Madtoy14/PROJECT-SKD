@@ -448,7 +448,12 @@ export default function Quiz() {
     if (!isEnergyDeducted && profile) {
       if (energyCost > 0 || coinCost > 0) {
         const updates: any = {};
-        if (energyCost > 0) updates.energy = Math.max(0, profile.energy - energyCost);
+        if (energyCost > 0) {
+          updates.energy = Math.max(0, profile.energy - energyCost);
+          if (profile.energy >= 25) {
+            updates.last_energy_update = new Date().toISOString();
+          }
+        }
         if (coinCost > 0) updates.coins = Math.max(0, profile.coins - coinCost);
         updateProfile(updates);
       }
