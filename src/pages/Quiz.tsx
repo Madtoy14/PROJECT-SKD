@@ -314,9 +314,14 @@ export default function Quiz() {
     };
 
     if (gameMode === 'catatansalah') {
-      const stored = localStorage.getItem('skdquest_catatan_salah');
-      const data = stored ? JSON.parse(stored) : [];
-      initQuestions(data);
+      fetchProfile().then(p => {
+        const data = p?.catatan_salah || [];
+        if (data.length === 0) {
+          navigate('/dashboard', { replace: true });
+        } else {
+          initQuestions(data);
+        }
+      });
     } else {
       fetchQuestionsFromSupabase(gameMode).then(initQuestions);
     }
