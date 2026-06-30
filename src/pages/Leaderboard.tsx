@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Users, Clock, Calendar, Star, Loader2 } from 'lucide-react';
 import { getRankForScore, getCurrentSeason, getSeasonDates, RANK_TIERS } from '../data/ranks';
 import { fetchMonthlyLeaderboard } from '../lib/supabase';
+import PlayerProfileModal from '../components/PlayerProfileModal';
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.05 } },
@@ -21,6 +22,7 @@ export default function Leaderboard() {
   const [activeTab, setActiveTab] = useState<'all' | 'friends'>('all');
   const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchMonthlyLeaderboard().then(data => {
@@ -28,7 +30,7 @@ export default function Leaderboard() {
       const mapped = data.map(item => ({
         ...item,
         xp: item.score
-      }));
+      })).slice(0, 10); // LIMIT to top 10 for now since the app is new
       setLeaderboardData(mapped);
       setLoading(false);
     });
@@ -147,7 +149,8 @@ export default function Leaderboard() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className={`flex flex-col items-center gap-2 flex-1 ${isFirst ? '-translate-y-3' : ''}`}
+                  onClick={() => setSelectedPlayerId(p.id)}
+                  className={`flex flex-col items-center gap-2 flex-1 cursor-pointer hover:scale-105 transition-transform ${isFirst ? '-translate-y-3' : ''}`}
                 >
                   {isFirst && <span className="text-3xl">👑</span>}
                   <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tier.color} flex items-center justify-center text-2xl shadow-lg`}>
@@ -193,7 +196,8 @@ export default function Leaderboard() {
                 <motion.div
                   key={player.rank}
                   variants={itemVariants}
-                  className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl border transition-colors
+                  onClick={() => setSelectedPlayerId(player.id)}
+                  className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl border transition-colors cursor-pointer
                     ${player.isMe
                       ? `bg-gradient-to-r ${tier.color}/10 ${tier.borderColor} shadow-md`
                       : 'bg-skd-card border-skd-border hover:bg-skd-muted/5'}`}
@@ -242,6 +246,14 @@ export default function Leaderboard() {
           </div>
         </div>
       </div>
+
+      {/* Profile Modal */}
+      {selectedPlayerId && (
+        <PlayerProfileModal 
+          playerId={selectedPlayerId} 
+          onClose={() => setSelectedPlayerId(null)} 
+        />
+      )}
     </div>
   );
 }

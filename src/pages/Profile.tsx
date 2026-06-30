@@ -9,6 +9,7 @@ import { useDuelMatchmaking } from '../context/DuelContext';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters } from '../lib/supabase';
 import type { UserProfile, Character } from '../lib/supabase';
 import { ProfileSkeleton } from '../components/LoadingSkeleton';
+import PlayerProfileModal from '../components/PlayerProfileModal';
 import avatarPdh from '../assets/avatar_pdh.png';
 import RankBadge, { RankCard } from '../components/RankBadge';
 const ALL_BADGES_DATA = [
@@ -147,6 +148,7 @@ export default function Profile() {
   const [searchFriendResult, setSearchFriendResult] = useState<any>(null);
   const [searchFriendError, setSearchFriendError] = useState(false);
   const [isSearchingFriend, setIsSearchingFriend] = useState(false);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
   // Dynamic Badges based on Profile
   const dynamicBadges = ALL_BADGES_DATA.map(badge => {
@@ -224,52 +226,11 @@ export default function Profile() {
       }, 1500);
     }
   }, [inviteStatus]);
-  const handleAddFriend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const searchVal = newFriendName.trim();
-    if (!searchVal) return;
-    if (isSupabaseConfigured()) {
-      try {
-        const searchUsername = searchVal.replace(/^@/, '');
-        const { data, error } = await supabase!
-          .from('profiles')
-          .select('id, username, score')
-          .eq('username', searchUsername)
-          .maybeSingle();
-        if (data) {
-          const newFriend = {
-            id: data.id,
-            name: data.username,
-            username: `@${data.username.toLowerCase()}`,
-            online: true,
-            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`,
-            score: data.score
-          };
-          const newFriendsList = [...friends, newFriend];
-          setFriends(newFriendsList);
-          updateProfile({ friends: newFriendsList });
-          setNewFriendName('');
-          showToast(`Berhasil menambahkan ${data.username} ke Rival!`, 'success');
-          return;
-        }
-      } catch (err) {
-        console.error('Error searching Supabase user:', err);
-      }
-    }
-    const newFriend = {
-      id: String(Date.now()),
-      name: searchVal,
-      username: `@${searchVal.toLowerCase().replace(/\s/g, '')}`,
-      online: Math.random() > 0.5,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchVal}`,
-      score: 1200 + Math.floor(Math.random() * 600)
-    };
-    const newFriendsList = [...friends, newFriend];
-    setFriends(newFriendsList);
-    updateProfile({ friends: newFriendsList });
-    setNewFriendName('');
-    showToast(`Rival ${newFriend.name} berhasil ditambahkan!`, 'success');
-  };
+  const filteredFriends = friends.filter(f => 
+    f.name?.toLowerCase().includes(newFriendName.toLowerCase()) || 
+    f.username?.toLowerCase().includes(newFriendName.toLowerCase())
+  );
+
   const handleRemoveFriend = (id: number) => {
     const friend = friends.find(f => f.id === id);
     const newFriendsList = friends.filter(f => f.id !== id);
@@ -835,30 +796,27 @@ export default function Profile() {
 
             <div className="bg-white/5 border border-white/10 rounded-[1.5rem] p-5 backdrop-blur-sm shadow-sm flex flex-col flex-1 max-h-[500px]">
 
-              {/* Add Friend Form */}
-              <form onSubmit={handleAddFriend} className="mb-4 flex gap-2">
+              {/* Filter Friend Form */}
+              <div className="mb-4 flex gap-2">
                 <div className="relative flex-1">
                   <UserPlus size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
                     value={newFriendName}
                     onChange={(e) => setNewFriendName(e.target.value)}
-                    placeholder="Username..."
+                    placeholder="Cari rival..."
                     className="w-full bg-[#1A1924] border border-white/5 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-skd-accent/50 transition-colors text-white"
                   />
                 </div>
-                <button type="submit" className="bg-skd-accent text-[#0F0E17] px-3 rounded-lg font-bold hover:bg-yellow-400 transition-colors text-xs">
-                  Tambah
-                </button>
-              </form>
+              </div>
               {/* Friends List Container */}
               <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
-                {friends.length === 0 ? (
-                  <p className="text-gray-500 text-xs text-center py-8">Belum ada rival terdaftar.</p>
+                {filteredFriends.length === 0 ? (
+                  <p className="text-gray-500 text-xs text-center py-8">Belum ada rival terdaftar atau ditemukan.</p>
                 ) : (
-                  friends.map((friend) => (
-                    <div key={friend.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors group">
-                      <div className="flex items-center gap-3">
+                  filteredFriends.map((friend) => (
+                    <div key={friend.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors group gap-3">
+                      <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSelectedPlayerId(String(friend.id))}>
                         <div className="relative">
                           <img src={friend.avatar} alt={friend.name} className="w-12 h-12 rounded-full bg-[#1A1924]" />
                           <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#1A1924] ${friend.online ? 'bg-skd-success' : 'bg-gray-500'}`} />
@@ -955,24 +913,29 @@ export default function Profile() {
                     <p className="text-xs mt-1 opacity-70">Pastikan username yang dimasukkan benar.</p>
                   </div>
                 ) : searchFriendResult && (
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center text-center">
-                    <img
-                      src={searchFriendResult.selected_avatar ? availableCharacters.find(o => o.id === searchFriendResult.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchFriendResult.username}`}
-                      alt={searchFriendResult.username}
-                      className="w-20 h-20 rounded-full bg-[#1A1924] mb-3 border-2 border-skd-accent object-cover"
-                    />
-                    <h4 className="font-bold text-lg text-white">@{searchFriendResult.username}</h4>
-                    <div className="mt-2 text-xs font-bold text-skd-premium bg-skd-premium/10 px-3 py-1 rounded-full mb-4">
-                      Skor: {searchFriendResult.score}
+                  <div 
+                    onClick={() => {
+                      setSelectedPlayerId(searchFriendResult.id);
+                      setSearchFriendModal(false);
+                    }}
+                    className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={searchFriendResult.selected_avatar ? availableCharacters.find(o => o.id === searchFriendResult.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchFriendResult.username}`}
+                        alt={searchFriendResult.username}
+                        className="w-14 h-14 rounded-full bg-[#1A1924] object-cover border border-white/10"
+                      />
+                      <div>
+                        <h4 className="font-bold text-white group-hover:text-skd-accent transition-colors">@{searchFriendResult.username}</h4>
+                        <div className="text-xs font-bold text-skd-premium">
+                          Skor: {searchFriendResult.score}
+                        </div>
+                      </div>
                     </div>
-
-                    <button
-                      onClick={handleFollowUser}
-                      className="w-full bg-skd-success text-white py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-skd-success/80 transition-colors"
-                    >
-                      <UserPlus size={18} />
-                      Ikuti (Follow)
-                    </button>
+                    <div className="bg-white/5 p-2 rounded-full group-hover:bg-skd-accent group-hover:text-[#0F0E17] transition-all">
+                      <UserPlus size={16} />
+                    </div>
                   </div>
                 )}
               </div>
@@ -1032,14 +995,14 @@ export default function Profile() {
                             const p = item.profiles;
                             if (!p) return null;
                             return (
-                              <div key={item.id} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
+                              <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors group">
                                 <img
                                   src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.username}`}
                                   alt={p.username}
                                   className="w-10 h-10 rounded-full bg-[#1A1924] object-cover"
                                 />
                                 <div>
-                                  <h4 className="font-bold text-sm text-white">@{p.username}</h4>
+                                  <h4 className="font-bold text-sm text-white group-hover:text-skd-accent transition-colors">@{p.username}</h4>
                                   <p className="text-[10px] text-skd-premium font-bold">Skor: {p.score}</p>
                                 </div>
                               </div>
@@ -1061,14 +1024,14 @@ export default function Profile() {
                             const p = item.profiles;
                             if (!p) return null;
                             return (
-                              <div key={item.id} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
+                              <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors group">
                                 <img
                                   src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.username}`}
                                   alt={p.username}
                                   className="w-10 h-10 rounded-full bg-[#1A1924] object-cover"
                                 />
                                 <div>
-                                  <h4 className="font-bold text-sm text-white">@{p.username}</h4>
+                                  <h4 className="font-bold text-sm text-white group-hover:text-skd-accent transition-colors">@{p.username}</h4>
                                   <p className="text-[10px] text-skd-premium font-bold">Skor: {p.score}</p>
                                 </div>
                               </div>
@@ -1084,6 +1047,32 @@ export default function Profile() {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Universal Player Profile Modal */}
+      {selectedPlayerId && (
+        <PlayerProfileModal 
+          playerId={selectedPlayerId} 
+          onClose={() => setSelectedPlayerId(null)}
+          onAddRival={(player) => {
+            // Note: Since follow/friend logic handles actual syncing in Supabase,
+            // this button can trigger a follow action or local add for now.
+            if (!friends.find(f => String(f.id) === String(player.id))) {
+              const newFriend = {
+                id: player.id,
+                name: player.username,
+                username: `@${player.username.toLowerCase()}`,
+                online: true,
+                avatar: player.selected_avatar ? availableCharacters.find(o => o.id === player.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.username}`,
+                score: player.score
+              };
+              const newFriendsList = [...friends, newFriend];
+              setFriends(newFriendsList);
+              updateProfile({ friends: newFriendsList });
+              showToast(`Berhasil menambahkan ${player.username} ke Rival!`, 'success');
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
