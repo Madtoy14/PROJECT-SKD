@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
-import { Zap, Coins, Plus, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Sun, Moon, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Share2, Copy, Volume2, VolumeX, BookOpen, LogOut } from 'lucide-react';
+import { Zap, Coins, Plus, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Sun, Moon, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Share2, Copy, BookOpen, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
-import { useAudio } from '../context/AudioContext';
 import RankBadge from '../components/RankBadge';
 import { getRankForScore, getCurrentSeason } from '../data/ranks';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
@@ -57,7 +56,6 @@ const itemVariants: Variants = {
 };
 export default function Dashboard() {
   const { theme, toggleTheme } = useTheme();
-  const { isMuted, toggleMute } = useAudio();
   const navigate = useNavigate();
   // Energy & Coins State
   const [energy, setEnergy] = useState<number | null>(null);
@@ -806,14 +804,6 @@ export default function Dashboard() {
               <ChevronRight className="w-3 h-3 text-white/70 ml-0.5" />
             </motion.button>
             <div className="flex items-center gap-1.5 ml-auto">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={toggleMute}
-                className="w-8 h-8 flex items-center justify-center bg-skd-bg rounded-full border border-skd-border text-skd-muted hover:text-skd-text transition-colors"
-              >
-                {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-              </motion.button>
               <button
                 onClick={toggleTheme}
                 className="w-8 h-8 flex items-center justify-center bg-skd-bg rounded-full border border-skd-border text-skd-muted hover:text-skd-text transition-colors"

@@ -33,8 +33,6 @@ import PembahasanTryout from './pages/PembahasanTryout';
 
 import { DuelProvider } from './context/DuelContext';
 
-import { AudioProvider } from './context/AudioContext';
-
 import IncomingDuelRequest from './components/IncomingDuelRequest';
 
 
@@ -330,17 +328,15 @@ function AppLayout() {
 function App() {
   return (
     <ErrorBoundary>
-      <AudioProvider>
-        <ThemeProvider>
-          <DuelProvider>
-            <QuizSessionProvider>
-              <Router>
-                <AppLayout />
-              </Router>
-            </QuizSessionProvider>
-          </DuelProvider>
-        </ThemeProvider>
-      </AudioProvider>
+      <ThemeProvider>
+        <DuelProvider>
+          <QuizSessionProvider>
+            <Router>
+              <AppLayout />
+            </Router>
+          </QuizSessionProvider>
+        </DuelProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
