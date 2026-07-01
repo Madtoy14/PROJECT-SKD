@@ -3,7 +3,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Users, Clock, Calendar, Star, Loader2 } from 'lucide-react';
 import { getRankForScore, getCurrentSeason, getSeasonDates, RANK_TIERS } from '../data/ranks';
-import { fetchMonthlyLeaderboard } from '../lib/supabase';
+import { fetchMonthlyLeaderboard, supabase, isSupabaseConfigured } from '../lib/supabase';
 import PlayerProfileModal from '../components/PlayerProfileModal';
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -21,20 +21,63 @@ export default function Leaderboard() {
   const { start, end, daysLeft, resetDate } = getSeasonDates();
   const [activeTab, setActiveTab] = useState<'all' | 'friends'>('all');
   const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+  const [mutualFriendIds, setMutualFriendIds] = useState<Set<string>>(new Set());
+  const [friendsLoading, setFriendsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchMonthlyLeaderboard().then(data => {
-      // Map score to xp for UI compatibility
       const mapped = data.map(item => ({
         ...item,
         xp: item.score
-      })).slice(0, 10); // LIMIT to top 10 for now since the app is new
+      })).slice(0, 10);
       setLeaderboardData(mapped);
       setLoading(false);
     });
   }, []);
+
+  // Fetch mutual follows saat tab Teman aktif
+  useEffect(() => {
+    if (activeTab !== 'friends' || !isSupabaseConfigured()) return;
+    if (mutualFriendIds.size > 0) return; // sudah di-fetch sebelumnya
+
+    setFriendsLoading(true);
+    const fetchMutuals = async () => {
+      try {
+        const { data: { user } } = await supabase!.auth.getUser();
+        if (!user) return;
+
+        // Ambil semua yang current user ikuti (user_id = saya)
+        const { data: following } = await supabase!
+          .from('friends')
+          .select('friend_id')
+          .eq('user_id', user.id)
+          .eq('status', 'accepted');
+
+        if (!following || following.length === 0) return;
+
+        const followingIds = following.map(f => f.friend_id);
+
+        // Dari daftar itu, cari yang juga mengikuti saya balik (mutual)
+        const { data: mutuals } = await supabase!
+          .from('friends')
+          .select('user_id')
+          .eq('friend_id', user.id)
+          .eq('status', 'accepted')
+          .in('user_id', followingIds);
+
+        if (mutuals) {
+          setMutualFriendIds(new Set(mutuals.map(m => m.user_id)));
+        }
+      } catch (err) {
+        console.error('Gagal fetch mutual friends:', err);
+      } finally {
+        setFriendsLoading(false);
+      }
+    };
+    fetchMutuals();
+  }, [activeTab]);
 
   const myData = leaderboardData.find(p => p.isMe);
   const myRank = getRankForScore(myData?.xp ?? 0);
@@ -176,16 +219,78 @@ export default function Leaderboard() {
             animate="show"
             className="space-y-2"
           >
-            <p className="text-[10px] text-skd-muted uppercase font-bold tracking-widest px-1 mb-3">
-              {activeTab === 'all' ? `${leaderboardData.length} Peserta` : 'Daftar Teman'}
-            </p>
+            {/* Header count */}
+            {activeTab === 'all' && (
+              <p className="text-[10px] text-skd-muted uppercase font-bold tracking-widest px-1 mb-3">
+                {leaderboardData.length} Peserta
+              </p>
+            )}
 
+            {/* ── Tab Teman: mutual follow dari Supabase ── */}
             {activeTab === 'friends' && (
-              <div className="text-center py-12 text-skd-muted">
-                <p className="text-4xl mb-3">👥</p>
-                <p className="font-bold">Belum ada teman yang ditambahkan</p>
-                <p className="text-xs mt-1">Tambah teman dari halaman Profil</p>
-              </div>
+              friendsLoading ? (
+                <div className="flex justify-center items-center py-16">
+                  <Loader2 className="animate-spin text-skd-accent" size={32} />
+                </div>
+              ) : mutualFriendIds.size === 0 ? (
+                <div className="text-center py-12 text-skd-muted">
+                  <p className="text-4xl mb-3">👥</p>
+                  <p className="font-bold">Belum ada teman saling mengikuti</p>
+                  <p className="text-xs mt-1">Ikuti pemain lain dari halaman Profil, lalu minta mereka balik mengikutimu</p>
+                </div>
+              ) : (() => {
+                // Filter leaderboard hanya untuk mutual friends + diri sendiri
+                const friendList = leaderboardData.filter(p => p.isMe || mutualFriendIds.has(p.id));
+                if (friendList.length === 0) {
+                  return (
+                    <div className="text-center py-12 text-skd-muted">
+                      <p className="text-4xl mb-3">🏆</p>
+                      <p className="font-bold">Teman kamu belum ada di papan peringkat</p>
+                      <p className="text-xs mt-1">Ajak teman bermain agar muncul di sini</p>
+                    </div>
+                  );
+                }
+                return (
+                  <>
+                    <p className="text-[10px] text-skd-muted uppercase font-bold tracking-widest px-1 mb-3">
+                      {friendList.length} Teman Saling Mengikuti
+                    </p>
+                    {friendList.map((player, idx) => {
+                      const tier = getRankForScore(player.xp);
+                      const medal = player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : null;
+                      return (
+                        <motion.div
+                          key={player.rank}
+                          variants={itemVariants}
+                          onClick={() => setSelectedPlayerId(player.id)}
+                          className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl border transition-colors cursor-pointer
+                            ${player.isMe
+                              ? `bg-gradient-to-r ${tier.color}/10 ${tier.borderColor} shadow-md`
+                              : 'bg-skd-card border-skd-border hover:bg-skd-muted/5'}`}
+                        >
+                          <div className={`w-7 text-center font-black text-base shrink-0
+                            ${idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-gray-400' : idx === 2 ? 'text-amber-600' : 'text-skd-muted'}`}>
+                            {medal ?? `#${player.rank}`}
+                          </div>
+                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center text-xl shrink-0 shadow-sm`}>
+                            {tier.emoji}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-bold truncate ${player.isMe ? tier.textColor : 'text-skd-text'}`}>
+                              {player.name}{player.isMe && ' 👤'}
+                            </p>
+                            <p className={`text-[10px] font-bold ${tier.textColor}`}>{tier.name}</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-sm font-black font-space text-skd-text">{player.xp.toLocaleString()}</p>
+                            <p className="text-[9px] text-skd-muted">XP</p>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </>
+                );
+              })()
             )}
 
             {activeTab === 'all' && leaderboardData.map((player, idx) => {

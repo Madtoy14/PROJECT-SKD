@@ -241,7 +241,7 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival }: Pl
                       }}
                       className="w-full bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] font-black py-2.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm"
                     >
-                      <Shield size={16} /> Tambahkan ke Daftar Rival
+                      <Shield size={15} /> Tambah Rival
                     </button>
                   )}
                 </div>
