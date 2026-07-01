@@ -187,6 +187,7 @@ export const fetchMonthlyLeaderboard = async () => {
     const currentUserId = currentUser.data.user?.id;
 
     return data.map((p, idx) => ({
+      id: p.id,
       rank: idx + 1,
       name: p.username,
       score: p.score,

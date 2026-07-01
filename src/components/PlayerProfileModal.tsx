@@ -85,7 +85,7 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival }: Pl
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.7 }}
@@ -98,7 +98,7 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival }: Pl
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="bg-[#1A1924] border border-white/10 w-full max-w-sm rounded-[2rem] shadow-2xl relative z-10 overflow-hidden"
+          className="bg-[#1A1924] border border-white/10 w-full max-w-xs rounded-[2rem] shadow-2xl relative z-10 overflow-hidden"
         >
           {loading ? (
             <div className="flex flex-col items-center justify-center p-12 text-gray-400">
@@ -125,26 +125,26 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival }: Pl
                 </button>
               </div>
 
-              <div className="px-6 pb-6 relative pt-12">
+              <div className="px-5 pb-5 relative pt-10">
                 {/* Avatar */}
-                <div className="absolute -top-16 left-6">
+                <div className="absolute -top-12 left-5">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full bg-[#1A1924] border-4 border-[#1A1924] overflow-hidden">
+                    <div className="w-20 h-20 rounded-full bg-[#1A1924] border-4 border-[#1A1924] overflow-hidden">
                       <img src={avatarUrl} alt={profile.username} className="w-full h-full object-cover" />
                     </div>
                     <div className={`absolute bottom-1 right-1 w-5 h-5 rounded-full border-4 border-[#1A1924] shadow-sm ${isOnline ? 'bg-skd-success' : 'bg-gray-500'}`} title={isOnline ? 'Online' : 'Offline'} />
                   </div>
                 </div>
 
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-3">
                   <div>
-                    <h2 className="text-2xl font-black text-white">{profile.username}</h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs font-bold text-skd-premium bg-skd-premium/10 px-2 py-0.5 rounded-md flex items-center gap-1">
+                    <h2 className="text-xl font-black text-white">{profile.username}</h2>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <span className="text-[10px] font-bold text-skd-premium bg-skd-premium/10 px-2 py-0.5 rounded-md flex items-center gap-1">
                         <Star size={12} className="fill-skd-premium" /> Level {profile.level || 1}
                       </span>
                       {profile.target_kedinasan && (
-                        <span className="text-xs font-bold text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded-md flex items-center gap-1">
+                        <span className="text-[10px] font-bold text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded-md flex items-center gap-1">
                           <Target size={12} /> {profile.target_kedinasan}
                         </span>
                       )}
@@ -152,31 +152,31 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival }: Pl
                   </div>
                 </div>
 
-                <div className="bg-white/5 rounded-2xl p-4 border border-white/5 mb-5 mt-2">
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/5 rounded-2xl p-3 border border-white/5 mb-4 mt-2">
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <Trophy size={12} className="text-skd-accent" /> Total Skor
+                      <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <Trophy size={10} className="text-skd-accent" /> Total Skor
                       </span>
-                      <span className="text-lg font-black text-white">{profile.score.toLocaleString()}</span>
+                      <span className="text-base font-black text-white">{profile.score.toLocaleString()}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <Swords size={12} className="text-red-400" /> PvP Wins
+                      <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <Swords size={10} className="text-red-400" /> PvP Wins
                       </span>
-                      <span className="text-lg font-black text-white">{profile.total_pvp_wins || 0}</span>
+                      <span className="text-base font-black text-white">{profile.total_pvp_wins || 0}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <CheckCircle2 size={12} className="text-skd-success" /> Akurasi
+                      <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <CheckCircle2 size={10} className="text-skd-success" /> Akurasi
                       </span>
-                      <span className="text-lg font-black text-white">{akurasiTotal}%</span>
+                      <span className="text-base font-black text-white">{akurasiTotal}%</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <Activity size={12} className="text-blue-400" /> Survival Max
+                      <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <Activity size={10} className="text-blue-400" /> Survival Max
                       </span>
-                      <span className="text-lg font-black text-white">{profile.highest_survival_score || 0} Combo</span>
+                      <span className="text-base font-black text-white">{profile.highest_survival_score || 0} Combo</span>
                     </div>
                   </div>
                 </div>

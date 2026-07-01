@@ -826,30 +826,30 @@ export default function Profile() {
                           <p className="text-[10px] font-space text-gray-400 truncate">{friend.username}</p>
                         </div>
                       </div>
-                      <div className={`flex items-center gap-1.5 transition-opacity ${inviteStatus === 'inviting' && targetId === String(friend.id)
+                      <div className={`flex flex-wrap items-center justify-end gap-1.5 transition-opacity ${inviteStatus === 'inviting' && targetId === String(friend.id)
                           ? 'opacity-100'
                           : 'opacity-0 group-hover:opacity-100'
                         }`}>
                         <button
                           disabled={inviteStatus === 'inviting'}
-                          onClick={() => sendInvite(String(friend.id), friend.name)}
+                          onClick={(e) => { e.stopPropagation(); sendInvite(String(friend.id), friend.name); }}
                           className={`px-3 py-1.5 font-black rounded-lg text-[10px] transition-colors ${inviteStatus === 'inviting' && targetId === String(friend.id)
                               ? 'bg-yellow-500 text-[#0F0E17] animate-pulse'
                               : 'bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] disabled:opacity-50 disabled:cursor-not-allowed'
                             }`}
                         >
-                          {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Menunggu...' : 'Duel'}
+                          {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Tunggu...' : 'Duel'}
                         </button>
                         {inviteStatus === 'inviting' && targetId === String(friend.id) && (
                           <button
-                            onClick={() => cancelInvite()}
+                            onClick={(e) => { e.stopPropagation(); cancelInvite(); }}
                             className="px-3 py-1.5 font-black rounded-lg text-[10px] bg-red-500 hover:bg-red-600 text-white transition-colors"
                           >
                             Batal
                           </button>
                         )}
                         <button
-                          onClick={() => handleRemoveFriend(friend.id)}
+                          onClick={(e) => { e.stopPropagation(); handleRemoveFriend(friend.id); }}
                           className="p-1.5 bg-skd-danger/10 hover:bg-skd-danger/20 text-skd-danger rounded-lg transition-colors"
                         >
                           <Trash2 size={12} />
