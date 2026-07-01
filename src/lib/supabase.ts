@@ -24,7 +24,8 @@ export interface UserProfile {
   level: number;
   avatar_url?: string;
   selected_avatar?: string;
-  unlocked_avatars?: string[];
+  unlocked_avatars?: string[];       // khusus ID karakter/avatar
+  purchased_packages?: string[];     // khusus ID paket premium (paket_*)
   inventory?: {
     item_5050: number;
     item_hint: number;
@@ -111,6 +112,11 @@ export const fetchProfile = async (userId: string = 'current'): Promise<UserProf
       data.inventory = parseSafely(data.inventory);
       data.catatan_salah = parseSafely(data.catatan_salah);
       data.friends = parseSafely(data.friends);
+      // purchased_packages adalah text[] di Postgres — sudah array, tidak perlu parse
+      // tapi jaga-jaga jika tersimpan sebagai string JSON
+      if (typeof data.purchased_packages === 'string') {
+        data.purchased_packages = parseSafely(data.purchased_packages);
+      }
     }
 
     return data as UserProfile;
@@ -154,6 +160,9 @@ export const updateProfile = async (profileUpdate: Partial<UserProfile>): Promis
       data.inventory = parseSafely(data.inventory);
       data.catatan_salah = parseSafely(data.catatan_salah);
       data.friends = parseSafely(data.friends);
+      if (typeof data.purchased_packages === 'string') {
+        data.purchased_packages = parseSafely(data.purchased_packages);
+      }
     }
 
     return data as UserProfile;

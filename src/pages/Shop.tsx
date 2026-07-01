@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coins, Scale, Lightbulb, Zap, LockKeyhole, Sparkles, Check, Clock, Eye, Heart, Battery, Shield, Skull } from 'lucide-react';
-import { fetchProfile, updateProfile } from '../lib/supabase';
+import { fetchProfile, updateProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
 import { logCoinPurchase, logItemSale, logEnergyPurchase, validatePurchase } from '../lib/transactions';
-import avatarPdh from '../assets/avatar_pdh.png';
 
 const POWER_UPS = [
   { id: 'item_5050', title: 'Eliminasi 50:50', description: 'Hapus 2 opsi jawaban yang salah.', cost: 300, icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
@@ -38,74 +37,116 @@ export default function Shop() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
+  const [purchasing, setPurchasing] = useState<string | null>(null); // loading state per item
 
   useEffect(() => {
     fetchProfile().then(p => setProfile(p));
   }, []);
 
-  const handlePurchase = async (itemId: string, itemTitle: string, cost: number, isAvatar = false) => {
-    if (!profile) return;
-    
-    // Validate purchase (rate limiting & anti-cheat)
-    const validation = await validatePurchase(itemId, cost);
-    if (!validation.valid) {
-      setToastType('error');
-      setToastMessage(validation.reason || 'Pembelian tidak valid');
-      setTimeout(() => setToastMessage(null), 3000);
-      return;
-    }
-    
-    // Check if coins are enough
-    if (profile.coins < cost) {
-      setToastType('error');
-      setToastMessage(`Koin tidak cukup untuk membeli ${itemTitle}!`);
-      setTimeout(() => setToastMessage(null), 3000);
-      return;
-    }
-
-    // Check if avatar is already unlocked
-    if (isAvatar && profile.unlocked_avatars?.includes(itemId)) {
-      setToastType('error');
-      setToastMessage(`Anda sudah memiliki ${itemTitle}!`);
-      setTimeout(() => setToastMessage(null), 3000);
-      return;
-    }
-
-    const updatedCoins = profile.coins - cost;
-    let profileUpdate: Partial<UserProfile> = { coins: updatedCoins };
-
-    if (isAvatar) {
-      profileUpdate.unlocked_avatars = [...(profile.unlocked_avatars || []), itemId];
-    } else {
-      if (itemId === 'item_energy_refill') {
-        profileUpdate.energy = Math.min(25, (profile.energy || 0) + 5);
-        // Log energy purchase
-        await logEnergyPurchase(cost, 5, updatedCoins);
-      } else {
-        const currentInv = profile.inventory || { item_5050: 0, item_hint: 0, item_shield: 0, item_waktu_beku: 0, item_skor_ganda: 0, item_terawangan: 0, item_kesempatan_kedua: 0, item_energy_refill: 0, item_streak_protector: 0, item_coin_booster: 0, item_tinta_hitam: 0, item_lompatan_kilat: 0 };
-        const invKey = itemId as keyof NonNullable<typeof profile.inventory>;
-        profileUpdate.inventory = {
-          ...currentInv,
-          [invKey]: (currentInv[invKey] || 0) + 1
-        };
-      }
-    }
-
-    // Update profile
-    const updatedProfile = await updateProfile(profileUpdate);
-    setProfile(updatedProfile);
-    
-    // Log transaction (for non-energy items)
-    if (itemId !== 'item_energy_refill') {
-      await logCoinPurchase(itemId, cost, updatedCoins, {
-        item_title: itemTitle,
-        is_avatar: isAvatar
-      });
-    }
-    
-    setToastType('success');
-    setToastMessage(`Berhasil membeli ${itemTitle}!`);
+  const showToast = (msg: string, type: 'success' | 'error') => {
+    setToastType(type);
+    setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // itemType: 'inventory' | 'avatar' | 'premium_package' | 'energy'
+  const handlePurchase = async (
+    itemId: string,
+    itemTitle: string,
+    cost: number,
+    itemType: 'inventory' | 'avatar' | 'premium_package' | 'energy' = 'inventory'
+  ) => {
+    if (!profile || purchasing) return;
+
+    // ── Guard: sudah punya? ──
+    if (itemType === 'avatar' && profile.unlocked_avatars?.includes(itemId)) {
+      showToast(`Anda sudah memiliki ${itemTitle}!`, 'error');
+      return;
+    }
+    if (itemType === 'premium_package' && profile.purchased_packages?.includes(itemId)) {
+      showToast(`Anda sudah memiliki ${itemTitle}!`, 'error');
+      return;
+    }
+
+    // ── Guard client-side koin (UX only) ──
+    if (profile.coins < cost) {
+      showToast(`Koin tidak cukup untuk membeli ${itemTitle}!`, 'error');
+      return;
+    }
+
+    setPurchasing(itemId);
+    try {
+      // ── Validasi rate-limit client ──
+      const validation = await validatePurchase(itemId, cost);
+      if (!validation.valid) {
+        showToast(validation.reason || 'Pembelian tidak valid', 'error');
+        return;
+      }
+
+      let coinsAfter = profile.coins - cost;
+
+      // ── SERVER-SIDE VALIDATION via RPC (atomic deduct koin) ──
+      if (isSupabaseConfigured()) {
+        const { data: rpcResult, error: rpcError } = await supabase!.rpc('purchase_item', {
+          p_item_id: itemId,
+          p_cost: cost,
+          p_item_type: itemType
+        });
+
+        if (rpcError || !rpcResult?.success) {
+          // RPC belum ada (fungsi belum dibuat di Supabase) — fallback ke client-side
+          if (rpcError?.code === 'PGRST202' || rpcError?.message?.includes('Could not find')) {
+            console.warn('RPC purchase_item belum tersedia, menggunakan client-side fallback');
+            // Lanjut dengan client-side deduct di bawah
+          } else {
+            showToast(rpcResult?.reason || rpcError?.message || 'Pembelian gagal di server', 'error');
+            return;
+          }
+        } else {
+          coinsAfter = rpcResult.coins_after;
+        }
+      }
+
+      // ── Update item / avatar / paket di profil ──
+      let profileUpdate: Partial<UserProfile> = { coins: coinsAfter };
+
+      if (itemType === 'premium_package') {
+        profileUpdate.purchased_packages = [...(profile.purchased_packages || []), itemId];
+      } else if (itemType === 'avatar') {
+        profileUpdate.unlocked_avatars = [...(profile.unlocked_avatars || []), itemId];
+      } else if (itemType === 'energy') {
+        profileUpdate.energy = Math.min(25, (profile.energy || 0) + 5);
+        await logEnergyPurchase(cost, 5, coinsAfter);
+      } else {
+        // inventory biasa
+        const currentInv = profile.inventory || {
+          item_5050: 0, item_hint: 0, item_shield: 0, item_waktu_beku: 0,
+          item_skor_ganda: 0, item_terawangan: 0, item_kesempatan_kedua: 0,
+          item_energy_refill: 0, item_streak_protector: 0, item_coin_booster: 0,
+          item_tinta_hitam: 0, item_lompatan_kilat: 0
+        };
+        const invKey = itemId as keyof NonNullable<typeof profile.inventory>;
+        profileUpdate.inventory = { ...currentInv, [invKey]: (currentInv[invKey] || 0) + 1 };
+      }
+
+      const updatedProfile = await updateProfile(profileUpdate);
+      setProfile(updatedProfile);
+
+      // ── Log transaksi ──
+      if (itemType !== 'energy') {
+        await logCoinPurchase(itemId, cost, coinsAfter, {
+          item_title: itemTitle,
+          item_type: itemType
+        });
+      }
+
+      showToast(`Berhasil membeli ${itemTitle}!`, 'success');
+    } catch (err: any) {
+      console.error('Purchase error:', err);
+      showToast('Terjadi kesalahan saat pembelian', 'error');
+    } finally {
+      setPurchasing(null);
+    }
   };
 
   const handleSellBack = async (itemId: string, itemTitle: string, cost: number) => {
@@ -219,7 +260,11 @@ export default function Shop() {
                       key={item.id}
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => handlePurchase(item.id, item.title, item.cost, false)}
+                      disabled={purchasing === item.id}
+                      onClick={() => item.id === 'item_energy_refill'
+                        ? handlePurchase(item.id, item.title, item.cost, 'energy')
+                        : handlePurchase(item.id, item.title, item.cost, 'inventory')
+                      }
                       className="bg-skd-card border border-skd-border hover:border-skd-muted/30 p-5 md:p-6 rounded-3xl flex flex-col items-start gap-4 text-left transition-all shadow-sm hover:shadow-md w-full relative overflow-hidden group"
                     >
                       {count > 0 && (
@@ -256,7 +301,9 @@ export default function Shop() {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {PREMIUM_PACKAGES.map((pkg) => {
-                  const isUnlocked = profile?.unlocked_avatars?.includes(pkg.id);
+                  // Gunakan purchased_packages, bukan unlocked_avatars
+                  const isUnlocked = profile?.purchased_packages?.includes(pkg.id);
+                  const isLoading = purchasing === pkg.id;
 
                   return (
                     <motion.div
@@ -284,10 +331,11 @@ export default function Shop() {
                               <span className="font-space font-bold text-yellow-400 text-sm">{pkg.cost}</span>
                             </div>
                             <button
-                              onClick={() => handlePurchase(pkg.id, pkg.title, pkg.cost, true)}
-                              className="px-4 py-2 bg-skd-premium hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                              disabled={isLoading}
+                              onClick={() => handlePurchase(pkg.id, pkg.title, pkg.cost, 'premium_package')}
+                              className="px-4 py-2 bg-skd-premium hover:bg-purple-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-1.5"
                             >
-                              Buka Akses
+                              {isLoading ? <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Memproses...</> : 'Buka Akses'}
                             </button>
                           </>
                         )}
