@@ -178,8 +178,10 @@ function Navigation() {
 
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading]   = useState(true);
+  const [session, setSession]   = useState<any>(null);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     if (!supabase) {
@@ -187,26 +189,90 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Cek session awal
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setLoading(false);
+      if (session?.user) {
+        checkOnboarding(session.user.id);
+      } else {
+        setLoading(false);
+      }
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    // P1.3: dengarkan perubahan auth — termasuk setelah Google OAuth redirect
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        if (session?.user) {
+          await checkOnboarding(session.user.id);
+        } else {
+          setNeedsOnboarding(false);
+          setLoading(false);
+        }
+      }
+    );
 
     return () => subscription.unsubscribe();
   }, []);
 
+  // P1.3 + P3.2: cek onboarding langsung ke Supabase, tidak pakai localStorage
+  const checkOnboarding = async (userId: string) => {
+    try {
+      const { data: profile } = await supabase!
+        .from('profiles')
+        .select('nickname, username')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (!profile) {
+        // P1.3: user baru via Google OAuth — buat profil dengan username dari Google
+        const { data: { user } } = await supabase!.auth.getUser();
+        if (user) {
+          const rawName = user.user_metadata?.full_name ||
+                          user.user_metadata?.name ||
+                          user.email?.split('@')[0] || 'pejuang';
+          const safeUsername = rawName
+            .toLowerCase()
+            .replace(/\s+/g, '_')
+            .replace(/[^a-z0-9_]/g, '')
+            .slice(0, 20) || 'pejuang';
+
+          await supabase!.from('profiles').upsert({
+            id: user.id,
+            username: safeUsername
+          });
+        }
+        setNeedsOnboarding(true);
+      } else if (!profile.nickname) {
+        // Profil ada tapi belum lengkap (nickname belum diisi di onboarding)
+        setNeedsOnboarding(true);
+      } else {
+        setNeedsOnboarding(false);
+      }
+    } catch {
+      setNeedsOnboarding(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
-    return <div className="min-h-screen bg-skd-bg flex items-center justify-center text-skd-accent font-bold">Memuat Arena...</div>;
+    return (
+      <div className="min-h-screen bg-skd-bg flex flex-col items-center justify-center gap-3 text-skd-accent font-bold">
+        <div className="w-10 h-10 border-4 border-skd-accent/20 border-t-skd-accent rounded-full animate-spin" />
+        <span className="text-sm">Memuat Arena...</span>
+      </div>
+    );
   }
 
   if (!session) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // P1.3: redirect ke onboarding jika profil belum lengkap,
+  // kecuali user memang sudah di /onboarding
+  if (needsOnboarding && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
   }
 
   return <>{children}</>;
