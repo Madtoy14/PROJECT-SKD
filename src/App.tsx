@@ -177,94 +177,23 @@ function Navigation() {
 
 
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading]   = useState(true);
-  const [session, setSession]   = useState<any>(null);
-  const [needsOnboarding, setNeedsOnboarding] = useState(false);
-  const location       = useLocation();
-  const checkingRef    = useRef(false); // cegah double call race condition
-  const checkedUserRef = useRef<string | null>(null); // track user yang sudah dicek
+// Auth state di-hoist ke AppLayout agar tidak re-query setiap navigasi
+// ProtectedRoute hanya membaca state yang sudah ada
+interface AuthState {
+  loading: boolean;
+  session: any;
+  needsOnboarding: boolean;
+}
 
-  useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        checkOnboarding(session.user.id);
-      } else {
-        setLoading(false);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        if (session?.user) {
-          await checkOnboarding(session.user.id);
-        } else {
-          setNeedsOnboarding(false);
-          checkingRef.current = false;
-          checkedUserRef.current = null;
-          setLoading(false);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const checkOnboarding = async (userId: string) => {
-    // Cegah double call untuk user yang sama
-    if (checkingRef.current && checkedUserRef.current === userId) return;
-    checkingRef.current    = true;
-    checkedUserRef.current = userId;
-
-    try {
-      const { data: profile } = await supabase!
-        .from('profiles')
-        .select('nickname, username, target_kedinasan')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (!profile) {
-        // User baru — buat profil awal dari Google metadata
-        const { data: { user } } = await supabase!.auth.getUser();
-        if (user) {
-          const rawName    = user.user_metadata?.full_name ||
-                             user.user_metadata?.name ||
-                             user.email?.split('@')[0] || 'pejuang';
-          const safeUsername = rawName
-            .toLowerCase()
-            .replace(/\s+/g, '_')
-            .replace(/[^a-z0-9_]/g, '')
-            .slice(0, 20) || 'pejuang';
-
-          await supabase!.from('profiles').upsert({
-            id: user.id,
-            username: safeUsername
-            // TIDAK set nickname atau target_kedinasan — biarkan kosong
-            // agar checkOnboarding mendeteksi bahwa profil belum lengkap
-          });
-        }
-        setNeedsOnboarding(true);
-      } else {
-        // Profil dianggap LENGKAP hanya jika user sudah mengisi
-        // nickname (display name) DAN target_kedinasan (pilihan di Onboarding)
-        const isComplete = !!(profile.nickname && profile.target_kedinasan);
-        setNeedsOnboarding(!isComplete);
-      }
-    } catch {
-      // Jika error, tetap arahkan ke onboarding untuk safety
-      setNeedsOnboarding(true);
-    } finally {
-      checkingRef.current = false;
-      setLoading(false);
-    }
-  };
+function ProtectedRoute({
+  children,
+  authState
+}: {
+  children: React.ReactNode;
+  authState: AuthState;
+}) {
+  const location = useLocation();
+  const { loading, session, needsOnboarding } = authState;
 
   if (loading) {
     return (
@@ -287,35 +216,108 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AppLayout() {
-
   const location = useLocation();
-
   const hideNavPaths = ['/quiz', '/result', '/auth', '/onboarding'];
-
   const isFullScreen = hideNavPaths.includes(location.pathname);
+
+  // Auth state di-kelola di sini — satu kali untuk semua route
+  // ProtectedRoute hanya membaca state ini tanpa query ulang
+  const [authState, setAuthState] = useState<AuthState>({
+    loading: true,
+    session: null,
+    needsOnboarding: false
+  });
+  const checkingRef    = useRef(false);
+  const checkedUserRef = useRef<string | null>(null);
+
+  const checkOnboarding = async (userId: string) => {
+    if (checkingRef.current && checkedUserRef.current === userId) return;
+    checkingRef.current    = true;
+    checkedUserRef.current = userId;
+
+    try {
+      const { data: profile } = await supabase!
+        .from('profiles')
+        .select('nickname, target_kedinasan')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (!profile) {
+        // User baru Google — buat profil awal tanpa nickname/target
+        const { data: { user } } = await supabase!.auth.getUser();
+        if (user) {
+          const rawName = user.user_metadata?.full_name ||
+                          user.user_metadata?.name ||
+                          user.email?.split('@')[0] || 'pejuang';
+          const safeUsername = rawName
+            .toLowerCase()
+            .replace(/\s+/g, '_')
+            .replace(/[^a-z0-9_]/g, '')
+            .slice(0, 20) || 'pejuang';
+          await supabase!.from('profiles').upsert({ id: user.id, username: safeUsername });
+        }
+        setAuthState(s => ({ ...s, needsOnboarding: true, loading: false }));
+      } else {
+        const isComplete = !!(profile.nickname && profile.target_kedinasan);
+        setAuthState(s => ({ ...s, needsOnboarding: !isComplete, loading: false }));
+      }
+    } catch {
+      setAuthState(s => ({ ...s, needsOnboarding: true, loading: false }));
+    } finally {
+      checkingRef.current = false;
+    }
+  };
+
+  useEffect(() => {
+    if (!supabase) {
+      setAuthState({ loading: false, session: null, needsOnboarding: false });
+      return;
+    }
+
+    // Cek session awal sekali saat AppLayout mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthState(s => ({ ...s, session }));
+      if (session?.user) {
+        checkOnboarding(session.user.id);
+      } else {
+        setAuthState(s => ({ ...s, loading: false }));
+      }
+    });
+
+    // Dengarkan perubahan auth (Google OAuth callback, logout, dll)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setAuthState(s => ({ ...s, session }));
+        if (session?.user) {
+          await checkOnboarding(session.user.id);
+        } else {
+          checkingRef.current    = false;
+          checkedUserRef.current = null;
+          setAuthState({ loading: false, session: null, needsOnboarding: false });
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <div className="min-h-screen bg-skd-bg text-skd-text font-syne transition-colors flex flex-col md:flex-row overflow-x-hidden">
       <Navigation />
       <IncomingDuelRequest />
-
-      {/* Main Content Area - padded for sidebar on desktop and bottom nav on mobile */}
       <main className={`flex-1 min-w-0 ${!isFullScreen ? 'md:ml-[88px] pb-20 md:pb-0' : ''} min-h-screen transition-all duration-300`}>
         <div className={`w-full h-full ${!isFullScreen ? 'max-w-7xl mx-auto' : ''}`}>
           <Routes>
-            {/* Public Route */}
             <Route path="/auth" element={<Auth />} />
-
-            {/* Protected Routes */}
-            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
-            <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
-            <Route path="/result" element={<ProtectedRoute><Result /></ProtectedRoute>} />
-            <Route path="/liga" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-            <Route path="/quest" element={<ProtectedRoute><Quest /></ProtectedRoute>} />
-            <Route path="/toko" element={<ProtectedRoute><Shop /></ProtectedRoute>} />
-            <Route path="/profil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/pembahasan-tryout" element={<ProtectedRoute><PembahasanTryout /></ProtectedRoute>} />
+            <Route path="/"                  element={<ProtectedRoute authState={authState}><Dashboard /></ProtectedRoute>} />
+            <Route path="/onboarding"        element={<ProtectedRoute authState={authState}><Onboarding /></ProtectedRoute>} />
+            <Route path="/quiz"              element={<ProtectedRoute authState={authState}><Quiz /></ProtectedRoute>} />
+            <Route path="/result"            element={<ProtectedRoute authState={authState}><Result /></ProtectedRoute>} />
+            <Route path="/liga"              element={<ProtectedRoute authState={authState}><Leaderboard /></ProtectedRoute>} />
+            <Route path="/quest"             element={<ProtectedRoute authState={authState}><Quest /></ProtectedRoute>} />
+            <Route path="/toko"              element={<ProtectedRoute authState={authState}><Shop /></ProtectedRoute>} />
+            <Route path="/profil"            element={<ProtectedRoute authState={authState}><Profile /></ProtectedRoute>} />
+            <Route path="/pembahasan-tryout" element={<ProtectedRoute authState={authState}><PembahasanTryout /></ProtectedRoute>} />
           </Routes>
         </div>
       </main>
