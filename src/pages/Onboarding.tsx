@@ -21,43 +21,58 @@ export default function Onboarding() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Check if already completed
-    const isComplete = localStorage.getItem('isProfileComplete');
-    if (isComplete === 'true') {
-      navigate('/');
-    }
+    // Cek ke Supabase langsung — tidak pakai localStorage
+    if (!supabase) return;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase!
+        .from('profiles')
+        .select('nickname, target_kedinasan')
+        .eq('id', user.id)
+        .maybeSingle()
+        .then(({ data: profile }) => {
+          // Sudah onboarding jika nickname DAN target_kedinasan sudah terisi
+          if (profile?.nickname && profile?.target_kedinasan) {
+            navigate('/');
+          }
+        });
+    });
   }, [navigate]);
 
   const activeSchool = SCHOOLS.find(s => s.id === targetSchool) || SCHOOLS[0];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!displayName.trim()) return;
     setLoading(true);
 
     try {
       const { data: { user } } = await supabase!.auth.getUser();
-      if (user) {
-        const usernameFallback = user.user_metadata?.name || user.email?.split('@')[0] || 'User' + Math.floor(Math.random()*1000);
-        
-        const { error } = await supabase!.from('profiles').upsert({
-          id: user.id,
-          username: usernameFallback,
-          nickname: displayName,
-          target_kedinasan: targetSchool,
-          bio: bio
-        });
-        
-        if (error) throw error;
-      }
-      
-      localStorage.setItem('isProfileComplete', 'true');
+      if (!user) throw new Error('Sesi tidak ditemukan');
+
+      const usernameFallback = user.user_metadata?.name ||
+                               user.email?.split('@')[0] ||
+                               'User' + Math.floor(Math.random() * 1000);
+
+      const { error } = await supabase!.from('profiles').upsert({
+        id: user.id,
+        username: usernameFallback,
+        nickname: displayName.trim(),
+        target_kedinasan: targetSchool,
+        bio: bio.trim()
+      });
+
+      if (error) throw error;
+
+      // Tidak pakai localStorage — ProtectedRoute cek langsung ke Supabase
       setShowToast(true);
       setTimeout(() => {
         navigate('/');
       }, 1500);
     } catch (err: any) {
       console.error(err);
-      alert(err.message || 'Gagal menyimpan data karakter');
+      // Tampilkan error sebagai toast daripada alert()
+      setShowToast(false);
     } finally {
       setLoading(false);
     }

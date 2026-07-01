@@ -4,7 +4,7 @@ import { QuizSessionProvider } from './context/QuizSessionContext';
 
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from './lib/supabase';
 
 import { Home, Trophy, BookOpen, Store, User, BookOpenCheck } from 'lucide-react';
@@ -181,7 +181,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [loading, setLoading]   = useState(true);
   const [session, setSession]   = useState<any>(null);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
-  const location = useLocation();
+  const location       = useLocation();
+  const checkingRef    = useRef(false); // cegah double call race condition
+  const checkedUserRef = useRef<string | null>(null); // track user yang sudah dicek
 
   useEffect(() => {
     if (!supabase) {
@@ -189,7 +191,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Cek session awal
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
@@ -199,7 +200,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       }
     });
 
-    // P1.3: dengarkan perubahan auth — termasuk setelah Google OAuth redirect
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
@@ -207,6 +207,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
           await checkOnboarding(session.user.id);
         } else {
           setNeedsOnboarding(false);
+          checkingRef.current = false;
+          checkedUserRef.current = null;
           setLoading(false);
         }
       }
@@ -215,22 +217,26 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // P1.3 + P3.2: cek onboarding langsung ke Supabase, tidak pakai localStorage
   const checkOnboarding = async (userId: string) => {
+    // Cegah double call untuk user yang sama
+    if (checkingRef.current && checkedUserRef.current === userId) return;
+    checkingRef.current    = true;
+    checkedUserRef.current = userId;
+
     try {
       const { data: profile } = await supabase!
         .from('profiles')
-        .select('nickname, username')
+        .select('nickname, username, target_kedinasan')
         .eq('id', userId)
         .maybeSingle();
 
       if (!profile) {
-        // P1.3: user baru via Google OAuth — buat profil dengan username dari Google
+        // User baru — buat profil awal dari Google metadata
         const { data: { user } } = await supabase!.auth.getUser();
         if (user) {
-          const rawName = user.user_metadata?.full_name ||
-                          user.user_metadata?.name ||
-                          user.email?.split('@')[0] || 'pejuang';
+          const rawName    = user.user_metadata?.full_name ||
+                             user.user_metadata?.name ||
+                             user.email?.split('@')[0] || 'pejuang';
           const safeUsername = rawName
             .toLowerCase()
             .replace(/\s+/g, '_')
@@ -240,18 +246,22 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
           await supabase!.from('profiles').upsert({
             id: user.id,
             username: safeUsername
+            // TIDAK set nickname atau target_kedinasan — biarkan kosong
+            // agar checkOnboarding mendeteksi bahwa profil belum lengkap
           });
         }
         setNeedsOnboarding(true);
-      } else if (!profile.nickname) {
-        // Profil ada tapi belum lengkap (nickname belum diisi di onboarding)
-        setNeedsOnboarding(true);
       } else {
-        setNeedsOnboarding(false);
+        // Profil dianggap LENGKAP hanya jika user sudah mengisi
+        // nickname (display name) DAN target_kedinasan (pilihan di Onboarding)
+        const isComplete = !!(profile.nickname && profile.target_kedinasan);
+        setNeedsOnboarding(!isComplete);
       }
     } catch {
-      setNeedsOnboarding(false);
+      // Jika error, tetap arahkan ke onboarding untuk safety
+      setNeedsOnboarding(true);
     } finally {
+      checkingRef.current = false;
       setLoading(false);
     }
   };
@@ -269,8 +279,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/auth" replace />;
   }
 
-  // P1.3: redirect ke onboarding jika profil belum lengkap,
-  // kecuali user memang sudah di /onboarding
   if (needsOnboarding && location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
