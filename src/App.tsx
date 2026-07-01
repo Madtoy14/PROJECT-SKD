@@ -233,6 +233,8 @@ function AppLayout() {
     checkingRef.current    = true;
     checkedUserRef.current = userId;
 
+    const cacheKey = `onboarding_${userId}`;
+
     try {
       const { data: profile } = await supabase!
         .from('profiles')
@@ -254,9 +256,12 @@ function AppLayout() {
             .slice(0, 20) || 'pejuang';
           await supabase!.from('profiles').upsert({ id: user.id, username: safeUsername });
         }
+        sessionStorage.setItem(cacheKey, 'true');
         setAuthState(s => ({ ...s, needsOnboarding: true, loading: false }));
       } else {
         const isComplete = !!(profile.nickname && profile.target_kedinasan);
+        // Cache hasil — false = sudah onboarding, true = perlu onboarding
+        sessionStorage.setItem(cacheKey, String(!isComplete));
         setAuthState(s => ({ ...s, needsOnboarding: !isComplete, loading: false }));
       }
     } catch {
@@ -274,25 +279,47 @@ function AppLayout() {
 
     // Cek session awal sekali saat AppLayout mount
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setAuthState(s => ({ ...s, session }));
-      if (session?.user) {
-        checkOnboarding(session.user.id);
+      if (!session?.user) {
+        setAuthState({ loading: false, session: null, needsOnboarding: false });
+        return;
+      }
+
+      // Cek cache di sessionStorage dulu — hindari query Supabase setiap refresh
+      const cacheKey = `onboarding_${session.user.id}`;
+      const cached   = sessionStorage.getItem(cacheKey);
+
+      if (cached !== null) {
+        // Sudah pernah dicek di sesi ini — langsung pakai hasil cache
+        setAuthState({ loading: false, session, needsOnboarding: cached === 'true' });
       } else {
-        setAuthState(s => ({ ...s, loading: false }));
+        // Belum ada cache — query Supabase
+        setAuthState(s => ({ ...s, session }));
+        checkOnboarding(session.user.id);
       }
     });
 
     // Dengarkan perubahan auth (Google OAuth callback, logout, dll)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setAuthState(s => ({ ...s, session }));
-        if (session?.user) {
-          await checkOnboarding(session.user.id);
-        } else {
+        if (event === 'SIGNED_OUT') {
           checkingRef.current    = false;
           checkedUserRef.current = null;
           setAuthState({ loading: false, session: null, needsOnboarding: false });
+          return;
         }
+        if (!session?.user) return;
+
+        setAuthState(s => ({ ...s, session }));
+
+        // Cek cache — skip query jika sudah ada
+        const cacheKey = `onboarding_${session.user.id}`;
+        const cached   = sessionStorage.getItem(cacheKey);
+        if (cached !== null && event !== 'USER_UPDATED') {
+          setAuthState(s => ({ ...s, loading: false, needsOnboarding: cached === 'true' }));
+          return;
+        }
+
+        await checkOnboarding(session.user.id);
       }
     );
 
