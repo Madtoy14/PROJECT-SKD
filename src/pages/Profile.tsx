@@ -207,7 +207,30 @@ export default function Profile() {
         .finally(() => setLoading(false));
     });
   }, []);
-  // Watch for invite status changes and show toast
+
+  // Fetch status online rival dari Supabase berdasarkan last_login
+  useEffect(() => {
+    if (!isSupabaseConfigured() || friends.length === 0) return;
+
+    const friendIds = friends.map(f => String(f.id));
+    supabase!
+      .from('profiles')
+      .select('id, last_login')
+      .in('id', friendIds)
+      .then(({ data }) => {
+        if (!data) return;
+        const now = Date.now();
+        const onlineMap: Record<string, boolean> = {};
+        data.forEach(p => {
+          const lastLogin = p.last_login ? new Date(p.last_login).getTime() : 0;
+          onlineMap[p.id] = (now - lastLogin) / (1000 * 60) <= 15;
+        });
+        setFriends(prev => prev.map(f => ({
+          ...f,
+          online: onlineMap[String(f.id)] ?? false
+        })));
+      });
+  }, [friends.length]); // run setiap kali jumlah rival berubah
   useEffect(() => {
     if (inviteStatus === 'rejected') {
       const friend = friends.find(f => String(f.id) === targetId);
@@ -1055,15 +1078,14 @@ export default function Profile() {
         <PlayerProfileModal 
           playerId={selectedPlayerId} 
           onClose={() => setSelectedPlayerId(null)}
+          existingRivalIds={friends.map(f => String(f.id))}
           onAddRival={(player) => {
-            // Note: Since follow/friend logic handles actual syncing in Supabase,
-            // this button can trigger a follow action or local add for now.
             if (!friends.find(f => String(f.id) === String(player.id))) {
               const newFriend = {
                 id: player.id,
                 name: player.username,
                 username: `@${player.username.toLowerCase()}`,
-                online: true,
+                online: false, // akan di-update dari last_login fetch
                 avatar: player.selected_avatar ? availableCharacters.find(o => o.id === player.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.username}`,
                 score: player.score
               };

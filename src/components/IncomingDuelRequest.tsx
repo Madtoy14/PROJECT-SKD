@@ -1,68 +1,151 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Swords } from 'lucide-react';
+import { Swords, Clock } from 'lucide-react';
 import { useDuelMatchmaking } from '../context/DuelContext';
+
+const TIMEOUT_SECONDS = 30;
 
 export default function IncomingDuelRequest() {
   const { incomingRequest, acceptInvite, rejectInvite } = useDuelMatchmaking();
   const navigate = useNavigate();
+  const [countdown, setCountdown] = useState(TIMEOUT_SECONDS);
+
+  // Reset dan jalankan countdown setiap kali ada request baru
+  useEffect(() => {
+    if (!incomingRequest) {
+      setCountdown(TIMEOUT_SECONDS);
+      return;
+    }
+
+    setCountdown(TIMEOUT_SECONDS);
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          rejectInvite(); // auto-tolak jika timeout
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [incomingRequest?.id]); // re-run hanya jika request ID berubah
 
   const handleAccept = () => {
     const roomId = 'R_' + Math.random().toString(36).substring(2, 8).toUpperCase();
     acceptInvite(roomId);
-    navigate('/quiz', { state: { mode: 'pvp1v1', opponent: incomingRequest?.senderName, roomId: roomId, isHost: false } });
+    navigate('/quiz', {
+      state: {
+        mode: 'pvp1v1',
+        opponent: incomingRequest?.senderName,
+        roomId,
+        isHost: false
+      }
+    });
   };
 
   const handleReject = () => {
     rejectInvite();
   };
 
+  // Persentase countdown untuk progress ring
+  const progressPct = (countdown / TIMEOUT_SECONDS) * 100;
+  const radius = 20;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference * (1 - progressPct / 100);
+  const isUrgent = countdown <= 10;
+
   return (
     <AnimatePresence>
       {incomingRequest && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+        // z-[9999] agar selalu di atas semua modal lain
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
           <motion.div
-            initial={{ scale: 0.8, opacity: 0, y: -50 }}
+            initial={{ scale: 0.8, opacity: 0, y: -40 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.8, opacity: 0, y: 50 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="bg-[#1A1924] w-full max-w-sm rounded-[2rem] border-2 border-[#8B5CF6] shadow-[0_0_40px_rgba(139,92,246,0.5)] overflow-hidden relative"
+            exit={{ scale: 0.85, opacity: 0, y: 40 }}
+            transition={{ type: 'spring', damping: 22, stiffness: 320 }}
+            className="bg-[#1A1924] w-full max-w-sm rounded-[2rem] border-2 border-[#8B5CF6] shadow-[0_0_50px_rgba(139,92,246,0.4)] overflow-hidden relative"
           >
-            {/* Glowing accents */}
-            <div className="absolute -top-20 -left-20 w-40 h-40 bg-[#8B5CF6]/30 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-[#F5A623]/20 rounded-full blur-3xl pointer-events-none" />
+            {/* Glow accents */}
+            <div className="absolute -top-16 -left-16 w-36 h-36 bg-[#8B5CF6]/25 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 -right-16 w-36 h-36 bg-[#F5A623]/15 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="p-6 relative z-10 text-center flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#F5A623] p-1 mb-4 shadow-lg shadow-[#8B5CF6]/30">
-                <img 
-                  src={incomingRequest.avatar} 
-                  alt={incomingRequest.senderName} 
-                  className="w-full h-full rounded-full bg-[#1A1924] object-cover"
+            <div className="p-6 relative z-10 flex flex-col items-center text-center">
+
+              {/* Avatar + countdown ring */}
+              <div className="relative mb-4">
+                {/* SVG countdown ring */}
+                <svg width="72" height="72" className="absolute inset-0 -rotate-90">
+                  {/* Track */}
+                  <circle
+                    cx="36" cy="36" r={radius}
+                    fill="none"
+                    stroke="rgba(255,255,255,0.1)"
+                    strokeWidth="4"
+                  />
+                  {/* Progress */}
+                  <circle
+                    cx="36" cy="36" r={radius}
+                    fill="none"
+                    stroke={isUrgent ? '#ef4444' : '#8B5CF6'}
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s' }}
+                  />
+                </svg>
+                {/* Avatar */}
+                <div className="w-[72px] h-[72px] rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#F5A623] p-[3px] shadow-lg shadow-[#8B5CF6]/30">
+                  <img
+                    src={incomingRequest.avatar}
+                    alt={incomingRequest.senderName}
+                    className="w-full h-full rounded-full bg-[#1A1924] object-cover"
+                  />
+                </div>
+                {/* Countdown badge */}
+                <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-[#1A1924] ${isUrgent ? 'bg-red-500 text-white' : 'bg-[#8B5CF6] text-white'}`}>
+                  {countdown}
+                </div>
+              </div>
+
+              {/* Teks tantangan */}
+              <h2 className="text-lg font-black text-white mb-1 leading-tight">
+                <span className="text-[#F5A623]">{incomingRequest.senderName}</span>
+                <br />
+                menantangmu PvP Battle!
+              </h2>
+              <p className="text-xs text-gray-400 mb-1 font-medium">Buktikan siapa yang terbaik sekarang juga.</p>
+
+              {/* Countdown bar */}
+              <div className="w-full bg-white/10 rounded-full h-1.5 mb-5 overflow-hidden">
+                <motion.div
+                  className={`h-full rounded-full ${isUrgent ? 'bg-red-500' : 'bg-[#8B5CF6]'}`}
+                  style={{ width: `${progressPct}%` }}
+                  transition={{ duration: 1, ease: 'linear' }}
                 />
               </div>
 
-              <h2 className="text-xl font-black text-white mb-2 leading-tight">
-                ðŸ”¥ <span className="text-[#F5A623]">{incomingRequest.senderName}</span> menantangmu PvP Battle!
-              </h2>
-              <p className="text-sm text-gray-400 mb-6 font-medium">Buktikan siapa yang terbaik sekarang juga.</p>
-
+              {/* Tombol aksi */}
               <div className="flex w-full gap-3">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={handleReject}
-                  className="flex-1 py-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 font-bold hover:bg-red-500 hover:text-white transition-colors"
+                  className="flex-1 py-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 font-bold hover:bg-red-500 hover:text-white transition-colors text-sm"
                 >
                   Tolak
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={handleAccept}
-                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#8B5CF6] to-purple-500 text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)] flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#8B5CF6] to-purple-500 text-white font-bold shadow-[0_0_20px_rgba(139,92,246,0.35)] flex items-center justify-center gap-2 text-sm"
                 >
-                  <Swords size={18} /> Terima
+                  <Swords size={16} /> Terima
                 </motion.button>
               </div>
             </div>

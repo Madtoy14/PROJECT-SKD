@@ -9,9 +9,10 @@ interface PlayerProfileModalProps {
   playerId: string | null;
   onClose: () => void;
   onAddRival?: (player: UserProfile) => void;
+  existingRivalIds?: string[]; // ID rival yang sudah ada, untuk sembunyikan tombol
 }
 
-export default function PlayerProfileModal({ playerId, onClose, onAddRival }: PlayerProfileModalProps) {
+export default function PlayerProfileModal({ playerId, onClose, onAddRival, existingRivalIds = [] }: PlayerProfileModalProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
@@ -232,8 +233,8 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival }: Pl
                     <p className="text-xs text-gray-400 text-center italic mb-3">"{profile.bio}"</p>
                   )}
 
-                  {/* Tombol tambah rival */}
-                  {onAddRival && (
+                  {/* Tombol tambah rival — hanya tampil jika belum ada di daftar rival */}
+                  {onAddRival && !existingRivalIds.includes(profile.id) && (
                     <button
                       onClick={() => {
                         onAddRival(profile);
@@ -243,6 +244,11 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival }: Pl
                     >
                       <Shield size={15} /> Tambah Rival
                     </button>
+                  )}
+                  {onAddRival && existingRivalIds.includes(profile.id) && (
+                    <div className="w-full bg-white/5 border border-white/10 text-gray-400 font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm">
+                      <Shield size={15} className="text-skd-success" /> Sudah di Daftar Rival
+                    </div>
                   )}
                 </div>
               </div>
