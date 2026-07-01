@@ -91,6 +91,7 @@ export default function Quiz() {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [questions, setQuestions] = useState<any[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [noCatatanSalah, setNoCatatanSalah] = useState(false); // state untuk layar kosong catatan salah
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const TOTAL_TIME = gameMode === 'tryout' 
     ? 100 * 60 
@@ -314,14 +315,51 @@ export default function Quiz() {
     };
 
     if (gameMode === 'catatansalah') {
-      fetchProfile().then(p => {
-        const data = p?.catatan_salah || [];
-        if (data.length === 0) {
-          navigate('/dashboard', { replace: true });
-        } else {
-          initQuestions(data);
+      // Fetch catatan_salah langsung dari Supabase agar selalu up-to-date
+      const loadCatatanSalah = async () => {
+        try {
+          let catatanData: any[] = [];
+          if (isSupabaseConfigured()) {
+            const { data: { user } } = await supabase!.auth.getUser();
+            if (user) {
+              const { data } = await supabase!
+                .from('profiles')
+                .select('catatan_salah')
+                .eq('id', user.id)
+                .maybeSingle();
+              if (data?.catatan_salah) {
+                const raw = typeof data.catatan_salah === 'string'
+                  ? JSON.parse(data.catatan_salah)
+                  : data.catatan_salah;
+                catatanData = Array.isArray(raw) ? raw : [];
+              }
+            }
+          } else {
+            // Fallback ke profil lokal jika Supabase tidak terkonfigurasi
+            const p = await fetchProfile();
+            catatanData = p?.catatan_salah || [];
+          }
+
+          if (!mounted) return;
+
+          if (catatanData.length === 0) {
+            // Tampilkan layar informatif, bukan silent redirect
+            setNoCatatanSalah(true);
+            setLoadingQuestions(false);
+          } else {
+            // Acak urutan soal catatan salah
+            const shuffled = [...catatanData].sort(() => Math.random() - 0.5);
+            initQuestions(shuffled);
+          }
+        } catch (err) {
+          console.error('Gagal fetch catatan salah:', err);
+          if (mounted) {
+            setNoCatatanSalah(true);
+            setLoadingQuestions(false);
+          }
         }
-      });
+      };
+      loadCatatanSalah();
     } else {
       fetchQuestionsFromSupabase(gameMode).then(initQuestions);
     }
@@ -662,10 +700,31 @@ const scoreBadge = (optionId: string) => {
           style={{ boxShadow: 'inset 0 0 80px 20px rgba(34,211,238,0.25)' }} />
       )}
       {/* Loading Screen */}
-      {(loadingQuestions || !currentQuestion) && (
+      {(loadingQuestions || (!currentQuestion && !noCatatanSalah)) && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-skd-bg gap-4">
           <Loader2 className="animate-spin text-blue-500" size={48} />
           <h2 className="text-xl font-bold text-skd-text animate-pulse">Mempersiapkan Arena...</h2>
+        </div>
+      )}
+
+      {/* Layar kosong Catatan Salah */}
+      {noCatatanSalah && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-skd-bg gap-6 p-8 text-center">
+          <div className="w-24 h-24 rounded-full bg-skd-success/10 border-2 border-skd-success/30 flex items-center justify-center text-5xl">
+            🎉
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-skd-text mb-2">Catatan Bersih!</h2>
+            <p className="text-skd-muted text-sm max-w-xs leading-relaxed">
+              Kamu belum pernah menjawab soal dengan salah, atau sudah berhasil mempelajari semua soal yang pernah salah. Pertahankan!
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/dashboard', { replace: true })}
+            className="px-8 py-3 bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] font-black rounded-xl transition-all shadow-lg text-sm"
+          >
+            Kembali ke Dashboard
+          </button>
         </div>
       )}
       {/* Floating Score Reward */}

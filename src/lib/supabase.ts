@@ -239,51 +239,72 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
   try {
     let questions: any[] = [];
     
-    if (gameMode === 'latihan' || gameMode === 'survival') {
-      // 10 soal acak
+    // Helper Fisher-Yates shuffle — lebih acak dari sort(() => Math.random())
+    const shuffle = <T>(arr: T[]): T[] => {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    };
+
+    if (gameMode === 'latihan') {
+      // Ambil lebih banyak dari DB lalu shuffle & slice untuk variasi maksimal
       const { data, error } = await supabase!.rpc('get_random_soal', { limit_count: 10 });
       if (error) {
-        // Fallback jika RPC belum ada
-        const res = await supabase!.from('soal_skd').select('*').limit(50);
+        const res = await supabase!.from('soal_skd').select('*').limit(100);
         if (res.error) throw res.error;
-        questions = res.data.sort(() => 0.5 - Math.random()).slice(0, 10);
+        questions = shuffle(res.data).slice(0, 10);
       } else {
-        questions = data;
+        questions = shuffle(data);
+      }
+    } else if (gameMode === 'survival') {
+      // Survival butuh lebih banyak soal — ambil semua lalu shuffle
+      const { data, error } = await supabase!.rpc('get_random_soal', { limit_count: 500 });
+      if (error) {
+        const res = await supabase!.from('soal_skd').select('*');
+        if (res.error) throw res.error;
+        questions = shuffle(res.data);
+      } else {
+        questions = shuffle(data);
       }
     } else if (gameMode === 'pvp' || gameMode === 'pvp1v1') {
-      // 15 soal acak
+      // 15 soal acak — ambil lebih banyak lalu shuffle & slice
       const { data, error } = await supabase!.rpc('get_random_soal', { limit_count: 15 });
       if (error) {
-        const res = await supabase!.from('soal_skd').select('*').limit(50);
+        const res = await supabase!.from('soal_skd').select('*').limit(100);
         if (res.error) throw res.error;
-        questions = res.data.sort(() => 0.5 - Math.random()).slice(0, 15);
+        questions = shuffle(res.data).slice(0, 15);
       } else {
-        questions = data;
+        questions = shuffle(data).slice(0, 15);
       }
     } else if (gameMode === 'tryout') {
       // 110 soal berdasar kategori dari tabel 'soal_tryout' untuk Try Out BKN Standar
       const fetchCategory = async (tipe: string, limit: number) => {
         const { data, error } = await supabase!.rpc('get_random_tryout_soal_by_tipe', { soal_tipe: tipe, limit_count: limit });
         if (error) {
-          const res = await supabase!.from('soal_tryout').select('*').eq('tipe', tipe).limit(limit * 2);
+          const res = await supabase!.from('soal_tryout').select('*').eq('tipe', tipe);
           if (res.error) throw res.error;
-          return res.data.sort(() => 0.5 - Math.random()).slice(0, limit);
+          return shuffle(res.data).slice(0, limit);
         }
-        return data;
+        // Shuffle hasil RPC juga agar urutan tidak predictable
+        return shuffle(data).slice(0, limit);
       };
 
-      const [tiu, twk, tkp] = await Promise.all([
-        fetchCategory('TIU', 35),
+      const [twk, tiu, tkp] = await Promise.all([
         fetchCategory('TWK', 30),
+        fetchCategory('TIU', 35),
         fetchCategory('TKP', 45)
       ]);
-      
-      questions = [...twk, ...tiu, ...tkp]; // Susunan biasa: TWK, TIU, TKP
+
+      // Tryout: urutan TWK → TIU → TKP (standar BKN), tapi soal dalam tiap kategori sudah diacak
+      questions = [...twk, ...tiu, ...tkp];
     } else {
-      // Default: ambil 10
-      const { data, error } = await supabase!.from('soal_skd').select('*').limit(10);
+      // Default: ambil lalu shuffle
+      const { data, error } = await supabase!.from('soal_skd').select('*').limit(50);
       if (error) throw error;
-      questions = data;
+      questions = shuffle(data).slice(0, 10);
     }
 
     // Jika database berhasil dihubungi tapi tabel masih KOSONG, gunakan data fallback lokal
