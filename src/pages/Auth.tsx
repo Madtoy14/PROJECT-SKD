@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Mail, User, Lock, ChevronRight, ArrowLeft, Eye, EyeOff, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import authBg from '../assets/auth_bg.png';
 import { useAudio } from '../context/AudioContext';
 import { supabase } from '../lib/supabase';
 
-type AuthMode = 'login' | 'register' | 'forgot';
+type AuthMode = 'login' | 'register' | 'forgot' | 'reset-password';
 
 // P3.1: variants di luar komponen agar tidak dibuat ulang setiap render
 const getFormVariants = (mode: AuthMode): Variants => ({
@@ -16,19 +16,52 @@ const getFormVariants = (mode: AuthMode): Variants => ({
 });
 
 export default function Auth() {
-  const [mode, setMode]         = useState<AuthMode>('login');
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [showPwd, setShowPwd]   = useState(false);
+  const [mode, setMode]               = useState<AuthMode>('login');
+  const [email, setEmail]             = useState('');
+  const [password, setPassword]       = useState('');
+  const [newPassword, setNewPassword] = useState('');  // untuk reset-password
+  const [confirmPassword, setConfirmPassword] = useState(''); // konfirmasi password baru
+  const [username, setUsername]       = useState('');
+  const [loading, setLoading]         = useState(false);
+  const [showPwd, setShowPwd]         = useState(false);
+  const [showNewPwd, setShowNewPwd]   = useState(false);
+  const [showConfirmPwd, setShowConfirmPwd] = useState(false);
+  const [loginAttemptFailed, setLoginAttemptFailed] = useState(false); // hint daftar akun
 
   // P1.1: state inline menggantikan alert()
   const [errorMsg, setErrorMsg]     = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  const navigate   = useNavigate();
+  const navigate    = useNavigate();
+  const location    = useLocation();
   const { playBGM } = useAudio();
+
+  // Deteksi token recovery dari URL hash saat halaman dimuat
+  // Supabase mengirim: /auth#access_token=...&type=recovery
+  useEffect(() => {
+    if (!supabase) return;
+
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+      // Ada token recovery — tampilkan form password baru
+      setMode('reset-password');
+      // Bersihkan hash dari URL agar tidak kelihatan di address bar
+      window.history.replaceState(null, '', window.location.pathname);
+      return;
+    }
+
+    // Handle Supabase auth state untuk token recovery
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, _session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setMode('reset-password');
+          setErrorMsg('');
+          setSuccessMsg('');
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, []);
 
   // P3.1: memoize variants agar referensi stabil
   const formVariants = useMemo(() => getFormVariants(mode), [mode]);
@@ -39,9 +72,14 @@ export default function Auth() {
     setEmail('');
     setPassword('');
     setUsername('');
+    setNewPassword('');
+    setConfirmPassword('');
     setErrorMsg('');
     setSuccessMsg('');
     setShowPwd(false);
+    setShowNewPwd(false);
+    setShowConfirmPwd(false);
+    setLoginAttemptFailed(false);
   };
 
   // P2.2: validasi client-side sebelum hit API
@@ -98,6 +136,23 @@ export default function Auth() {
     setLoading(true);
 
     try {
+      // ── RESET PASSWORD (dari link email) ──────────────────────
+      if (mode === 'reset-password') {
+        if (newPassword.length < 6) {
+          setErrorMsg('Password baru minimal 6 karakter.');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          setErrorMsg('Konfirmasi password tidak cocok.');
+          return;
+        }
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+        setSuccessMsg('Password berhasil diubah! Kamu akan diarahkan ke halaman login.');
+        setTimeout(() => switchMode('login'), 2500);
+        return;
+      }
+
       // ── LUPA PASSWORD ──────────────────────────────────────────
       if (mode === 'forgot') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -229,8 +284,8 @@ export default function Auth() {
 
           <div className="relative z-10">
 
-            {/* Tombol kembali di mode forgot */}
-            {mode === 'forgot' && (
+            {/* Tombol kembali di mode forgot atau reset-password */}
+            {(mode === 'forgot' || mode === 'reset-password') && (
               <button
                 onClick={() => switchMode('login')}
                 className="absolute -top-4 -left-4 p-2 text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 text-sm font-medium"
@@ -240,16 +295,18 @@ export default function Auth() {
             )}
 
             {/* Judul */}
-            <div className={`mb-6 text-center ${mode === 'forgot' ? 'mt-6' : ''}`}>
+            <div className={`mb-6 text-center ${(mode === 'forgot' || mode === 'reset-password') ? 'mt-6' : ''}`}>
               <h2 className="text-3xl font-bold mb-2">
-                {mode === 'login' ? 'Selamat Datang' : mode === 'register' ? 'Mulai Perjalanan' : 'Pulihkan Akses'}
+                {mode === 'login'          ? 'Selamat Datang'
+                : mode === 'register'     ? 'Mulai Perjalanan'
+                : mode === 'reset-password' ? 'Buat Password Baru'
+                :                           'Pulihkan Akses'}
               </h2>
               <p className="text-gray-400 text-sm">
-                {mode === 'login'
-                  ? 'Siapkan strategimu dan masuk ke arena.'
-                  : mode === 'register'
-                    ? 'Daftarkan karaktermu dan capai target kedinasan.'
-                    : 'Masukkan email untuk menerima tautan pemulihan.'}
+                {mode === 'login'            ? 'Siapkan strategimu dan masuk ke arena.'
+                : mode === 'register'        ? 'Daftarkan karaktermu dan capai target kedinasan.'
+                : mode === 'reset-password'  ? 'Masukkan password baru untuk akunmu.'
+                :                             'Masukkan email untuk menerima tautan pemulihan.'}
               </p>
             </div>
 
@@ -314,30 +371,31 @@ export default function Auth() {
                   </div>
                 )}
 
-                {/* Field Email */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">EMAIL</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
-                      <Mail size={17} />
+                {/* Field Email — tidak di mode reset-password */}
+                {mode !== 'reset-password' && (
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">EMAIL</label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
+                        <Mail size={17} />
+                      </div>
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        placeholder="Masukkan email"
+                        autoComplete="email"
+                        className="w-full bg-[#1A1927] text-white rounded-xl pl-11 pr-4 py-3.5 outline-none transition-all border border-transparent focus:border-skd-accent/50 focus:shadow-[0_0_15px_rgba(245,166,35,0.15)] font-mono text-sm"
+                      />
                     </div>
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      placeholder="Masukkan email"
-                      autoComplete="email"
-                      className="w-full bg-[#1A1927] text-white rounded-xl pl-11 pr-4 py-3.5 outline-none transition-all border border-transparent focus:border-skd-accent/50 focus:shadow-[0_0_15px_rgba(245,166,35,0.15)] font-mono text-sm"
-                    />
                   </div>
-                </div>
+                )}
 
-                {/* Field Password — tidak di mode forgot */}
-                {mode !== 'forgot' && (
+                {/* Field Password — hanya di mode login dan register */}
+                {(mode === 'login' || mode === 'register') && (
                   <div>
                     <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">PASSWORD</label>
-                    {/* P2.1: show/hide password toggle */}
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
                         <Lock size={17} />
@@ -364,6 +422,74 @@ export default function Auth() {
                   </div>
                 )}
 
+                {/* Field Password Baru — hanya di mode reset-password */}
+                {mode === 'reset-password' && (
+                  <>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">PASSWORD BARU</label>
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
+                          <Lock size={17} />
+                        </div>
+                        <input
+                          type={showNewPwd ? 'text' : 'password'}
+                          required
+                          value={newPassword}
+                          onChange={e => setNewPassword(e.target.value)}
+                          placeholder="Min. 6 karakter"
+                          autoComplete="new-password"
+                          className="w-full bg-[#1A1927] text-white rounded-xl pl-11 pr-12 py-3.5 outline-none transition-all border border-transparent focus:border-skd-accent/50 focus:shadow-[0_0_15px_rgba(245,166,35,0.15)] font-mono text-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPwd(p => !p)}
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-300 transition-colors"
+                          tabIndex={-1}
+                        >
+                          {showNewPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">KONFIRMASI PASSWORD BARU</label>
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
+                          <Lock size={17} />
+                        </div>
+                        <input
+                          type={showConfirmPwd ? 'text' : 'password'}
+                          required
+                          value={confirmPassword}
+                          onChange={e => setConfirmPassword(e.target.value)}
+                          placeholder="Ulangi password baru"
+                          autoComplete="new-password"
+                          className={`w-full bg-[#1A1927] text-white rounded-xl pl-11 pr-12 py-3.5 outline-none transition-all border font-mono text-sm ${
+                            confirmPassword && confirmPassword !== newPassword
+                              ? 'border-red-500/50'
+                              : confirmPassword && confirmPassword === newPassword
+                                ? 'border-green-500/50'
+                                : 'border-transparent focus:border-skd-accent/50'
+                          } focus:shadow-[0_0_15px_rgba(245,166,35,0.15)]`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPwd(p => !p)}
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-300 transition-colors"
+                          tabIndex={-1}
+                        >
+                          {showConfirmPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                      {/* Indikator kecocokan password */}
+                      {confirmPassword && (
+                        <p className={`text-[10px] mt-1 ml-1 ${confirmPassword === newPassword ? 'text-green-400' : 'text-red-400'}`}>
+                          {confirmPassword === newPassword ? '✓ Password cocok' : '✗ Password tidak cocok'}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
+
                 {/* Link lupa password */}
                 {mode === 'login' && (
                   <div className="flex justify-end -mt-1">
@@ -377,8 +503,8 @@ export default function Auth() {
                   </div>
                 )}
 
-                {/* Divider ATAU — tidak di mode forgot */}
-                {mode !== 'forgot' && (
+                {/* Divider ATAU — hanya di mode login dan register */}
+                {(mode === 'login' || mode === 'register') && (
                   <div className="relative flex items-center py-1">
                     <div className="flex-grow border-t border-white/10" />
                     <span className="flex-shrink-0 mx-4 text-gray-500 text-xs font-bold uppercase tracking-wider">ATAU</span>
@@ -386,8 +512,8 @@ export default function Auth() {
                   </div>
                 )}
 
-                {/* Tombol Google */}
-                {mode !== 'forgot' && (
+                {/* Tombol Google — hanya di mode login dan register */}
+                {(mode === 'login' || mode === 'register') && (
                   <button
                     type="button"
                     onClick={handleGoogleLogin}
@@ -413,14 +539,17 @@ export default function Auth() {
                   whileHover={{ scale: loading ? 1 : 1.02 }}
                   whileTap={{ scale: loading ? 1 : 0.98 }}
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || (mode === 'reset-password' && confirmPassword !== newPassword && confirmPassword.length > 0)}
                   className="w-full mt-2 bg-gradient-to-r from-skd-accent to-yellow-500 text-[#0F0E17] font-black py-3.5 rounded-xl shadow-[0_0_20px_rgba(245,166,35,0.3)] hover:shadow-[0_0_30px_rgba(245,166,35,0.5)] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-2 group"
                 >
                   {loading ? (
                     <><Loader2 size={18} className="animate-spin" /> Memproses...</>
                   ) : (
                     <>
-                      {mode === 'login' ? 'Masuk dengan Email' : mode === 'register' ? 'Daftar dengan Email' : 'Kirim Tautan Reset'}
+                      {mode === 'login'           ? 'Masuk dengan Email'
+                      : mode === 'register'       ? 'Daftar dengan Email'
+                      : mode === 'reset-password' ? 'Simpan Password Baru'
+                      :                             'Kirim Tautan Reset'}
                       <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
@@ -428,8 +557,8 @@ export default function Auth() {
               </motion.form>
             </AnimatePresence>
 
-            {/* Switch mode login ↔ register */}
-            {mode !== 'forgot' && (
+            {/* Switch mode login ↔ register — tidak tampil di forgot dan reset-password */}
+            {(mode === 'login' || mode === 'register') && (
               <div className="mt-6 text-center">
                 <button
                   type="button"
