@@ -273,13 +273,13 @@ export default function Profile() {
         try {
           if (followModalTab === 'pengikut') {
             const { data } = await supabase!.from('friends')
-              .select('id, user_id, profiles!friends_user_id_fkey(username, selected_avatar, score)')
+              .select('id, user_id, profiles!friends_user_id_fkey(id, username, selected_avatar, score)')
               .eq('friend_id', profile.id)
               .eq('status', 'accepted');
             setFollowersList(data || []);
           } else {
             const { data } = await supabase!.from('friends')
-              .select('id, friend_id, profiles!friends_friend_id_fkey(username, selected_avatar, score)')
+              .select('id, friend_id, profiles!friends_friend_id_fkey(id, username, selected_avatar, score)')
               .eq('user_id', profile.id)
               .eq('status', 'accepted');
             setFollowingList(data || []);
@@ -815,42 +815,44 @@ export default function Profile() {
                   <p className="text-gray-500 text-xs text-center py-8">Belum ada rival terdaftar atau ditemukan.</p>
                 ) : (
                   filteredFriends.map((friend) => (
-                    <div key={friend.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors group gap-3">
-                      <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSelectedPlayerId(String(friend.id))}>
-                        <div className="relative">
-                          <img src={friend.avatar} alt={friend.name} className="w-12 h-12 rounded-full bg-[#1A1924]" />
-                          <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#1A1924] ${friend.online ? 'bg-skd-success' : 'bg-gray-500'}`} />
+                    <div key={friend.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors group gap-2 overflow-hidden">
+                      {/* Kiri: Avatar + Nama — flex-1 + min-w-0 agar bisa truncate */}
+                      <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity min-w-0 flex-1" onClick={() => setSelectedPlayerId(String(friend.id))}>
+                        <div className="relative flex-shrink-0">
+                          <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full bg-[#1A1924]" />
+                          <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#1A1924] ${friend.online ? 'bg-skd-success' : 'bg-gray-500'}`} />
                         </div>
                         <div className="min-w-0">
                           <h4 className="font-bold text-xs truncate text-white">{friend.name}</h4>
                           <p className="text-[10px] font-space text-gray-400 truncate">{friend.username}</p>
                         </div>
                       </div>
-                      <div className={`flex flex-wrap items-center justify-end gap-1.5 transition-opacity ${inviteStatus === 'inviting' && targetId === String(friend.id)
+                      {/* Kanan: Action buttons — flex-shrink-0 agar tidak stretch */}
+                      <div className={`flex-shrink-0 flex items-center gap-1 transition-opacity ${inviteStatus === 'inviting' && targetId === String(friend.id)
                           ? 'opacity-100'
                           : 'opacity-0 group-hover:opacity-100'
                         }`}>
                         <button
                           disabled={inviteStatus === 'inviting'}
                           onClick={(e) => { e.stopPropagation(); sendInvite(String(friend.id), friend.name); }}
-                          className={`px-3 py-1.5 font-black rounded-lg text-[10px] transition-colors ${inviteStatus === 'inviting' && targetId === String(friend.id)
+                          className={`px-2.5 py-1.5 font-black rounded-lg text-[10px] transition-colors whitespace-nowrap ${inviteStatus === 'inviting' && targetId === String(friend.id)
                               ? 'bg-yellow-500 text-[#0F0E17] animate-pulse'
                               : 'bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] disabled:opacity-50 disabled:cursor-not-allowed'
                             }`}
                         >
-                          {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Tunggu...' : 'Duel'}
+                          {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Tunggu' : 'Duel'}
                         </button>
                         {inviteStatus === 'inviting' && targetId === String(friend.id) && (
                           <button
                             onClick={(e) => { e.stopPropagation(); cancelInvite(); }}
-                            className="px-3 py-1.5 font-black rounded-lg text-[10px] bg-red-500 hover:bg-red-600 text-white transition-colors"
+                            className="px-2.5 py-1.5 font-black rounded-lg text-[10px] bg-red-500 hover:bg-red-600 text-white transition-colors whitespace-nowrap"
                           >
                             Batal
                           </button>
                         )}
                         <button
                           onClick={(e) => { e.stopPropagation(); handleRemoveFriend(friend.id); }}
-                          className="p-1.5 bg-skd-danger/10 hover:bg-skd-danger/20 text-skd-danger rounded-lg transition-colors"
+                          className="p-1.5 bg-skd-danger/10 hover:bg-skd-danger/20 text-skd-danger rounded-lg transition-colors flex-shrink-0"
                         >
                           <Trash2 size={12} />
                         </button>
