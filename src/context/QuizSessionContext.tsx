@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -14,12 +14,14 @@ interface QuizSession {
   tkpScore: number;
   usedPowerups: Array<{questionIndex: number; powerup: string}>;
   timeSpent: number;
+  packageId?: string;
+  packageVersion?: number;
 }
 
 interface QuizSessionContextType {
   activeSession: QuizSession | null;
   isAutoSaving: boolean;
-  createSession: (mode: string, questions: any[]) => Promise<string>;
+  createSession: (mode: string, questions: any[], packageId?: string, packageVersion?: number) => Promise<string>;
   updateSession: (sessionId: string, updates: Partial<QuizSession>) => Promise<void>;
   completeSession: (sessionId: string, finalData: {
     score: number;
@@ -40,6 +42,31 @@ const QuizSessionContext = createContext<QuizSessionContextType | undefined>(und
 export function QuizSessionProvider({ children }: { children: ReactNode }) {
   const [activeSession, setActiveSession] = useState<QuizSession | null>(null);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
+
+  const activeSessionRef = useRef<QuizSession | null>(null);
+  useEffect(() => {
+    activeSessionRef.current = activeSession;
+  }, [activeSession]);
+
+  // Cleanup on unmount or sudden exit (browser close)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const session = activeSessionRef.current;
+      if (session) {
+        supabase!.from('quiz_sessions').update({ status: 'cancelled' }).eq('id', session.id).then();
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      const session = activeSessionRef.current;
+      if (session) {
+        supabase!.from('quiz_sessions').update({ status: 'cancelled' }).eq('id', session.id).then();
+      }
+    };
+  }, []);
 
   // Auto-save every 30 seconds if there's an active session
   useEffect(() => {
@@ -68,7 +95,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [activeSession]);
 
-  const createSession = useCallback(async (mode: string, questions: any[]): Promise<string> => {
+  const createSession = useCallback(async (mode: string, questions: any[], packageId?: string, packageVersion?: number): Promise<string> => {
     const { data: { user } } = await supabase!.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
@@ -82,7 +109,9 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
         mode,
         questions_json: questions,
         status: 'active',
-        energy_consumed: 1
+        energy_consumed: 1,
+        package_id: packageId || null,
+        package_version: packageVersion || 1
       })
       .select()
       .single();
@@ -100,7 +129,9 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
       tiuScore: data.tiu_score || 0,
       tkpScore: data.tkp_score || 0,
       usedPowerups: data.used_powerups || [],
-      timeSpent: data.time_spent_seconds || 0
+      timeSpent: data.time_spent_seconds || 0,
+      packageId: data.package_id,
+      packageVersion: data.package_version
     };
 
     setActiveSession(session);
@@ -150,21 +181,6 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     const session = activeSession;
     if (!session) throw new Error('No active session');
 
-    // Mark session as completed
-    const { error: sessionError } = await supabase!
-      .from('quiz_sessions')
-      .update({
-        status: 'completed',
-        completed_at: new Date().toISOString(),
-        score: finalData.score,
-        twk_score: finalData.twkScore || 0,
-        tiu_score: finalData.tiuScore || 0,
-        tkp_score: finalData.tkpScore || 0
-      })
-      .eq('id', sessionId);
-
-    if (sessionError) throw sessionError;
-
     // Calculate passing status for tryout
     let passedTwk = null;
     let passedTiu = null;
@@ -186,39 +202,27 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
       passedOverall = passedTwk && passedTiu && passedTkp;
     }
 
-    // Create result record
-    const { data: resultData, error: resultError } = await supabase!
-      .from('quiz_results')
-      .insert({
-        session_id: sessionId,
-        mode: session.mode,
-        score: finalData.score,
-        twk_score: finalData.twkScore || 0,
-        tiu_score: finalData.tiuScore || 0,
-        tkp_score: finalData.tkpScore || 0,
-        accuracy: finalData.accuracy || 0,
-        time_spent_seconds: session.timeSpent,
-        coins_earned: finalData.coinsEarned,
-        xp_earned: finalData.xpEarned,
-        questions_json: session.questions,
-        answers_json: session.answers,
-        powerups_used: session.usedPowerups,
-        passed_twk: passedTwk,
-        passed_tiu: passedTiu,
-        passed_tkp: passedTkp,
-        passed_overall: passedOverall
-      })
-      .select()
-      .single();
+    // Call Idempotent RPC to complete session, insert result, and award coins/xp
+    const { data: resultId, error: rpcError } = await supabase!.rpc('complete_quiz_session', {
+      p_session_id: sessionId,
+      p_score: finalData.score,
+      p_twk_score: finalData.twkScore || 0,
+      p_tiu_score: finalData.tiuScore || 0,
+      p_tkp_score: finalData.tkpScore || 0,
+      p_accuracy: finalData.accuracy || 0,
+      p_coins_earned: finalData.coinsEarned,
+      p_xp_earned: finalData.xpEarned,
+      p_passed_twk: passedTwk,
+      p_passed_tiu: passedTiu,
+      p_passed_tkp: passedTkp,
+      p_passed_overall: passedOverall
+    });
 
-    if (resultError) throw resultError;
-
-    // PENTING: Update profile dengan koin dan XP ditangani oleh Result.tsx untuk menjaga konsistensi dengan fitur lainnya (seperti Akurasi, Catatan Salah).
-    // QuizSessionContext HANYA mengurus status sesi dan pencatatan quiz_results.
+    if (rpcError) throw rpcError;
 
     setActiveSession(null);
     console.log('✅ Quiz session completed:', sessionId);
-    return resultData.id;
+    return resultId;
   }, [activeSession]);
 
   const recoverSession = useCallback(async (): Promise<QuizSession | null> => {
@@ -247,7 +251,9 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
       tiuScore: data.tiu_score || 0,
       tkpScore: data.tkp_score || 0,
       usedPowerups: data.used_powerups || [],
-      timeSpent: data.time_spent_seconds || 0
+      timeSpent: data.time_spent_seconds || 0,
+      packageId: data.package_id,
+      packageVersion: data.package_version
     };
 
     setActiveSession(session);
@@ -258,7 +264,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
   const abandonSession = useCallback(async (sessionId: string) => {
     const { error } = await supabase!
       .from('quiz_sessions')
-      .update({ status: 'abandoned' })
+      .update({ status: 'cancelled' })
       .eq('id', sessionId);
 
     if (error) throw error;

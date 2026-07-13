@@ -22,13 +22,15 @@ import Quest from './pages/Quest';
 
 import Shop from './pages/Shop';
 
+import TryOutLobby from './pages/TryOutLobby';
+import ReviewDetail from './pages/ReviewDetail';
+
 import Profile from './pages/Profile';
 
 import Auth from './pages/Auth';
 
 import Onboarding from './pages/Onboarding';
 
-import PembahasanTryout from './pages/PembahasanTryout';
 
 import { DuelProvider } from './context/DuelContext';
 
@@ -44,24 +46,18 @@ function Navigation() {
 
 
 
-  const hideNavPaths = ['/quiz', '/result', '/auth', '/onboarding'];
+  const hideNavPaths = ['/quiz', '/auth', '/onboarding'];
 
-  if (hideNavPaths.includes(location.pathname)) return null;
+  if (hideNavPaths.includes(location.pathname) || location.pathname.startsWith('/result') || location.pathname.startsWith('/review')) return null;
 
 
 
   const navItems = [
-
     { path: '/', icon: Home, label: 'Home' },
-
+    { path: '/pembahasan', icon: BookOpenCheck, label: 'Pembahasan' },
     { path: '/liga', icon: Trophy, label: 'Liga' },
-
     { path: '/quest', icon: BookOpen, label: 'Quest' },
-
-    { path: '/pembahasan-tryout', icon: BookOpenCheck, label: 'Pembahasan' },
-
     { path: '/toko', icon: Store, label: 'Toko' },
-
     { path: '/profil', icon: User, label: 'Profil' },
 
   ];
@@ -107,15 +103,10 @@ function Navigation() {
 
 
       {/* Desktop Sidebar Navigation */}
-
-      <nav className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-[88px] hover:w-64 bg-surface border-r border-border z-50 transition-all duration-300 group overflow-hidden shadow-sm">
-
+      <nav className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-[88px] hover:w-64 bg-slate-900 border-r border-slate-800 z-50 transition-all duration-300 group overflow-hidden shadow-xl">
         <div className="h-24 flex items-center justify-center group-hover:justify-start group-hover:px-6 shrink-0 relative w-full">
-
-          <h1 className="text-[20px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute left-6 whitespace-nowrap">SKDQuest</h1>
-
-          <h1 className="text-[22px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent group-hover:opacity-0 transition-opacity duration-300">SQ</h1>
-
+          <h1 className="text-[20px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-200 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute left-6 whitespace-nowrap">SKDQuest</h1>
+          <h1 className="text-[22px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-200 bg-clip-text text-transparent group-hover:opacity-0 transition-opacity duration-300">SQ</h1>
         </div>
 
 
@@ -131,17 +122,11 @@ function Navigation() {
               <li key={path}>
 
                 <Link
-
                   to={path}
-
-                  className={`flex flex-col group-hover:flex-row items-center group-hover:items-center px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full ${isActive
-
-                    ? 'bg-primary-subtle text-primary font-bold'
-
-                    : 'text-fg-muted hover:bg-bg hover:text-fg font-medium'
-
+                  className={`flex flex-col group-hover:flex-row items-center group-hover:items-center px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full border-l-[3px] border-transparent ${isActive
+                    ? 'bg-primary/20 text-white font-bold !border-primary'
+                    : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 font-medium'
                     }`}
-
                 >
 
                   <div className="flex flex-col items-center justify-center shrink-0 w-16 group-hover:w-6 gap-1.5 group-hover:gap-0">
@@ -214,8 +199,8 @@ function ProtectedRoute({
 
 function AppLayout() {
   const location = useLocation();
-  const hideNavPaths = ['/quiz', '/result', '/auth', '/onboarding'];
-  const isFullScreen = hideNavPaths.includes(location.pathname);
+  const hideNavPaths = ['/quiz', '/auth', '/onboarding'];
+  const isFullScreen = hideNavPaths.includes(location.pathname) || location.pathname.startsWith('/result') || location.pathname.startsWith('/review');
 
   // Auth state di-kelola di sini — satu kali untuk semua route
   // ProtectedRoute hanya membaca state ini tanpa query ulang
@@ -326,7 +311,7 @@ function AppLayout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg text-fg font-syne transition-colors flex flex-col md:flex-row overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--app-bg)] text-[var(--text-main)] font-syne transition-colors flex flex-col md:flex-row overflow-x-hidden">
       <Navigation />
       <IncomingDuelRequest />
       <main className={`flex-1 min-w-0 ${!isFullScreen ? 'md:ml-[88px] pb-20 md:pb-0' : ''} min-h-screen transition-all duration-300`}>
@@ -336,12 +321,13 @@ function AppLayout() {
             <Route path="/"                  element={<ProtectedRoute authState={authState}><Dashboard /></ProtectedRoute>} />
             <Route path="/onboarding"        element={<ProtectedRoute authState={authState}><Onboarding /></ProtectedRoute>} />
             <Route path="/quiz"              element={<ProtectedRoute authState={authState}><Quiz /></ProtectedRoute>} />
-            <Route path="/result"            element={<ProtectedRoute authState={authState}><Result /></ProtectedRoute>} />
+            <Route path="/result/:attemptId" element={<ProtectedRoute authState={authState}><Result /></ProtectedRoute>} />
             <Route path="/liga"              element={<ProtectedRoute authState={authState}><Leaderboard /></ProtectedRoute>} />
             <Route path="/quest"             element={<ProtectedRoute authState={authState}><Quest /></ProtectedRoute>} />
             <Route path="/toko"              element={<ProtectedRoute authState={authState}><Shop /></ProtectedRoute>} />
+            <Route path="/pembahasan"        element={<ProtectedRoute authState={authState}><TryOutLobby /></ProtectedRoute>} />
+            <Route path="/review/:attemptId" element={<ProtectedRoute authState={authState}><ReviewDetail /></ProtectedRoute>} />
             <Route path="/profil"            element={<ProtectedRoute authState={authState}><Profile /></ProtectedRoute>} />
-            <Route path="/pembahasan-tryout" element={<ProtectedRoute authState={authState}><PembahasanTryout /></ProtectedRoute>} />
           </Routes>
         </div>
       </main>

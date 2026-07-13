@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Coins, Zap, ArrowRight, Award, AlertTriangle
+  Coins, Zap, ArrowRight, Award, AlertTriangle, CheckCircle, XCircle, Circle, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { fetchProfile, updateProfile } from '../lib/supabase';
+import { fetchProfile, supabase } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
-import { useQuizSession } from '../context/QuizSessionContext';
+import { Button } from '../components/ui/Button';
 
 function AnimatedCounter({ end, duration = 2, suffix = '' }: { end: number, duration?: number, suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -28,180 +28,111 @@ function AnimatedCounter({ end, duration = 2, suffix = '' }: { end: number, dura
 }
 
 export default function Result() {
+  const { attemptId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // NEW: Result data from database
+  const [resultData, setResultData] = useState<any>(null);
 
-  const gameMode = location.state?.mode || 'latihan';
+  useEffect(() => {
+    const loadResult = async () => {
+      setLoading(true);
+      try {
+        const p = await fetchProfile();
+        setProfile(p);
+        
+        if (attemptId) {
+          const { data, error: resultError } = await supabase!
+            .from('quiz_results')
+            .select('*')
+            .eq('session_id', attemptId)
+            .single();
+          
+          if (resultError) throw resultError;
+          setResultData(data);
+        } else {
+          setError('Attempt ID tidak ditemukan');
+        }
+      } catch (err) {
+        console.error('Failed to load result:', err);
+        setError('Gagal memuat hasil kuis');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadResult();
+  }, [attemptId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-6 text-center font-syne">
+        <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
+        <h2 className="text-xl font-black text-fg mb-2">Memuat Hasil...</h2>
+      </div>
+    );
+  }
+
+  if (error || !resultData) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-surface border border-border rounded-3xl p-8 text-center space-y-6 shadow-sm">
+          <div className="w-16 h-16 bg-danger/10 rounded-2xl flex items-center justify-center mx-auto">
+            <AlertTriangle className="text-danger" size={32} />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-fg mb-2">
+              {error || 'Data Tidak Ditemukan'}
+            </h2>
+            <p className="text-sm text-fg-muted">
+              Tidak dapat memuat hasil kuis. Data mungkin sudah kadaluarsa atau Anda tidak memiliki akses.
+            </p>
+          </div>
+          <Button variant="primary" onClick={() => navigate('/')} className="w-full">
+            Kembali ke Beranda
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const gameMode = resultData.mode || 'latihan';
   const isTryout = gameMode === 'tryout';
   
-  const sessionId = location.state?.sessionId;
-  const { completeSession } = useQuizSession();
+  const score = resultData.score || 0;
+  const twkScore = resultData.twk_score || 0;
+  const tiuScore = resultData.tiu_score || 0;
+  const tkpScore = resultData.tkp_score || 0;
 
-  const score = location.state?.score || 0;
+  const userAnswers = resultData.answers_json || {};
+  const quizQuestions = resultData.questions_json || [];
 
-  // Try Out Score Breakdowns
-  const twkScore = location.state?.twkScore || 0;
-  const tiuScore = location.state?.tiuScore || 0;
-  const tkpScore = location.state?.tkpScore || 0;
+  const earnedCoins = resultData.coins_earned || 0;
+  const gainedXP = resultData.xp_earned || 0;
 
-  const userAnswers = location.state?.userAnswers;
-  const quizQuestions = location.state?.quizQuestions;
-
+  // PvP Support
   const receivedRanks: { name: string; score: number; isMe?: boolean }[] = location.state?.liveRanks || [];
-  const earnedCoins = isTryout ? 300 : gameMode === 'survival' ? Math.floor(score * 0.2) : 50;
-  const gainedXP = isTryout ? 500 : gameMode === 'survival' ? score : 150;
 
-  const hasAwarded = useRef(false);
+  const totalQuestions = quizQuestions?.length || 0;
+  const correctCount = quizQuestions?.filter((q: any, i: number) => {
+    const ansId = userAnswers?.[i];
+    const isTKP = q.category === 'TKP';
+    if (isTKP) {
+      const opt = q.options?.find((o: any) => o.id === ansId);
+      return (opt?.score ?? 0) >= 50;
+    }
+    return ansId === q.correct;
+  }).length || 0;
+  const emptyCount = quizQuestions?.filter((q: any, i: number) => !userAnswers?.[i]).length || 0;
+  const incorrectCount = totalQuestions - correctCount - emptyCount;
 
-  // Load and update user profile dynamic reward on mount
-  useEffect(() => {
-    if (hasAwarded.current) return;
-    hasAwarded.current = true;
-    
-    fetchProfile().then(async (p) => {
-      if (!p) return;
-      
-      // Simpan session secara persisten ke database (quiz_results & quiz_sessions)
-      if (sessionId) {
-        try {
-          await completeSession(sessionId, {
-            score,
-            twkScore,
-            tiuScore,
-            tkpScore,
-            coinsEarned: earnedCoins,
-            xpEarned: gainedXP
-          });
-        } catch(err) {
-          console.error("Gagal menyimpan quiz_results:", err);
-        }
-      }
-
-      setProfile(p);
-
-      // Award coins and XP
-      const updatedCoins = p.coins + earnedCoins;
-      const updatedScore = p.score + gainedXP;
-
-      // Calculate level up
-      const currentLevel = p.level;
-      let newLevel = currentLevel;
-      let tempXP = updatedScore;
-
-      while (tempXP >= newLevel * 1000) {
-        tempXP -= newLevel * 1000;
-        newLevel += 1;
-      }
-
-      // Check daily quest triggers and update quests_progress
-      let questsProgress = { ...(p.quests_progress || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }) };
-      
-      let newAkurasi = { 
-        TWK: { correct: 0, total: 0 }, 
-        TIU: { correct: 0, total: 0 }, 
-        TKP: { correct: 0, total: 0 },
-        ...(p.akurasi as any || {})
-      };
-      
-      let newCatatanSalah = Array.isArray(p.catatan_salah) ? [...p.catatan_salah] : [];
-      let newTotalQuizzes = (p.total_quizzes_completed || 0) + 1;
-      let newTotalCorrect = (p.total_correct_answers || 0);
-      let newHighestSurvival = p.highest_survival_score || 0;
-      let newTotalPvPWins = p.total_pvp_wins || 0;
-
-      if (quizQuestions && userAnswers) {
-        let twkCorrectCount = 0;
-        let tiuCompleted = false;
-        let survivalCount = 0;
-        let currentCombo = 0;
-        let maxCombo = 0;
-
-        quizQuestions.forEach((q: any, idx: number) => {
-          const ansId = userAnswers[idx];
-          if (!ansId) {
-            currentCombo = 0;
-            return; // skipped
-          }
-          
-          const opt = q.options.find((o: any) => o.id === ansId);
-          const pts = opt?.score ?? 0;
-          const isTKP = q.category === 'TKP';
-          const isCorrect = ansId === q.correct;
-          const isFullyCorrect = (!isTKP && isCorrect) || (isTKP && pts >= 50);
-
-          // Update akurasi
-          if (!newAkurasi[q.category]) newAkurasi[q.category] = { correct: 0, total: 0 };
-          newAkurasi[q.category].total += 1;
-          if (isFullyCorrect) {
-            newAkurasi[q.category].correct += 1;
-            newTotalCorrect += 1;
-            if (q.category === 'TWK') twkCorrectCount++;
-            currentCombo++;
-            if (currentCombo > maxCombo) maxCombo = currentCombo;
-          } else {
-            currentCombo = 0;
-          }
-
-          if (gameMode === 'survival') {
-            survivalCount++;
-          }
-
-          // Catatan Salah Logic
-          if (gameMode === 'catatansalah') {
-            newCatatanSalah = newCatatanSalah.map((wrongQ: any) => {
-              if (wrongQ.id === q.id) {
-                return { ...wrongQ, consecutiveCorrect: isFullyCorrect ? (wrongQ.consecutiveCorrect || 0) + 1 : 0 };
-              }
-              return wrongQ;
-            }).filter((wrongQ: any) => (wrongQ.consecutiveCorrect || 0) < 3);
-          } else {
-            if (!isFullyCorrect) {
-              if (!newCatatanSalah.some((wrongQ: any) => wrongQ.id === q.id)) {
-                newCatatanSalah.push({ ...q, consecutiveCorrect: 0 });
-              }
-            }
-          }
-        });
-
-        if (gameMode === 'latihan' && quizQuestions.some((q: any) => q.category === 'TIU')) {
-          tiuCompleted = true;
-        }
-
-        if (questsProgress[1] !== 999) questsProgress[1] = Math.min((questsProgress[1] || 0) + twkCorrectCount, 10);
-        if (questsProgress[2] !== 999) questsProgress[2] = Math.min(Math.max(questsProgress[2] || 0, maxCombo), 5);
-        if (tiuCompleted && questsProgress[3] !== 999) questsProgress[3] = Math.min((questsProgress[3] || 0) + 1, 1);
-        if (questsProgress[4] !== 999) questsProgress[4] = Math.min((questsProgress[4] || 0) + 1, 10);
-        if (survivalCount > 0 && questsProgress[5] !== 999) questsProgress[5] = Math.min(Math.max(questsProgress[5] || 0, survivalCount), 30);
-      }
-      
-      if (gameMode === 'survival') {
-        newHighestSurvival = Math.max(newHighestSurvival, score);
-      }
-      
-      if (gameMode === 'pvp' || gameMode === 'pvp1v1') {
-        // Did we win?
-        const sorted = receivedRanks.length > 0 ? [...receivedRanks].sort((a,b) => b.score - a.score) : [];
-        const isWin = sorted.length > 0 && sorted[0].isMe;
-        if (isWin) {
-          newTotalPvPWins += 1;
-        }
-      }
-
-      await updateProfile({
-        coins: updatedCoins,
-        score: updatedScore,
-        level: newLevel,
-        quests_progress: questsProgress,
-        akurasi: newAkurasi,
-        catatan_salah: newCatatanSalah,
-        total_quizzes_completed: newTotalQuizzes,
-        total_correct_answers: newTotalCorrect,
-        highest_survival_score: newHighestSurvival,
-        total_pvp_wins: newTotalPvPWins
-      });
-    });
-  }, [earnedCoins, gainedXP, gameMode, quizQuestions, userAnswers, score, receivedRanks]);
+  const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+  const circleCircumference = 2 * Math.PI * 120;
+  const strokeDashoffset = circleCircumference - (percentage / 100) * circleCircumference;
 
   // Strict compiler workaround (read vars)
   if (profile) { }
@@ -289,7 +220,7 @@ export default function Result() {
                 if (!rank) return null;
 
                 const height = isFirst ? 'h-40' : isSecond ? 'h-32' : 'h-24';
-                const color = isFirst ? 'bg-yellow-500 shadow-yellow-500/20' : isSecond ? 'bg-gray-300 shadow-white/10' : 'bg-amber-600 shadow-amber-500/10';
+                const color = isFirst ? 'bg-warning shadow-yellow-500/20' : isSecond ? 'bg-gray-300 shadow-white/10' : 'bg-warning shadow-amber-500/10';
 
                 return (
                   <motion.div
@@ -311,10 +242,10 @@ export default function Result() {
 
             <div className="space-y-3">
               {finalRanks.slice(3).map((rank, index) => (
-                <div key={rank.name} className={`flex items-center justify-between p-4 rounded-xl border ${rank.isMe ? 'bg-blue-500/10 border-blue-500' : 'bg-surface border-border'}`}>
+                <div key={rank.name} className={`flex items-center justify-between p-4 rounded-xl border ${rank.isMe ? 'bg-info/10 border-info' : 'bg-surface border-border'}`}>
                   <div className="flex items-center gap-4">
                     <span className="font-bold text-fg-muted w-6 text-center">{index + 4}</span>
-                    <span className={`font-bold ${rank.isMe ? 'text-blue-500' : 'text-fg'}`}>{rank.name}</span>
+                    <span className={`font-bold ${rank.isMe ? 'text-primary' : 'text-fg'}`}>{rank.name}</span>
                   </div>
                   <span className="font-space font-bold text-fg-muted">{rank.score} pts</span>
                 </div>
@@ -322,12 +253,24 @@ export default function Result() {
             </div>
           </div>
         ) : (
-          <div className="text-center space-y-2 relative">
-            <div className="absolute inset-0 bg-primary/20 blur-[60px] -z-10 rounded-full" />
-            <h1 className="text-7xl md:text-8xl font-black text-fg font-space tracking-tighter">
-              <AnimatedCounter end={score} />
-            </h1>
-            <p className="text-fg-muted font-bold tracking-widest">TOTAL SKOR SKD</p>
+          <div className="flex flex-col items-center relative mb-8 mt-6">
+            <div className="absolute inset-0 bg-emerald-500/20 blur-[60px] -z-10 rounded-full" />
+            <div className="relative w-64 h-64 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90 drop-shadow-sm" viewBox="0 0 256 256">
+                <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" strokeWidth="16" className="text-destructive" />
+                <motion.circle 
+                  cx="128" cy="128" r="120" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" 
+                  className="text-emerald-500"
+                  initial={{ strokeDasharray: circleCircumference, strokeDashoffset: circleCircumference }}
+                  animate={{ strokeDashoffset }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-5xl font-black text-fg font-space"><AnimatedCounter end={score} /></span>
+                <span className="text-xs font-bold text-slate-500 tracking-widest mt-1">TOTAL SKOR</span>
+              </div>
+            </div>
           </div>
         )}
 
@@ -479,17 +422,22 @@ export default function Result() {
         )}
 
         {/* Stats Grid */}
-        {!isTryout && (
-          <div className="grid grid-cols-2 gap-4 md:gap-6 w-full max-w-xl">
-            <div className="bg-surface border border-border p-6 rounded-3xl flex flex-col items-center shadow-sm">
-              <div className="text-3xl md:text-4xl font-bold font-space text-success">
-                <AnimatedCounter end={85} suffix="%" />
-              </div>
-              <p className="text-xs text-fg-muted mt-2 font-bold uppercase tracking-wider">Akurasi Jawaban</p>
+        {!isTryout && quizQuestions && (
+          <div className="grid grid-cols-3 gap-3 md:gap-4 w-full max-w-xl mb-6">
+            <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex flex-col items-center shadow-sm">
+              <CheckCircle className="text-emerald-600 mb-2" size={24} />
+              <div className="text-2xl font-black font-space text-emerald-700">{correctCount}</div>
+              <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider mt-1">Benar</p>
             </div>
-            <div className="bg-surface border border-border p-6 rounded-3xl flex flex-col items-center shadow-sm">
-              <div className="text-3xl md:text-4xl font-bold font-space text-fg">04:32</div>
-              <p className="text-xs text-fg-muted mt-2 font-bold uppercase tracking-wider">Waktu Pengerjaan</p>
+            <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex flex-col items-center shadow-sm">
+              <XCircle className="text-destructive mb-2" size={24} />
+              <div className="text-2xl font-black font-space text-rose-700">{incorrectCount}</div>
+              <p className="text-[10px] text-destructive font-bold uppercase tracking-wider mt-1">Salah</p>
+            </div>
+            <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col items-center shadow-sm">
+              <Circle className="text-slate-500 mb-2" size={24} />
+              <div className="text-2xl font-black font-space text-fg">{emptyCount}</div>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Kosong</p>
             </div>
           </div>
         )}
@@ -522,20 +470,28 @@ export default function Result() {
           </div>
         </motion.div>
 
+        {/* Pembahasan Action */}
+        {quizQuestions && userAnswers && (
+          <div className="w-full max-w-xl mt-8">
+            <Button
+              variant="outline"
+              onClick={() => navigate(`/review/${attemptId}`)}
+              className="w-full py-4 rounded-2xl shadow-sm border-2 border-slate-200 text-fg hover:bg-slate-50 hover:border-blue-200 active:scale-[0.99] font-bold"
+            >
+              Lihat Pembahasan Detail
+            </Button>
+          </div>
+        )}
+
         {/* Action Buttons */}
-        <div className="w-full max-w-xl space-y-3 pt-4">
-          <button
-            onClick={() => navigate('/pembahasan-tryout', { state: { userAnswers, quizQuestions } })}
-            className="w-full py-4 rounded-2xl border-2 border-border text-fg font-bold hover:bg-surface-subtle transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all"
-          >
-            Tinjau Pembahasan Lembar Jawaban <ArrowRight size={20} />
-          </button>
-          <button
+        <div className="w-full max-w-xl space-y-3 pt-6">
+          <Button
+            variant="primary"
             onClick={() => navigate('/')}
-            className="w-full py-4 rounded-2xl bg-skd-text text-skd-bg font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all"
+            className="w-full py-4 rounded-2xl shadow-lg active:scale-[0.99]"
           >
-            Kembali ke Beranda
-          </button>
+            Selesai Review & Kembali
+          </Button>
         </div>
 
       </div>

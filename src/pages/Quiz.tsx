@@ -53,11 +53,12 @@ function cleanMathText(text: string): string {
 }
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
+import { X, Check, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useQuizSession } from '../context/QuizSessionContext';
 import MathCard from '../components/MathCard';
+import { Button } from '../components/ui/Button';
 // Konfigurasi Power up yang diijinkan per mode kuis
 const ALLOWED_POWER_UPS: Record<string, string[]> = {
   latihan: ['item_5050', 'item_hint', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan'],
@@ -80,15 +81,18 @@ export default function Quiz() {
   const energyCost = location.state?.energyCost || 0;
   const coinCost = location.state?.coinCost || 0;
   const botDifficulty = location.state?.botDifficulty || 'medium';
+  const packageId = location.state?.packageId || undefined;
+  const packageVersion = location.state?.packageVersion || 1;
   
   // --- Quiz Session ---
-  const { createSession, updateSession, abandonSession } = useQuizSession();
+  const { createSession, updateSession, abandonSession, completeSession } = useQuizSession();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const answersRef = useRef<Record<number, string>>({});
   
   // --- Quiz state ---
   const [isEnergyDeducted, setIsEnergyDeducted] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [questions, setQuestions] = useState<any[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [noCatatanSalah, setNoCatatanSalah] = useState(false); // state untuk layar kosong catatan salah
@@ -306,7 +310,7 @@ export default function Quiz() {
         setQuestions(data);
         setLoadingQuestions(false);
         try {
-          const id = await createSession(gameMode, data);
+          const id = await createSession(gameMode, data, packageId, packageVersion);
           if (mounted) setSessionId(id);
         } catch (err) {
           console.error("Failed to create quiz session:", err);
@@ -527,17 +531,27 @@ export default function Quiz() {
         }
       }
       setIsGameOver(true);
-      setTimeout(() => {
-        navigate('/result', { 
-          state: { 
-            score: currentQuestionIndex * 50 + earned, 
-            mode: gameMode,
-            sessionId,
-            userAnswers: { ...answers, [currentQuestionIndex]: optionId },
-            quizQuestions: questions
-          } 
-        });
-      }, 1800);
+      
+      const earnedCoins = gameMode === 'survival' ? Math.floor((currentQuestionIndex * 50 + earned) * 0.2) : 50;
+      const gainedXP = gameMode === 'survival' ? (currentQuestionIndex * 50 + earned) : 150;
+
+      completeSession(sessionId!, {
+        score: currentQuestionIndex * 50 + earned,
+        coinsEarned: earnedCoins,
+        xpEarned: gainedXP
+      }).then(() => {
+        setTimeout(() => {
+          navigate(`/result/${sessionId}`, { 
+            state: { 
+              score: currentQuestionIndex * 50 + earned, 
+              mode: gameMode,
+              sessionId,
+              userAnswers: { ...answers, [currentQuestionIndex]: optionId },
+              quizQuestions: questions
+            } 
+          });
+        }, 1800);
+      });
       return;
     }
     // Update my score
@@ -586,18 +600,26 @@ export default function Quiz() {
         else if (q.category === 'TKP') tkpScore += pts;
       }
     });
-    navigate('/result', { 
-      state: { 
-        score: finalScore, 
-        mode: gameMode,
-        sessionId,
-        twkScore,
-        tiuScore,
-        tkpScore,
-        userAnswers: answers,
-        quizQuestions: questions,
-        doubtfulMap: doubtful
-      } 
+    
+    const earnedCoins = gameMode === 'tryout' ? 300 : 50;
+    const gainedXP = gameMode === 'tryout' ? 500 : 150;
+
+    completeSession(sessionId!, {
+      score: finalScore, twkScore, tiuScore, tkpScore, coinsEarned: earnedCoins, xpEarned: gainedXP
+    }).then(() => {
+      navigate(`/result/${sessionId}`, { 
+        state: { 
+          score: finalScore, 
+          mode: gameMode,
+          sessionId,
+          twkScore,
+          tiuScore,
+          tkpScore,
+          userAnswers: answers,
+          quizQuestions: questions,
+          doubtfulMap: doubtful
+        } 
+      });
     });
   };
   const handleShowExplanation = () => {
@@ -625,15 +647,22 @@ export default function Quiz() {
         setTimeLeft(TOTAL_TIME);
       }
     } else {
-      navigate('/result', { 
-        state: { 
-          score: scoreSnapshot, 
-          mode: gameMode, 
-          sessionId,
-          liveRanks,
-          userAnswers: answers,
-          quizQuestions: questions
-        } 
+      const earnedCoins = gameMode === 'survival' ? Math.floor(scoreSnapshot * 0.2) : 50;
+      const gainedXP = gameMode === 'survival' ? scoreSnapshot : 150;
+
+      completeSession(sessionId!, {
+        score: scoreSnapshot, coinsEarned: earnedCoins, xpEarned: gainedXP
+      }).then(() => {
+        navigate(`/result/${sessionId}`, { 
+          state: { 
+            score: scoreSnapshot, 
+            mode: gameMode, 
+            sessionId,
+            liveRanks,
+            userAnswers: answers,
+            quizQuestions: questions
+          } 
+        });
       });
     }
   };
@@ -660,16 +689,16 @@ const scoreBadge = (optionId: string) => {
         <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs justify-center">
           <Link
             to="/toko"
-            className="px-6 py-3 bg-primary hover:bg-slate-800 text-primary-fg font-bold rounded-xl shadow-md transition-colors text-center w-full"
+            className="px-6 py-3 bg-primary hover:bg-primary-hover text-primary-fg font-bold rounded-xl shadow-md transition-colors text-center w-full"
           >
             Beli Energi di Toko
           </Link>
-          <button
+          <Button
             onClick={() => navigate('/')}
             className="px-6 py-3 bg-locked-subtle hover:bg-locked-subtle text-fg font-bold rounded-xl transition-colors w-full"
           >
             Kembali ke Beranda
-          </button>
+          </Button>
         </div>
         {/* Tinta Hitam crisp overlay */}
         {tintaHitamActive && (
@@ -702,7 +731,7 @@ const scoreBadge = (optionId: string) => {
       {/* Loading Screen */}
       {(loadingQuestions || (!currentQuestion && !noCatatanSalah)) && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-bg gap-4">
-          <Loader2 className="animate-spin text-blue-500" size={48} />
+          <Loader2 className="animate-spin text-primary" size={48} />
           <h2 className="text-xl font-bold text-fg animate-pulse">Mempersiapkan Arena...</h2>
         </div>
       )}
@@ -719,12 +748,12 @@ const scoreBadge = (optionId: string) => {
               Kamu belum pernah menjawab soal dengan salah, atau sudah berhasil mempelajari semua soal yang pernah salah. Pertahankan!
             </p>
           </div>
-          <button
+          <Button
             onClick={() => navigate('/dashboard', { replace: true })}
-            className="px-8 py-3 bg-primary hover:bg-slate-800 text-primary-fg font-black rounded-xl transition-all shadow-lg text-sm"
+            className="px-8 py-3 bg-primary hover:bg-primary-hover text-primary-fg font-black rounded-xl transition-all shadow-lg text-sm"
           >
             Kembali ke Dashboard
-          </button>
+          </Button>
         </div>
       )}
       {/* Floating Score Reward */}
@@ -749,44 +778,49 @@ const scoreBadge = (optionId: string) => {
         {/* === Quiz Panel === */}
         <div className="flex flex-col flex-1 h-full min-w-0 w-full max-w-5xl mx-auto">
           {/* Header */}
-          <header className="p-4 flex items-center justify-between border-b border-border bg-surface/60 backdrop-blur-sm z-10">
-            <button onClick={() => setShowExitConfirm(true)} className="p-2 hover:bg-locked-subtle rounded-full transition-colors text-fg">
-              <X size={20} />
-            </button>
-            <div className="flex-1 px-4">
-              <div className="flex justify-between items-center text-xs mb-1.5 font-space font-bold text-fg-muted">
-                <span>Soal {currentQuestionIndex + 1}{gameMode !== 'survival' && `/${totalQuestions}`}</span>
-                <div className="flex items-center gap-2">
-                  {gameMode === 'survival' && <span className="flex items-center gap-1 text-danger bg-danger-subtle px-2 py-0.5 rounded-full"><Skull size={12} /> Survival</span>}
-                  {gameMode === 'tryout'  && <span className="flex items-center gap-1 text-premium-text bg-premium-subtle px-2 py-0.5 rounded-full"><Trophy size={12} /> Try Out</span>}
-                  {(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && <span className="flex items-center gap-1 text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-full"><Users size={12} /> {gameMode === 'pvp1v1' ? '1v1 Duel' : 'PvP'}</span>}
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                    currentQuestion.category === 'TWK' ? 'bg-purple-500/10 text-purple-400' :
-                    currentQuestion.category === 'TIU' ? 'bg-blue-500/10 text-blue-400' :
-                    'bg-orange-500/10 text-orange-400'
+          <header className="sticky top-0 p-3 md:p-4 flex items-center justify-between gap-3 md:gap-4 border-b border-slate-100 bg-white/90 backdrop-blur-md z-40 shadow-sm">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" onClick={() => setShowExitConfirm(true)} className="!p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full shrink-0">
+                <X size={20} />
+              </Button>
+              
+              <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 shrink-0">
+                <span className="font-space font-bold text-sm text-fg whitespace-nowrap">Soal {currentQuestionIndex + 1}{gameMode !== 'survival' && `/${totalQuestions}`}</span>
+                <div className="flex items-center gap-1.5">
+                  {gameMode === 'survival' && <span className="flex items-center gap-1 text-destructive bg-rose-50 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold border border-rose-100"><Skull size={10} /> Survival</span>}
+                  {gameMode === 'tryout'  && <span className="flex items-center gap-1 text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold border border-purple-100"><Trophy size={10} /> Try Out</span>}
+                  {(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && <span className="flex items-center gap-1 text-primary bg-blue-50 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold border border-blue-100"><Users size={10} /> PvP</span>}
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${
+                    currentQuestion.category === 'TWK' ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                    currentQuestion.category === 'TIU' ? 'bg-blue-50 text-primary border-blue-100' :
+                    'bg-amber-50 text-warning border-amber-100'
                   }`}>{currentQuestion.category}</span>
                 </div>
               </div>
-              <div className="h-1.5 bg-locked-subtle rounded-full overflow-hidden">
+            </div>
+
+            <div className="flex-1 hidden md:block px-6">
+              <div className="h-2 bg-slate-100 rounded-full overflow-hidden w-full max-w-md mx-auto">
                 <motion.div
-                  className="h-full bg-premium text-primary-fg rounded-full"
+                  className="h-full bg-primary rounded-full"
                   initial={{ width: `${(currentQuestionIndex / totalQuestions) * 100}%` }}
                   animate={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
                   transition={{ duration: 0.5 }}
                 />
               </div>
             </div>
-            {/* Circular Timer (or text for Tryout) */}
-            <div className="flex items-center gap-2">
-              <div className="relative w-16 h-11 flex items-center justify-center">
+
+            {/* Timer */}
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="relative w-14 h-10 flex items-center justify-center">
                 {gameMode === 'tryout' ? (
-                  <div className={`font-space font-bold text-xs bg-surface px-2 py-1 rounded border border-border ${timerColor}`}>
+                  <div className={`font-space font-bold text-xs bg-white px-2 py-1 rounded-md border border-slate-200 ${timerColor}`}>
                     {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
                   </div>
                 ) : (
                   <>
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 40 40">
-                      <circle cx="20" cy="20" r="18" fill="none" className="stroke-skd-muted/20" strokeWidth="3" />
+                      <circle cx="20" cy="20" r="18" fill="none" className="stroke-slate-100" strokeWidth="3" />
                       <circle
                         cx="20" cy="20" r="18" fill="none"
                         className={`stroke-current transition-all duration-1000 ease-linear ${timerColor}`}
@@ -800,49 +834,21 @@ const scoreBadge = (optionId: string) => {
               </div>
               
               {gameMode === 'tryout' && (
-                <button 
+                <Button 
+                  variant="ghost"
                   onClick={() => setShowSidebarMobile(true)} 
-                  className="lg:hidden p-2 text-fg hover:bg-locked-subtle rounded-xl transition-colors shrink-0"
+                  className="lg:hidden !p-2 text-slate-500 hover:bg-slate-100 rounded-full shrink-0"
                 >
                   <Menu size={20} />
-                </button>
+                </Button>
               )}
             </div>
-                    </header>
-          {/* Quick Slots */}
-          {gameMode !== 'tryout' && profile && (
-            <div className="flex gap-2 px-4 py-2 border-b border-border bg-surface/30 overflow-x-auto shrink-0">
-              {profile.inventory?.item_5050 > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_5050') && (
-                <button onClick={use5050} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"><Scale size={12}/> 50:50 ({profile.inventory.item_5050})</button>
-              )}
-              {profile.inventory?.item_hint > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_hint') && (
-                <button onClick={useHint} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-info-subtle text-info-fg hover:bg-info-subtle"><Lightbulb size={12}/> Bocoran Rumus ({profile.inventory.item_hint})</button>
-              )}
-              {profile.inventory?.item_waktu_beku > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_waktu_beku') && (
-                <button onClick={useWaktuBeku} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 ${activePowerUps.waktuBeku ? 'bg-cyan-500/30 text-cyan-300' : 'bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20'}`}><Clock size={12}/> Waktu Beku ({profile.inventory.item_waktu_beku})</button>
-              )}
-              {profile.inventory?.item_skor_ganda > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_skor_ganda') && (
-                <button onClick={useSkorGanda} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 ${activePowerUps.skorGanda ? 'bg-amber-500/30 text-amber-300' : 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20'}`}><Zap size={12}/> Skor Ganda ({profile.inventory.item_skor_ganda})</button>
-              )}
-              {profile.inventory?.item_terawangan > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_terawangan') && (
-                <button onClick={useTerawangan} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 ${activePowerUps.terawangan ? 'bg-purple-500/30 text-purple-300' : 'bg-purple-500/10 text-purple-400 hover:bg-purple-500/20'}`}><Eye size={12}/> Terawangan ({profile.inventory.item_terawangan})</button>
-              )}
-              {profile.inventory?.item_tinta_hitam > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_tinta_hitam') && (
-                <button onClick={useTintaHitam} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-danger/10 text-red-400 hover:bg-danger-subtle shrink-0"><Skull size={12}/> Tinta Hitam ({profile.inventory.item_tinta_hitam})</button>
-              )}
-              {profile.inventory?.item_lompatan_kilat > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_lompatan_kilat') && !lompatanKilatUsed && (
-                <button onClick={useLompatanKilat} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-info-subtle text-info-fg hover:bg-info-subtle shrink-0"><Zap size={12}/> Lompatan Kilat ({profile.inventory.item_lompatan_kilat})</button>
-              )}
-              {(profile.inventory?.item_kesempatan_kedua > 0 || profile.inventory?.item_shield > 0) && ALLOWED_POWER_UPS[gameMode]?.includes('item_kesempatan_kedua') && (
-                <div className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 shrink-0"><Shield size={12}/> Perisai Aktif ({(profile.inventory.item_kesempatan_kedua || 0) + (profile.inventory.item_shield || 0)})</div>
-              )}
-            </div>
-          )}
+          </header>
           {/* PvP: My rank badge (mobile, under header) */}
           {(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && (
             <div className="lg:hidden px-4 py-2 border-b border-border bg-surface/30 flex items-center justify-between text-xs">
               <span className="text-fg-muted font-bold">Peringkat Saya:</span>
-              <span className="font-black text-blue-500 flex items-center gap-1">
+              <span className="font-black text-primary flex items-center gap-1">
                 #{myRankPosition}
                 <span className="font-normal text-fg-muted">dari {liveRanks.length}</span>
               </span>
@@ -868,8 +874,8 @@ const scoreBadge = (optionId: string) => {
                     <span className="text-fg-muted">Setiap pilihan memiliki bobot poin berbeda (10–50).</span>
                   </div>
                 )}
-                <div className="bg-surface p-5 md:p-7 rounded-2xl border border-border shadow-sm">
-                  <p className="text-base md:text-lg leading-loose text-fg font-medium" dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.text) }} />
+                <div className="bg-white rounded-3xl p-8 md:px-12 md:py-10 border border-slate-100 shadow-sm mb-6 mt-2 md:mt-4">
+                  <p className="text-xl font-semibold leading-loose text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.text) }} />
                 </div>
                 {/* Bocoran Rumus Hint Box */}
                 {showHint && currentQuestion.explanation && (
@@ -887,49 +893,50 @@ const scoreBadge = (optionId: string) => {
                     const isCorrect  = opt.id === currentQuestion.correct;
                     const showStatus = selected !== null;
                     const isTKP = currentQuestion.category === 'TKP';
-                    let cardClass = 'bg-surface hover:bg-surface-subtle border-border focus-visible:ring focus-visible:outline-none';
-                    let markerClass = 'bg-locked-subtle text-fg';
+                    let cardClass = 'bg-white border-slate-200 hover:border-blue-300 hover:bg-blue-50/30';
+                    let markerClass = 'bg-slate-100 text-slate-600 font-bold';
                     
                     if (gameMode === 'tryout') {
                       if (isSelected) {
-                        cardClass = 'bg-info-subtle border-info';
-                        markerClass = 'bg-info text-info-fg';
+                        cardClass = 'bg-blue-50 border-primary shadow-sm';
+                        markerClass = 'bg-primary text-white';
                       }
                     } else if (showStatus) {
                       if (isTKP) {
                         if (isSelected) {
-                          cardClass = 'bg-orange-500/15 border-orange-400';
-                          markerClass = 'bg-orange-400 text-white';
+                          cardClass = 'bg-blue-50 border-primary shadow-sm';
+                          markerClass = 'bg-primary text-white';
+                        } else {
+                          cardClass = 'bg-white border-slate-200 opacity-50';
                         }
-                        else cardClass = 'bg-surface border-border opacity-50';
                       } else {
                         if (isCorrect) {
-                          cardClass = 'bg-success/20 border-success';
-                          markerClass = 'bg-success text-white';
+                          cardClass = 'bg-emerald-50 border-emerald-500 shadow-sm';
+                          markerClass = 'bg-emerald-500 text-white';
+                        } else if (isSelected) {
+                          cardClass = 'bg-rose-50 border-destructive shadow-sm';
+                          markerClass = 'bg-destructive text-white';
+                        } else {
+                          cardClass = 'bg-white border-slate-200 opacity-40';
                         }
-                        else if (isSelected) {
-                          cardClass = 'bg-danger-subtle border-danger';
-                          markerClass = 'bg-danger text-white';
-                        }
-                        else cardClass = 'bg-surface border-border opacity-40';
                       }
                     }
-                                        const terawanganPercent = activePowerUps.terawangan ? (isCorrect ? Math.floor(Math.random() * 20) + 60 : Math.floor(Math.random() * 30)) : 0;
+                                        const terawanganPercent = activePowerUps.terawangan ? (isCorrect ? ((opt.text.length * 7) % 20) + 60 : ((opt.text.length * 13) % 30)) : 0;
                     return (
                       <motion.button
                         key={opt.id}
                         whileTap={(!selected || gameMode === 'tryout') ? { scale: 0.98 } : {}}
                         onClick={() => handleSelect(opt.id)}
                         disabled={selected !== null && gameMode !== 'tryout'}
-                        className={`w-full p-3.5 md:p-4 rounded-xl border text-left flex items-center gap-3 transition-all shadow-sm relative z-0 overflow-hidden ${cardClass}`}
+                        className={`w-full p-3.5 md:p-4 rounded-xl border-2 text-left flex items-center gap-3 transition-all shadow-sm relative z-0 overflow-hidden active:scale-[0.98] ${cardClass}`}
                       >
                         {activePowerUps.terawangan && (
-                          <div className="absolute left-0 bottom-0 top-0 bg-purple-500/10 -z-10 rounded-xl transition-all duration-1000" style={{ width: `${terawanganPercent}%` }} />
+                          <div className="absolute left-0 bottom-0 top-0 bg-premium/10 -z-10 rounded-xl transition-all duration-1000" style={{ width: `${terawanganPercent}%` }} />
                         )}
                         <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base ${markerClass}`}>
                           {opt.id}
                         </div>
-                        <span className="flex-1 leading-snug text-sm md:text-base font-medium text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(opt.text) }} ></span>
+                        <span className="flex-1 leading-snug text-sm md:text-base font-semibold text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(opt.text) }} ></span>
                         {/* TKP score badge revealed after answering (not in tryout) */}
                         {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
@@ -952,41 +959,44 @@ const scoreBadge = (optionId: string) => {
                   <div className="pt-4">
                     {!showExplanation ? (
                       <div className="flex gap-3">
-                        <button
+                        <Button
+                          variant="ghost"
                           onClick={handleShowExplanation}
-                          className="flex-1 py-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl font-bold text-sm transition-colors"
+                          className="flex-1 py-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl"
                         >
                           Lihat Pembahasan
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="primary"
                           onClick={() => {
                             if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
                             goNextOrFinish(totalScoreRef.current);
                           }}
-                          className="flex-1 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold text-sm transition-all shadow-md active:scale-95"
+                          className="flex-1 py-3 rounded-xl shadow-md active:scale-95"
                         >
                           Lanjut
-                        </button>
+                        </Button>
                       </div>
                     ) : (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
-                        className="bg-blue-500/10 border border-blue-500/20 p-5 rounded-xl space-y-3"
+                        className="bg-info/10 border border-info/20 p-5 rounded-xl space-y-3"
                       >
-                        <h4 className="font-bold text-blue-400">Pembahasan:</h4>
+                        <h4 className="font-bold text-primary">Pembahasan:</h4>
                         <p className="text-sm md:text-base text-fg leading-relaxed">
                           <MathCard explanation={cleanMathText(currentQuestion.explanation || "Pembahasan tidak tersedia untuk soal ini.")} category={currentQuestion.category} />
                         </p>
-                        <button
+                        <Button
+                          variant="primary"
                           onClick={() => {
                             if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
                             goNextOrFinish(totalScoreRef.current);
                           }}
-                          className="mt-4 w-full py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
+                          className="mt-4 w-full py-3 rounded-xl shadow-lg active:scale-95"
                         >
                           Lanjut ke Soal Berikutnya
-                        </button>
+                        </Button>
                       </motion.div>
                     )}
                   </div>
@@ -996,39 +1006,42 @@ const scoreBadge = (optionId: string) => {
                   <div className="flex flex-col gap-4 pt-4 mt-6 border-t border-border">
                     <div className="flex justify-end gap-2">
                       {selected && (
-                        <button onClick={() => {
+                        <Button variant="danger" onClick={() => {
                           setAnswers(p => { const n = {...p}; delete n[currentQuestionIndex]; return n; });
-                        }} className="px-4 py-2 bg-danger/10 text-danger border border-danger/20 rounded-xl text-sm font-bold hover:bg-danger-subtle transition-colors shadow-sm">
+                        }} className="px-4 py-2 rounded-xl text-sm shadow-sm">
                           Batalkan Jawaban
-                        </button>
+                        </Button>
                       )}
-                      <button onClick={() => setDoubtful(p => ({...p, [currentQuestionIndex]: !p[currentQuestionIndex]}))} className={`px-4 py-2 border rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95 ${doubtful[currentQuestionIndex] ? 'bg-danger text-white border-danger shadow-md' : 'bg-orange-500/10 text-orange-500 border-orange-500/20 hover:bg-orange-500/20'}`}>
+                      <Button onClick={() => setDoubtful(p => ({...p, [currentQuestionIndex]: !p[currentQuestionIndex]}))} className={`px-4 py-2 border rounded-xl text-sm flex items-center gap-2 active:scale-95 ${doubtful[currentQuestionIndex] ? 'bg-danger text-white border-danger shadow-md' : 'bg-orange-500/10 text-orange-500 border-orange-500/20 hover:bg-orange-500/20'}`}>
                         Ragu-Ragu
-                      </button>
+                      </Button>
                     </div>
                     <div className="flex justify-between items-center">
-                    <button
+                    <Button
+                      variant="ghost"
                       onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
                       disabled={currentQuestionIndex === 0}
-                      className="px-5 py-2.5 bg-surface border border-border rounded-xl font-bold text-fg disabled:opacity-30 transition-all hover:bg-locked-subtle"
+                      className="px-5 py-2.5 bg-surface border border-border rounded-xl text-fg disabled:opacity-30 hover:bg-locked-subtle"
                     >
                       Sebelumnya
-                    </button>
+                    </Button>
                     
                     {currentQuestionIndex < totalQuestions - 1 ? (
-                      <button
+                      <Button
+                        variant="primary"
                         onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
-                        className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold shadow-md transition-all active:scale-95"
+                        className="px-5 py-2.5 rounded-xl shadow-md active:scale-95"
                       >
                         Selanjutnya
-                      </button>
+                      </Button>
                     ) : (
-                      <button
+                      <Button
+                        variant="success"
                         onClick={finishTryout}
-                        className="px-6 py-2.5 bg-success hover:bg-success/90 text-white rounded-xl font-black shadow-lg shadow-sm transition-all active:scale-95"
+                        className="px-6 py-2.5 rounded-xl shadow-lg shadow-sm active:scale-95"
                       >
                         Kumpulkan Ujian
-                      </button>
+                      </Button>
                     )}
                   </div>
                   </div>
@@ -1036,12 +1049,42 @@ const scoreBadge = (optionId: string) => {
               </motion.div>
             </AnimatePresence>
           </main>
+
+          {/* Quick Slots (Power Ups) at the bottom */}
+          {gameMode !== 'tryout' && profile && (
+            <div className="flex gap-4 px-4 py-3 border-t border-slate-100 bg-white/50 backdrop-blur-md overflow-x-auto shrink-0 mt-auto shadow-[0_-4px_20px_rgba(0,0,0,0.02)] relative z-30">
+              {profile.inventory?.item_5050 > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_5050') && (
+                <Button variant="custom" onClick={use5050} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary hover:bg-blue-100 transition-colors border border-blue-100 shadow-sm"><Scale size={14}/> 50:50 ({profile.inventory.item_5050})</Button>
+              )}
+              {profile.inventory?.item_hint > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_hint') && (
+                <Button variant="custom" onClick={useHint} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-amber-50 text-warning hover:bg-amber-100 transition-colors border border-amber-100 shadow-sm"><Lightbulb size={14}/> Petunjuk ({profile.inventory.item_hint})</Button>
+              )}
+              {profile.inventory?.item_waktu_beku > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_waktu_beku') && (
+                <Button variant="custom" onClick={useWaktuBeku} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${activePowerUps.waktuBeku ? 'bg-cyan-50 border-cyan-200 text-cyan-600 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Clock size={14}/> Waktu Beku ({profile.inventory.item_waktu_beku})</Button>
+              )}
+              {profile.inventory?.item_skor_ganda > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_skor_ganda') && (
+                <Button variant="custom" onClick={useSkorGanda} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${activePowerUps.skorGanda ? 'bg-amber-50 border-amber-200 text-warning shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Zap size={14}/> Skor Ganda ({profile.inventory.item_skor_ganda})</Button>
+              )}
+              {profile.inventory?.item_terawangan > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_terawangan') && (
+                <Button variant="custom" onClick={useTerawangan} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${activePowerUps.terawangan ? 'bg-purple-50 border-purple-200 text-purple-600 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Eye size={14}/> Terawangan ({profile.inventory.item_terawangan})</Button>
+              )}
+              {profile.inventory?.item_tinta_hitam > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_tinta_hitam') && (
+                <Button variant="custom" onClick={useTintaHitam} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-rose-50 text-destructive hover:bg-rose-100 transition-colors border border-rose-100 shrink-0 shadow-sm"><Skull size={14}/> Tinta Hitam ({profile.inventory.item_tinta_hitam})</Button>
+              )}
+              {profile.inventory?.item_lompatan_kilat > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_lompatan_kilat') && !lompatanKilatUsed && (
+                <Button variant="custom" onClick={useLompatanKilat} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary hover:bg-blue-100 transition-colors border border-blue-100 shrink-0 shadow-sm"><Zap size={14}/> Lompatan Kilat ({profile.inventory.item_lompatan_kilat})</Button>
+              )}
+              {(profile.inventory?.item_kesempatan_kedua > 0 || profile.inventory?.item_shield > 0) && ALLOWED_POWER_UPS[gameMode]?.includes('item_kesempatan_kedua') && (
+                <div className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0"><Shield size={14}/> Perisai ({(profile.inventory.item_kesempatan_kedua || 0) + (profile.inventory.item_shield || 0)})</div>
+              )}
+            </div>
+          )}
         </div>
         {/* === PvP Live Leaderboard Sidebar (desktop) === */}
         {(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && (
           <div className="hidden lg:flex flex-col w-64 xl:w-72 border-l border-border bg-surface/40 backdrop-blur-sm">
             <div className="p-4 border-b border-border">
-              <h3 className="font-bold text-blue-400 flex items-center gap-2 text-sm">
+              <h3 className="font-bold text-primary flex items-center gap-2 text-sm">
                 <Users size={16} /> Live Ranking
               </h3>
             </div>
@@ -1059,12 +1102,12 @@ const scoreBadge = (optionId: string) => {
                       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                       className={`flex items-center gap-3 p-3 rounded-xl border transition-colors
                         ${rank.isMe
-                          ? 'bg-info-subtle border-blue-500/40 shadow-md shadow-blue-500/10'
+                          ? 'bg-info-subtle border-info/40 shadow-md shadow-primary/10'
                           : 'bg-bg/50 border-border/50'}`}
                     >
                       <span className="text-base w-6 text-center">{medal}</span>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs font-bold truncate ${rank.isMe ? 'text-blue-400' : 'text-fg'}`}>
+                        <p className={`text-xs font-bold truncate ${rank.isMe ? 'text-primary' : 'text-fg'}`}>
                           {rank.name}{rank.isMe && ' 👤'}
                         </p>
                         <p className="text-[10px] text-fg-muted font-space">{rank.score} pts</p>
@@ -1072,7 +1115,7 @@ const scoreBadge = (optionId: string) => {
                       {/* Score bar */}
                       <div className="w-10 h-1.5 bg-locked-subtle rounded-full overflow-hidden">
                         <motion.div
-                          className={`h-full rounded-full ${rank.isMe ? 'bg-blue-400' : 'bg-surface-subtle0'}`}
+                          className={`h-full rounded-full ${rank.isMe ? 'bg-primary' : 'bg-surface-subtle0'}`}
                           animate={{ width: `${Math.min((rank.score / 300) * 100, 100)}%` }}
                           transition={{ duration: 0.4 }}
                         />
@@ -1083,10 +1126,10 @@ const scoreBadge = (optionId: string) => {
               </AnimatePresence>
             </div>
             {/* My score summary at bottom */}
-            <div className="p-4 border-t border-border bg-blue-500/5">
+            <div className="p-4 border-t border-border bg-info/5">
               <div className="text-center">
                 <p className="text-[10px] text-fg-muted uppercase font-bold tracking-wider mb-1">Total Skor Anda</p>
-                <p className="text-2xl font-black text-blue-400 font-space">{liveRanks.find(r => r.isMe)?.score ?? 0}</p>
+                <p className="text-2xl font-black text-primary font-space">{liveRanks.find(r => r.isMe)?.score ?? 0}</p>
                 <p className="text-[10px] text-fg-muted mt-0.5">Soal {currentQuestionIndex + 1}/{totalQuestions}</p>
               </div>
             </div>
@@ -1107,13 +1150,14 @@ const scoreBadge = (optionId: string) => {
                 const isOpen = openCategories[cat];
                 return (
                   <div key={cat} className="mb-4">
-                    <button
+                    <Button
+                      variant="ghost"
                       onClick={() => toggleCategory(cat)}
                       className="flex items-center justify-between w-full p-2 mb-2 bg-locked-subtle hover:bg-locked-subtle rounded-lg text-sm font-bold text-fg transition-colors"
                     >
                       <span>{cat}</span>
                       {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                    </button>
+                    </Button>
                     <AnimatePresence>
                       {isOpen && (
                         <motion.div 
@@ -1127,20 +1171,21 @@ const scoreBadge = (optionId: string) => {
                             const isCurrent = currentQuestionIndex === idx;
                             let btnClass = 'bg-bg border-border text-fg-muted hover:bg-locked-subtle';
                             if (isCurrent) {
-                              btnClass = 'bg-info text-info-fg border-blue-500 shadow-md ring-2 ring-blue-500/50 ring-offset-1 ring-offset-skd-card';
+                              btnClass = 'bg-info text-info-fg border-info shadow-md ring-2 ring-info/50 ring-offset-1 ring-offset-skd-card';
                             } else if (doubtful[idx]) {
-                              btnClass = 'bg-danger text-white border-red-600 shadow-sm';
+                              btnClass = 'bg-danger text-white border-danger shadow-sm';
                             } else if (isAnswered) {
                               btnClass = 'bg-success text-white border-success shadow-sm';
                             }
                             return (
-                              <button
+                              <Button
+                                variant="custom"
                                 key={idx}
                                 onClick={() => setCurrentQuestionIndex(idx)}
                                 className={`w-10 h-10 rounded-md border flex items-center justify-center text-xs font-bold transition-all ${btnClass}`}
                               >
                                 {idx + 1}
-                              </button>
+                              </Button>
                             );
                           })}
                         </motion.div>
@@ -1151,12 +1196,13 @@ const scoreBadge = (optionId: string) => {
               })}
             </div>
             <div className="p-4 border-t border-border bg-bg">
-              <button
-                onClick={finishTryout}
-                className="w-full py-3 bg-success hover:bg-success/90 text-white rounded-xl font-black shadow-lg shadow-sm transition-all active:scale-95"
+              <Button
+                variant="success"
+                onClick={() => setShowSubmitConfirm(true)}
+                className="w-full py-3 rounded-xl shadow-lg shadow-sm active:scale-95"
               >
                 Kumpulkan Ujian
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -1170,7 +1216,7 @@ const scoreBadge = (optionId: string) => {
                 animate={{ opacity: 0.5 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setShowSidebarMobile(false)}
-                className="fixed inset-0 bg-black z-40 lg:hidden"
+                className="fixed inset-0 bg-overlay backdrop-blur-sm z-40 lg:hidden"
               />
               
               {/* Drawer Container */}
@@ -1185,12 +1231,13 @@ const scoreBadge = (optionId: string) => {
                   <h3 className="font-bold text-fg flex items-center gap-2 text-sm">
                     Navigasi Soal
                   </h3>
-                  <button 
+                  <Button 
+                    variant="ghost"
                     onClick={() => setShowSidebarMobile(false)}
-                    className="p-1 hover:bg-locked-subtle rounded-full transition-colors text-fg"
+                    className="!p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full"
                   >
                     <X size={20} />
-                  </button>
+                  </Button>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
@@ -1200,13 +1247,14 @@ const scoreBadge = (optionId: string) => {
                     const isOpen = openCategories[cat];
                     return (
                       <div key={cat} className="mb-4">
-                        <button
+                        <Button
+                          variant="ghost"
                           onClick={() => toggleCategory(cat)}
-                          className="flex items-center justify-between w-full p-2 mb-2 bg-locked-subtle hover:bg-locked-subtle rounded-lg text-sm font-bold text-fg transition-colors"
+                          className="flex items-center justify-between w-full p-2 mb-2 bg-locked-subtle hover:bg-locked-subtle rounded-lg text-sm text-fg"
                         >
                           <span>{cat}</span>
                           {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                        </button>
+                        </Button>
                         <AnimatePresence>
                           {isOpen && (
                             <motion.div 
@@ -1220,23 +1268,24 @@ const scoreBadge = (optionId: string) => {
                                 const isCurrent = currentQuestionIndex === idx;
                                 let btnClass = 'bg-bg border-border text-fg-muted hover:bg-locked-subtle';
                                 if (isCurrent) {
-                                  btnClass = 'bg-info text-info-fg border-blue-500 shadow-md ring-2 ring-blue-500/50 ring-offset-1 ring-offset-skd-card';
+                                  btnClass = 'bg-info text-info-fg border-info shadow-md ring-2 ring-info/50 ring-offset-1 ring-offset-skd-card';
                                 } else if (doubtful[idx]) {
-                                  btnClass = 'bg-danger text-white border-red-600 shadow-sm';
+                                  btnClass = 'bg-danger text-white border-danger shadow-sm';
                                 } else if (isAnswered) {
                                   btnClass = 'bg-success text-white border-success shadow-sm';
                                 }
                                 return (
-                                  <button
+                                  <Button
+                                    variant="custom"
                                     key={idx}
                                     onClick={() => {
                                       setCurrentQuestionIndex(idx);
                                       setShowSidebarMobile(false);
                                     }}
-                                    className={`w-10 h-10 rounded-md border flex items-center justify-center text-xs font-bold transition-all ${btnClass}`}
+                                    className={`w-10 h-10 rounded-md border flex items-center justify-center text-xs font-bold ${btnClass}`}
                                   >
                                     {idx + 1}
-                                  </button>
+                                  </Button>
                                 );
                               })}
                             </motion.div>
@@ -1248,15 +1297,16 @@ const scoreBadge = (optionId: string) => {
                 </div>
                 
                 <div className="p-4 border-t border-border bg-bg">
-                  <button
+                  <Button
+                    variant="success"
                     onClick={() => {
                       setShowSidebarMobile(false);
-                      finishTryout();
+                      setShowSubmitConfirm(true);
                     }}
-                    className="w-full py-3 bg-success hover:bg-success/90 text-white rounded-xl font-black shadow-lg shadow-sm transition-all active:scale-95"
+                    className="w-full py-3 rounded-xl shadow-lg shadow-sm active:scale-95"
                   >
                     Kumpulkan Ujian
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             </>
@@ -1271,7 +1321,7 @@ const scoreBadge = (optionId: string) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-overlay backdrop-blur-sm backdrop-blur-sm"
+              className="absolute inset-0 bg-overlay backdrop-blur-sm"
               onClick={() => setShowExitConfirm(false)}
             />
             <motion.div
@@ -1290,21 +1340,70 @@ const scoreBadge = (optionId: string) => {
                   : "Kuis belum selesai. Anda sudah menjawab soal sehingga biaya permainan sudah terpotong. Progress tidak akan tersimpan!"}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => setShowExitConfirm(false)}
-                  className="flex-1 py-3 px-4 bg-locked-subtle hover:bg-locked-subtle text-fg font-bold rounded-xl transition-colors"
+                  className="flex-1 py-3 px-4 bg-locked-subtle hover:bg-locked-subtle text-fg rounded-xl"
                 >
                   Batal
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="danger"
                   onClick={() => {
                     if (sessionId) abandonSession(sessionId);
                     navigate('/');
                   }}
-                  className="flex-1 py-3 px-4 bg-danger hover:bg-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
+                  className="flex-1 py-3 px-4 rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
                 >
                   Ya, Keluar
-                </button>
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* Submit Confirmation Modal */}
+      <AnimatePresence>
+        {showSubmitConfirm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-overlay backdrop-blur-sm"
+              onClick={() => setShowSubmitConfirm(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-bg border border-border rounded-3xl p-6 md:p-8 max-w-sm w-full relative z-10 shadow-2xl"
+            >
+              <div className="w-16 h-16 bg-success/10 text-success rounded-2xl flex items-center justify-center mb-6 mx-auto border border-success/20">
+                <Check size={32} />
+              </div>
+              <h2 className="text-xl font-black text-center text-fg mb-3">Kumpulkan Ujian?</h2>
+              <p className="text-sm text-center text-fg-muted mb-8 leading-relaxed">
+                Apakah Anda yakin ingin menyelesaikan kuis ini? Pastikan Anda sudah mengecek kembali seluruh jawaban Anda.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowSubmitConfirm(false)}
+                  className="flex-1 py-3 px-4 bg-locked-subtle hover:bg-locked-subtle text-fg rounded-xl"
+                >
+                  Batal
+                </Button>
+                <Button
+                  variant="success"
+                  onClick={() => {
+                    setShowSubmitConfirm(false);
+                    finishTryout();
+                  }}
+                  className="flex-1 py-3 px-4 rounded-xl shadow-lg shadow-success/20 transition-all active:scale-95"
+                >
+                  Ya, Kumpulkan
+                </Button>
               </div>
             </motion.div>
           </div>
