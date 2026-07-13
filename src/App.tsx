@@ -9,7 +9,6 @@ import { supabase } from './lib/supabase';
 
 import { Home, Trophy, BookOpen, Store, User, BookOpenCheck } from 'lucide-react';
 
-import { ThemeProvider } from './context/ThemeContext';
 
 import Dashboard from './pages/Dashboard';
 
@@ -75,7 +74,7 @@ function Navigation() {
 
       {/* Mobile Bottom Navigation */}
 
-      <nav className="md:hidden fixed bottom-0 w-full bg-skd-card/95 backdrop-blur-md border-t border-skd-border z-50 transition-colors pb-[env(safe-area-inset-bottom)]">
+      <nav className="md:hidden fixed bottom-0 w-full bg-surface/95 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] backdrop-blur-md border-t border-border z-50 transition-colors pb-[env(safe-area-inset-bottom)]">
 
         <ul className="flex justify-around items-center h-16">
 
@@ -87,7 +86,7 @@ function Navigation() {
 
               <li key={path} className="flex-1 h-full">
 
-                <Link to={path} className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'text-skd-accent' : 'text-skd-muted hover:text-skd-text'}`}>
+                <Link to={path} className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'text-primary' : 'text-fg-muted hover:text-fg'}`}>
 
                   <Icon size={20} className={isActive ? 'drop-shadow-[0_0_8px_rgba(245,166,35,0.5)]' : ''} />
 
@@ -109,13 +108,13 @@ function Navigation() {
 
       {/* Desktop Sidebar Navigation */}
 
-      <nav className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-[88px] hover:w-64 bg-skd-card border-r border-skd-border z-50 transition-all duration-300 group overflow-hidden shadow-sm">
+      <nav className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-[88px] hover:w-64 bg-surface border-r border-border z-50 transition-all duration-300 group overflow-hidden shadow-sm">
 
         <div className="h-24 flex items-center justify-center group-hover:justify-start group-hover:px-6 shrink-0 relative w-full">
 
-          <h1 className="text-[20px] font-bold tracking-tighter bg-gradient-to-r from-skd-accent to-yellow-500 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute left-6 whitespace-nowrap">SKDQuest</h1>
+          <h1 className="text-[20px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute left-6 whitespace-nowrap">SKDQuest</h1>
 
-          <h1 className="text-[22px] font-bold tracking-tighter bg-gradient-to-r from-skd-accent to-yellow-500 bg-clip-text text-transparent group-hover:opacity-0 transition-opacity duration-300">SQ</h1>
+          <h1 className="text-[22px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent group-hover:opacity-0 transition-opacity duration-300">SQ</h1>
 
         </div>
 
@@ -137,9 +136,9 @@ function Navigation() {
 
                   className={`flex flex-col group-hover:flex-row items-center group-hover:items-center px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full ${isActive
 
-                    ? 'bg-skd-accent/10 text-skd-accent font-bold'
+                    ? 'bg-primary-subtle text-primary font-bold'
 
-                    : 'text-skd-muted hover:bg-skd-bg hover:text-skd-text font-medium'
+                    : 'text-fg-muted hover:bg-bg hover:text-fg font-medium'
 
                     }`}
 
@@ -195,8 +194,8 @@ function ProtectedRoute({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-skd-bg flex flex-col items-center justify-center gap-3 text-skd-accent font-bold">
-        <div className="w-10 h-10 border-4 border-skd-accent/20 border-t-skd-accent rounded-full animate-spin" />
+      <div className="min-h-screen bg-bg flex flex-col items-center justify-center gap-3 text-primary font-bold">
+        <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
         <span className="text-sm">Memuat Arena...</span>
       </div>
     );
@@ -327,7 +326,7 @@ function AppLayout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-skd-bg text-skd-text font-syne transition-colors flex flex-col md:flex-row overflow-x-hidden">
+    <div className="min-h-screen bg-bg text-fg font-syne transition-colors flex flex-col md:flex-row overflow-x-hidden">
       <Navigation />
       <IncomingDuelRequest />
       <main className={`flex-1 min-w-0 ${!isFullScreen ? 'md:ml-[88px] pb-20 md:pb-0' : ''} min-h-screen transition-all duration-300`}>
@@ -355,7 +354,7 @@ function AppLayout() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider>
+      
         <DuelProvider>
           <QuizSessionProvider>
             <Router>
@@ -363,7 +362,7 @@ function App() {
             </Router>
           </QuizSessionProvider>
         </DuelProvider>
-      </ThemeProvider>
+      
     </ErrorBoundary>
   );
 }

@@ -1,50 +1,108 @@
 @import "tailwindcss";
 
 @theme {
-  --color-skd-bg: var(--skd-bg);
-  --color-skd-card: var(--skd-card);
-  --color-skd-text: var(--skd-text);
-  --color-skd-muted: var(--skd-muted);
-  --color-skd-border: var(--skd-border);
-  
-  /* Core constants */
-  --color-skd-accent: #F5A623;
-  --color-skd-success: #10B981;
-  --color-skd-danger: #EF4444;
-  --color-skd-premium: #8B5CF6;
-  
   --font-syne: "Syne", sans-serif;
   --font-space: "Space Mono", monospace;
+
+  /* SURFACES */
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F1F5F9;
+  --color-surface-tinted: #EFF6FF;
+  --color-surface-muted: #E2E8F0;
+  --color-surface-raised: #FFFFFF;
+  --color-overlay: rgba(15, 23, 42, 0.4);
+
+  /* TEXT */
+  --color-fg: #0F172A;
+  --color-fg-secondary: #334155;
+  --color-fg-muted: #64748B;
+  --color-fg-inverse: #FFFFFF;
+  --color-link: #2563EB;
+  --color-link-hover: #1D4ED8;
+
+  /* BRAND */
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-active: #1E40AF;
+  --color-primary-fg: #FFFFFF;
+  --color-primary-subtle: #EFF6FF;
+  --color-primary-subtle-fg: #1E40AF;
+
+  /* UI */
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+  --color-input: #FFFFFF;
+  --color-ring: rgba(37, 99, 235, 0.5);
+  --color-disabled-bg: #E2E8F0;
+  --color-disabled-fg: #64748B;
+
+  /* STATUS */
+  --color-success: #059669;
+  --color-success-subtle: #D1FAE5;
+  --color-success-fg: #064E3B;
+  --color-warning: #D97706;
+  --color-warning-subtle: #FEF3C7;
+  --color-warning-fg: #78350F;
+  --color-danger: #DC2626;
+  --color-danger-subtle: #FEE2E2;
+  --color-danger-fg: #7F1D1D;
+  --color-info: #3B82F6;
+  --color-info-subtle: #DBEAFE;
+  --color-info-fg: #1E3A8A;
+
+  /* GAMIFICATION */
+  --color-coin: #D97706;
+  --color-coin-subtle: #FEF3C7;
+  --color-coin-text: #78350F;
+  --color-energy: #F43F5E;
+  --color-energy-subtle: #FFE4E6;
+  --color-xp: #8B5CF6;
+  --color-xp-subtle: #EDE9FE;
+  --color-streak: #EA580C;
+  --color-streak-subtle: #FFEDD5;
+  --color-premium: #8B5CF6;
+  --color-premium-subtle: #EDE9FE;
+  --color-premium-text: #4C1D95;
+  --color-locked: #64748B;
+  --color-locked-subtle: #F1F5F9;
+
+  /* VISUAL FOUNDATION */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* LEGACY FALLBACKS (To prevent UI breakage before step 4/5) */
+  --color-skd-bg: var(--color-bg);
+  --color-skd-card: var(--color-surface);
+  --color-skd-text: var(--color-fg);
+  --color-skd-muted: var(--color-fg-muted);
+  --color-skd-border: var(--color-border);
+  --color-skd-accent: var(--color-primary);
+  --color-skd-success: var(--color-success);
+  --color-skd-danger: var(--color-danger);
+  --color-skd-premium: var(--color-premium);
 }
 
 :root {
-  /* Light Mode (Default) */
-  --skd-bg: #F3F4F6;
-  --skd-card: #FFFFFF;
-  --skd-text: #111827;
-  --skd-muted: #6B7280;
-  --skd-border: #E5E7EB;
-}
-
-.dark {
-  /* Dark Mode */
-  --skd-bg: #0F0E17;
-  --skd-card: #1E1D2E;
-  --skd-text: #FFFFFF;
-  --skd-muted: #9CA3AF;
-  --skd-border: rgba(255, 255, 255, 0.05);
+  color-scheme: light;
 }
 
 body {
   font-family: var(--font-syne);
   margin: 0;
   min-height: 100vh;
-  background-color: var(--skd-bg);
-  color: var(--skd-text);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: var(--color-bg);
+  color: var(--color-fg);
 }
 
 html, body, #root {
   overflow-x: hidden;
   max-width: 100%;
+}
+
+/* GLOBAL ACCESSIBILITY FOCUS RING */
+*:focus-visible {
+  outline: 2px solid var(--color-fg);
+  outline-offset: 2px;
 }

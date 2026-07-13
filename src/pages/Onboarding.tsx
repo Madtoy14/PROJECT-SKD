@@ -7,8 +7,8 @@ import { supabase } from '../lib/supabase';
 
 const SCHOOLS = [
   { id: 'stmkg', name: 'STMKG', color: 'text-blue-400', glow: 'bg-blue-500/20' },
-  { id: 'stan', name: 'PKN STAN', color: 'text-yellow-400', glow: 'bg-yellow-500/20' },
-  { id: 'ipdn', name: 'IPDN', color: 'text-red-400', glow: 'bg-red-500/20' },
+  { id: 'stan', name: 'PKN STAN', color: 'text-coin', glow: 'bg-coin-subtle' },
+  { id: 'ipdn', name: 'IPDN', color: 'text-red-400', glow: 'bg-danger-subtle' },
   { id: 'poltekim', name: 'Poltekimipas', color: 'text-purple-400', glow: 'bg-purple-500/20' },
 ];
 
@@ -79,7 +79,7 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0E17] text-white flex flex-col lg:flex-row font-syne overflow-hidden relative">
+    <div className="min-h-screen bg-bg text-fg flex flex-col lg:flex-row font-syne overflow-hidden relative">
       {/* Toast Notification */}
       <AnimatePresence>
         {showToast && (
@@ -87,7 +87,7 @@ export default function Onboarding() {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-green-500/20 border border-green-500/50 backdrop-blur-md px-6 py-3 rounded-full flex items-center gap-3 shadow-[0_0_20px_rgba(34,197,94,0.3)]"
+            className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-success-subtle border border-success/50 backdrop-blur-md px-6 py-3 rounded-full flex items-center gap-3 shadow-[0_0_20px_rgba(34,197,94,0.3)]"
           >
             <CheckCircle2 size={20} className="text-green-400" />
             <span className="font-bold text-green-100">Karakter berhasil dibuat! Memasuki arena...</span>
@@ -116,13 +116,13 @@ export default function Onboarding() {
           <img
             src={avatarPdh}
             alt="Character Preview"
-            className="w-64 h-64 md:w-96 md:h-96 rounded-full border-4 border-[#1A1927] object-cover shadow-2xl relative z-10"
+            className="w-64 h-64 md:w-96 md:h-96 rounded-full border-4 border-surface object-cover shadow-2xl relative z-10"
           />
           <motion.div
             key={`${targetSchool}-badge`}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-[#1A1927] border border-white/10 px-6 py-2 rounded-full shadow-xl z-20 whitespace-nowrap"
+            className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-surface border border-border px-6 py-2 rounded-full shadow-xl z-20 whitespace-nowrap"
           >
             <span className={`text-sm font-bold ${activeSchool.color}`}>
               {activeSchool.name.split(' ')[0]}
@@ -138,20 +138,20 @@ export default function Onboarding() {
         transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
         className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 relative z-10"
       >
-        <div className="w-full max-w-md bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
+        <div className="w-full max-w-md bg-surface-subtle border border-border rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
 
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-2">Persiapan Memasuki Arena</h2>
-            <p className="text-gray-400 text-sm">
+            <p className="text-fg-muted text-sm">
               Lengkapi identitas karaktermu sebelum menantang simulasi SKD.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">NICKNAME (DISPLAY NAME)</label>
+              <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">NICKNAME (DISPLAY NAME)</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                   <User size={18} />
                 </div>
                 <input
@@ -160,21 +160,21 @@ export default function Onboarding() {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Misal: Akmil stmkg cihuy"
-                  className="w-full bg-[#1A1927] text-white rounded-xl pl-12 pr-4 py-3.5 outline-none transition-all duration-300 border border-transparent focus:border-skd-accent/50 focus:shadow-[0_0_15px_rgba(245,166,35,0.2)] font-mono text-sm"
+                  className="w-full bg-surface text-fg rounded-xl pl-12 pr-4 py-3.5 outline-none transition-all duration-300 border border-transparent focus:border-primary/50 focus:shadow-[0_0_15px_rgba(37,99,235,0.2)] font-mono text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">TARGET SEKOLAH KEDINASAN</label>
+              <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">TARGET SEKOLAH KEDINASAN</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                   <Target size={18} />
                 </div>
                 <select
                   value={targetSchool}
                   onChange={(e) => setTargetSchool(e.target.value)}
-                  className="w-full bg-[#1A1927] text-white rounded-xl pl-12 pr-4 py-3.5 outline-none transition-all duration-300 border border-transparent focus:border-skd-accent/50 focus:shadow-[0_0_15px_rgba(245,166,35,0.2)] font-mono text-sm appearance-none cursor-pointer"
+                  className="w-full bg-surface text-fg rounded-xl pl-12 pr-4 py-3.5 outline-none transition-all duration-300 border border-transparent focus:border-primary/50 focus:shadow-[0_0_15px_rgba(37,99,235,0.2)] font-mono text-sm appearance-none cursor-pointer"
                 >
                   {SCHOOLS.map((school) => (
                     <option key={school.id} value={school.id}>
@@ -182,16 +182,16 @@ export default function Onboarding() {
                     </option>
                   ))}
                 </select>
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-500">
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-fg-muted">
                   <ChevronRight size={16} className="rotate-90" />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">MOTIVASI / BIO SINGKAT</label>
+              <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">MOTIVASI / BIO SINGKAT</label>
               <div className="relative group">
-                <div className="absolute top-4 left-0 pl-4 pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
+                <div className="absolute top-4 left-0 pl-4 pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                   <PenTool size={18} />
                 </div>
                 <textarea
@@ -200,7 +200,7 @@ export default function Onboarding() {
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Alasan kamu ingin masuk sekolah kedinasan ini"
                   rows={3}
-                  className="w-full bg-[#1A1927] text-white rounded-xl pl-12 pr-4 py-3.5 outline-none transition-all duration-300 border border-transparent focus:border-skd-accent/50 focus:shadow-[0_0_15px_rgba(245,166,35,0.2)] font-mono text-sm resize-none"
+                  className="w-full bg-surface text-fg rounded-xl pl-12 pr-4 py-3.5 outline-none transition-all duration-300 border border-transparent focus:border-primary/50 focus:shadow-[0_0_15px_rgba(37,99,235,0.2)] font-mono text-sm resize-none"
                 />
               </div>
             </div>

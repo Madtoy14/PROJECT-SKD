@@ -45,35 +45,35 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-skd-bg flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-skd-card border border-skd-border rounded-3xl p-8 text-center space-y-6 shadow-lg">
+        <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-surface border border-border rounded-3xl p-8 text-center space-y-6 shadow-lg">
             {/* Error Icon */}
-            <div className="w-16 h-16 bg-skd-danger/10 rounded-2xl flex items-center justify-center mx-auto">
-              <AlertTriangle className="text-skd-danger" size={32} />
+            <div className="w-16 h-16 bg-danger/10 rounded-2xl flex items-center justify-center mx-auto">
+              <AlertTriangle className="text-danger" size={32} />
             </div>
 
             {/* Error Message */}
             <div>
-              <h2 className="text-xl font-bold text-skd-text mb-2">
+              <h2 className="text-xl font-bold text-fg mb-2">
                 Oops! Terjadi Kesalahan
               </h2>
-              <p className="text-sm text-skd-muted leading-relaxed">
+              <p className="text-sm text-fg-muted leading-relaxed">
                 Aplikasi mengalami error yang tidak terduga. Coba refresh halaman atau kembali ke beranda.
               </p>
             </div>
 
             {/* Error Details (Development Only) */}
             {import.meta.env.DEV && this.state.error && (
-              <div className="bg-skd-bg border border-skd-danger/20 rounded-xl p-4 text-left">
-                <p className="text-xs font-mono text-skd-danger break-all">
+              <div className="bg-bg border border-danger/20 rounded-xl p-4 text-left">
+                <p className="text-xs font-mono text-danger break-all">
                   {this.state.error.message}
                 </p>
                 {this.state.errorInfo && (
                   <details className="mt-2">
-                    <summary className="text-xs text-skd-muted cursor-pointer hover:text-skd-text">
+                    <summary className="text-xs text-fg-muted cursor-pointer hover:text-fg">
                       Stack Trace
                     </summary>
-                    <pre className="text-[10px] text-skd-muted mt-2 overflow-auto max-h-32">
+                    <pre className="text-[10px] text-fg-muted mt-2 overflow-auto max-h-32">
                       {this.state.errorInfo.componentStack}
                     </pre>
                   </details>
@@ -85,14 +85,14 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="space-y-3">
               <button
                 onClick={() => window.location.reload()}
-                className="w-full py-3 bg-skd-primary text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md"
+                className="w-full py-3 bg-primary text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md"
               >
                 <RefreshCw size={18} />
                 Refresh Halaman
               </button>
               <button
                 onClick={() => window.location.href = '/'}
-                className="w-full py-3 bg-skd-card border border-skd-border text-skd-text rounded-xl font-bold hover:bg-skd-muted/5 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 bg-surface border border-border text-fg rounded-xl font-bold hover:bg-surface-subtle transition-colors flex items-center justify-center gap-2"
               >
                 <Home size={18} />
                 Kembali ke Beranda

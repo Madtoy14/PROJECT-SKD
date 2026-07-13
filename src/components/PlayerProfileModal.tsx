@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trophy, Swords, Shield, Star, Target, Activity, CheckCircle2 } from 'lucide-react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile, Character } from '../lib/supabase';
 
@@ -13,6 +14,7 @@ interface PlayerProfileModalProps {
 }
 
 export default function PlayerProfileModal({ playerId, onClose, onAddRival, existingRivalIds = [] }: PlayerProfileModalProps) {
+  const modalRef = useFocusTrap(!!playerId, onClose);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,20 +24,26 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
   useEffect(() => {
     if (!playerId) return;
 
-    setProfile(null);
-    setCharacter(null);
-    setError('');
-    setLoading(true);
 
-    if (!isSupabaseConfigured()) {
-      setError('Supabase tidak terkonfigurasi');
-      setLoading(false);
-      return;
-    }
 
     let mounted = true;
 
     const fetchProfileData = async () => {
+      if (mounted) {
+        setProfile(null);
+        setCharacter(null);
+        setError('');
+        setLoading(true);
+      }
+
+      if (!isSupabaseConfigured()) {
+        if (mounted) {
+          setError('Supabase tidak terkonfigurasi');
+          setLoading(false);
+        }
+        return;
+      }
+
       try {
         const { data, error: err } = await supabase!
           .from('profiles')
@@ -57,8 +65,8 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
 
           if (mounted && charData) setCharacter(charData as Character);
         }
-      } catch (err: any) {
-        if (mounted) setError(err.message || 'Gagal memuat profil');
+      } catch (err: unknown) {
+        if (mounted) setError((err as Error).message || 'Gagal memuat profil');
       } finally {
         if (mounted) setLoading(false);
       }
@@ -81,10 +89,11 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
   }, [onClose]);
 
   // Cek status online (aktif dalam 15 menit terakhir)
+  const [now] = useState(() => Date.now());
   let isOnline = false;
   if (profile?.last_login) {
     const lastLogin = new Date(profile.last_login).getTime();
-    const now = Date.now();
+
     isOnline = (now - lastLogin) / (1000 * 60) <= 15;
   }
 
@@ -110,28 +119,32 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
     <AnimatePresence>
       {playerId && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          {/* Backdrop */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.7 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black backdrop-blur-sm"
+            className="fixed inset-0 bg-overlay backdrop-blur-sm z-0"
+            data-backdrop="true"
           />
 
           {/* Modal Card */}
           <motion.div
+            ref={modalRef}
             key="card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="player-profile-title"
             initial={{ scale: 0.92, opacity: 0, y: 16 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.92, opacity: 0, y: 16 }}
             transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-            className="bg-[#1A1924] border border-white/10 w-full max-w-xs rounded-[1.75rem] shadow-2xl relative z-10 overflow-hidden"
+            className="bg-surface shadow-sm border border-border w-full max-w-xs rounded-[1.75rem] shadow-2xl relative z-10 overflow-hidden"
           >
             {loading ? (
-              <div className="flex flex-col items-center justify-center p-10 text-gray-400">
-                <div className="animate-spin w-8 h-8 border-4 border-skd-accent/20 border-t-skd-accent rounded-full mb-3" />
+              <div className="flex flex-col items-center justify-center p-10 text-fg-muted">
+                <div className="animate-spin w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full mb-3" />
                 <p className="text-sm font-space">Memuat profil...</p>
               </div>
             ) : error ? (
@@ -139,11 +152,11 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
                 <div className="w-14 h-14 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
                   <X size={28} />
                 </div>
-                <h3 className="font-bold text-white mb-2">Terjadi Kesalahan</h3>
-                <p className="text-gray-400 text-sm mb-5">{error}</p>
+                <h3 className="font-bold text-fg mb-2">Terjadi Kesalahan</h3>
+                <p className="text-fg-muted text-sm mb-5">{error}</p>
                 <button
                   onClick={onClose}
-                  className="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-xl transition-colors text-sm font-bold"
+                  className="bg-surface-muted hover:bg-surface-subtle text-fg px-6 py-2 rounded-xl transition-colors text-sm font-bold"
                 >
                   Tutup
                 </button>
@@ -153,8 +166,10 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
                 {/* Header cover — lebih compact */}
                 <div className="h-16 bg-gradient-to-r from-skd-accent to-skd-premium relative flex-shrink-0">
                   <button
+                    type="button"
                     onClick={onClose}
-                    className="absolute top-3 right-3 w-7 h-7 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center backdrop-blur-md transition-colors z-10"
+                    aria-label="Tutup Profil Pemain"
+                    className="absolute top-3 right-3 w-7 h-7 bg-black/30 hover:bg-overlay backdrop-blur-sm text-white rounded-full flex items-center justify-center backdrop-blur-md transition-colors z-10"
                   >
                     <X size={14} />
                   </button>
@@ -164,7 +179,7 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
                   {/* Avatar — overlap cover */}
                   <div className="absolute -top-9 left-4">
                     <div className="relative">
-                      <div className="w-16 h-16 rounded-full bg-[#1A1924] border-[3px] border-[#1A1924] overflow-hidden">
+                      <div className="w-16 h-16 rounded-full bg-surface shadow-sm border-[3px] border-surface overflow-hidden">
                         <img
                           src={avatarUrl}
                           alt={profile.username}
@@ -172,7 +187,7 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
                         />
                       </div>
                       <div
-                        className={`absolute bottom-0.5 right-0.5 w-4 h-4 rounded-full border-[3px] border-[#1A1924] ${isOnline ? 'bg-skd-success' : 'bg-gray-500'}`}
+                        className={`absolute bottom-0.5 right-0.5 w-4 h-4 rounded-full border-[3px] border-surface ${isOnline ? 'bg-success' : 'bg-gray-500'}`}
                         title={isOnline ? 'Online' : 'Offline'}
                       />
                     </div>
@@ -180,9 +195,9 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
 
                   {/* Nama & badges */}
                   <div className="mb-3">
-                    <h2 className="text-lg font-black text-white leading-tight">{profile.username}</h2>
+                    <h2 id="player-profile-title" className="text-lg font-black text-fg leading-tight">{profile.username}</h2>
                     <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                      <span className="text-[10px] font-bold text-skd-premium bg-skd-premium/10 px-2 py-0.5 rounded-md flex items-center gap-1">
+                      <span className="text-[10px] font-bold text-premium bg-premium/10 px-2 py-0.5 rounded-md flex items-center gap-1">
                         <Star size={10} className="fill-skd-premium" /> Lv.{profile.level || 1}
                       </span>
                       {profile.target_kedinasan && (
@@ -191,7 +206,7 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
                         </span>
                       )}
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isOnline ? 'text-skd-success bg-skd-success/10' : 'text-gray-400 bg-white/5'}`}
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isOnline ? 'text-success bg-success/10' : 'text-fg-muted bg-surface-subtle'}`}
                       >
                         {isOnline ? '● Online' : '○ Offline'}
                       </span>
@@ -199,38 +214,38 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
                   </div>
 
                   {/* Stats grid 2x2 */}
-                  <div className="bg-white/5 rounded-xl p-3 border border-white/5 mb-3">
+                  <div className="bg-surface-subtle rounded-xl p-3 border border-white/5 mb-3">
                     <div className="grid grid-cols-2 gap-2.5">
                       <div className="flex flex-col">
-                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
-                          <Trophy size={9} className="text-skd-accent" /> Total Skor
+                        <span className="text-[9px] text-fg-muted font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                          <Trophy size={9} className="text-primary" /> Total Skor
                         </span>
-                        <span className="text-sm font-black text-white">{profile.score.toLocaleString()}</span>
+                        <span className="text-sm font-black text-fg">{profile.score.toLocaleString()}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                        <span className="text-[9px] text-fg-muted font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
                           <Swords size={9} className="text-red-400" /> PvP Wins
                         </span>
-                        <span className="text-sm font-black text-white">{profile.total_pvp_wins || 0}</span>
+                        <span className="text-sm font-black text-fg">{profile.total_pvp_wins || 0}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
-                          <CheckCircle2 size={9} className="text-skd-success" /> Akurasi
+                        <span className="text-[9px] text-fg-muted font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                          <CheckCircle2 size={9} className="text-success" /> Akurasi
                         </span>
-                        <span className="text-sm font-black text-white">{akurasiTotal}%</span>
+                        <span className="text-sm font-black text-fg">{akurasiTotal}%</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                        <span className="text-[9px] text-fg-muted font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1">
                           <Activity size={9} className="text-blue-400" /> Survival Max
                         </span>
-                        <span className="text-sm font-black text-white">{profile.highest_survival_score || 0} Combo</span>
+                        <span className="text-sm font-black text-fg">{profile.highest_survival_score || 0} Combo</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Bio */}
                   {profile.bio && (
-                    <p className="text-xs text-gray-400 text-center italic mb-3">"{profile.bio}"</p>
+                    <p className="text-xs text-fg-muted text-center italic mb-3">"{profile.bio}"</p>
                   )}
 
                   {/* Tombol tambah rival — hanya tampil jika belum ada di daftar rival */}
@@ -240,14 +255,14 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
                         onAddRival(profile);
                         onClose();
                       }}
-                      className="w-full bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] font-black py-2.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm"
+                      className="w-full bg-primary hover:bg-yellow-400 text-primary-fg font-black py-2.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm"
                     >
                       <Shield size={15} /> Tambah Rival
                     </button>
                   )}
                   {onAddRival && existingRivalIds.includes(profile.id) && (
-                    <div className="w-full bg-white/5 border border-white/10 text-gray-400 font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm">
-                      <Shield size={15} className="text-skd-success" /> Sudah di Daftar Rival
+                    <div className="w-full bg-surface-subtle border border-border text-fg-muted font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm">
+                      <Shield size={15} className="text-success" /> Sudah di Daftar Rival
                     </div>
                   )}
                 </div>

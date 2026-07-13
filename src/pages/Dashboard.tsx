@@ -3,17 +3,17 @@ import { motion, type Variants, AnimatePresence } from 'framer-motion';
 import { Zap, Coins, Plus, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Sun, Moon, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Share2, Copy, BookOpen, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character } from '../lib/supabase';
-import { useTheme } from '../context/ThemeContext';
 import RankBadge from '../components/RankBadge';
 import { getRankForScore, getCurrentSeason } from '../data/ranks';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import avatarPdh from '../assets/avatar_pdh.png';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 const GAME_MODES = [
-  { id: 'latihan', title: 'Latihan Harian', desc: 'Asah kemampuanmu setiap hari', cost: 3, costType: 'energy', icon: BrainCircuit, color: 'text-skd-success', bg: 'bg-skd-success/10', border: 'border-skd-success/20 hover:border-skd-success hover:bg-skd-success/5', badge: 'Santai' },
-  { id: 'survival', title: 'Survival Mode', desc: '1 Kesalahan = Game Over', cost: 2, costType: 'energy', icon: Target, color: 'text-skd-danger', bg: 'bg-skd-danger/10', border: 'border-skd-danger/20 hover:border-skd-danger hover:bg-skd-danger/5', badge: 'Hardcore' },
-  { id: 'pvp', title: 'PvP Battle', desc: 'Main bareng maks 50 player', cost: 2, costType: 'energy', icon: Swords, color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20 hover:border-blue-500 hover:bg-blue-500/5', badge: 'Multiplayer' },
-  { id: 'tryout', title: 'Try Out Mode', desc: 'Simulasi SKD', cost: 1500, costType: 'coin', icon: Trophy, color: 'text-skd-premium', bg: 'bg-skd-premium/10', border: 'border-skd-premium/30 hover:border-skd-premium hover:bg-skd-premium/5 hover:shadow-[0_0_15px_rgba(245,166,35,0.3)]', badge: 'Premium' },
-  { id: 'catatansalah', title: 'Buku Catatan Salah', desc: 'Latih ulang soal yang pernah salah', cost: 0, costType: 'energy', icon: BookOpen, color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20 hover:border-yellow-500 hover:bg-yellow-500/5', badge: 'Evaluasi' },
+  { id: 'latihan', title: 'Latihan Harian', desc: 'Asah kemampuanmu setiap hari', cost: 3, costType: 'energy', icon: BrainCircuit, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success/30 hover:border-success hover:shadow-sm', badge: 'Santai' },
+  { id: 'survival', title: 'Survival Mode', desc: '1 Kesalahan = Game Over', cost: 2, costType: 'energy', icon: Target, color: 'text-danger', bg: 'bg-danger-subtle', border: 'border-danger/30 hover:border-danger hover:shadow-sm', badge: 'Hardcore' },
+  { id: 'pvp', title: 'PvP Battle', desc: 'Main bareng maks 50 player', cost: 2, costType: 'energy', icon: Swords, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-sm', badge: 'Multiplayer' },
+  { id: 'tryout', title: 'Try Out Mode', desc: 'Simulasi SKD', cost: 1500, costType: 'coin', icon: Trophy, color: 'text-premium', bg: 'bg-premium-subtle', border: 'border-premium/30 hover:border-premium hover:shadow-sm', badge: 'Premium' },
+  { id: 'catatansalah', title: 'Buku Catatan Salah', desc: 'Latih ulang soal yang pernah salah', cost: 0, costType: 'energy', icon: BookOpen, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-card', badge: 'Evaluasi' },
 ];
 const MONTHLY_LEADERBOARD = [
   { rank: 1, name: 'Raden Saori', xp: 3800, isMe: true },
@@ -55,8 +55,7 @@ const itemVariants: Variants = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 export default function Dashboard() {
-  const { theme, toggleTheme } = useTheme();
-  const navigate = useNavigate();
+    const navigate = useNavigate();
   // Energy & Coins State
   const [energy, setEnergy] = useState<number | null>(null);
 
@@ -85,6 +84,7 @@ export default function Dashboard() {
         if (!p) {
           // Jika profil null, berarti ini user baru (dari Google Auth) yang belum punya karakter
           navigate('/onboarding', { replace: true });
+          setIsProcessing(false);
           return;
         }
 
@@ -184,6 +184,15 @@ export default function Dashboard() {
   const [toastMessage, setToastMessage] = useState('');
   // Modal State for Game Modes
   const [selectedMode, setSelectedMode] = useState<any>(null);
+  const gameModeModalRef = useFocusTrap(!!selectedMode, () => {
+    setSelectedMode(null);
+    setPvpState('idle');
+    setPvpSubMode('selection');
+    setRoomCode('');
+    setIsHost(false);
+    setActiveRoom('');
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   // PvP State
   const [roomCode, setRoomCode] = useState('');
@@ -199,6 +208,9 @@ export default function Dashboard() {
   // Spin Wheel States
   const [showSpinWheel, setShowSpinWheel] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
+  const spinWheelModalRef = useFocusTrap(showSpinWheel, () => {
+    if (!isSpinning) setShowSpinWheel(false);
+  });
   const [spinAngle, setSpinAngle] = useState(0);
   const [spinResult, setSpinResult] = useState<string | null>(null);
   const [lastSpinDate, setLastSpinDate] = useState<string | null>(null);
@@ -480,12 +492,15 @@ export default function Dashboard() {
     setPvpSubMode('selection');
   };
   const handlePlayGame = (e: React.MouseEvent, path: string, modeId?: string, extraState: any = {}) => {
+    if (isProcessing) return;
+    setIsProcessing(true);
     if (modeId === 'catatansalah') {
       try {
         const parsed = profile?.catatan_salah || [];
         if (parsed.length === 0) {
           setToastMessage('Buku Catatan Salah Anda masih kosong! Belum ada soal yang tercatat.');
           setTimeout(() => setToastMessage(''), 3000);
+          setIsProcessing(false);
           return;
         }
       } catch (err) {
@@ -501,11 +516,13 @@ export default function Dashboard() {
     if (costType === 'energy' && (energy || 0) < cost) {
       setToastMessage(`Energi Anda tidak cukup! Dibutuhkan ${cost} energi.`);
       setTimeout(() => setToastMessage(''), 3000);
+      setIsProcessing(false);
       return;
     }
     if (costType === 'coin' && globalCoins < cost) {
       setToastMessage(`Koin Anda tidak cukup! Dibutuhkan ${cost.toLocaleString()} koin.`);
       setTimeout(() => setToastMessage(''), 3000);
+      setIsProcessing(false);
       return;
     }
     // Energi akan dipotong di Quiz.tsx saat menjawab soal pertama (Deferred Deduction)
@@ -582,35 +599,42 @@ export default function Dashboard() {
               exit={{ opacity: 0 }}
               onClick={() => !isSpinning && setShowSpinWheel(false)}
               className="fixed inset-0 bg-black"
+              data-backdrop="true"
             />
             
             <motion.div
+              ref={spinWheelModalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="spin-wheel-title"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-skd-card border border-skd-border w-full max-w-sm rounded-[32px] p-6 shadow-2xl relative z-10 overflow-hidden text-center flex flex-col items-center gap-4"
+              className="bg-surface border border-border w-full max-w-sm rounded-[32px] p-6 shadow-2xl relative z-10 overflow-hidden text-center flex flex-col items-center gap-4"
             >
               <button 
+                type="button"
                 disabled={isSpinning}
                 onClick={() => setShowSpinWheel(false)}
-                className="absolute top-4 right-4 p-1 hover:bg-skd-muted/10 rounded-full transition-colors text-skd-text disabled:opacity-30"
+                aria-label="Tutup Roda Keberuntungan"
+                className="absolute top-4 right-4 p-1 hover:bg-locked-subtle rounded-full transition-colors text-fg disabled:opacity-30"
               >
                 <X size={20} />
               </button>
               
-              <h3 className="font-black text-lg text-skd-text flex items-center gap-1.5 uppercase font-space tracking-wider">
+              <h3 id="spin-wheel-title" className="font-black text-lg text-fg flex items-center gap-1.5 uppercase font-space tracking-wider">
                 🎡 Roda Keberuntungan
               </h3>
-              <p className="text-xs text-skd-muted leading-relaxed">
+              <p className="text-xs text-fg-muted leading-relaxed">
                 {lastSpinDate === new Date().toDateString() 
                   ? "Anda sudah menggunakan spin gratis hari ini. Beli putaran ekstra seharga 100 Koin!" 
                   : "Putar roda untuk mendapatkan Power-up harian gratis Anda!"}
               </p>
               
-              <div className="relative w-72 h-72 md:w-80 md:h-80 mt-2 flex items-center justify-center bg-black/40 rounded-full border-[6px] border-skd-border shadow-inner">
+              <div className="relative w-72 h-72 md:w-80 md:h-80 mt-2 flex items-center justify-center bg-overlay backdrop-blur-sm rounded-full border-[6px] border-border shadow-inner">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-20 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[16px] border-t-red-500 drop-shadow-md" />
                 
-                <div className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-[#1A1924] border-4 border-skd-border z-10 flex items-center justify-center shadow-lg">
+                <div className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-surface shadow-sm border-4 border-border z-10 flex items-center justify-center shadow-lg">
                   <div className="w-3 h-3 rounded-full bg-yellow-500 fill-yellow-500 animate-pulse" />
                 </div>
                 <motion.div
@@ -705,7 +729,7 @@ export default function Dashboard() {
               <button
                 disabled={isSpinning}
                 onClick={startSpin}
-                className="w-full mt-2 py-3 bg-gradient-to-r from-skd-premium to-skd-accent text-[#0F0E17] font-black rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
+                className="w-full mt-2 py-3 bg-xp text-primary-fg text-[#0F0E17] font-black rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
               >
                 <Coins size={16} />
                 <span>
@@ -717,16 +741,16 @@ export default function Dashboard() {
                 </span>
               </button>
               {/* Legenda Peluang Gacha Transparan */}
-              <div className="mt-4 bg-white/5 border border-white/5 rounded-2xl p-3 text-center max-w-sm w-full backdrop-blur-md">
-                <h4 className="text-[10px] font-black text-skd-accent uppercase tracking-widest mb-2 font-space">Peluang Hadiah Roda CAT</h4>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[9px] font-bold text-gray-400">
+              <div className="mt-4 bg-surface-subtle border border-border rounded-2xl p-3 text-center max-w-sm w-full backdrop-blur-md">
+                <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-2 font-space">Peluang Hadiah Roda CAT</h4>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[9px] font-bold text-fg-muted">
                   {SPIN_PRIZES.map(prize => (
-                    <div key={prize.id} className="flex justify-between border-b border-white/5 pb-0.5">
+                    <div key={prize.id} className="flex justify-between border-b border-border pb-0.5">
                       <span className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: prize.color }} />
                         {prize.title.split(' (')[0]}
                       </span>
-                      <span className="font-space text-white">{prize.weight}%</span>
+                      <span className="font-space text-fg">{prize.weight}%</span>
                     </div>
                   ))}
                 </div>
@@ -741,7 +765,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: -20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-skd-premium/20 border border-skd-premium text-skd-premium font-bold px-6 py-3 rounded-full flex items-center gap-3 shadow-[0_0_20px_rgba(245,166,35,0.3)] backdrop-blur-md whitespace-nowrap"
+            className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-premium-subtle border border-premium text-premium font-bold px-6 py-3 rounded-full flex items-center gap-3 shadow-[0_0_20px_rgba(245,166,35,0.3)] backdrop-blur-md whitespace-nowrap"
           >
             <Coins size={20} />
             <span>{toastMessage}</span>
@@ -757,11 +781,11 @@ export default function Dashboard() {
         {/* ── Top Header (Profile, XP, Resources) ── */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col md:flex-row items-center justify-between gap-4 bg-skd-card p-3 rounded-2xl border border-skd-border shadow-sm"
+          className="flex flex-col md:flex-row items-center justify-between gap-4 bg-surface p-3 rounded-2xl border border-border shadow-sm"
         >
           {/* Profile & XP Inline */}
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-skd-premium to-skd-accent p-0.5 shadow-sm shrink-0 overflow-hidden">
+            <div className="w-10 h-10 rounded-full bg-xp text-primary-fg p-0.5 shadow-sm shrink-0 overflow-hidden">
                 {(()=>{
                   const currentAvatar = availableCharacters.find(c => c.id === (profile?.selected_avatar || equippedAvatarId));
                   return (
@@ -775,50 +799,45 @@ export default function Dashboard() {
             </div>
             <div className="flex flex-col flex-1 min-w-[150px]">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-skd-text leading-none">{profile?.nickname || profile?.username || 'Pejuang'}</p>
-                <div className="px-1.5 py-0.5 bg-skd-premium/10 rounded text-[9px] text-skd-premium font-bold">Lvl {profile?.level || 1}</div>
+                <p className="text-sm font-semibold text-fg leading-none">{profile?.nickname || profile?.username || 'Pejuang'}</p>
+                <div className="px-1.5 py-0.5 bg-premium-subtle rounded text-[9px] text-premium font-bold">Lvl {profile?.level || 1}</div>
                 <RankBadge score={profile?.score || 0} size="sm" />
               </div>
               {/* Inline XP Bar */}
               <div className="flex items-center gap-2 mt-1.5">
-                <div className="flex-1 h-1.5 bg-skd-muted/20 rounded-full overflow-hidden">
+                <div className="flex-1 h-1.5 bg-locked-subtle rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }} animate={{ width: `${((profile?.score || 0) % 1000) / 10}%` }}
                     transition={{ duration: 1.5, ease: 'easeOut', delay: 0.5 }}
-                    className="h-full bg-gradient-to-r from-skd-premium to-skd-accent rounded-full"
+                    className="h-full bg-xp text-primary-fg rounded-full"
                   />
                 </div>
-                <p className="text-[10px] text-skd-muted font-medium w-16">{(profile?.score || 0) % 1000}/1K XP</p>
+                <p className="text-[10px] text-fg-muted font-medium w-16">{(profile?.score || 0) % 1000}/1K XP</p>
               </div>
             </div>
           </div>
           {/* Right Side Resources & Theme */}
-          <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto pt-2 md:pt-0 border-t border-skd-border md:border-none">
+          <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto pt-2 md:pt-0 border-t border-border md:border-none">
             <motion.button
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/liga')}
               className="inline-flex items-center px-2.5 py-1 gap-1.5 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 shadow-lg text-[10px] sm:text-xs font-black text-white transition-all hover:brightness-110 active:scale-95 cursor-pointer"
             >
-              <Users className="w-3.5 h-3.5 text-white" />
+              <Users className="w-3.5 h-3.5 text-fg" />
               <span>Liga</span>
-              <ChevronRight className="w-3 h-3 text-white/70 ml-0.5" />
+              <ChevronRight className="w-3 h-3 text-fg/70 ml-0.5" />
             </motion.button>
             <div className="flex items-center gap-1.5 ml-auto">
-              <button
-                onClick={toggleTheme}
-                className="w-8 h-8 flex items-center justify-center bg-skd-bg rounded-full border border-skd-border text-skd-muted hover:text-skd-text transition-colors"
-              >
-                {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
-              </button>
+              
               <button
                 onClick={handleLogout}
-                className="w-8 h-8 flex items-center justify-center bg-skd-danger/10 rounded-full border border-skd-danger/20 text-skd-danger hover:bg-skd-danger/20 transition-colors cursor-pointer ml-1"
+                className="w-8 h-8 flex items-center justify-center bg-danger-subtle rounded-full border border-danger/20 text-danger hover:bg-danger-subtle transition-colors cursor-pointer ml-1"
                 title="Keluar / Logout"
               >
                 <LogOut size={15} />
               </button>
               <div 
-                className="flex items-center gap-1 bg-skd-bg px-2.5 py-1.5 rounded-full border border-skd-border shadow-sm relative group cursor-pointer"
+                className="flex items-center gap-1 bg-surface-subtle px-2.5 py-1.5 rounded-full border border-border shadow-sm relative group cursor-pointer"
                 onClick={() => {
                   if ((energy || 0) < 25) {
                     setToastMessage(`+1 Energi dalam ${formatTime(energyTimer)}`);
@@ -826,17 +845,17 @@ export default function Dashboard() {
                   }
                 }}
               >
-                <Zap className="w-3.5 h-3.5 text-skd-accent fill-skd-accent" />
-                <span className="font-space font-bold text-xs text-skd-text">{energy}/25</span>
+                <Zap className="text-energy" />
+                <span className="font-space font-bold text-xs text-fg">{energy}/25</span>
                 {(energy || 0) < 25 && (
-                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-[#1A1924] border border-white/10 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-lg">
+                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface shadow-sm border border-border text-fg text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-lg">
                     +{formatTime(energyTimer)} mnt
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-1 bg-skd-bg px-2.5 py-1.5 rounded-full border border-skd-border shadow-sm">
-                <Coins className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-                <span className="font-space font-bold text-xs text-skd-text">{globalCoins.toLocaleString()}</span>
+              <div className="flex items-center gap-1 bg-surface-subtle px-2.5 py-1.5 rounded-full border border-border shadow-sm">
+                <Coins className="w-3.5 h-3.5 text-coin fill-yellow-500" />
+                <span className="font-space font-bold text-xs text-fg">{globalCoins.toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -844,8 +863,8 @@ export default function Dashboard() {
         {/* ── GAME MODES (MAIN FOCUS) ── */}
         <motion.section variants={itemVariants} className="space-y-4 pt-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-[18px] sm:text-[20px] font-semibold text-skd-text tracking-tight">Mode Permainan</h2>
-            <span className="text-[12px] text-skd-muted font-medium hidden sm:block">Pilih Mode Permainan</span>
+            <h2 className="text-[18px] sm:text-[20px] font-semibold text-fg tracking-tight">Mode Permainan</h2>
+            <span className="text-[12px] text-fg-muted font-medium hidden sm:block">Pilih Mode Permainan</span>
           </div>
           <div className="flex flex-col gap-3 md:gap-4">
             {/* Primary CTA: Latihan Harian */}
@@ -855,17 +874,17 @@ export default function Dashboard() {
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setSelectedMode(mode)}
-                className="bg-skd-card rounded-2xl border-l-[6px] border-l-skd-success border-t border-r border-b border-skd-border transition-all cursor-pointer p-5 sm:p-6 shadow-sm relative overflow-hidden group flex flex-col sm:flex-row items-center sm:justify-between gap-5"
+                className="bg-surface rounded-2xl border-l-[6px] border-l-success border-t border-r border-b border-border transition-all cursor-pointer p-5 sm:p-6 shadow-sm relative overflow-hidden group flex flex-col sm:flex-row items-center sm:justify-between gap-5"
               >
                 <div className="flex items-center gap-4 w-full sm:w-auto">
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-skd-success/10 text-skd-success shrink-0">
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-success-subtle text-success shrink-0">
                     <mode.icon size={28} />
                   </div>
                   <div className="text-left">
-                    <h4 className="font-black text-[22px] text-skd-text leading-tight">{mode.title}</h4>
-                    <p className="text-[13px] text-skd-muted mt-1 font-medium">{mode.desc}</p>
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-skd-text bg-skd-bg px-2.5 py-1 rounded-md w-fit border border-skd-border mt-2.5">
-                      <Zap size={12} className="text-skd-accent" />
+                    <h4 className="font-black text-[22px] text-fg leading-tight">{mode.title}</h4>
+                    <p className="text-[13px] text-fg-muted mt-1 font-medium">{mode.desc}</p>
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-fg bg-surface-subtle px-2.5 py-1 rounded-md w-fit border border-border mt-2.5">
+                      <Zap size={12} className="text-energy" />
                       <span>{mode.cost} Energi</span>
                     </div>
                   </div>
@@ -876,7 +895,7 @@ export default function Dashboard() {
                       boxShadow: ['0 0 0px rgba(74, 222, 128, 0)', '0 0 20px rgba(74, 222, 128, 0.4)', '0 0 0px rgba(74, 222, 128, 0)']
                     }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="w-full sm:w-auto px-8 py-3.5 bg-skd-success text-white rounded-xl font-bold text-[15px] hover:brightness-110 transition-all z-10 relative"
+                    className="w-full sm:w-auto px-8 py-3.5 bg-primary text-primary-fg focus-visible:outline-none focus-visible:ring focus-visible:ring-ring rounded-xl font-bold text-[15px] hover:brightness-110 transition-all z-10 relative"
                   >
                     Mulai Sekarang
                   </motion.button>
@@ -887,31 +906,31 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
               {GAME_MODES.filter(m => m.id !== 'latihan').map((mode) => {
                 let accentColor = '';
-                if (mode.id === 'survival') accentColor = 'border-l-skd-danger';
-                else if (mode.id === 'pvp') accentColor = 'border-l-blue-500';
-                else if (mode.id === 'tryout') accentColor = 'border-l-skd-premium';
+                if (mode.id === 'survival') accentColor = 'border-l-danger';
+                else if (mode.id === 'pvp') accentColor = 'border-l-info';
+                else if (mode.id === 'tryout') accentColor = 'border-l-premium';
                 return (
                   <motion.div
                     key={mode.id}
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedMode(mode)}
-                    className={`bg-skd-card rounded-xl border-l-[5px] ${accentColor} border-t border-r border-b border-skd-border transition-all cursor-pointer p-4 shadow-sm flex flex-col gap-2 group relative`}
+                    className={`bg-surface rounded-xl border-l-[5px] ${accentColor} border-t border-r border-b border-border transition-all cursor-pointer p-4 shadow-sm flex flex-col gap-2 group relative`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${mode.bg} ${mode.color}`}>
                         <mode.icon size={20} />
                       </div>
                       <div>
-                        <h4 className="font-black text-[15px] text-skd-text leading-tight group-hover:text-skd-accent transition-colors">{mode.title}</h4>
-                        <div className="absolute top-3 right-3 text-[9px] font-bold text-skd-muted uppercase bg-skd-bg px-1.5 py-0.5 rounded border border-skd-border">
+                        <h4 className="font-black text-[15px] text-fg leading-tight group-hover:text-primary transition-colors">{mode.title}</h4>
+                        <div className="absolute top-3 right-3 text-[9px] font-bold text-fg-muted uppercase bg-surface-subtle px-1.5 py-0.5 rounded border border-border">
                           {mode.badge}
                         </div>
                       </div>
                     </div>
-                    <p className="text-[12px] text-skd-muted font-medium line-clamp-2 mt-1">{mode.desc}</p>
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-skd-text mt-auto pt-2">
-                      {mode.costType === 'energy' ? <Zap size={12} className="text-skd-accent" /> : <Coins size={12} className="text-yellow-500" />}
+                    <p className="text-[12px] text-fg-muted font-medium line-clamp-2 mt-1">{mode.desc}</p>
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-fg mt-auto pt-2">
+                      {mode.costType === 'energy' ? <Zap size={12} className="text-energy" /> : <Coins size={12} className="text-coin" />}
                       <span>{mode.cost.toLocaleString()} {mode.costType === 'energy' ? 'Energi' : 'Koin'}</span>
                     </div>
                   </motion.div>
@@ -923,32 +942,32 @@ export default function Dashboard() {
         {/* ── STREAK + STATS ROW ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2">
           {/* Streak Section */}
-          <motion.section variants={itemVariants} className="lg:col-span-7 bg-skd-card rounded-2xl p-5 border border-skd-border shadow-sm flex flex-col">
+          <motion.section variants={itemVariants} className="lg:col-span-7 bg-surface rounded-2xl p-5 border border-border shadow-sm flex flex-col">
             <div className="flex justify-between items-end mb-3">
               <div>
-                <h3 className="text-[18px] sm:text-[20px] font-semibold text-skd-text tracking-tight flex items-center gap-2">
-                  <Flame className="text-skd-accent" size={20} />
+                <h3 className="text-[18px] sm:text-[20px] font-semibold text-fg tracking-tight flex items-center gap-2">
+                  <Flame className="text-streak" size={20} />
                   Streak Harian
                 </h3>
-                <p className="text-[13px] text-skd-muted font-medium mt-0.5">{totalStreak + (isStreakClaimed ? 1 : 0)}/30 hari — hampir MEGA!</p>
+                <p className="text-[13px] text-fg-muted font-medium mt-0.5">{totalStreak + (isStreakClaimed ? 1 : 0)}/30 hari — hampir MEGA!</p>
               </div>
               <div className="flex items-center gap-2 text-right pb-1">
                 <button 
                   onClick={() => setShowSpinWheel(true)}
-                  className="text-[10px] font-bold text-skd-premium uppercase tracking-wider bg-skd-premium/10 px-3 py-1.5 rounded hover:bg-skd-premium/20 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 animate-pulse shrink-0"
+                  className="text-[10px] font-bold text-premium uppercase tracking-wider bg-premium-subtle px-3 py-1.5 rounded hover:bg-premium-subtle transition-all flex items-center gap-1.5 shadow-sm active:scale-95 animate-pulse shrink-0"
                 >
                   <Gift size={12} /> Klaim Spin Harian 🎡
                 </button>
-                <span className="text-[10px] font-bold text-skd-premium uppercase tracking-wider bg-skd-premium/10 px-2 py-1.5 rounded">Mega Reward</span>
+                <span className="text-[10px] font-bold text-premium uppercase tracking-wider bg-premium-subtle px-2 py-1.5 rounded">Mega Reward</span>
               </div>
             </div>
             {/* Motivational Progress Bar */}
-            <div className="w-full h-2.5 bg-skd-bg rounded-full overflow-hidden border border-skd-border mb-5">
+            <div className="w-full h-2.5 bg-surface-subtle rounded-full overflow-hidden border border-border mb-5">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${((totalStreak + (isStreakClaimed ? 1 : 0)) / 30) * 100}%` }}
                 transition={{ duration: 1.5, delay: 0.2 }}
-                className="h-full bg-gradient-to-r from-skd-accent to-skd-premium rounded-full"
+                className="h-full bg-gradient-to-r from-primary to-premium rounded-full"
               />
             </div>
             <div className="flex justify-between items-center w-full mt-auto">
@@ -960,17 +979,17 @@ export default function Dashboard() {
                   return (
                     <div key={idx} className="flex flex-col items-center gap-1.5">
                       <div className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all
-                        ${day.status === 'done' ? 'bg-skd-success border-skd-success text-white' :
-                          day.status === 'current' ? 'border-skd-premium bg-skd-premium/10 text-skd-premium shadow-[0_0_12px_rgba(245,166,35,0.4)]' :
-                            'border-skd-border bg-skd-muted/5 text-skd-muted'}`}
+                        ${day.status === 'done' ? 'bg-success border-success text-white' :
+                          day.status === 'current' ? 'border-premium bg-premium-subtle text-premium-text shadow-[0_0_12px_rgba(245,166,35,0.4)]' :
+                            'border-border bg-surface-subtle text-fg-muted'}`}
                       >
                         {day.status === 'done' ? <Check size={16} strokeWidth={3} /> : <Gift size={16} className={day.status === 'future' ? 'opacity-50' : ''} />}
                         {canClaimToday && (
                           <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 1.5, repeat: Infinity }}
-                            className="absolute inset-0 border-2 border-skd-premium rounded-full pointer-events-none" />
+                            className="absolute inset-0 border-2 border-premium rounded-full pointer-events-none" />
                         )}
                       </div>
-                      <span className={`text-[10px] font-bold ${day.status === 'done' ? 'text-skd-success' : day.status === 'current' ? 'text-skd-premium' : 'text-skd-muted'}`}>
+                      <span className={`text-[10px] font-bold ${day.status === 'done' ? 'text-success' : day.status === 'current' ? 'text-premium' : 'text-fg-muted'}`}>
                         {day.status === 'done' ? '✓' : day.isMega ? '+50🪙' : '+10🪙'}
                       </span>
                     </div>
@@ -979,20 +998,20 @@ export default function Dashboard() {
                 return (
                   <div key={idx} className="flex flex-col items-center gap-1.5">
                     <div className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all
-                      ${day.status === 'done' ? 'bg-skd-success border-skd-success text-white' :
-                        day.status === 'current' ? 'border-skd-accent bg-skd-accent/10 text-skd-accent' :
-                          'border-skd-border bg-skd-muted/5 text-skd-muted'}`}
+                      ${day.status === 'done' ? 'bg-success border-success text-white' :
+                        day.status === 'current' ? 'border-primary bg-primary-subtle text-primary' :
+                          'border-border bg-surface-subtle text-fg-muted'}`}
                     >
                       {day.status === 'done' && <Check size={16} strokeWidth={3} />}
                       {day.status === 'current' && !isStreakClaimed && (
                         <>
-                          <div className="w-2.5 h-2.5 rounded-full bg-skd-accent" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-primary" />
                           <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }}
-                            className="absolute inset-0 border-2 border-skd-accent rounded-full pointer-events-none" />
+                            className="absolute inset-0 border-2 border-primary rounded-full pointer-events-none" />
                         </>
                       )}
                     </div>
-                    <span className={`text-[10px] font-bold ${day.status === 'current' ? 'text-skd-accent' : 'text-skd-muted'}`}>{day.day}</span>
+                    <span className={`text-[10px] font-bold ${day.status === 'current' ? 'text-primary' : 'text-fg-muted'}`}>{day.day}</span>
                   </div>
                 );
               })}
@@ -1000,22 +1019,22 @@ export default function Dashboard() {
           </motion.section>
           {/* Quick Stats */}
           <motion.section variants={itemVariants} className="lg:col-span-5 flex flex-col">
-            <h3 className="text-[18px] sm:text-[20px] font-semibold text-skd-text tracking-tight mb-3">Statistik</h3>
+            <h3 className="text-[18px] sm:text-[20px] font-semibold text-fg tracking-tight mb-3">Statistik</h3>
             <div className="grid grid-cols-3 gap-3 flex-1">
               {[
-                { icon: Activity, color: 'text-skd-success', bg: 'bg-skd-success/10', border: 'border-skd-success/20', value: totalDijawab, label: 'Dijawab', suffix: '' },
-                { icon: Crosshair, color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20', value: calculatedAkurasi, label: 'Akurasi', suffix: '%' },
-                { icon: Flame, color: 'text-skd-accent', bg: 'bg-skd-accent/10', border: 'border-skd-accent/20', value: calculatedCombo, label: 'Combo', suffix: '', prefix: 'x' },
+                { icon: Activity, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success', value: totalDijawab, label: 'Dijawab', suffix: '' },
+                { icon: Crosshair, color: 'text-info', bg: 'bg-info/', border: 'border-info/20', value: calculatedAkurasi, label: 'Akurasi', suffix: '%' },
+                { icon: Flame, color: 'text-primary', bg: 'bg-primary-subtle', border: 'border-primary/20', value: calculatedCombo, label: 'Combo', suffix: '', prefix: 'x' },
               ].map((stat, i) => (
-                <motion.div key={i} whileHover={{ y: -3 }} className={`bg-skd-card rounded-2xl p-4 border ${stat.border} shadow-sm flex flex-col items-center justify-center text-center gap-3 relative overflow-hidden group`}>
+                <motion.div key={i} whileHover={{ y: -3 }} className={`bg-surface rounded-2xl p-4 border ${stat.border} shadow-sm flex flex-col items-center justify-center text-center gap-3 relative overflow-hidden group`}>
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.bg} transition-transform group-hover:scale-110`}>
                     <stat.icon className={stat.color} size={20} />
                   </div>
                   <div className="relative z-10">
-                    <p className="text-2xl font-black text-skd-text font-space leading-none mb-1">
+                    <p className="text-2xl font-black text-fg font-space leading-none mb-1">
                       {stat.prefix}<AnimatedCounter end={stat.value} suffix={stat.suffix} />
                     </p>
-                    <p className="text-[11px] text-skd-muted font-bold uppercase tracking-wider">{stat.label}</p>
+                    <p className="text-[11px] text-fg-muted font-bold uppercase tracking-wider">{stat.label}</p>
                   </div>
                   <div className={`absolute -bottom-4 -right-4 w-16 h-16 rounded-full opacity-20 ${stat.bg}`} />
                 </motion.div>
@@ -1029,38 +1048,42 @@ export default function Dashboard() {
         {selectedMode && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={handleCloseModal} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+              onClick={handleCloseModal} className="absolute inset-0 bg-overlay backdrop-blur-sm backdrop-blur-sm" data-backdrop="true" />
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-skd-card w-full max-w-md rounded-3xl border border-skd-border shadow-2xl relative z-10 overflow-hidden"
+              ref={gameModeModalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="game-mode-title"
+              className="bg-surface w-full max-w-md rounded-3xl border border-border shadow-2xl relative z-10 overflow-hidden"
             >
               <div className={`h-24 ${selectedMode.bg} relative`}>
-                <button onClick={handleCloseModal} className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-full text-white transition-colors">
+                <button type="button" onClick={handleCloseModal} aria-label="Tutup Mode Game" className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-overlay backdrop-blur-sm rounded-full text-white transition-colors">
                   <X size={20} />
                 </button>
-                <div className={`absolute -bottom-8 left-6 w-16 h-16 rounded-2xl flex items-center justify-center bg-skd-card border-4 border-skd-card shadow-lg ${selectedMode.color}`}>
+                <div className={`absolute -bottom-8 left-6 w-16 h-16 rounded-2xl flex items-center justify-center bg-surface border-4 border-skd-card shadow-lg ${selectedMode.color}`}>
                   <selectedMode.icon size={32} />
                 </div>
               </div>
               <div className="p-6 pt-12">
-                <h3 className="text-2xl font-bold text-skd-text mb-1">{selectedMode.title}</h3>
-                <p className="text-skd-muted text-sm mb-6">{selectedMode.desc}</p>
+                <h3 id="game-mode-title" className="text-2xl font-bold text-fg mb-1">{selectedMode.title}</h3>
+                <p className="text-fg-muted text-sm mb-6">{selectedMode.desc}</p>
                 {selectedMode.id === 'latihan' && (
-                  <div className="bg-skd-bg p-4 rounded-xl border border-skd-border mb-6">
-                    <h4 className="text-sm font-bold text-skd-text mb-2">Tentang Mode Ini</h4>
-                    <p className="text-xs text-skd-muted leading-relaxed">Selesaikan kuis harian tanpa batas waktu. Cocok untuk mengasah ingatan dan membangun fondasi pemahaman materi SKD dengan santai.</p>
+                  <div className="bg-surface-subtle p-4 rounded-xl border border-border mb-6">
+                    <h4 className="text-sm font-bold text-fg mb-2">Tentang Mode Ini</h4>
+                    <p className="text-xs text-fg-muted leading-relaxed">Selesaikan kuis harian tanpa batas waktu. Cocok untuk mengasah ingatan dan membangun fondasi pemahaman materi SKD dengan santai.</p>
                   </div>
                 )}
                 {selectedMode.id === 'catatansalah' && (
-                  <div className="bg-yellow-500/10 p-4 rounded-xl border border-yellow-500/20 mb-6">
-                    <h4 className="text-sm font-bold text-yellow-400 mb-2">Tentang Mode Ini</h4>
-                    <p className="text-xs text-skd-muted leading-relaxed">Latih kembali soal-soal yang pernah Anda jawab salah di mode latihan atau tryout. Soal baru akan dihapus dari buku catatan setelah Anda menjawab benar 3 kali berturut-turut!</p>
+                  <div className="bg-coin-subtle p-4 rounded-xl border border-yellow-500/20 mb-6">
+                    <h4 className="text-sm font-bold text-coin mb-2">Tentang Mode Ini</h4>
+                    <p className="text-xs text-fg-muted leading-relaxed">Latih kembali soal-soal yang pernah Anda jawab salah di mode latihan atau tryout. Soal baru akan dihapus dari buku catatan setelah Anda menjawab benar 3 kali berturut-turut!</p>
                   </div>
                 )}
                 {selectedMode.id === 'survival' && (
-                  <div className="bg-skd-danger/10 p-4 rounded-xl border border-skd-danger/20 mb-6">
-                    <h4 className="text-sm font-bold text-skd-danger mb-2 flex items-center gap-2"><Target size={16} /> Aturan Hardcore</h4>
-                    <p className="text-xs text-skd-text leading-relaxed">Jawab sebanyak-banyaknya. <span className="font-bold text-skd-danger">Salah 1 soal = LANGSUNG GAGAL.</span> Buktikan akurasi sempurna Anda!</p>
-                    <div className="mt-3 text-xs font-bold text-skd-muted">Rekor Terbaikmu: <span className="text-skd-text">42 Soal Beruntun</span></div>
+                  <div className="bg-danger-subtle p-4 rounded-xl border border-danger/20 mb-6">
+                    <h4 className="text-sm font-bold text-danger mb-2 flex items-center gap-2"><Target size={16} /> Aturan Hardcore</h4>
+                    <p className="text-xs text-fg leading-relaxed">Jawab sebanyak-banyaknya. <span className="font-bold text-danger">Salah 1 soal = LANGSUNG GAGAL.</span> Buktikan akurasi sempurna Anda!</p>
+                    <div className="mt-3 text-xs font-bold text-fg-muted">Rekor Terbaikmu: <span className="text-fg">42 Soal Beruntun</span></div>
                   </div>
                 )}
                 {selectedMode.id === 'pvp' && (
@@ -1071,65 +1094,65 @@ export default function Dashboard() {
                         {/* Option 1: 1v1 Quick Duel (Real Player) */}
                         <div
                           onClick={() => setPvpState('matching')}
-                          className="p-4 rounded-2xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 cursor-pointer transition-all flex items-center gap-4 group"
+                          className="p-4 rounded-2xl border border-info/20 bg-info/5 hover:bg-info/10 cursor-pointer transition-all flex items-center gap-4 group"
                         >
-                          <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <div className="w-12 h-12 rounded-xl bg-info/ text-info flex items-center justify-center group-hover:scale-110 transition-transform">
                             <Swords size={22} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-black text-skd-text flex items-center gap-1.5">
+                            <h4 className="text-sm font-black text-fg flex items-center gap-1.5">
                               Lawan Pemain Asli (Real-time)
-                              <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400 font-bold uppercase tracking-wider">Online</span>
+                              <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-success-subtle text-green-400 font-bold uppercase tracking-wider">Online</span>
                             </h4>
-                            <p className="text-[11px] text-skd-muted mt-0.5 leading-snug">Cari lawan secara acak di seluruh dunia.</p>
+                            <p className="text-[11px] text-fg-muted mt-0.5 leading-snug">Cari lawan secara acak di seluruh dunia.</p>
                           </div>
-                          <ChevronRight size={16} className="text-skd-muted group-hover:text-blue-400 transition-colors" />
+                          <ChevronRight size={16} className="text-fg-muted group-hover:text-info transition-colors" />
                         </div>
                         {/* Option 1.2: 1v1 Bot AI */}
                         <div
                           onClick={() => setPvpSubMode('bot_setup')}
-                          className="p-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 hover:bg-yellow-500/10 cursor-pointer transition-all flex items-center gap-4 group"
+                          className="p-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 hover:bg-coin-subtle cursor-pointer transition-all flex items-center gap-4 group"
                         >
-                          <div className="w-12 h-12 rounded-xl bg-yellow-500/20 text-yellow-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <div className="w-12 h-12 rounded-xl bg-info-subtle text-info-fg flex items-center justify-center group-hover:scale-110 transition-transform">
                             <BrainCircuit size={22} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-black text-skd-text flex items-center gap-1.5">
+                            <h4 className="text-sm font-black text-fg flex items-center gap-1.5">
                               Lawan Bot (AI)
                             </h4>
-                            <p className="text-[11px] text-skd-muted mt-0.5 leading-snug">Duel melawan bot pintar dengan tingkat kesulitan.</p>
+                            <p className="text-[11px] text-fg-muted mt-0.5 leading-snug">Duel melawan bot pintar dengan tingkat kesulitan.</p>
                           </div>
-                          <ChevronRight size={16} className="text-skd-muted group-hover:text-yellow-400 transition-colors" />
+                          <ChevronRight size={16} className="text-fg-muted group-hover:text-coin transition-colors" />
                         </div>
                         {/* Option 1.5: 1v1 Duel Teman */}
                         <div
                           onClick={handleCreateFriendDuel}
-                          className="p-4 rounded-2xl border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 cursor-pointer transition-all flex items-center gap-4 group"
+                          className="p-4 rounded-2xl border border-premium bg-premium-subtle hover:bg-premium-subtle cursor-pointer transition-all flex items-center gap-4 group"
                         >
-                          <div className="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <div className="w-12 h-12 rounded-xl bg-premium-subtle text-premium-text flex items-center justify-center group-hover:scale-110 transition-transform">
                             <UserPlus size={22} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-black text-skd-text flex items-center gap-1.5">
+                            <h4 className="text-sm font-black text-fg flex items-center gap-1.5">
                               Duel Bersama Teman
                             </h4>
-                            <p className="text-[11px] text-skd-muted mt-0.5 leading-snug">Undang temanmu untuk duel 1v1 secara private.</p>
+                            <p className="text-[11px] text-fg-muted mt-0.5 leading-snug">Undang temanmu untuk duel 1v1 secara private.</p>
                           </div>
-                          <ChevronRight size={16} className="text-skd-muted group-hover:text-purple-400 transition-colors" />
+                          <ChevronRight size={16} className="text-fg-muted group-hover:text-premium transition-colors" />
                         </div>
                         {/* Option 2: Custom Room */}
                         <div
                           onClick={() => setPvpSubMode('custom')}
-                          className="p-4 rounded-2xl border border-skd-border bg-skd-bg/50 hover:bg-skd-card cursor-pointer transition-all flex items-center gap-4 group"
+                          className="p-4 rounded-2xl border border-border bg-surface-subtle/50 hover:bg-surface cursor-pointer transition-all flex items-center gap-4 group"
                         >
-                          <div className="w-12 h-12 rounded-xl bg-skd-muted/10 text-skd-text flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <div className="w-12 h-12 rounded-xl bg-locked-subtle text-fg flex items-center justify-center group-hover:scale-110 transition-transform">
                             <Users size={22} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-black text-skd-text">Custom Room (Maks 50 Player)</h4>
-                            <p className="text-[11px] text-skd-muted mt-0.5 leading-snug">Buat atau masuk room dengan teman menggunakan kode room.</p>
+                            <h4 className="text-sm font-black text-fg">Custom Room (Maks 50 Player)</h4>
+                            <p className="text-[11px] text-fg-muted mt-0.5 leading-snug">Buat atau masuk room dengan teman menggunakan kode room.</p>
                           </div>
-                          <ChevronRight size={16} className="text-skd-muted group-hover:text-skd-text transition-colors" />
+                          <ChevronRight size={16} className="text-fg-muted group-hover:text-fg transition-colors" />
                         </div>
                       </motion.div>
                     )}
@@ -1138,32 +1161,32 @@ export default function Dashboard() {
                       <motion.div initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                         <button
                           onClick={() => setPvpSubMode('selection')}
-                          className="text-xs text-blue-500 font-bold hover:underline flex items-center gap-1 mb-1"
+                          className="text-xs text-info font-bold hover:underline flex items-center gap-1 mb-1"
                         >
                           <ChevronRight size={14} className="rotate-180" /> Kembali
                         </button>
                         <div className="space-y-3">
-                          <h4 className="text-sm font-bold text-skd-text">Pilih Tingkat Kesulitan AI:</h4>
+                          <h4 className="text-sm font-bold text-fg">Pilih Tingkat Kesulitan AI:</h4>
                           <div
                             onClick={(e) => { handlePlayGame(e, '/quiz', 'pvp_bot', { botDifficulty: 'easy', energyCost: 2 }); setSelectedMode(null); setPvpSubMode('selection'); }}
-                            className="p-4 rounded-xl border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 cursor-pointer transition-colors"
+                            className="p-4 rounded-xl border border-success/30 bg-success/10 hover:bg-success-subtle cursor-pointer transition-colors"
                           >
                             <h5 className="font-black text-green-400 text-sm mb-1">EASY (Santai)</h5>
-                            <p className="text-[11px] text-skd-muted">Bot menjawab lebih lambat dan sering salah. Cocok untuk pemanasan.</p>
+                            <p className="text-[11px] text-fg-muted">Bot menjawab lebih lambat dan sering salah. Cocok untuk pemanasan.</p>
                           </div>
                           <div
                             onClick={(e) => { handlePlayGame(e, '/quiz', 'pvp_bot', { botDifficulty: 'medium', energyCost: 2 }); setSelectedMode(null); setPvpSubMode('selection'); }}
-                            className="p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/20 cursor-pointer transition-colors"
+                            className="p-4 rounded-xl border border-yellow-500/30 bg-coin-subtle hover:bg-coin-subtle cursor-pointer transition-colors"
                           >
-                            <h5 className="font-black text-yellow-400 text-sm mb-1">MEDIUM (Normal)</h5>
-                            <p className="text-[11px] text-skd-muted">Bot bermain setara dengan pemain rata-rata.</p>
+                            <h5 className="font-black text-coin text-sm mb-1">MEDIUM (Normal)</h5>
+                            <p className="text-[11px] text-fg-muted">Bot bermain setara dengan pemain rata-rata.</p>
                           </div>
                           <div
                             onClick={(e) => { handlePlayGame(e, '/quiz', 'pvp_bot', { botDifficulty: 'hard', energyCost: 2 }); setSelectedMode(null); setPvpSubMode('selection'); }}
-                            className="p-4 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 cursor-pointer transition-colors"
+                            className="p-4 rounded-xl border border-danger/30 bg-danger/10 hover:bg-danger-subtle cursor-pointer transition-colors"
                           >
-                            <h5 className="font-black text-red-500 text-sm mb-1">HARD (Sangat Sulit)</h5>
-                            <p className="text-[11px] text-skd-muted">Bot menjawab super cepat dan hampir sempurna!</p>
+                            <h5 className="font-black text-danger text-sm mb-1">HARD (Sangat Sulit)</h5>
+                            <p className="text-[11px] text-fg-muted">Bot menjawab super cepat dan hampir sempurna!</p>
                           </div>
                         </div>
                       </motion.div>
@@ -1173,50 +1196,50 @@ export default function Dashboard() {
                       <motion.div initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                         <button
                           onClick={() => setPvpSubMode('selection')}
-                          className="text-xs text-blue-500 font-bold hover:underline flex items-center gap-1 mb-1"
+                          className="text-xs text-info font-bold hover:underline flex items-center gap-1 mb-1"
                         >
                           ← Kembali ke Pilihan Mode
                         </button>
-                        <div className="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
-                          <h4 className="text-sm font-bold text-blue-500 mb-2 flex items-center gap-2"><Users size={16} /> Multiplayer Custom Room</h4>
-                          <p className="text-xs text-skd-text mb-3">Lawan teman-temanmu secara real-time. Siapa yang tercepat dan paling akurat?</p>
-                          <button onClick={handleCreateRoom} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2.5 rounded-lg text-sm transition-colors shadow-lg shadow-blue-500/20">
+                        <div className="bg-info/10 p-4 rounded-xl border border-info/20">
+                          <h4 className="text-sm font-bold text-info mb-2 flex items-center gap-2"><Users size={16} /> Multiplayer Custom Room</h4>
+                          <p className="text-xs text-fg mb-3">Lawan teman-temanmu secara real-time. Siapa yang tercepat dan paling akurat?</p>
+                          <button onClick={handleCreateRoom} className="w-full bg-info text-info-fg hover:bg-info-hover text-white font-bold py-2.5 rounded-lg text-sm transition-colors shadow-lg shadow-blue-500/20">
                             Buat Room Baru
                           </button>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 h-px bg-skd-border" /><span className="text-xs text-skd-muted font-medium uppercase">Atau</span><div className="flex-1 h-px bg-skd-border" />
+                          <div className="flex-1 h-px bg-skd-border" /><span className="text-xs text-fg-muted font-medium uppercase">Atau</span><div className="flex-1 h-px bg-skd-border" />
                         </div>
                         <div className="flex gap-2">
                           <input type="text" placeholder="Masukkan Kode Room" value={roomCode} onChange={(e) => setRoomCode(e.target.value)}
-                            className="flex-1 bg-skd-bg border border-skd-border rounded-lg px-4 text-sm font-mono text-skd-text outline-none focus:border-blue-500 transition-colors uppercase" maxLength={6} />
-                          <button onClick={handleJoinRoom} disabled={roomCode.length < 4} className="bg-skd-card border border-skd-border hover:bg-skd-bg disabled:opacity-50 px-4 rounded-lg text-sm font-bold text-skd-text transition-colors">Join</button>
+                            className="flex-1 bg-surface-subtle border border-border rounded-lg px-4 text-sm font-mono text-fg outline-none focus:border-info transition-colors uppercase" maxLength={6} />
+                          <button onClick={handleJoinRoom} disabled={roomCode.length < 4} className="bg-surface border border-border hover:bg-surface-subtle disabled:opacity-50 px-4 rounded-lg text-sm font-bold text-fg transition-colors">Join</button>
                         </div>
                       </motion.div>
                     )}
                     {/* Matchmaking Screen for 1v1 PvP */}
                     {pvpState === 'matching' && (
-                      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-skd-bg/60 rounded-2xl border border-skd-border p-5 text-center space-y-6">
+                      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-surface-subtle/60 rounded-2xl border border-border p-5 text-center space-y-6">
                         <div className="flex flex-col items-center gap-1.5">
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-400">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-info/ text-info">
                             Quick Match
                           </span>
-                          <h4 className="text-base font-bold text-skd-text">Mencari Lawan Duel 1v1...</h4>
+                          <h4 className="text-base font-bold text-fg">Mencari Lawan Duel 1v1...</h4>
                         </div>
                         {/* Matchmaking VS screen */}
                         <div className="flex items-center justify-center gap-6 py-4">
                           {/* Player 1: Me */}
                           <div className="flex flex-col items-center gap-2 flex-1">
-                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-skd-premium to-skd-accent p-0.5 shadow-md flex items-center justify-center shrink-0">
-                              <div className="w-full h-full bg-skd-card rounded-full flex items-center justify-center font-bold text-sm text-skd-text">US</div>
+                            <div className="w-14 h-14 rounded-full bg-xp text-primary-fg p-0.5 shadow-md flex items-center justify-center shrink-0">
+                              <div className="w-full h-full bg-surface rounded-full flex items-center justify-center font-bold text-sm text-fg">US</div>
                             </div>
-                            <span className="text-xs font-black text-skd-text truncate max-w-[80px]">{profile?.nickname || profile?.username || 'Pejuang'}</span>
-                            <span className="text-[9px] text-skd-muted font-bold">Lvl {profile?.level || 1}</span>
+                            <span className="text-xs font-black text-fg truncate max-w-[80px]">{profile?.nickname || profile?.username || 'Pejuang'}</span>
+                            <span className="text-[9px] text-fg-muted font-bold">Lvl {profile?.level || 1}</span>
                           </div>
                           {/* VS Badge */}
                           <div className="relative shrink-0 w-10 h-10 flex items-center justify-center">
-                            <div className="absolute inset-0 bg-blue-500/20 blur-md rounded-full animate-ping" />
-                            <div className="w-10 h-10 rounded-full bg-skd-card border-2 border-blue-500 flex items-center justify-center font-black text-xs text-blue-500 relative z-10 shadow-lg">
+                            <div className="absolute inset-0 bg-info/ blur-md rounded-full animate-ping" />
+                            <div className="w-10 h-10 rounded-full bg-surface border-2 border-info flex items-center justify-center font-black text-xs text-info relative z-10 shadow-lg">
                               VS
                             </div>
                           </div>
@@ -1230,13 +1253,13 @@ export default function Dashboard() {
                                   animate={{ scale: 1, opacity: 1 }}
                                   className="flex flex-col items-center gap-2"
                                 >
-                                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-skd-accent to-yellow-500 p-0.5 shadow-md flex items-center justify-center shrink-0">
-                                    <div className="w-full h-full bg-skd-card rounded-full flex items-center justify-center font-bold text-sm text-skd-text">
+                                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-yellow-500 p-0.5 shadow-md flex items-center justify-center shrink-0">
+                                    <div className="w-full h-full bg-surface rounded-full flex items-center justify-center font-bold text-sm text-fg">
                                       {opponentName.substring(0, 2).toUpperCase()}
                                     </div>
                                   </div>
-                                  <span className="text-xs font-black text-skd-accent truncate max-w-[80px]">{opponentName}</span>
-                                  <span className="text-[9px] text-skd-muted font-bold">Lvl {opponentLevel}</span>
+                                  <span className="text-xs font-black text-primary truncate max-w-[80px]">{opponentName}</span>
+                                  <span className="text-[9px] text-fg-muted font-bold">Lvl {opponentLevel}</span>
                                 </motion.div>
                               ) : (
                                 <motion.div
@@ -1246,11 +1269,11 @@ export default function Dashboard() {
                                   transition={{ repeat: Infinity, duration: 1.5 }}
                                   className="flex flex-col items-center gap-2"
                                 >
-                                  <div className="w-14 h-14 rounded-full border-2 border-dashed border-skd-border bg-skd-card flex items-center justify-center text-skd-muted font-black text-xl">
+                                  <div className="w-14 h-14 rounded-full border-2 border-dashed border-border bg-surface flex items-center justify-center text-fg-muted font-black text-xl">
                                     ?
                                   </div>
-                                  <span className="text-xs font-bold text-skd-muted animate-pulse">Mencari...</span>
-                                  <span className="text-[9px] text-skd-muted font-bold">-</span>
+                                  <span className="text-xs font-bold text-fg-muted animate-pulse">Mencari...</span>
+                                  <span className="text-[9px] text-fg-muted font-bold">-</span>
                                 </motion.div>
                               )}
                             </AnimatePresence>
@@ -1263,15 +1286,15 @@ export default function Dashboard() {
                               Pertandingan dimulai dalam {matchCountdown}...
                             </motion.p>
                           ) : (
-                            <div className="flex items-center gap-2 text-skd-muted">
-                              <Loader2 className="animate-spin text-blue-500" size={14} />
+                            <div className="flex items-center gap-2 text-fg-muted">
+                              <Loader2 className="animate-spin text-info" size={14} />
                               <span className="text-xs font-bold">Menyamakan peringkat Anda...</span>
                             </div>
                           )}
                         </div>
                         <button
                           onClick={handleCancelMatching}
-                          className="w-full bg-skd-card border border-skd-border hover:bg-skd-bg text-skd-text font-bold py-2 rounded-lg text-xs transition-colors"
+                          className="w-full bg-surface border border-border hover:bg-surface-subtle text-fg font-bold py-2 rounded-lg text-xs transition-colors"
                         >
                           Batal
                         </button>
@@ -1279,65 +1302,65 @@ export default function Dashboard() {
                     )}
                     {pvpState === 'loading' && (
                       <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                        <Loader2 className="animate-spin text-blue-500" size={32} />
-                        <p className="text-sm font-bold text-skd-text animate-pulse">Menghubungkan ke Server PvP...</p>
+                        <Loader2 className="animate-spin text-info" size={32} />
+                        <p className="text-sm font-bold text-fg animate-pulse">Menghubungkan ke Server PvP...</p>
                       </div>
                     )}
                     {pvpState === 'waiting_friend' && (
-                      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-skd-bg rounded-2xl border border-skd-border p-6 text-center space-y-4">
+                      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-surface-subtle rounded-2xl border border-border p-6 text-center space-y-4">
                         <div>
-                          <p className="text-xs text-skd-muted uppercase font-bold tracking-widest mb-1">Kode Duel</p>
-                          <div className="text-3xl font-black text-skd-text font-mono tracking-widest bg-skd-card py-2 rounded-xl border border-skd-border flex items-center justify-center gap-3">
+                          <p className="text-xs text-fg-muted uppercase font-bold tracking-widest mb-1">Kode Duel</p>
+                          <div className="text-3xl font-black text-fg font-mono tracking-widest bg-surface py-2 rounded-xl border border-border flex items-center justify-center gap-3">
                             {activeRoom}
-                            <button onClick={() => setToastMessage('Kode berhasil disalin!')} className="p-2 bg-skd-bg hover:bg-skd-border rounded-lg text-skd-muted hover:text-skd-text transition-colors">
+                            <button onClick={() => setToastMessage('Kode berhasil disalin!')} className="p-2 bg-surface-subtle hover:bg-skd-border rounded-lg text-fg-muted hover:text-fg transition-colors">
                               <Copy size={18} />
                             </button>
                           </div>
                         </div>
                         <div className="flex items-center justify-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500"><UserPlus size={24} /></div>
+                          <div className="w-12 h-12 rounded-full bg-premium-subtle flex items-center justify-center text-premium"><UserPlus size={24} /></div>
                           <div className="text-left">
-                            <div className="text-2xl font-black text-skd-text">{playersCount}<span className="text-sm text-skd-muted font-medium">/2</span></div>
-                            <div className="text-xs text-skd-muted">Pemain Bergabung</div>
+                            <div className="text-2xl font-black text-fg">{playersCount}<span className="text-sm text-fg-muted font-medium">/2</span></div>
+                            <div className="text-xs text-fg-muted">Pemain Bergabung</div>
                           </div>
                         </div>
                         {isHost ? (
-                          <button onClick={handleStartHostGame} disabled={playersCount < 2} className="w-full mt-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 disabled:hover:bg-purple-500 text-white font-bold py-3 rounded-xl shadow-lg transition-colors active:scale-95">
+                          <button onClick={handleStartHostGame} disabled={playersCount < 2} className="w-full mt-2 bg-premium hover:bg-premium-hover disabled:opacity-50 disabled:hover:bg-premium text-white font-bold py-3 rounded-xl shadow-lg transition-colors active:scale-95">
                             {playersCount < 2 ? 'Menunggu teman bergabung...' : 'Mulai Pertandingan'}
                           </button>
                         ) : (
-                          <div className="flex items-center justify-center gap-2 text-purple-400 pt-2">
+                          <div className="flex items-center justify-center gap-2 text-premium pt-2">
                             <Loader2 className="animate-spin" size={14} />
                             <p className="text-xs font-bold">Menunggu Host Memulai Pertandingan...</p>
                           </div>
                         )}
                         <button
                           onClick={handleCancelMatching}
-                          className="w-full mt-4 bg-skd-card border border-skd-border hover:bg-skd-bg text-skd-text font-bold py-2 rounded-lg text-xs transition-colors"
+                          className="w-full mt-4 bg-surface border border-border hover:bg-surface-subtle text-fg font-bold py-2 rounded-lg text-xs transition-colors"
                         >
                           Batalkan Duel
                         </button>
                       </motion.div>
                     )}
                     {pvpState === 'waiting' && (
-                      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-skd-bg rounded-2xl border border-skd-border p-6 text-center space-y-4">
+                      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-surface-subtle rounded-2xl border border-border p-6 text-center space-y-4">
                         <div>
-                          <p className="text-xs text-skd-muted uppercase font-bold tracking-widest mb-1">Kode Room</p>
-                          <div className="text-3xl font-black text-skd-text font-mono tracking-widest bg-skd-card py-2 rounded-xl border border-skd-border">{activeRoom}</div>
+                          <p className="text-xs text-fg-muted uppercase font-bold tracking-widest mb-1">Kode Room</p>
+                          <div className="text-3xl font-black text-fg font-mono tracking-widest bg-surface py-2 rounded-xl border border-border">{activeRoom}</div>
                         </div>
                         <div className="flex items-center justify-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500"><Users size={24} /></div>
+                          <div className="w-12 h-12 rounded-full bg-info/ flex items-center justify-center text-info"><Users size={24} /></div>
                           <div className="text-left">
-                            <div className="text-2xl font-black text-skd-text">{playersCount}<span className="text-sm text-skd-muted font-medium">/50</span></div>
-                            <div className="text-xs text-skd-muted">Pemain Bergabung</div>
+                            <div className="text-2xl font-black text-fg">{playersCount}<span className="text-sm text-fg-muted font-medium">/50</span></div>
+                            <div className="text-xs text-fg-muted">Pemain Bergabung</div>
                           </div>
                         </div>
                         {isHost ? (
-                          <button onClick={handleStartHostGame} disabled={playersCount < 2} className="w-full mt-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:hover:bg-blue-500 text-white font-bold py-3 rounded-xl shadow-lg transition-colors active:scale-95">
+                          <button onClick={handleStartHostGame} disabled={playersCount < 2} className="w-full mt-2 bg-info text-info-fg hover:bg-info-hover disabled:opacity-50 disabled:hover:bg-info text-info-fg text-white font-bold py-3 rounded-xl shadow-lg transition-colors active:scale-95">
                             {playersCount < 2 ? 'Menunggu pemain...' : `Mulai Pertandingan (${playersCount} Pemain)`}
                           </button>
                         ) : (
-                          <div className="flex items-center justify-center gap-2 text-blue-400 pt-2">
+                          <div className="flex items-center justify-center gap-2 text-info pt-2">
                             <Loader2 className="animate-spin" size={14} />
                             <p className="text-xs font-bold">Menunggu Host Memulai Pertandingan...</p>
                           </div>
@@ -1347,28 +1370,28 @@ export default function Dashboard() {
                   </div>
                 )}
                 {selectedMode.id === 'tryout' && (
-                  <div className="bg-skd-premium/10 p-4 rounded-xl border border-skd-premium/30 mb-6">
-                    <h4 className="text-sm font-bold text-skd-premium mb-2 flex items-center gap-2"><Lock size={16} /> Buka Akses Try Out</h4>
-                    <p className="text-xs text-skd-text leading-relaxed mb-4">Simulasi ini menggunakan standar format BKN dengan sistem penilaian ambang batas resmi. Dapatkan rapor lengkap di akhir sesi.</p>
+                  <div className="bg-premium-subtle p-4 rounded-xl border border-premium mb-6">
+                    <h4 className="text-sm font-bold text-premium mb-2 flex items-center gap-2"><Lock size={16} /> Buka Akses Try Out</h4>
+                    <p className="text-xs text-fg leading-relaxed mb-4">Simulasi ini menggunakan standar format BKN dengan sistem penilaian ambang batas resmi. Dapatkan rapor lengkap di akhir sesi.</p>
                     <div className="space-y-2">
-                      <button onClick={(e) => { handlePlayGame(e, '/quiz', selectedMode.id); setSelectedMode(null); }} className="w-full bg-skd-premium hover:bg-yellow-400 text-[#0F0E17] font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-skd-premium/20 flex items-center justify-center gap-2">
+                      <button onClick={(e) => { handlePlayGame(e, '/quiz', selectedMode.id); setSelectedMode(null); }} className="w-full bg-premium text-primary-fg hover:bg-coin text-[#0F0E17] font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-skd-premium/20 flex items-center justify-center gap-2">
                         <Coins size={18} /> Buka dengan 1.500 Koin
                       </button>
-                      <button className="w-full bg-skd-bg hover:bg-skd-card border border-skd-border text-skd-text font-bold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                      <button className="w-full bg-surface-subtle hover:bg-surface border border-border text-fg font-bold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
                         <CreditCard size={18} /> Beli seharga Rp 15.000
                       </button>
                     </div>
                   </div>
                 )}
-                <div className="flex items-center justify-between border-t border-skd-border pt-4">
-                  <div className="flex items-center gap-1.5 text-sm font-bold text-skd-text">
-                    <span className="text-skd-muted font-normal mr-1">Biaya:</span>
-                    {selectedMode.costType === 'energy' ? <><Zap size={16} className="text-skd-accent" /> {selectedMode.cost}</> : <><Coins size={16} className="text-yellow-500" /> {selectedMode.cost.toLocaleString()}</>}
+                <div className="flex items-center justify-between border-t border-border pt-4">
+                  <div className="flex items-center gap-1.5 text-sm font-bold text-fg">
+                    <span className="text-fg-muted font-normal mr-1">Biaya:</span>
+                    {selectedMode.costType === 'energy' ? <><Zap size={16} className="text-energy" /> {selectedMode.cost}</> : <><Coins size={16} className="text-coin" /> {selectedMode.cost.toLocaleString()}</>}
                   </div>
                   {selectedMode.id !== 'tryout' && (selectedMode.id !== 'pvp' || (selectedMode.id === 'pvp' && isHost && pvpState === 'waiting')) && (
                     <button
                       onClick={(e) => { const extra = selectedMode.id === 'pvp' ? { roomId: activeRoom } : {}; handlePlayGame(e, '/quiz', selectedMode.id, extra); handleCloseModal(); }}
-                      className={`text-skd-bg hover:scale-105 transition-transform px-6 py-2.5 rounded-full font-bold text-sm shadow-md ${selectedMode.id === 'pvp' ? 'bg-blue-500' : 'bg-skd-text'}`}
+                      className={`text-skd-bg hover:scale-105 transition-transform px-6 py-2.5 rounded-full font-bold text-sm shadow-md ${selectedMode.id === 'pvp' ? 'bg-info text-info-fg' : 'bg-skd-text'}`}
                     >
                       {selectedMode.id === 'pvp' ? 'Mulai Sekarang' : 'Mulai Main'}
                     </button>

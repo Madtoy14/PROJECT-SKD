@@ -233,7 +233,7 @@ export default function Result() {
   const isLulusSkd = isTwkPass && isTiuPass && isTkpPass;
 
   return (
-    <div className="min-h-screen bg-skd-bg flex flex-col items-center transition-colors pb-24">
+    <div className="min-h-screen bg-bg flex flex-col items-center transition-colors pb-24">
       <div className="w-full max-w-3xl p-4 md:p-8 flex flex-col items-center pt-8 md:pt-12 space-y-8 md:space-y-12">
 
         {/* Header Badges */}
@@ -243,7 +243,7 @@ export default function Result() {
           transition={{ type: "spring", bounce: 0.5 }}
           className="bg-gradient-to-r p-[2px] rounded-full shadow-lg from-skd-premium to-skd-accent"
         >
-          <div className="bg-skd-bg px-6 py-2 rounded-full font-bold tracking-widest text-xs text-skd-text uppercase">
+          <div className="bg-bg px-6 py-2 rounded-full font-bold tracking-widest text-xs text-fg uppercase">
             {isTryout ? 'TRY OUT CPNS SELESAI' : (gameMode === 'pvp' || gameMode === 'pvp1v1') ? 'PvP BATTLE SELESAI' : gameMode === 'survival' ? 'SURVIVAL BERAKHIR' : 'LATIHAN SELESAI'}
           </div>
         </motion.div>
@@ -254,20 +254,20 @@ export default function Result() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             className={`w-full max-w-xl rounded-3xl p-[2px] overflow-hidden shadow-2xl relative ${isLulusSkd
-              ? 'bg-gradient-to-r from-skd-success via-emerald-400 to-green-500 shadow-skd-success/20'
-              : 'bg-gradient-to-r from-skd-danger via-rose-500 to-red-600 shadow-skd-danger/20'
+              ? 'bg-gradient-to-r from-skd-success via-emerald-400 to-green-500 shadow-sm'
+              : 'bg-gradient-to-r from-skd-danger via-rose-500 to-red-600 shadow-sm/20'
               }`}
           >
-            <div className="bg-[#1A1924] rounded-[22px] p-6 text-center space-y-4">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border ${isLulusSkd ? 'bg-skd-success/10 border-skd-success/20 text-skd-success' : 'bg-skd-danger/10 border-skd-danger/20 text-skd-danger'
+            <div className="bg-surface shadow-sm rounded-[22px] p-6 text-center space-y-4">
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border ${isLulusSkd ? 'bg-success-subtle border-success/20 text-success' : 'bg-danger-subtle border-danger/20 text-danger'
                 }`}>
                 {isLulusSkd ? <Award size={36} /> : <AlertTriangle size={36} />}
               </div>
               <div>
-                <h2 className={`text-2xl font-black ${isLulusSkd ? 'text-skd-success' : 'text-skd-danger'}`}>
+                <h2 className={`text-2xl font-black ${isLulusSkd ? 'text-success' : 'text-danger font-bold'}`}>
                   {isLulusSkd ? 'LULUS AMBANG BATAS!' : 'BELUM MEMENUHI AMBANG BATAS'}
                 </h2>
-                <p className="text-xs text-skd-muted mt-2 leading-relaxed max-w-md mx-auto">
+                <p className="text-xs text-fg-muted mt-2 leading-relaxed max-w-md mx-auto">
                   {isLulusSkd
                     ? 'Luar biasa! Skor perolehan Anda pada semua kategori (TWK, TIU, TKP) berhasil melewati ambang batas nasional Seleksi Kompetensi Dasar BKN!'
                     : 'Jangan berkecil hati. Masih ada kategori nilai yang berada di bawah standar kelulusan nasional. Mari tinjau kembali pembahasan soal dan perbanyak latihan!'}
@@ -280,7 +280,7 @@ export default function Result() {
         {/* PvP Leaderboard podiums */}
         {(gameMode === 'pvp' || gameMode === 'pvp1v1') ? (
           <div className="w-full max-w-xl space-y-6">
-            <h2 className="text-3xl md:text-4xl font-black text-center text-skd-text mb-8">Papan Peringkat Akhir</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-center text-fg mb-8">Papan Peringkat Akhir</h2>
 
             <div className="flex items-end justify-center gap-2 md:gap-4 h-48 mb-12">
               {[finalRanks[1], finalRanks[0], finalRanks[2]].map((rank, idx) => {
@@ -299,7 +299,7 @@ export default function Result() {
                     transition={{ delay: idx * 0.2, type: 'spring' }}
                     className="flex flex-col items-center flex-1"
                   >
-                    <span className="text-xs font-bold text-skd-text mb-2 truncate max-w-[80px]">{rank.name}</span>
+                    <span className="text-xs font-bold text-fg mb-2 truncate max-w-[80px]">{rank.name}</span>
                     <div className={`w-full ${height} ${color} rounded-t-2xl shadow-lg border border-white/5 flex flex-col justify-center items-center text-skd-bg`}>
                       <span className="text-2xl font-black font-space">{isFirst ? '1' : isSecond ? '2' : '3'}</span>
                       <span className="text-[10px] font-black font-space">{rank.score} pts</span>
@@ -311,30 +311,30 @@ export default function Result() {
 
             <div className="space-y-3">
               {finalRanks.slice(3).map((rank, index) => (
-                <div key={rank.name} className={`flex items-center justify-between p-4 rounded-xl border ${rank.isMe ? 'bg-blue-500/10 border-blue-500' : 'bg-skd-card border-skd-border'}`}>
+                <div key={rank.name} className={`flex items-center justify-between p-4 rounded-xl border ${rank.isMe ? 'bg-blue-500/10 border-blue-500' : 'bg-surface border-border'}`}>
                   <div className="flex items-center gap-4">
-                    <span className="font-bold text-skd-muted w-6 text-center">{index + 4}</span>
-                    <span className={`font-bold ${rank.isMe ? 'text-blue-500' : 'text-skd-text'}`}>{rank.name}</span>
+                    <span className="font-bold text-fg-muted w-6 text-center">{index + 4}</span>
+                    <span className={`font-bold ${rank.isMe ? 'text-blue-500' : 'text-fg'}`}>{rank.name}</span>
                   </div>
-                  <span className="font-space font-bold text-skd-muted">{rank.score} pts</span>
+                  <span className="font-space font-bold text-fg-muted">{rank.score} pts</span>
                 </div>
               ))}
             </div>
           </div>
         ) : (
           <div className="text-center space-y-2 relative">
-            <div className="absolute inset-0 bg-skd-accent/20 blur-[60px] -z-10 rounded-full" />
-            <h1 className="text-7xl md:text-8xl font-black text-skd-text font-space tracking-tighter">
+            <div className="absolute inset-0 bg-primary/20 blur-[60px] -z-10 rounded-full" />
+            <h1 className="text-7xl md:text-8xl font-black text-fg font-space tracking-tighter">
               <AnimatedCounter end={score} />
             </h1>
-            <p className="text-skd-muted font-bold tracking-widest">TOTAL SKOR SKD</p>
+            <p className="text-fg-muted font-bold tracking-widest">TOTAL SKOR SKD</p>
           </div>
         )}
 
         {/* Radar Chart SVG for Tryout Analysis */}
         {isTryout && (
-          <div className="w-full max-w-xl bg-skd-card border border-skd-border rounded-3xl p-6 flex flex-col items-center shadow-sm gap-4 mb-6">
-            <h3 className="text-xs md:text-sm font-bold text-skd-text uppercase tracking-wider font-space">Analisis Rapor Kompetensi CAT</h3>
+          <div className="w-full max-w-xl bg-surface border border-border rounded-3xl p-6 flex flex-col items-center shadow-sm gap-4 mb-6">
+            <h3 className="text-xs md:text-sm font-bold text-fg uppercase tracking-wider font-space">Analisis Rapor Kompetensi CAT</h3>
             
             <div className="relative w-64 h-64 flex items-center justify-center">
               {(() => {
@@ -435,12 +435,12 @@ export default function Result() {
             
             <div className="flex gap-4 text-[10px] font-bold font-space mt-2">
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-1.5 bg-red-500 rounded-sm border-t border-b border-dashed border-red-500" />
+                <div className="w-3 h-1.5 bg-danger rounded-sm border-t border-b border-dashed border-danger" />
                 <span className="text-red-400">Ambang Batas BKN</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className={`w-3 h-1.5 rounded-sm ${isLulusSkd ? 'bg-skd-success' : 'bg-skd-accent'}`} />
-                <span className={isLulusSkd ? 'text-skd-success' : 'text-skd-accent'}>Skor Anda</span>
+                <div className={`w-3 h-1.5 rounded-sm ${isLulusSkd ? 'bg-success' : 'bg-primary'}`} />
+                <span className={isLulusSkd ? 'text-success' : 'text-primary'}>Skor Anda</span>
               </div>
             </div>
           </div>
@@ -450,28 +450,28 @@ export default function Result() {
         {isTryout && (
           <div className="w-full max-w-xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 font-space">
             {/* TWK Card */}
-            <div className={`p-4 rounded-2xl border text-center bg-[#1A1924] ${isTwkPass ? 'border-skd-success/40' : 'border-skd-danger/40'}`}>
-              <span className="block text-[9px] text-gray-400 font-bold uppercase mb-1">Wawasan Kebangsaan</span>
-              <span className="block text-xl font-black text-white">{twkScore} <span className="text-xs text-skd-muted">/ {twkQuestionsCount * 5}</span></span>
-              <span className={`inline-block mt-2 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${isTwkPass ? 'bg-skd-success/20 text-skd-success' : 'bg-skd-danger/20 text-skd-danger'}`}>
+            <div className={`p-4 rounded-2xl border text-center bg-surface shadow-sm ${isTwkPass ? 'border-success/40' : 'border-danger/40'}`}>
+              <span className="block text-[9px] text-fg-muted font-bold uppercase mb-1">Wawasan Kebangsaan</span>
+              <span className="block text-xl font-black text-fg">{twkScore} <span className="text-xs text-fg-muted">/ {twkQuestionsCount * 5}</span></span>
+              <span className={`inline-block mt-2 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${isTwkPass ? 'bg-success/20 text-success' : 'bg-danger-subtle text-danger'}`}>
                 {isTwkPass ? `Lolos (Min. ${twkPassThreshold})` : `Gagal (Min. ${twkPassThreshold})`}
               </span>
             </div>
 
             {/* TIU Card */}
-            <div className={`p-4 rounded-2xl border text-center bg-[#1A1924] ${isTiuPass ? 'border-skd-success/40' : 'border-skd-danger/40'}`}>
-              <span className="block text-[9px] text-gray-400 font-bold uppercase mb-1">Inteligensia Umum</span>
-              <span className="block text-xl font-black text-white">{tiuScore} <span className="text-xs text-skd-muted">/ {tiuQuestionsCount * 5}</span></span>
-              <span className={`inline-block mt-2 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${isTiuPass ? 'bg-skd-success/20 text-skd-success' : 'bg-skd-danger/20 text-skd-danger'}`}>
+            <div className={`p-4 rounded-2xl border text-center bg-surface shadow-sm ${isTiuPass ? 'border-success/40' : 'border-danger/40'}`}>
+              <span className="block text-[9px] text-fg-muted font-bold uppercase mb-1">Inteligensia Umum</span>
+              <span className="block text-xl font-black text-fg">{tiuScore} <span className="text-xs text-fg-muted">/ {tiuQuestionsCount * 5}</span></span>
+              <span className={`inline-block mt-2 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${isTiuPass ? 'bg-success/20 text-success' : 'bg-danger-subtle text-danger'}`}>
                 {isTiuPass ? `Lolos (Min. ${tiuPassThreshold})` : `Gagal (Min. ${tiuPassThreshold})`}
               </span>
             </div>
 
             {/* TKP Card */}
-            <div className={`p-4 rounded-2xl border text-center bg-[#1A1924] ${isTkpPass ? 'border-skd-success/40' : 'border-skd-danger/40'}`}>
-              <span className="block text-[9px] text-gray-400 font-bold uppercase mb-1">Karakteristik Pribadi</span>
-              <span className="block text-xl font-black text-white">{tkpScore} <span className="text-xs text-skd-muted">/ {tkpQuestionsCount * 5}</span></span>
-              <span className={`inline-block mt-2 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${isTkpPass ? 'bg-skd-success/20 text-skd-success' : 'bg-skd-danger/20 text-skd-danger'}`}>
+            <div className={`p-4 rounded-2xl border text-center bg-surface shadow-sm ${isTkpPass ? 'border-success/40' : 'border-danger/40'}`}>
+              <span className="block text-[9px] text-fg-muted font-bold uppercase mb-1">Karakteristik Pribadi</span>
+              <span className="block text-xl font-black text-fg">{tkpScore} <span className="text-xs text-fg-muted">/ {tkpQuestionsCount * 5}</span></span>
+              <span className={`inline-block mt-2 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${isTkpPass ? 'bg-success/20 text-success' : 'bg-danger-subtle text-danger'}`}>
                 {isTkpPass ? `Lolos (Min. ${tkpPassThreshold})` : `Gagal (Min. ${tkpPassThreshold})`}
               </span>
             </div>
@@ -481,15 +481,15 @@ export default function Result() {
         {/* Stats Grid */}
         {!isTryout && (
           <div className="grid grid-cols-2 gap-4 md:gap-6 w-full max-w-xl">
-            <div className="bg-skd-card border border-skd-border p-6 rounded-3xl flex flex-col items-center shadow-sm">
-              <div className="text-3xl md:text-4xl font-bold font-space text-skd-success">
+            <div className="bg-surface border border-border p-6 rounded-3xl flex flex-col items-center shadow-sm">
+              <div className="text-3xl md:text-4xl font-bold font-space text-success">
                 <AnimatedCounter end={85} suffix="%" />
               </div>
-              <p className="text-xs text-skd-muted mt-2 font-bold uppercase tracking-wider">Akurasi Jawaban</p>
+              <p className="text-xs text-fg-muted mt-2 font-bold uppercase tracking-wider">Akurasi Jawaban</p>
             </div>
-            <div className="bg-skd-card border border-skd-border p-6 rounded-3xl flex flex-col items-center shadow-sm">
-              <div className="text-3xl md:text-4xl font-bold font-space text-skd-text">04:32</div>
-              <p className="text-xs text-skd-muted mt-2 font-bold uppercase tracking-wider">Waktu Pengerjaan</p>
+            <div className="bg-surface border border-border p-6 rounded-3xl flex flex-col items-center shadow-sm">
+              <div className="text-3xl md:text-4xl font-bold font-space text-fg">04:32</div>
+              <p className="text-xs text-fg-muted mt-2 font-bold uppercase tracking-wider">Waktu Pengerjaan</p>
             </div>
           </div>
         )}
@@ -499,25 +499,25 @@ export default function Result() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="w-full max-w-xl bg-skd-card/80 border border-skd-border rounded-3xl p-5 md:p-6 flex justify-around items-center shadow-sm"
+          className="w-full max-w-xl bg-surface/80 border border-border rounded-3xl p-5 md:p-6 flex justify-around items-center shadow-sm"
         >
           <div className="flex items-center gap-3 md:gap-4">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-yellow-500/10 flex items-center justify-center">
-              <Coins className="text-yellow-500 fill-yellow-500 w-6 h-6 md:w-8 md:h-8" />
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-coin-subtle flex items-center justify-center">
+              <Coins className="text-coin fill-yellow-500 w-6 h-6 md:w-8 md:h-8" />
             </div>
             <div>
-              <p className="text-xs md:text-sm text-skd-muted font-bold">Koin Diperoleh</p>
-              <p className="font-bold font-space text-xl md:text-2xl text-yellow-500">+<AnimatedCounter end={earnedCoins} duration={2.5} /></p>
+              <p className="text-xs md:text-sm text-fg-muted font-bold">Koin Diperoleh</p>
+              <p className="font-bold font-space text-xl md:text-2xl text-coin">+<AnimatedCounter end={earnedCoins} duration={2.5} /></p>
             </div>
           </div>
           <div className="w-px h-12 md:h-16 bg-skd-border" />
           <div className="flex items-center gap-3 md:gap-4">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-skd-premium/10 flex items-center justify-center">
-              <Zap className="text-skd-premium fill-skd-premium w-6 h-6 md:w-8 md:h-8" />
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-premium-subtle flex items-center justify-center">
+              <Zap className="text-premium fill-skd-premium w-6 h-6 md:w-8 md:h-8" />
             </div>
             <div>
-              <p className="text-xs md:text-sm text-skd-muted font-bold">XP Diperoleh</p>
-              <p className="font-bold font-space text-xl md:text-2xl text-skd-premium">+<AnimatedCounter end={gainedXP} duration={2.5} /></p>
+              <p className="text-xs md:text-sm text-fg-muted font-bold">XP Diperoleh</p>
+              <p className="font-bold font-space text-xl md:text-2xl text-premium">+<AnimatedCounter end={gainedXP} duration={2.5} /></p>
             </div>
           </div>
         </motion.div>
@@ -526,7 +526,7 @@ export default function Result() {
         <div className="w-full max-w-xl space-y-3 pt-4">
           <button
             onClick={() => navigate('/pembahasan-tryout', { state: { userAnswers, quizQuestions } })}
-            className="w-full py-4 rounded-2xl border-2 border-skd-border text-skd-text font-bold hover:bg-skd-muted/5 transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all"
+            className="w-full py-4 rounded-2xl border-2 border-border text-fg font-bold hover:bg-surface-subtle transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all"
           >
             Tinjau Pembahasan Lembar Jawaban <ArrowRight size={20} />
           </button>

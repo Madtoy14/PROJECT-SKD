@@ -394,8 +394,8 @@ export default function Profile() {
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full text-white font-bold shadow-2xl transition-all whitespace-nowrap ${toastType === 'success' ? 'bg-skd-success shadow-skd-success/30' :
-                toastType === 'error' ? 'bg-skd-danger shadow-skd-danger/30' : 'bg-skd-accent text-[#0F0E17] shadow-skd-accent/30'
+            className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full text-white font-bold shadow-2xl transition-all whitespace-nowrap ${toastType === 'success' ? 'bg-success shadow-sm' :
+                toastType === 'error' ? 'bg-danger shadow-sm' : 'bg-primary text-primary-fg shadow-sm'
               }`}
           >
             {inviteToast}
@@ -407,15 +407,15 @@ export default function Profile() {
         {isEditProfileOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-overlay backdrop-blur-sm backdrop-blur-md z-[100] flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#1A1924] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+              className="bg-surface shadow-sm border border-border rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
             >
-              <div className="flex justify-between items-center p-4 border-b border-white/10">
+              <div className="flex justify-between items-center p-4 border-b border-border">
                 <h3 className="font-bold text-lg">Edit Profil & Karakter</h3>
-                <button onClick={() => setIsEditProfileOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+                <button onClick={() => setIsEditProfileOpen(false)} className="text-fg-muted hover:text-fg transition-colors">
                   <X size={20} />
                 </button>
               </div>
@@ -424,24 +424,24 @@ export default function Profile() {
 
                 {/* Username Input */}
                 <div>
-                  <h4 className="text-sm font-bold text-gray-400 mb-3">NAMA PEJUANG CPNS</h4>
+                  <h4 className="text-sm font-bold text-fg-muted mb-3">NAMA PEJUANG CPNS</h4>
                   <input
                     type="text"
                     value={usernameInput}
                     onChange={(e) => setUsernameInput(e.target.value)}
                     placeholder="Masukkan nama..."
                     maxLength={15}
-                    className="w-full bg-[#1A1924] border border-white/10 rounded-xl p-3 text-sm font-bold outline-none focus:border-skd-accent transition-colors text-white"
+                    className="w-full bg-surface shadow-sm border border-border rounded-xl p-3 text-sm font-bold outline-none focus:border-primary transition-colors text-fg"
                   />
                 </div>
                 {/* Target Kedinasan */}
                 <div>
-                  <h4 className="text-sm font-bold text-gray-400 mb-3">TARGET KEDINASAN</h4>
+                  <h4 className="text-sm font-bold text-fg-muted mb-3">TARGET KEDINASAN</h4>
                   <div className="relative">
                     <select
                       value={targetKedinasan}
                       onChange={(e) => setTargetKedinasan(e.target.value)}
-                      className="w-full bg-[#1A1924] border border-white/10 rounded-xl p-3 text-sm font-bold appearance-none outline-none focus:border-skd-accent transition-colors"
+                      className="w-full bg-surface shadow-sm border border-border rounded-xl p-3 text-sm font-bold appearance-none outline-none focus:border-primary transition-colors"
                     >
                       {SCHOOLS.map(opt => (
                         <option key={opt.id} value={opt.id}>{opt.name}</option>
@@ -451,7 +451,7 @@ export default function Profile() {
                 </div>
                 {/* Avatar / Seragam Karakter */}
                 <div>
-                  <h4 className="text-sm font-bold text-gray-400 mb-3 mt-6">PILIH KARAKTER PRIA</h4>
+                  <h4 className="text-sm font-bold text-fg-muted mb-3 mt-6">PILIH KARAKTER PRIA</h4>
                   <div className="grid grid-cols-5 gap-3">
                     {availableCharacters.filter(c => c.gender === 'male').map(opt => {
                       const isUnlocked = opt.is_free || profile?.unlocked_avatars?.includes(opt.id);
@@ -466,15 +466,15 @@ export default function Profile() {
                             }
                           }}
                           className={`cursor-pointer rounded-2xl border-2 transition-all p-1.5 flex flex-col items-center gap-1 relative ${selectedAvatar?.id === opt.id
-                              ? 'border-skd-accent bg-skd-accent/10 shadow-[0_0_15px_rgba(245,166,35,0.3)]'
-                              : isUnlocked ? 'border-white/5 hover:border-white/20 bg-white/5' : 'border-white/5 opacity-50'
+                              ? 'border-primary bg-primary/10 shadow-sm'
+                              : isUnlocked ? 'border-border hover:border-primary bg-surface-subtle' : 'border-border opacity-50'
                             }`}
                         >
-                          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-[#1A1924]">
+                          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-surface shadow-sm">
                             <img src={opt.image_url} alt={opt.name} className="w-full h-full object-cover" />
                             {!isUnlocked && (
-                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                <Lock size={16} className="text-white" />
+                              <div className="absolute inset-0 bg-overlay backdrop-blur-sm flex items-center justify-center">
+                                <Lock size={16} className="text-fg" />
                               </div>
                             )}
                           </div>
@@ -484,7 +484,7 @@ export default function Profile() {
                     })}
                   </div>
 
-                  <h4 className="text-sm font-bold text-gray-400 mb-3 mt-6">PILIH KARAKTER WANITA</h4>
+                  <h4 className="text-sm font-bold text-fg-muted mb-3 mt-6">PILIH KARAKTER WANITA</h4>
                   <div className="grid grid-cols-5 gap-3">
                     {availableCharacters.filter(c => c.gender === 'female').map(opt => {
                       const isUnlocked = opt.is_free || profile?.unlocked_avatars?.includes(opt.id);
@@ -499,15 +499,15 @@ export default function Profile() {
                             }
                           }}
                           className={`cursor-pointer rounded-2xl border-2 transition-all p-1.5 flex flex-col items-center gap-1 relative ${selectedAvatar?.id === opt.id
-                              ? 'border-skd-accent bg-skd-accent/10 shadow-[0_0_15px_rgba(245,166,35,0.3)]'
-                              : isUnlocked ? 'border-white/5 hover:border-white/20 bg-white/5' : 'border-white/5 opacity-50'
+                              ? 'border-primary bg-primary/10 shadow-sm'
+                              : isUnlocked ? 'border-border hover:border-primary bg-surface-subtle' : 'border-border opacity-50'
                             }`}
                         >
-                          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-[#1A1924]">
+                          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-surface shadow-sm">
                             <img src={opt.image_url} alt={opt.name} className="w-full h-full object-cover" />
                             {!isUnlocked && (
-                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                <Lock size={16} className="text-white" />
+                              <div className="absolute inset-0 bg-overlay backdrop-blur-sm flex items-center justify-center">
+                                <Lock size={16} className="text-fg" />
                               </div>
                             )}
                           </div>
@@ -519,7 +519,7 @@ export default function Profile() {
                 </div>
                 {/* Badge pinning */}
                 <div>
-                  <h4 className="text-sm font-bold text-gray-400 mb-3">PIN LENCANA (MAKS. 3)</h4>
+                  <h4 className="text-sm font-bold text-fg-muted mb-3">PIN LENCANA (MAKS. 3)</h4>
                   <div className="grid grid-cols-4 gap-3">
                     {dynamicBadges.filter(b => b.unlocked).map(badge => {
                       const isPinned = pinnedBadges.includes(badge.id);
@@ -528,21 +528,21 @@ export default function Profile() {
                           key={badge.id}
                           onClick={() => togglePinBadge(badge.id)}
                           className={`cursor-pointer w-full aspect-square rounded-2xl border-2 flex items-center justify-center text-2xl transition-all relative
-                            ${isPinned ? 'border-skd-accent bg-skd-accent/10' : 'border-white/5 hover:border-white/20'}
+                            ${isPinned ? 'border-primary bg-primary/10' : 'border-border hover:border-primary'}
                           `}
                         >
                           {badge.icon}
-                          {isPinned && <CheckCircle2 size={14} className="absolute -top-2 -right-2 text-skd-accent bg-[#1A1924] rounded-full" />}
+                          {isPinned && <CheckCircle2 size={14} className="absolute -top-2 -right-2 text-primary bg-surface shadow-sm rounded-full" />}
                         </div>
                       )
                     })}
                   </div>
                 </div>
               </div>
-              <div className="p-4 border-t border-white/10">
+              <div className="p-4 border-t border-border">
                 <button
                   onClick={handleSaveProfile}
-                  className="w-full bg-skd-accent text-[#0F0E17] font-bold py-3 rounded-xl hover:bg-yellow-400 transition-colors shadow-lg shadow-skd-accent/10"
+                  className="w-full bg-primary text-primary-fg font-bold py-3 rounded-xl hover:bg-coin transition-colors shadow-lg shadow-sm"
                 >
                   Simpan Perubahan
                 </button>
@@ -560,35 +560,35 @@ export default function Profile() {
         {/* Main Hero Card (Identity and Avatar) */}
         <motion.section
           variants={itemVariants}
-          className="relative bg-gradient-to-br from-skd-card to-[#15141F] border border-skd-border rounded-[2.5rem] p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 overflow-hidden group shadow-lg hover:shadow-xl transition-all"
+          className="relative bg-surface border border-border rounded-[2.5rem] p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 overflow-hidden group shadow-lg hover:shadow-xl transition-all"
         >
           {/* Neon background decorations */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-skd-accent/10 rounded-full blur-3xl opacity-30 pointer-events-none" />
+          <div className="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl opacity-30 pointer-events-none" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl opacity-20 pointer-events-none" />
           {/* Avatar Picture with Equipped Dress */}
           <div className="relative group/avatar">
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-skd-premium to-skd-accent rounded-full blur opacity-25 group-hover/avatar:opacity-40 transition-opacity" />
+            <div className="absolute -inset-1.5 bg-xp text-primary-fg rounded-full blur opacity-25 group-hover/avatar:opacity-40 transition-opacity" />
             <img
               src={selectedAvatar?.image_url || avatarPdh}
               alt="Avatar"
-              className="w-48 h-48 rounded-full border-[6px] border-[#1A1924] shadow-2xl relative z-10 object-cover"
+              className="w-48 h-48 rounded-full border-[6px] border-surface shadow-2xl relative z-10 object-cover"
             />
-            <div className="absolute top-4 left-4 bg-skd-premium text-[#0F0E17] font-space font-black text-xs px-3 py-1 rounded-full border border-yellow-300 shadow-md relative z-20">
+            <div className="absolute top-4 left-4 bg-premium text-primary-fg text-primary-fg font-space font-black text-xs px-3 py-1 rounded-full border border-yellow-300 shadow-md relative z-20">
               {selectedAvatar?.name ? selectedAvatar.name.split('-')[1]?.trim() || selectedAvatar.name : 'Profil'}
             </div>
             <button
               onClick={() => setIsEditProfileOpen(true)}
-              className="absolute bottom-4 right-0 md:bottom-6 md:-right-2 bg-skd-accent text-[#0F0E17] p-2.5 rounded-full shadow-[0_0_15px_rgba(245,166,35,0.4)] hover:shadow-[0_0_25px_rgba(245,166,35,0.8)] transition-all z-30 group-hover:scale-110"
+              className="absolute bottom-4 right-0 md:bottom-6 md:-right-2 bg-primary text-primary-fg p-2.5 rounded-full shadow-[0_0_15px_rgba(245,166,35,0.4)] hover:shadow-[0_0_25px_rgba(245,166,35,0.8)] transition-all z-30 group-hover:scale-110"
             >
               <SquarePen size={20} />
             </button>
           </div>
           {/* User Details */}
           <div className="flex-1 text-center md:text-left w-full">
-            <div className="inline-flex items-center px-4 py-1.5 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-full text-xs font-bold mb-4 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
+            <div className="inline-flex items-center px-4 py-1.5 bg-coin-subtle border border-yellow-500/30 text-coin rounded-full text-xs font-bold mb-4 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
               Target: {SCHOOLS.find(s => s.id === (profile?.target_kedinasan || 'ipdn'))?.name || 'Sekolah Kedinasan'}
             </div>
-            <h2 className="text-4xl font-black mb-1 tracking-tight text-white flex flex-wrap items-center gap-2">
+            <h2 className="text-4xl font-black mb-1 tracking-tight text-fg flex flex-wrap items-center gap-2">
               {profile ? (profile.nickname || profile.username) : 'Pejuang SKD'}
             </h2>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 mb-2">
@@ -608,10 +608,10 @@ export default function Profile() {
                 </span>
               )}
               {!isMasterTwk && !isMasterTiu && !isMasterTkp && (
-                <span className="text-[10px] text-gray-500 italic">Selesaikan 50+ soal akurasi &gt;= 80% untuk gelar</span>
+                <span className="text-[10px] text-fg-muted italic">Selesaikan 50+ soal akurasi &gt;= 80% untuk gelar</span>
               )}
             </div>
-            <p className="text-gray-400 mb-3 font-space">
+            <p className="text-fg-muted mb-3 font-space">
               @{profile ? profile.username.toLowerCase().replace(/\s/g, '') : 'pejuang_skd'}
             </p>
 
@@ -625,21 +625,21 @@ export default function Profile() {
                 className="text-center cursor-pointer group"
                 onClick={() => { setFollowModalTab('mengikuti'); setIsFollowModalOpen(true); }}
               >
-                <span className="block text-2xl font-black font-space group-hover:text-skd-accent group-hover:scale-105 transition-all text-white">{followingCount}</span>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider group-hover:text-white transition-colors">Mengikuti</span>
+                <span className="block text-2xl font-black font-space group-hover:text-primary group-hover:scale-105 transition-all text-fg">{followingCount}</span>
+                <span className="text-[10px] text-fg-muted font-bold uppercase tracking-wider group-hover:text-fg transition-colors">Mengikuti</span>
               </div>
-              <div className="w-px h-8 bg-white/10" />
+              <div className="w-px h-8 bg-surface-subtle" />
               <div
                 className="text-center cursor-pointer group"
                 onClick={() => { setFollowModalTab('pengikut'); setIsFollowModalOpen(true); }}
               >
-                <span className="block text-2xl font-black font-space group-hover:text-skd-accent group-hover:scale-105 transition-all text-white">{followersCount}</span>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider group-hover:text-white transition-colors">Pengikut</span>
+                <span className="block text-2xl font-black font-space group-hover:text-primary group-hover:scale-105 transition-all text-fg">{followersCount}</span>
+                <span className="text-[10px] text-fg-muted font-bold uppercase tracking-wider group-hover:text-fg transition-colors">Pengikut</span>
               </div>
-              <div className="w-px h-8 bg-white/10" />
+              <div className="w-px h-8 bg-surface-subtle" />
               <button
                 onClick={() => setSearchFriendModal(true)}
-                className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-skd-premium/20 hover:border-skd-premium/50 hover:text-skd-premium transition-all"
+                className="w-12 h-12 rounded-full bg-surface-subtle border border-border flex items-center justify-center hover:bg-premium-subtle hover:border-premium hover:text-premium transition-all"
                 title="Cari & Tambah Teman"
               >
                 <UserPlus size={20} />
@@ -648,12 +648,12 @@ export default function Profile() {
             {/* Level Experience Bar */}
             <div className="space-y-2 max-w-md">
               <div className="flex justify-between text-sm font-bold">
-                <span className="text-skd-accent">Level {profile ? profile.level : 14}</span>
-                <span className="text-gray-400 font-space">
+                <span className="text-primary">Level {profile ? profile.level : 14}</span>
+                <span className="text-fg-muted font-space">
                   {currentXPProgress.toLocaleString()} / {levelXPRequired.toLocaleString()} XP
                 </span>
               </div>
-              <div className="h-4 w-full bg-[#1A1924] rounded-full overflow-hidden border border-white/5 shadow-inner">
+              <div className="h-4 w-full bg-surface shadow-sm rounded-full overflow-hidden border border-border shadow-inner">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercent}%` }}
@@ -670,7 +670,7 @@ export default function Profile() {
             {/* Season Rank Card */}
             <motion.section variants={itemVariants}>
               <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
-                <Trophy size={24} className="text-skd-accent" />
+                <Trophy size={24} className="text-primary" />
                 Rank Musim Ini
               </h3>
               <RankCard score={profile ? profile.score : 1250} />
@@ -679,35 +679,35 @@ export default function Profile() {
             {/* Career Statistics */}
             <motion.section variants={itemVariants}>
               <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
-                <Zap size={24} className="text-skd-accent" />
+                <Zap size={24} className="text-energy" />
                 Statistik Karir
               </h3>
               <div className="grid grid-cols-2 gap-5">
                 {[
                   { label: 'Total Kuis Selesai', value: (profile?.total_quizzes_completed || 0).toLocaleString(), icon: Target, color: 'text-blue-400' },
                   { label: 'Win PvP', value: `${profile?.total_pvp_wins || 0} Menang`, icon: Swords, color: 'text-red-400' },
-                  { label: 'Total Jawaban Benar', value: (profile?.total_correct_answers || 0).toLocaleString(), icon: Zap, color: 'text-yellow-400' },
+                  { label: 'Total Jawaban Benar', value: (profile?.total_correct_answers || 0).toLocaleString(), icon: Zap, color: 'text-coin' },
                   { label: 'Skor Survival', value: (profile?.highest_survival_score || 0).toLocaleString(), icon: Trophy, color: 'text-purple-400' },
                 ].map((stat, idx) => (
-                  <div key={idx} className="bg-white/5 border border-white/10 rounded-[1.5rem] p-5 backdrop-blur-sm hover:bg-white/10 transition-colors group shadow-sm hover:shadow-md">
+                  <div key={idx} className="bg-surface-subtle border border-border rounded-[1.5rem] p-5 backdrop-blur-sm hover:bg-surface-subtle/50 transition-colors group shadow-sm hover:shadow-md">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className={`p-2.5 rounded-xl bg-white/5 ${stat.color} group-hover:scale-110 transition-transform`}>
+                      <div className={`p-2.5 rounded-xl bg-surface-subtle ${stat.color} group-hover:scale-110 transition-transform`}>
                         <stat.icon size={20} />
                       </div>
-                      <span className="text-xs text-gray-400 font-bold tracking-wide">{stat.label}</span>
+                      <span className="text-xs text-fg-muted font-bold tracking-wide">{stat.label}</span>
                     </div>
-                    <div className="text-3xl font-black font-space tracking-tight text-white">{stat.value}</div>
+                    <div className="text-3xl font-black font-space tracking-tight text-fg">{stat.value}</div>
                   </div>
                 ))}
               </div>
             </motion.section>
 
             {/* Analisis Radar Chart & Rekomendasi Belajar */}
-            <motion.section variants={itemVariants} className="bg-white/5 border border-white/10 rounded-[2rem] p-6 shadow-xl relative overflow-hidden backdrop-blur-md">
+            <motion.section variants={itemVariants} className="bg-surface-subtle border border-border rounded-[2rem] p-6 shadow-xl relative overflow-hidden backdrop-blur-md">
               <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#F5A623]/5 rounded-full blur-3xl pointer-events-none" />
 
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-white">
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-fg">
                 📊 Analisis Kemampuan & Rekomendasi AI
               </h3>
 
@@ -716,15 +716,15 @@ export default function Profile() {
                 <div className="w-full max-w-[240px] flex justify-center shrink-0">
                   <svg width="240" height="220" className="overflow-visible">
                     {/* Concentric grid lines (triangles) */}
-                    <polygon points={`${cx + rMax * Math.cos(angles[0])},${cy + rMax * Math.sin(angles[0])} ${cx + rMax * Math.cos(angles[1])},${cy + rMax * Math.sin(angles[1])} ${cx + rMax * Math.cos(angles[2])},${cy + rMax * Math.sin(angles[2])}`} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-                    <polygon points={`${cx + rMax * 0.75 * Math.cos(angles[0])},${cy + rMax * 0.75 * Math.sin(angles[0])} ${cx + rMax * 0.75 * Math.cos(angles[1])},${cy + rMax * 0.75 * Math.sin(angles[1])} ${cx + rMax * 0.75 * Math.cos(angles[2])},${cy + rMax * 0.75 * Math.sin(angles[2])}`} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-                    <polygon points={`${cx + rMax * 0.5 * Math.cos(angles[0])},${cy + rMax * 0.5 * Math.sin(angles[0])} ${cx + rMax * 0.5 * Math.cos(angles[1])},${cy + rMax * 0.5 * Math.sin(angles[1])} ${cx + rMax * 0.5 * Math.cos(angles[2])},${cy + rMax * 0.5 * Math.sin(angles[2])}`} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-                    <polygon points={`${cx + rMax * 0.25 * Math.cos(angles[0])},${cy + rMax * 0.25 * Math.sin(angles[0])} ${cx + rMax * 0.25 * Math.cos(angles[1])},${cy + rMax * 0.25 * Math.sin(angles[1])} ${cx + rMax * 0.25 * Math.cos(angles[2])},${cy + rMax * 0.25 * Math.sin(angles[2])}`} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                    <polygon points={`${cx + rMax * Math.cos(angles[0])},${cy + rMax * Math.sin(angles[0])} ${cx + rMax * Math.cos(angles[1])},${cy + rMax * Math.sin(angles[1])} ${cx + rMax * Math.cos(angles[2])},${cy + rMax * Math.sin(angles[2])}`} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
+                    <polygon points={`${cx + rMax * 0.75 * Math.cos(angles[0])},${cy + rMax * 0.75 * Math.sin(angles[0])} ${cx + rMax * 0.75 * Math.cos(angles[1])},${cy + rMax * 0.75 * Math.sin(angles[1])} ${cx + rMax * 0.75 * Math.cos(angles[2])},${cy + rMax * 0.75 * Math.sin(angles[2])}`} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
+                    <polygon points={`${cx + rMax * 0.5 * Math.cos(angles[0])},${cy + rMax * 0.5 * Math.sin(angles[0])} ${cx + rMax * 0.5 * Math.cos(angles[1])},${cy + rMax * 0.5 * Math.sin(angles[1])} ${cx + rMax * 0.5 * Math.cos(angles[2])},${cy + rMax * 0.5 * Math.sin(angles[2])}`} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
+                    <polygon points={`${cx + rMax * 0.25 * Math.cos(angles[0])},${cy + rMax * 0.25 * Math.sin(angles[0])} ${cx + rMax * 0.25 * Math.cos(angles[1])},${cy + rMax * 0.25 * Math.sin(angles[1])} ${cx + rMax * 0.25 * Math.cos(angles[2])},${cy + rMax * 0.25 * Math.sin(angles[2])}`} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
 
                     {/* Axis lines */}
-                    <line x1={cx} y1={cy} x2={cx + rMax * Math.cos(angles[0])} y2={cy + rMax * Math.sin(angles[0])} stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-                    <line x1={cx} y1={cy} x2={cx + rMax * Math.cos(angles[1])} y2={cy + rMax * Math.sin(angles[1])} stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-                    <line x1={cx} y1={cy} x2={cx + rMax * Math.cos(angles[2])} y2={cy + rMax * Math.sin(angles[2])} stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                    <line x1={cx} y1={cy} x2={cx + rMax * Math.cos(angles[0])} y2={cy + rMax * Math.sin(angles[0])} stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
+                    <line x1={cx} y1={cy} x2={cx + rMax * Math.cos(angles[1])} y2={cy + rMax * Math.sin(angles[1])} stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
+                    <line x1={cx} y1={cy} x2={cx + rMax * Math.cos(angles[2])} y2={cy + rMax * Math.sin(angles[2])} stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
 
                     {/* User accuracy polygon */}
                     <polygon points={userPoints} fill="rgba(139,92,246,0.3)" stroke="#8B5CF6" strokeWidth="2" strokeLinejoin="round" />
@@ -735,32 +735,32 @@ export default function Profile() {
                     <circle cx={cx + rMax * (tkpAcc / 100) * Math.cos(angles[2])} cy={cy + rMax * (tkpAcc / 100) * Math.sin(angles[2])} r="4" fill="#8B5CF6" />
 
                     {/* Vertex Labels */}
-                    <text x={cx} y={cy - rMax - 12} textAnchor="middle" fill="#E2E8F0" fontSize="10" fontWeight="bold">TWK ({twkAcc.toFixed(0)}%)</text>
-                    <text x={cx - rMax - 14} y={cy + rMax * 0.5 + 14} textAnchor="middle" fill="#E2E8F0" fontSize="10" fontWeight="bold">TIU ({tiuAcc.toFixed(0)}%)</text>
-                    <text x={cx + rMax + 14} y={cy + rMax * 0.5 + 14} textAnchor="middle" fill="#E2E8F0" fontSize="10" fontWeight="bold">TKP ({tkpAcc.toFixed(0)}%)</text>
+                    <text x={cx} y={cy - rMax - 12} textAnchor="middle" fill="#1E293B" fontSize="10" fontWeight="bold">TWK ({twkAcc.toFixed(0)}%)</text>
+                    <text x={cx - rMax - 14} y={cy + rMax * 0.5 + 14} textAnchor="middle" fill="#1E293B" fontSize="10" fontWeight="bold">TIU ({tiuAcc.toFixed(0)}%)</text>
+                    <text x={cx + rMax + 14} y={cy + rMax * 0.5 + 14} textAnchor="middle" fill="#1E293B" fontSize="10" fontWeight="bold">TKP ({tkpAcc.toFixed(0)}%)</text>
                   </svg>
                 </div>
 
                 {/* Recommendation Texts */}
                 <div className="flex-1 space-y-4 w-full">
-                  <div className="bg-[#1A1924] border border-white/5 rounded-2xl p-4 space-y-3">
+                  <div className="bg-surface shadow-sm border border-border rounded-2xl p-4 space-y-3">
                     <h4 className="text-xs font-black tracking-wider text-[#F5A623] uppercase">Status Kesiapan CAT CPNS BKN</h4>
                     <div className="grid grid-cols-3 gap-2">
-                      <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-                        <span className="block text-[10px] text-gray-400 font-bold">TWK (Min 65)</span>
-                        <span className={`text-xs font-black font-space ${twkAcc >= 65 ? 'text-skd-success' : 'text-skd-danger'}`}>
+                      <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
+                        <span className="block text-[10px] text-fg-muted font-bold">TWK (Min 65)</span>
+                        <span className={`text-xs font-black font-space ${twkAcc >= 65 ? 'text-success' : 'text-danger'}`}>
                           {twkAcc >= 65 ? 'LULUS' : 'GAGAL'}
                         </span>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-                        <span className="block text-[10px] text-gray-400 font-bold">TIU (Min 80)</span>
-                        <span className={`text-xs font-black font-space ${tiuAcc >= 80 ? 'text-skd-success' : 'text-skd-danger'}`}>
+                      <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
+                        <span className="block text-[10px] text-fg-muted font-bold">TIU (Min 80)</span>
+                        <span className={`text-xs font-black font-space ${tiuAcc >= 80 ? 'text-success' : 'text-danger'}`}>
                           {tiuAcc >= 80 ? 'LULUS' : 'GAGAL'}
                         </span>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-                        <span className="block text-[10px] text-gray-400 font-bold">TKP (Min 72)</span>
-                        <span className={`text-xs font-black font-space ${tkpAcc >= 72 ? 'text-skd-success' : 'text-skd-danger'}`}>
+                      <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
+                        <span className="block text-[10px] text-fg-muted font-bold">TKP (Min 72)</span>
+                        <span className={`text-xs font-black font-space ${tkpAcc >= 72 ? 'text-success' : 'text-danger'}`}>
                           {tkpAcc >= 72 ? 'LULUS' : 'GAGAL'}
                         </span>
                       </div>
@@ -780,7 +780,7 @@ export default function Profile() {
             {/* Lencana Kehormatan */}
             <motion.section variants={itemVariants}>
               <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
-                <Medal size={24} className="text-skd-accent" />
+                <Medal size={24} className="text-primary" />
                 Lencana Kehormatan
               </h3>
 
@@ -788,23 +788,23 @@ export default function Profile() {
                 {dynamicBadges.map((badge) => (
                   <div
                     key={badge.id}
-                    className="bg-white/5 border border-white/10 rounded-[1.5rem] p-4 flex flex-col items-center text-center backdrop-blur-sm hover:bg-white/10 transition-all duration-300 shadow-sm"
+                    className="bg-surface-subtle border border-border rounded-[1.5rem] p-4 flex flex-col items-center text-center backdrop-blur-sm hover:bg-surface-subtle/50 transition-all duration-300 shadow-sm"
                   >
                     {badge.unlocked ? (
                       <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-2 border-yellow-500/50 shadow-[0_0_20px_rgba(234,179,8,0.25)] hover:scale-110 transition-all duration-300 mb-3">
                         {badge.icon}
                       </div>
                     ) : (
-                      <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl bg-white/5 border-2 border-white/10 text-white opacity-40 grayscale relative mb-3">
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl bg-surface-subtle border-2 border-border text-fg opacity-40 grayscale relative mb-3">
                         <span className="blur-[0.5px]">{badge.icon}</span>
-                        <div className="absolute -top-1 -right-1 bg-black/80 border border-white/10 p-0.5 rounded-full text-white/60">
+                        <div className="absolute -top-1 -right-1 bg-black/80 border border-border p-0.5 rounded-full text-white/60">
                           <Lock size={10} />
                         </div>
                       </div>
                     )}
 
-                    <h4 className="font-bold text-white text-xs mb-1 font-space">{badge.name}</h4>
-                    <p className="text-gray-400 text-[9px] leading-snug max-w-[130px]">{badge.desc}</p>
+                    <h4 className="font-bold text-fg text-xs mb-1 font-space">{badge.name}</h4>
+                    <p className="text-fg-muted text-[9px] leading-snug max-w-[130px]">{badge.desc}</p>
                   </div>
                 ))}
               </div>
@@ -817,37 +817,37 @@ export default function Profile() {
               Daftar Rival
             </h3>
 
-            <div className="bg-white/5 border border-white/10 rounded-[1.5rem] p-5 backdrop-blur-sm shadow-sm flex flex-col flex-1 max-h-[500px]">
+            <div className="bg-surface-subtle border border-border rounded-[1.5rem] p-5 backdrop-blur-sm shadow-sm flex flex-col flex-1 max-h-[500px]">
 
               {/* Filter Friend Form */}
               <div className="mb-4 flex gap-2">
                 <div className="relative flex-1">
-                  <UserPlus size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <UserPlus size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-muted" />
                   <input
                     type="text"
                     value={newFriendName}
                     onChange={(e) => setNewFriendName(e.target.value)}
                     placeholder="Cari rival..."
-                    className="w-full bg-[#1A1924] border border-white/5 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-skd-accent/50 transition-colors text-white"
+                    className="w-full bg-surface shadow-sm border border-border rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-primary/50 transition-colors text-fg"
                   />
                 </div>
               </div>
               {/* Friends List Container */}
               <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
                 {filteredFriends.length === 0 ? (
-                  <p className="text-gray-500 text-xs text-center py-8">Belum ada rival terdaftar atau ditemukan.</p>
+                  <p className="text-fg-muted text-xs text-center py-8">Belum ada rival terdaftar atau ditemukan.</p>
                 ) : (
                   filteredFriends.map((friend) => (
-                    <div key={friend.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors group gap-2 overflow-hidden">
+                    <div key={friend.id} className="flex items-center justify-between p-3 rounded-xl bg-surface-subtle border border-border hover:border-border transition-colors group gap-2 overflow-hidden">
                       {/* Kiri: Avatar + Nama — flex-1 + min-w-0 agar bisa truncate */}
                       <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity min-w-0 flex-1" onClick={() => setSelectedPlayerId(String(friend.id))}>
                         <div className="relative flex-shrink-0">
-                          <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full bg-[#1A1924]" />
-                          <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#1A1924] ${friend.online ? 'bg-skd-success' : 'bg-gray-500'}`} />
+                          <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full bg-surface shadow-sm" />
+                          <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-surface ${friend.online ? 'bg-success' : 'bg-gray-500'}`} />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="font-bold text-xs truncate text-white">{friend.name}</h4>
-                          <p className="text-[10px] font-space text-gray-400 truncate">{friend.username}</p>
+                          <h4 className="font-bold text-xs truncate text-fg">{friend.name}</h4>
+                          <p className="text-[10px] font-space text-fg-muted truncate">{friend.username}</p>
                         </div>
                       </div>
                       {/* Kanan: Action buttons — flex-shrink-0 agar tidak stretch */}
@@ -859,8 +859,8 @@ export default function Profile() {
                           disabled={inviteStatus === 'inviting'}
                           onClick={(e) => { e.stopPropagation(); sendInvite(String(friend.id), friend.name); }}
                           className={`px-2.5 py-1.5 font-black rounded-lg text-[10px] transition-colors whitespace-nowrap ${inviteStatus === 'inviting' && targetId === String(friend.id)
-                              ? 'bg-yellow-500 text-[#0F0E17] animate-pulse'
-                              : 'bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] disabled:opacity-50 disabled:cursor-not-allowed'
+                              ? 'bg-yellow-500 text-primary-fg animate-pulse'
+                              : 'bg-primary hover:bg-slate-800 text-primary-fg disabled:opacity-50 disabled:cursor-not-allowed'
                             }`}
                         >
                           {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Tunggu' : 'Duel'}
@@ -868,14 +868,14 @@ export default function Profile() {
                         {inviteStatus === 'inviting' && targetId === String(friend.id) && (
                           <button
                             onClick={(e) => { e.stopPropagation(); cancelInvite(); }}
-                            className="px-2.5 py-1.5 font-black rounded-lg text-[10px] bg-red-500 hover:bg-red-600 text-white transition-colors whitespace-nowrap"
+                            className="px-2.5 py-1.5 font-black rounded-lg text-[10px] bg-danger hover:bg-red-600 text-white transition-colors whitespace-nowrap"
                           >
                             Batal
                           </button>
                         )}
                         <button
                           onClick={(e) => { e.stopPropagation(); handleRemoveFriend(friend.id); }}
-                          className="p-1.5 bg-skd-danger/10 hover:bg-skd-danger/20 text-skd-danger rounded-lg transition-colors flex-shrink-0"
+                          className="p-1.5 bg-danger-subtle hover:bg-danger-subtle text-danger rounded-lg transition-colors flex-shrink-0"
                         >
                           <Trash2 size={12} />
                         </button>
@@ -894,15 +894,15 @@ export default function Profile() {
         {searchFriendModal && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-overlay backdrop-blur-sm backdrop-blur-md z-[100] flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#1A1924] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col"
+              className="bg-surface shadow-sm border border-border rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col"
             >
-              <div className="flex justify-between items-center p-4 border-b border-white/10">
+              <div className="flex justify-between items-center p-4 border-b border-border">
                 <h3 className="font-bold text-lg">Cari Teman</h3>
-                <button onClick={() => setSearchFriendModal(false)} className="text-gray-400 hover:text-white transition-colors">
+                <button onClick={() => setSearchFriendModal(false)} className="text-fg-muted hover:text-fg transition-colors">
                   <X size={20} />
                 </button>
               </div>
@@ -914,25 +914,25 @@ export default function Profile() {
                     value={newFriendName}
                     onChange={(e) => setNewFriendName(e.target.value)}
                     placeholder="Masukkan username..."
-                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-skd-accent/50 text-white"
+                    className="flex-1 bg-surface-subtle border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/50 text-fg"
                     disabled={isSearchingFriend}
                   />
                   <button
                     type="submit"
                     disabled={isSearchingFriend || !newFriendName.trim()}
-                    className="bg-skd-accent text-[#0F0E17] px-4 rounded-lg font-bold hover:bg-yellow-400 disabled:opacity-50 transition-colors"
+                    className="bg-primary text-primary-fg px-4 rounded-lg font-bold hover:bg-coin disabled:opacity-50 transition-colors"
                   >
                     Cari
                   </button>
                 </form>
 
                 {isSearchingFriend ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-                    <div className="animate-spin w-8 h-8 border-4 border-skd-accent/20 border-t-skd-accent rounded-full mb-3" />
+                  <div className="flex flex-col items-center justify-center py-8 text-fg-muted">
+                    <div className="animate-spin w-8 h-8 border-4 border-primary/20 border-t-skd-accent rounded-full mb-3" />
                     <p className="text-sm">Mencari pemain...</p>
                   </div>
                 ) : searchFriendError ? (
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex flex-col items-center text-center text-red-400 mt-2">
+                  <div className="bg-danger/10 border border-danger/20 rounded-xl p-6 flex flex-col items-center text-center text-red-400 mt-2">
                     <UserPlus size={32} className="mb-2 opacity-50" />
                     <p className="text-sm font-bold">Pemain tidak ditemukan</p>
                     <p className="text-xs mt-1 opacity-70">Pastikan username yang dimasukkan benar.</p>
@@ -943,22 +943,22 @@ export default function Profile() {
                       setSelectedPlayerId(searchFriendResult.id);
                       setSearchFriendModal(false);
                     }}
-                    className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors group"
+                    className="bg-surface-subtle border border-border rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-surface-subtle/50 transition-colors group"
                   >
                     <div className="flex items-center gap-4">
                       <img
                         src={searchFriendResult.selected_avatar ? availableCharacters.find(o => o.id === searchFriendResult.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchFriendResult.username}`}
                         alt={searchFriendResult.username}
-                        className="w-14 h-14 rounded-full bg-[#1A1924] object-cover border border-white/10"
+                        className="w-14 h-14 rounded-full bg-surface shadow-sm object-cover border border-border"
                       />
                       <div>
-                        <h4 className="font-bold text-white group-hover:text-skd-accent transition-colors">@{searchFriendResult.username}</h4>
-                        <div className="text-xs font-bold text-skd-premium">
+                        <h4 className="font-bold text-fg group-hover:text-primary transition-colors">@{searchFriendResult.username}</h4>
+                        <div className="text-xs font-bold text-premium">
                           Skor: {searchFriendResult.score}
                         </div>
                       </div>
                     </div>
-                    <div className="bg-white/5 p-2 rounded-full group-hover:bg-skd-accent group-hover:text-[#0F0E17] transition-all">
+                    <div className="bg-surface-subtle p-2 rounded-full group-hover:bg-primary group-hover:text-primary-fg transition-all">
                       <UserPlus size={16} />
                     </div>
                   </div>
@@ -973,28 +973,28 @@ export default function Profile() {
         {isFollowModalOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-overlay backdrop-blur-sm backdrop-blur-md z-[100] flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#1A1924] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col max-h-[80vh]"
+              className="bg-surface shadow-sm border border-border rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col max-h-[80vh]"
             >
-              <div className="flex justify-between items-center p-4 border-b border-white/10">
+              <div className="flex justify-between items-center p-4 border-b border-border">
                 <h3 className="font-bold text-lg">{followModalTab === 'mengikuti' ? 'Mengikuti' : 'Pengikut'}</h3>
-                <button onClick={() => setIsFollowModalOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+                <button onClick={() => setIsFollowModalOpen(false)} className="text-fg-muted hover:text-fg transition-colors">
                   <X size={20} />
                 </button>
               </div>
 
-              <div className="flex border-b border-white/10">
+              <div className="flex border-b border-border">
                 <button
-                  className={`flex-1 py-3 text-sm font-bold transition-colors ${followModalTab === 'mengikuti' ? 'text-skd-accent border-b-2 border-skd-accent' : 'text-gray-400 hover:text-white'}`}
+                  className={`flex-1 py-3 text-sm font-bold transition-colors ${followModalTab === 'mengikuti' ? 'text-primary border-b-2 border-primary' : 'text-fg-muted hover:text-fg'}`}
                   onClick={() => setFollowModalTab('mengikuti')}
                 >
                   Mengikuti
                 </button>
                 <button
-                  className={`flex-1 py-3 text-sm font-bold transition-colors ${followModalTab === 'pengikut' ? 'text-skd-accent border-b-2 border-skd-accent' : 'text-gray-400 hover:text-white'}`}
+                  className={`flex-1 py-3 text-sm font-bold transition-colors ${followModalTab === 'pengikut' ? 'text-primary border-b-2 border-primary' : 'text-fg-muted hover:text-fg'}`}
                   onClick={() => setFollowModalTab('pengikut')}
                 >
                   Pengikut
@@ -1004,7 +1004,7 @@ export default function Profile() {
               <div className="p-4 overflow-y-auto flex-1 custom-scrollbar min-h-[250px]">
                 {isFollowListLoading ? (
                   <div className="flex justify-center items-center h-40">
-                    <div className="animate-spin w-8 h-8 border-4 border-skd-accent/20 border-t-skd-accent rounded-full" />
+                    <div className="animate-spin w-8 h-8 border-4 border-primary/20 border-t-skd-accent rounded-full" />
                   </div>
                 ) : (
                   <>
@@ -1020,15 +1020,15 @@ export default function Profile() {
                             const p = item.profiles;
                             if (!p) return null;
                             return (
-                              <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors group">
+                              <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-surface-subtle p-3 rounded-xl border border-border cursor-pointer hover:bg-surface-subtle/50 transition-colors group">
                                 <img
                                   src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.username}`}
                                   alt={p.username}
-                                  className="w-10 h-10 rounded-full bg-[#1A1924] object-cover"
+                                  className="w-10 h-10 rounded-full bg-surface shadow-sm object-cover"
                                 />
                                 <div>
-                                  <h4 className="font-bold text-sm text-white group-hover:text-skd-accent transition-colors">@{p.username}</h4>
-                                  <p className="text-[10px] text-skd-premium font-bold">Skor: {p.score}</p>
+                                  <h4 className="font-bold text-sm text-fg group-hover:text-primary transition-colors">@{p.username}</h4>
+                                  <p className="text-[10px] text-premium font-bold">Skor: {p.score}</p>
                                 </div>
                               </div>
                             );
@@ -1049,15 +1049,15 @@ export default function Profile() {
                             const p = item.profiles;
                             if (!p) return null;
                             return (
-                              <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors group">
+                              <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-surface-subtle p-3 rounded-xl border border-border cursor-pointer hover:bg-surface-subtle/50 transition-colors group">
                                 <img
                                   src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.username}`}
                                   alt={p.username}
-                                  className="w-10 h-10 rounded-full bg-[#1A1924] object-cover"
+                                  className="w-10 h-10 rounded-full bg-surface shadow-sm object-cover"
                                 />
                                 <div>
-                                  <h4 className="font-bold text-sm text-white group-hover:text-skd-accent transition-colors">@{p.username}</h4>
-                                  <p className="text-[10px] text-skd-premium font-bold">Skor: {p.score}</p>
+                                  <h4 className="font-bold text-sm text-fg group-hover:text-primary transition-colors">@{p.username}</h4>
+                                  <p className="text-[10px] text-premium font-bold">Skor: {p.score}</p>
                                 </div>
                               </div>
                             );

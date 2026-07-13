@@ -144,12 +144,12 @@ export default function PembahasanTryout() {
   // Render Package Selection Dashboard if no package is selected
   if (!selectedPackageId) {
     return (
-      <div className="min-h-screen bg-skd-bg text-skd-text p-4 md:p-10 pb-24 relative overflow-y-auto max-w-5xl mx-auto flex flex-col justify-start">
+      <div className="min-h-screen bg-bg text-fg p-4 md:p-10 pb-24 relative overflow-y-auto max-w-5xl mx-auto flex flex-col justify-start">
         {/* Back to Home Button */}
         <div className="flex justify-start mb-6 mt-2">
           <button 
             onClick={() => navigate('/')} 
-            className="flex items-center gap-2 text-xs font-bold text-skd-muted hover:text-skd-text transition-colors bg-skd-card/40 px-4 py-2 rounded-full border border-skd-border shadow-sm active:scale-95"
+            className="flex items-center gap-2 text-xs font-bold text-fg-muted hover:text-fg transition-colors bg-surface/40 px-4 py-2 rounded-full border border-border shadow-sm active:scale-95"
           >
             <ArrowLeft size={16} />
             <span>Kembali ke Beranda</span>
@@ -162,7 +162,7 @@ export default function PembahasanTryout() {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 50 }}
-              className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-skd-danger shadow-[0_0_20px_rgba(239,68,68,0.4)] text-white px-6 py-3 rounded-full font-bold whitespace-nowrap"
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-danger shadow-[0_0_20px_rgba(239,68,68,0.4)] text-white px-6 py-3 rounded-full font-bold whitespace-nowrap"
             >
               {showLockedToast}
             </motion.div>
@@ -172,12 +172,12 @@ export default function PembahasanTryout() {
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="w-16 h-16 mx-auto bg-skd-primary/10 rounded-3xl flex items-center justify-center border border-skd-primary/20 mb-4 shadow-[0_0_30px_rgba(139,92,246,0.15)]"
+            className="w-16 h-16 mx-auto bg-primary/10 rounded-3xl flex items-center justify-center border border-primary/20 mb-4 shadow-[0_0_30px_rgba(139,92,246,0.15)]"
           >
-            <BookOpenCheck className="text-skd-primary" size={32} />
+            <BookOpenCheck className="text-primary" size={32} />
           </motion.div>
           <h1 className="text-2xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-skd-text to-skd-muted bg-clip-text text-transparent">Pembahasan Try Out Premium</h1>
-          <p className="text-sm text-skd-muted mt-2 leading-relaxed">
+          <p className="text-sm text-fg-muted mt-2 leading-relaxed">
             Pilih paket pembahasan untuk memperdalam materi ujian CAT SKD. Konten premium terproteksi memerlukan pembelian terlebih dahulu.
           </p>
         </header>
@@ -191,25 +191,25 @@ export default function PembahasanTryout() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
                 whileHover={{ scale: 1.03 }}
-                className={`bg-skd-card/60 backdrop-blur-sm border border-skd-border hover:border-skd-primary/30 p-6 rounded-[32px] relative overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-md transition-all group`}
+                className={`bg-surface/60 backdrop-blur-sm border border-border hover:border-primary/30 p-6 rounded-[32px] relative overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-md transition-all group`}
               >
                 {/* Background glow gradient */}
                 <div className={`absolute -inset-10 bg-gradient-to-br ${pkg.gradient} blur-2xl opacity-40 group-hover:opacity-60 transition-opacity pointer-events-none`} />
                 <div className="relative mt-2">
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`text-[10px] uppercase font-black tracking-wider px-3 py-1 rounded-full ${pkg.isFree ? 'bg-skd-success/15 text-skd-success border border-skd-success/20' : 'bg-skd-premium/10 text-skd-accent border border-skd-premium/20'}`}>
+                    <span className={`text-[10px] uppercase font-black tracking-wider px-3 py-1 rounded-full ${pkg.isFree ? 'bg-success/15 text-success border border-success/20' : 'bg-premium-subtle text-primary border border-premium/20'}`}>
                       {pkg.type}
                     </span>
                     {isUnlocked ? (
-                      <Unlock className="text-skd-success" size={18} />
+                      <Unlock className="text-success" size={18} />
                     ) : (
-                      <Lock className="text-skd-muted" size={18} />
+                      <Lock className="text-fg-muted" size={18} />
                     )}
                   </div>
-                  <h3 className="text-lg font-bold text-skd-text mb-2 tracking-tight">{pkg.title}</h3>
-                  <p className="text-xs text-skd-muted leading-relaxed mb-6 h-12 overflow-hidden">{pkg.description}</p>
+                  <h3 className="text-lg font-bold text-fg mb-2 tracking-tight">{pkg.title}</h3>
+                  <p className="text-xs text-fg-muted leading-relaxed mb-6 h-12 overflow-hidden">{pkg.description}</p>
                 </div>
-                <div className="relative pt-4 border-t border-skd-border/40 mt-4">
+                <div className="relative pt-4 border-t border-border/40 mt-4">
                   {isUnlocked ? (
                     <button
                       onClick={() => handleSelectPackage(pkg.id)}
@@ -221,17 +221,17 @@ export default function PembahasanTryout() {
                   ) : (
                     <div className="space-y-2.5">
                       <div className="flex items-center justify-between text-xs bg-black/30 p-2.5 rounded-xl border border-white/5">
-                        <span className="text-skd-muted font-medium">Buka Kunci:</span>
-                        <span className="font-space font-bold text-yellow-400 flex items-center gap-1">
+                        <span className="text-fg-muted font-medium">Buka Kunci:</span>
+                        <span className="font-space font-bold text-coin-text flex items-center gap-1">
                           <Coins size={14} className="fill-yellow-400" />
                           {pkg.cost} Koin
                         </span>
                       </div>
                       <Link
                         to="/toko"
-                        className="w-full py-3 bg-skd-muted/10 hover:bg-skd-muted/20 text-skd-text font-black rounded-2xl text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 border border-skd-border"
+                        className="w-full py-3 bg-locked-subtle hover:bg-locked-subtle text-fg font-black rounded-2xl text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 border border-border"
                       >
-                        <Sparkles size={14} className="text-skd-premium animate-pulse" />
+                        <Sparkles size={14} className="text-premium animate-pulse" />
                         <span>Beli di Toko</span>
                       </Link>
                     </div>
@@ -319,10 +319,10 @@ export default function PembahasanTryout() {
     }
   };
   return (
-    <div className="flex flex-col h-screen bg-skd-bg text-skd-text font-syne overflow-hidden">
+    <div className="flex flex-col h-screen bg-bg text-fg font-syne overflow-hidden">
       
       {/* Top Navigation Header */}
-      <header className="p-4 border-b border-skd-border bg-skd-card/60 backdrop-blur-md z-10 flex items-center justify-between shrink-0">
+      <header className="p-4 border-b border-border bg-surface/60 backdrop-blur-md z-10 flex items-center justify-between shrink-0">
         <button 
           onClick={() => {
             if (location.state?.quizQuestions) {
@@ -332,27 +332,27 @@ export default function PembahasanTryout() {
               setSelectedPackageId(null);
             }
           }} 
-          className="flex items-center gap-2 text-xs font-bold text-skd-muted hover:text-skd-text transition-colors"
+          className="flex items-center gap-2 text-xs font-bold text-fg-muted hover:text-fg transition-colors"
         >
           <ArrowLeft size={16} />
           <span>{location.state?.quizQuestions ? 'Kembali ke Katalog' : 'Kembali ke Katalog'}</span>
         </button>
         <div className="text-center">
           <h1 className="text-xs md:text-base font-black tracking-tight uppercase flex items-center gap-1.5 justify-center">
-            <BookOpen size={16} className="text-skd-accent shrink-0" />
+            <BookOpen size={16} className="text-primary shrink-0" />
             <span className="hidden md:inline">ANALISIS LEMBAR PEMBAHASAN TRY OUT</span>
             <span className="md:hidden">PEMBAHASAN TO</span>
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center gap-2 font-space text-[10px] font-bold text-skd-muted bg-[#1A1924] px-4 py-1.5 rounded-full border border-skd-border">
-            <span className="text-skd-success">Benar: {answeredCorrectCount}</span>
-            <span className="text-white/20">|</span>
-            <span className="text-skd-danger">Salah: {answeredIncorrectCount}</span>
-            <span className="text-white/20">|</span>
-            <span className="text-gray-400">Kosong: {unansweredCount}</span>
+          <div className="hidden md:flex items-center gap-2 font-space text-[10px] font-bold text-fg-muted bg-surface shadow-sm px-4 py-1.5 rounded-full border border-border">
+            <span className="text-success">Benar: {answeredCorrectCount}</span>
+            <span className="text-fg/20">|</span>
+            <span className="text-danger">Salah: {answeredIncorrectCount}</span>
+            <span className="text-fg/20">|</span>
+            <span className="text-fg-muted">Kosong: {unansweredCount}</span>
           </div>
-          <button onClick={() => setShowSidebarMobile(true)} className="lg:hidden p-2 text-skd-text hover:bg-skd-muted/10 rounded-xl transition-colors">
+          <button onClick={() => setShowSidebarMobile(true)} className="lg:hidden p-2 text-fg hover:bg-locked-subtle rounded-xl transition-colors">
             <Menu size={20} />
           </button>
         </div>
@@ -363,12 +363,12 @@ export default function PembahasanTryout() {
         {/* === SIDEBAR: Kisi Soal Navigasi (Left) === */}
         
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex flex-col w-80 xl:w-96 border-r border-skd-border bg-skd-card/30 backdrop-blur-sm h-full shrink-0">
+        <aside className="hidden lg:flex flex-col w-80 xl:w-96 border-r border-border bg-surface/30 backdrop-blur-sm h-full shrink-0">
           
           {/* Radar Chart Analysis if viewing live results */}
           {isTryoutResult && (
-            <div className="p-4 border-b border-skd-border shrink-0 flex flex-col items-center gap-2 bg-white/5">
-              <h4 className="text-[10px] font-black text-skd-accent uppercase tracking-widest font-space">Rapor Kompetensi CAT</h4>
+            <div className="p-4 border-b border-border shrink-0 flex flex-col items-center gap-2 bg-surface-subtle">
+              <h4 className="text-[10px] font-black text-primary uppercase tracking-widest font-space">Rapor Kompetensi CAT</h4>
               
               <div className="relative w-40 h-40 flex items-center justify-center">
                 {(() => {
@@ -449,16 +449,16 @@ export default function PembahasanTryout() {
                   );
                 })()}
               </div>
-              <div className="flex gap-4 text-[9px] font-bold mt-1 text-skd-muted">
-                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-skd-accent rounded-full" /> Skor Anda</span>
-                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-skd-danger rounded-full" /> Passing Grade</span>
+              <div className="flex gap-4 text-[9px] font-bold mt-1 text-fg-muted">
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-primary rounded-full" /> Skor Anda</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-danger rounded-full" /> Passing Grade</span>
               </div>
             </div>
           )}
           
           {/* Category Filter buttons */}
-          <div className="p-4 border-b border-skd-border shrink-0">
-            <h3 className="text-xs font-bold text-gray-400 mb-3 tracking-wide">KATEGORI SOAL</h3>
+          <div className="p-4 border-b border-border shrink-0">
+            <h3 className="text-xs font-bold text-fg-muted mb-3 tracking-wide">KATEGORI SOAL</h3>
             <div className="grid grid-cols-4 gap-1.5">
               {(['ALL', 'TWK', 'TIU', 'TKP', 'RAGU'] as const).map(cat => (
                 <button
@@ -470,11 +470,11 @@ export default function PembahasanTryout() {
                     if (match !== -1) setActiveIndex(match);
                   }}
                   className={`py-1.5 text-[10px] font-black rounded-lg border text-center transition-all ${
-                    cat === 'RAGU' && filterCategory === 'RAGU' ? 'bg-red-500 border-red-500 text-white shadow-sm shadow-red-500/10' :
-                    cat === 'RAGU' ? 'bg-[#1A1924] border-red-500/30 text-red-400 hover:text-red-300' :
+                    cat === 'RAGU' && filterCategory === 'RAGU' ? 'bg-danger border-danger text-white shadow-sm shadow-red-500/10' :
+                    cat === 'RAGU' ? 'bg-surface shadow-sm border-danger text-red-400 hover:text-red-300' :
                     filterCategory === cat
-                      ? 'bg-skd-accent border-skd-accent text-[#0F0E17] shadow-sm shadow-skd-accent/10'
-                      : 'bg-[#1A1924] border-skd-border text-skd-muted hover:text-white'
+                      ? 'bg-primary border-primary text-primary-fg shadow-sm shadow-sm/10'
+                      : 'bg-surface shadow-sm border-border text-fg-muted hover:text-fg'
                   }`}
                 >
                   {cat}
@@ -488,14 +488,14 @@ export default function PembahasanTryout() {
               {filteredIndices.map(({ q, idx }: { q: any; idx: number }) => {
                 const status = getQuestionStatus(idx);
                 const isCurrent = activeIndex === idx;
-                let btnClass = 'bg-[#1A1924] border-skd-border text-gray-500 hover:border-white/20';
+                let btnClass = 'bg-surface shadow-sm border-border text-fg-muted hover:border-white/20';
                 
                 if (isCurrent) {
-                  btnClass = 'bg-blue-500 border-blue-500 text-white shadow-lg ring-2 ring-blue-500/50 ring-offset-2 ring-offset-[#1A1924] scale-105 z-10';
+                  btnClass = 'bg-blue-500 border-blue-500 text-white shadow-lg ring-2 ring-blue-500/50 ring-offset-2 ring-offset-surface scale-105 z-10';
                 } else if (status === 'correct') {
-                  btnClass = 'bg-skd-success/15 border-skd-success/50 text-skd-success font-black';
+                  btnClass = 'bg-success/15 border-success/50 text-success font-black';
                 } else if (status === 'incorrect') {
-                  btnClass = 'bg-skd-danger/15 border-skd-danger/50 text-skd-danger font-black';
+                  btnClass = 'bg-danger/15 border-danger/50 text-danger font-black';
                 }
                 return (
                   <button
@@ -515,14 +515,14 @@ export default function PembahasanTryout() {
           </div>
           
           {/* Legend indicators */}
-          <div className="p-4 border-t border-skd-border bg-skd-card/50 text-[10px] font-bold text-skd-muted grid grid-cols-3 gap-2 text-center shrink-0">
-            <div className="flex flex-col items-center p-1 rounded bg-skd-success/10 text-skd-success border border-skd-success/20">
+          <div className="p-4 border-t border-border bg-surface/50 text-[10px] font-bold text-fg-muted grid grid-cols-3 gap-2 text-center shrink-0">
+            <div className="flex flex-col items-center p-1 rounded bg-success-subtle text-success border border-success/20">
               <span>BENAR</span>
             </div>
-            <div className="flex flex-col items-center p-1 rounded bg-skd-danger/10 text-skd-danger border border-skd-danger/20">
+            <div className="flex flex-col items-center p-1 rounded bg-danger-subtle text-danger border border-danger/20">
               <span>SALAH</span>
             </div>
-            <div className="flex flex-col items-center p-1 rounded bg-white/5 border border-white/10 text-gray-400">
+            <div className="flex flex-col items-center p-1 rounded bg-surface-subtle border border-border text-fg-muted">
               <span>KOSONG</span>
             </div>
           </div>
@@ -532,16 +532,16 @@ export default function PembahasanTryout() {
         <AnimatePresence>
           {showSidebarMobile && (
             <>
-              <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={() => setShowSidebarMobile(false)} />
-              <motion.aside initial={{x:'-100%'}} animate={{x:0}} exit={{x:'-100%'}} transition={{type:'spring', damping:25, stiffness:200}} className="fixed inset-y-0 left-0 w-80 bg-skd-bg border-r border-skd-border z-50 lg:hidden flex flex-col shadow-2xl">
-                <div className="p-4 border-b border-skd-border flex justify-between items-center shrink-0">
-                  <h3 className="font-bold text-skd-text text-sm flex items-center gap-2"><BookOpen size={16}/> Navigasi</h3>
-                  <button onClick={() => setShowSidebarMobile(false)} className="p-1 text-skd-muted hover:text-skd-text"><XCircle size={20}/></button>
+              <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-overlay backdrop-blur-sm z-40 lg:hidden" onClick={() => setShowSidebarMobile(false)} />
+              <motion.aside initial={{x:'-100%'}} animate={{x:0}} exit={{x:'-100%'}} transition={{type:'spring', damping:25, stiffness:200}} className="fixed inset-y-0 left-0 w-80 bg-bg border-r border-border z-50 lg:hidden flex flex-col shadow-2xl">
+                <div className="p-4 border-b border-border flex justify-between items-center shrink-0">
+                  <h3 className="font-bold text-fg text-sm flex items-center gap-2"><BookOpen size={16}/> Navigasi</h3>
+                  <button onClick={() => setShowSidebarMobile(false)} className="p-1 text-fg-muted hover:text-fg"><XCircle size={20}/></button>
                 </div>
                 
           {/* Category Filter buttons */}
-          <div className="p-4 border-b border-skd-border shrink-0">
-            <h3 className="text-xs font-bold text-gray-400 mb-3 tracking-wide">KATEGORI SOAL</h3>
+          <div className="p-4 border-b border-border shrink-0">
+            <h3 className="text-xs font-bold text-fg-muted mb-3 tracking-wide">KATEGORI SOAL</h3>
             <div className="grid grid-cols-4 gap-1.5">
               {(['ALL', 'TWK', 'TIU', 'TKP', 'RAGU'] as const).map(cat => (
                 <button
@@ -553,11 +553,11 @@ export default function PembahasanTryout() {
                     if (match !== -1) setActiveIndex(match);
                   }}
                   className={`py-1.5 text-[10px] font-black rounded-lg border text-center transition-all ${
-                    cat === 'RAGU' && filterCategory === 'RAGU' ? 'bg-red-500 border-red-500 text-white shadow-sm shadow-red-500/10' :
-                    cat === 'RAGU' ? 'bg-[#1A1924] border-red-500/30 text-red-400 hover:text-red-300' :
+                    cat === 'RAGU' && filterCategory === 'RAGU' ? 'bg-danger border-danger text-white shadow-sm shadow-red-500/10' :
+                    cat === 'RAGU' ? 'bg-surface shadow-sm border-danger text-red-400 hover:text-red-300' :
                     filterCategory === cat
-                      ? 'bg-skd-accent border-skd-accent text-[#0F0E17] shadow-sm shadow-skd-accent/10'
-                      : 'bg-[#1A1924] border-skd-border text-skd-muted hover:text-white'
+                      ? 'bg-primary border-primary text-primary-fg shadow-sm shadow-sm/10'
+                      : 'bg-surface shadow-sm border-border text-fg-muted hover:text-fg'
                   }`}
                 >
                   {cat}
@@ -571,14 +571,14 @@ export default function PembahasanTryout() {
               {filteredIndices.map(({ q, idx }: { q: any; idx: number }) => {
                 const status = getQuestionStatus(idx);
                 const isCurrent = activeIndex === idx;
-                let btnClass = 'bg-[#1A1924] border-skd-border text-gray-500 hover:border-white/20';
+                let btnClass = 'bg-surface shadow-sm border-border text-fg-muted hover:border-white/20';
                 
                 if (isCurrent) {
-                  btnClass = 'bg-blue-500 border-blue-500 text-white shadow-lg ring-2 ring-blue-500/50 ring-offset-2 ring-offset-[#1A1924] scale-105 z-10';
+                  btnClass = 'bg-blue-500 border-blue-500 text-white shadow-lg ring-2 ring-blue-500/50 ring-offset-2 ring-offset-surface scale-105 z-10';
                 } else if (status === 'correct') {
-                  btnClass = 'bg-skd-success/15 border-skd-success/50 text-skd-success font-black';
+                  btnClass = 'bg-success/15 border-success/50 text-success font-black';
                 } else if (status === 'incorrect') {
-                  btnClass = 'bg-skd-danger/15 border-skd-danger/50 text-skd-danger font-black';
+                  btnClass = 'bg-danger/15 border-danger/50 text-danger font-black';
                 }
                 return (
                   <button
@@ -598,14 +598,14 @@ export default function PembahasanTryout() {
           </div>
           
           {/* Legend indicators */}
-          <div className="p-4 border-t border-skd-border bg-skd-card/50 text-[10px] font-bold text-skd-muted grid grid-cols-3 gap-2 text-center shrink-0">
-            <div className="flex flex-col items-center p-1 rounded bg-skd-success/10 text-skd-success border border-skd-success/20">
+          <div className="p-4 border-t border-border bg-surface/50 text-[10px] font-bold text-fg-muted grid grid-cols-3 gap-2 text-center shrink-0">
+            <div className="flex flex-col items-center p-1 rounded bg-success-subtle text-success border border-success/20">
               <span>BENAR</span>
             </div>
-            <div className="flex flex-col items-center p-1 rounded bg-skd-danger/10 text-skd-danger border border-skd-danger/20">
+            <div className="flex flex-col items-center p-1 rounded bg-danger-subtle text-danger border border-danger/20">
               <span>SALAH</span>
             </div>
-            <div className="flex flex-col items-center p-1 rounded bg-white/5 border border-white/10 text-gray-400">
+            <div className="flex flex-col items-center p-1 rounded bg-surface-subtle border border-border text-fg-muted">
               <span>KOSONG</span>
             </div>
           </div>
@@ -628,7 +628,7 @@ export default function PembahasanTryout() {
             >
               
               {/* Question Header Card */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-skd-border pb-3 shrink-0">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3 shrink-0">
                 <div className="flex items-center gap-3">
                   <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
                     activeQuestion.category === 'TWK' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
@@ -639,16 +639,16 @@ export default function PembahasanTryout() {
                   </span>
                   {userAnswers[activeIndex] ? (
                     userAnswers[activeIndex] === activeQuestion.correct ? (
-                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-skd-success/10 text-skd-success border border-skd-success/20">
+                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-success-subtle text-success border border-success/20">
                         <CheckCircle2 size={14} /> Benar
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-skd-danger/10 text-skd-danger border border-skd-danger/20">
+                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-danger-subtle text-danger border border-danger/20">
                         <XCircle size={14} /> Salah
                       </span>
                     )
                   ) : (
-                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-white/5 text-gray-400 border border-white/10">
+                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-surface-subtle text-fg-muted border border-border">
                       Tidak Dijawab
                     </span>
                   )}
@@ -662,24 +662,24 @@ export default function PembahasanTryout() {
                 )}
               </div>
               {/* Question Text Box */}
-              <div className="bg-skd-card p-6 md:p-8 rounded-[1.5rem] border border-skd-border shadow-sm">
-                <p className="text-base md:text-lg leading-relaxed text-skd-text font-medium" dangerouslySetInnerHTML={{ __html: cleanMathText(activeQuestion.text) }} />
+              <div className="bg-surface p-6 md:p-8 rounded-[1.5rem] border border-border shadow-sm">
+                <p className="text-base md:text-lg leading-loose text-fg font-medium" dangerouslySetInnerHTML={{ __html: cleanMathText(activeQuestion.text) }} />
               </div>
               {/* Options comparison */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-gray-400 tracking-wide uppercase">Pilihan Jawaban & Hasil Analisis:</h3>
+                <h3 className="text-xs font-bold text-fg-muted tracking-wide uppercase">Pilihan Jawaban & Hasil Analisis:</h3>
                 {activeQuestion.options.map((opt: any) => {
                   const isUserPick = userAnswers[activeIndex] === opt.id;
                   const isBestKey  = opt.id === activeQuestion.correct;
                   const isTKP = activeQuestion.category === 'TKP';
-                  let cardClass = 'bg-skd-card border-skd-border opacity-40';
-                  let markerClass = 'bg-skd-muted/10 text-skd-muted';
+                  let cardClass = 'bg-surface border-border opacity-40';
+                  let markerClass = 'bg-locked-subtle text-fg-muted';
                   let statusLabel = null;
                   if (isBestKey) {
-                    cardClass = 'bg-skd-success/15 border-skd-success shadow-sm';
-                    markerClass = 'bg-skd-success text-white font-black';
+                    cardClass = 'bg-success/15 border-success shadow-sm';
+                    markerClass = 'bg-success text-white font-black';
                     statusLabel = (
-                      <span className="ml-auto flex items-center gap-1 text-xs font-black text-skd-success bg-skd-success/10 px-3 py-1 rounded-full border border-skd-success/20">
+                      <span className="ml-auto flex items-center gap-1 text-xs font-black text-success bg-success-subtle px-3 py-1 rounded-full border border-success/20">
                         {isTKP ? 'Skor 5 (Kunci Terbaik)' : 'Kunci Jawaban'}
                       </span>
                     );
@@ -687,23 +687,23 @@ export default function PembahasanTryout() {
                   
                   if (isUserPick) {
                     if (isBestKey) {
-                      cardClass = 'bg-skd-success/20 border-skd-success ring-2 ring-skd-success/20 shadow-md';
-                      markerClass = 'bg-skd-success text-white font-black animate-pulse';
+                      cardClass = 'bg-success/20 border-success ring-2 ring-skd-success/20 shadow-md';
+                      markerClass = 'bg-success text-white font-black animate-pulse';
                     } else {
-                      cardClass = 'bg-skd-danger/15 border-skd-danger shadow-sm opacity-100';
-                      markerClass = 'bg-skd-danger text-white font-black';
+                      cardClass = 'bg-danger/15 border-danger shadow-sm opacity-100';
+                      markerClass = 'bg-danger text-white font-black';
                       statusLabel = (
-                        <span className="ml-auto flex items-center gap-1 text-xs font-black text-skd-danger bg-skd-danger/10 px-3 py-1 rounded-full border border-skd-danger/20">
+                        <span className="ml-auto flex items-center gap-1 text-xs font-black text-danger bg-danger-subtle px-3 py-1 rounded-full border border-danger/20">
                           {isTKP ? `Pilihan Anda (Skor ${opt.score})` : 'Pilihan Anda (Salah)'}
                         </span>
                       );
                     }
                   } else if (isTKP) {
                     // Show points score for TKP other options as they are always slightly active
-                    cardClass = 'bg-skd-card border-skd-border/80 opacity-75';
+                    cardClass = 'bg-surface border-border/80 opacity-75';
                     if (!isBestKey) {
                       statusLabel = (
-                        <span className="ml-auto text-[10px] font-bold text-gray-400 bg-white/5 px-2.5 py-1 rounded-lg">
+                        <span className="ml-auto text-[10px] font-bold text-fg-muted bg-surface-subtle px-2.5 py-1 rounded-lg">
                           Skor {opt.score}
                         </span>
                       );
@@ -717,21 +717,21 @@ export default function PembahasanTryout() {
                       <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold font-space ${markerClass}`}>
                         {opt.id}
                       </div>
-                      <span className="text-xs md:text-sm font-medium leading-relaxed text-skd-text" dangerouslySetInnerHTML={{ __html: cleanMathText(opt.text) }} />
+                      <span className="text-xs md:text-sm font-medium leading-relaxed text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(opt.text) }} />
                       {statusLabel}
                     </div>
                   );
                 })}
               </div>
               {/* Theory Explanation Card */}
-              <div className="bg-skd-card border border-skd-border rounded-3xl p-6 space-y-4">
-                <div className="flex items-center gap-2 border-b border-skd-border pb-3">
-                  <div className="w-9 h-9 rounded-xl bg-skd-accent/10 text-skd-accent flex items-center justify-center">
+              <div className="bg-surface border border-border rounded-3xl p-6 space-y-4">
+                <div className="flex items-center gap-2 border-b border-border pb-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                     <HelpCircle size={20} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-black text-skd-text">Analisis Teori & Pembahasan</h4>
-                    <p className="text-[10px] text-skd-muted font-bold font-space uppercase">Teori CAT CPNS BKN Standar Nasional</p>
+                    <h4 className="text-sm font-black text-fg">Analisis Teori & Pembahasan</h4>
+                    <p className="text-[10px] text-fg-muted font-bold font-space uppercase">Teori CAT CPNS BKN Standar Nasional</p>
                   </div>
                 </div>
                 <MathCard explanation={activeQuestion.explanation ? cleanMathText(activeQuestion.explanation) : "Pembahasan terperinci belum tersedia untuk soal ini. Untuk penyelesaian kuis Try Out ini, bacalah rangkuman teori dasar CPNS mengenai kompetensi ini."} category={activeQuestion.category} />
@@ -739,22 +739,22 @@ export default function PembahasanTryout() {
             </motion.div>
           </AnimatePresence>
           {/* Navigation buttons at bottom of Right Panel */}
-          <div className="max-w-4xl mx-auto flex items-center justify-between border-t border-skd-border pt-6 mt-8 shrink-0">
+          <div className="max-w-4xl mx-auto flex items-center justify-between border-t border-border pt-6 mt-8 shrink-0">
             <button
               disabled={filteredIndices.findIndex((item: any) => item.idx === activeIndex) === 0}
               onClick={handlePrev}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#1A1924] hover:bg-white/5 border border-skd-border text-skd-muted disabled:opacity-30 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+              className="flex items-center gap-2 px-5 py-2.5 bg-surface shadow-sm hover:bg-surface-subtle border border-border text-fg-muted disabled:opacity-30 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
             >
               <ChevronLeft size={16} />
               <span>Sebelumnya</span>
             </button>
-            <span className="text-[10px] text-skd-muted font-space font-black uppercase">
+            <span className="text-[10px] text-fg-muted font-space font-black uppercase">
               Soal {filteredIndices.findIndex((item: any) => item.idx === activeIndex) + 1} dari {filteredIndices.length} Terfilter
             </span>
             <button
               disabled={filteredIndices.findIndex((item: any) => item.idx === activeIndex) === filteredIndices.length - 1}
               onClick={handleNext}
-              className="flex items-center gap-2 px-5 py-2.5 bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+              className="flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-slate-800 text-primary-fg rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
             >
               <span>Selanjutnya</span>
               <ChevronRight size={16} />

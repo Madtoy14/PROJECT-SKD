@@ -109,7 +109,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0E17] text-white flex flex-col lg:flex-row font-syne overflow-hidden">
+    <div className="min-h-screen bg-bg text-fg flex flex-col lg:flex-row font-syne overflow-hidden">
 
       {/* ── Sisi Kiri: Visual/Branding ── */}
       <div className="relative w-full lg:w-1/2 min-h-[28vh] lg:min-h-screen flex flex-col justify-end p-8 lg:p-16 overflow-hidden">
@@ -117,11 +117,11 @@ export default function Auth() {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${authBg})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0E17] via-[#0F0E17]/60 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-[#0F0E17]/40 lg:to-[#0F0E17]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-bg via-surface-bg/60 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-surface-bg/40 lg:to-surface-bg" />
         <div
           className="absolute inset-0 opacity-20 pointer-events-none"
           style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(15, 23, 42, 0.1) 1px, transparent 0)',
             backgroundSize: '40px 40px'
           }}
         />
@@ -134,7 +134,7 @@ export default function Auth() {
             <h1 className="text-4xl lg:text-6xl font-black mb-4 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-skd-accent to-yellow-500">
               SKDQuest
             </h1>
-            <p className="text-xl lg:text-2xl font-medium text-gray-300 font-mono">
+            <p className="text-xl lg:text-2xl font-medium text-fg-muted font-mono">
               Taklukan Rintangannya<br />Raih Mimpimu.
             </p>
           </motion.div>
@@ -143,10 +143,10 @@ export default function Auth() {
 
       {/* ── Sisi Kanan: Panel Auth ── */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 relative z-20 -mt-8 lg:mt-0">
-        <div className="w-full max-w-sm bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative">
+        <div className="w-full max-w-sm bg-surface-subtle border border-border rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative">
 
           {/* Glow dekoratif */}
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-skd-accent/20 rounded-full blur-[60px] pointer-events-none" />
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-[60px] pointer-events-none" />
           <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/20 rounded-full blur-[60px] pointer-events-none" />
 
           <div className="relative z-10">
@@ -163,11 +163,11 @@ export default function Auth() {
                 >
                   {/* Header */}
                   <div className="text-center mb-8">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-skd-accent to-yellow-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-skd-accent/20">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-skd-accent to-yellow-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sm/20">
                       <span className="text-2xl">⚔️</span>
                     </div>
                     <h2 className="text-2xl font-black mb-1.5">Masuk ke Arena</h2>
-                    <p className="text-gray-400 text-sm leading-relaxed">
+                    <p className="text-fg-muted text-sm leading-relaxed">
                       Gunakan akun Google kamu untuk masuk atau mendaftar.
                     </p>
                   </div>
@@ -179,7 +179,7 @@ export default function Auth() {
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="mb-5 flex items-start gap-2.5 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl"
+                        className="mb-5 flex items-start gap-2.5 bg-danger/10 border border-danger/30 text-red-400 text-sm px-4 py-3 rounded-xl"
                       >
                         <AlertCircle size={16} className="shrink-0 mt-0.5" />
                         <span>{errorMsg}</span>
@@ -197,7 +197,7 @@ export default function Auth() {
                   >
                     {loading ? (
                       <>
-                        <Loader2 size={20} className="animate-spin text-gray-500" />
+                        <Loader2 size={20} className="animate-spin text-fg-muted" />
                         <span className="text-gray-600">Menghubungkan...</span>
                       </>
                     ) : (
@@ -215,13 +215,13 @@ export default function Auth() {
 
                   {/* Info pembeda akun baru vs lama */}
                   <div className="mt-6 space-y-2.5">
-                    <div className="flex items-start gap-2.5 text-xs text-gray-500">
-                      <CheckCircle2 size={14} className="shrink-0 mt-0.5 text-skd-success" />
-                      <span>Akun yang <span className="text-gray-300 font-medium">sudah terdaftar</span> akan langsung masuk ke halaman utama.</span>
+                    <div className="flex items-start gap-2.5 text-xs text-fg-muted">
+                      <CheckCircle2 size={14} className="shrink-0 mt-0.5 text-success" />
+                      <span>Akun yang <span className="text-fg-secondary font-medium">sudah terdaftar</span> akan langsung masuk ke halaman utama.</span>
                     </div>
-                    <div className="flex items-start gap-2.5 text-xs text-gray-500">
-                      <CheckCircle2 size={14} className="shrink-0 mt-0.5 text-skd-accent" />
-                      <span>Akun <span className="text-gray-300 font-medium">baru</span> akan diarahkan ke halaman pengaturan profil.</span>
+                    <div className="flex items-start gap-2.5 text-xs text-fg-muted">
+                      <CheckCircle2 size={14} className="shrink-0 mt-0.5 text-primary" />
+                      <span>Akun <span className="text-fg-secondary font-medium">baru</span> akan diarahkan ke halaman pengaturan profil.</span>
                     </div>
                   </div>
 
@@ -243,10 +243,10 @@ export default function Auth() {
                 >
                   <div className="text-center mb-6">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                      <Lock size={22} className="text-white" />
+                      <Lock size={22} className="text-fg" />
                     </div>
                     <h2 className="text-2xl font-black mb-1.5">Buat Password Baru</h2>
-                    <p className="text-gray-400 text-sm">Masukkan password baru untuk akunmu.</p>
+                    <p className="text-fg-muted text-sm">Masukkan password baru untuk akunmu.</p>
                   </div>
 
                   {/* Pesan error / sukses */}
@@ -256,7 +256,7 @@ export default function Auth() {
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="mb-4 flex items-start gap-2.5 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl"
+                        className="mb-4 flex items-start gap-2.5 bg-danger/10 border border-danger/30 text-red-400 text-sm px-4 py-3 rounded-xl"
                       >
                         <AlertCircle size={16} className="shrink-0 mt-0.5" />
                         <span>{errorMsg}</span>
@@ -267,7 +267,7 @@ export default function Auth() {
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="mb-4 flex items-start gap-2.5 bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl"
+                        className="mb-4 flex items-start gap-2.5 bg-success/10 border border-success/30 text-green-400 text-sm px-4 py-3 rounded-xl"
                       >
                         <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
                         <span>{successMsg}</span>
@@ -278,9 +278,9 @@ export default function Auth() {
                   <form onSubmit={handleResetPassword} className="space-y-4">
                     {/* Password Baru */}
                     <div>
-                      <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">PASSWORD BARU</label>
+                      <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">PASSWORD BARU</label>
                       <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                           <Lock size={16} />
                         </div>
                         <input
@@ -290,12 +290,12 @@ export default function Auth() {
                           onChange={e => setNewPassword(e.target.value)}
                           placeholder="Min. 6 karakter"
                           autoComplete="new-password"
-                          className="w-full bg-[#1A1927] text-white rounded-xl pl-11 pr-12 py-3.5 outline-none transition-all border border-transparent focus:border-skd-accent/50 focus:shadow-[0_0_15px_rgba(245,166,35,0.15)] font-mono text-sm"
+                          className="w-full bg-surface text-fg rounded-xl pl-11 pr-12 py-3.5 outline-none transition-all border border-transparent focus:border-primary/50 focus:shadow-[0_0_15px_rgba(37,99,235,0.15)] font-mono text-sm"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPwd(p => !p)}
-                          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-300 transition-colors"
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center text-fg-muted hover:text-fg transition-colors"
                           tabIndex={-1}
                         >
                           {showNewPwd ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -305,9 +305,9 @@ export default function Auth() {
 
                     {/* Konfirmasi Password */}
                     <div>
-                      <label className="block text-xs font-bold text-gray-400 mb-1.5 ml-1">KONFIRMASI PASSWORD</label>
+                      <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">KONFIRMASI PASSWORD</label>
                       <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-skd-accent transition-colors">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                           <Lock size={16} />
                         </div>
                         <input
@@ -317,18 +317,18 @@ export default function Auth() {
                           onChange={e => setConfirmPassword(e.target.value)}
                           placeholder="Ulangi password baru"
                           autoComplete="new-password"
-                          className={`w-full bg-[#1A1927] text-white rounded-xl pl-11 pr-12 py-3.5 outline-none transition-all border font-mono text-sm ${
+                          className={`w-full bg-surface text-fg rounded-xl pl-11 pr-12 py-3.5 outline-none transition-all border font-mono text-sm ${
                             confirmPassword && confirmPassword !== newPassword
-                              ? 'border-red-500/50'
+                              ? 'border-danger/50'
                               : confirmPassword && confirmPassword === newPassword
-                                ? 'border-green-500/50'
-                                : 'border-transparent focus:border-skd-accent/50'
-                          } focus:shadow-[0_0_15px_rgba(245,166,35,0.15)]`}
+                                ? 'border-success/50'
+                                : 'border-transparent focus:border-primary/50'
+                          } focus:shadow-[0_0_15px_rgba(37,99,235,0.15)]`}
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPwd(p => !p)}
-                          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-300 transition-colors"
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center text-fg-muted hover:text-fg transition-colors"
                           tabIndex={-1}
                         >
                           {showConfirmPwd ? <EyeOff size={15} /> : <Eye size={15} />}

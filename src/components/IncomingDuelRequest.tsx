@@ -67,11 +67,11 @@ export default function IncomingDuelRequest() {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.85, opacity: 0, y: 40 }}
             transition={{ type: 'spring', damping: 22, stiffness: 320 }}
-            className="bg-[#1A1924] w-full max-w-sm rounded-[2rem] border-2 border-[#8B5CF6] shadow-[0_0_50px_rgba(139,92,246,0.4)] overflow-hidden relative"
+            className="bg-surface shadow-sm w-full max-w-sm rounded-[2rem] border-2 border-premium shadow-[0_0_50px_rgba(139,92,246,0.4)] overflow-hidden relative"
           >
             {/* Glow accents */}
-            <div className="absolute -top-16 -left-16 w-36 h-36 bg-[#8B5CF6]/25 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-16 -right-16 w-36 h-36 bg-[#F5A623]/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-16 -left-16 w-36 h-36 bg-premium/25 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 -right-16 w-36 h-36 bg-warning/15 rounded-full blur-3xl pointer-events-none" />
 
             <div className="p-6 relative z-10 flex flex-col items-center text-center">
 
@@ -83,14 +83,14 @@ export default function IncomingDuelRequest() {
                   <circle
                     cx="36" cy="36" r={radius}
                     fill="none"
-                    stroke="rgba(255,255,255,0.1)"
+                    stroke="rgba(0,0,0,0.1)"
                     strokeWidth="4"
                   />
                   {/* Progress */}
                   <circle
                     cx="36" cy="36" r={radius}
                     fill="none"
-                    stroke={isUrgent ? '#ef4444' : '#8B5CF6'}
+                    stroke={isUrgent ? '#ef4444' : 'var(--color-premium)'}
                     strokeWidth="4"
                     strokeLinecap="round"
                     strokeDasharray={circumference}
@@ -99,31 +99,31 @@ export default function IncomingDuelRequest() {
                   />
                 </svg>
                 {/* Avatar */}
-                <div className="w-[72px] h-[72px] rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#F5A623] p-[3px] shadow-lg shadow-[#8B5CF6]/30">
+                <div className="w-[72px] h-[72px] rounded-full bg-gradient-to-br from-premium to-warning p-[3px] shadow-lg shadow-premium/30">
                   <img
                     src={incomingRequest.avatar}
                     alt={incomingRequest.senderName}
-                    className="w-full h-full rounded-full bg-[#1A1924] object-cover"
+                    className="w-full h-full rounded-full bg-surface shadow-sm object-cover"
                   />
                 </div>
                 {/* Countdown badge */}
-                <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-[#1A1924] ${isUrgent ? 'bg-red-500 text-white' : 'bg-[#8B5CF6] text-white'}`}>
+                <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-surface ${isUrgent ? 'bg-red-500 text-white' : 'bg-premium text-white'}`}>
                   {countdown}
                 </div>
               </div>
 
               {/* Teks tantangan */}
-              <h2 className="text-lg font-black text-white mb-1 leading-tight">
-                <span className="text-[#F5A623]">{incomingRequest.senderName}</span>
+              <h2 className="text-lg font-black text-fg mb-1 leading-tight">
+                <span className="text-warning">{incomingRequest.senderName}</span>
                 <br />
                 menantangmu PvP Battle!
               </h2>
-              <p className="text-xs text-gray-400 mb-1 font-medium">Buktikan siapa yang terbaik sekarang juga.</p>
+              <p className="text-xs text-fg-muted mb-1 font-medium">Buktikan siapa yang terbaik sekarang juga.</p>
 
               {/* Countdown bar */}
-              <div className="w-full bg-white/10 rounded-full h-1.5 mb-5 overflow-hidden">
+              <div className="w-full bg-surface-muted rounded-full h-1.5 mb-5 overflow-hidden">
                 <motion.div
-                  className={`h-full rounded-full ${isUrgent ? 'bg-red-500' : 'bg-[#8B5CF6]'}`}
+                  className={`h-full rounded-full ${isUrgent ? 'bg-red-500' : 'bg-premium'}`}
                   style={{ width: `${progressPct}%` }}
                   transition={{ duration: 1, ease: 'linear' }}
                 />
@@ -143,7 +143,7 @@ export default function IncomingDuelRequest() {
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.96 }}
                   onClick={handleAccept}
-                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#8B5CF6] to-purple-500 text-white font-bold shadow-[0_0_20px_rgba(139,92,246,0.35)] flex items-center justify-center gap-2 text-sm"
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-premium to-purple-500 text-white font-bold shadow-[0_0_20px_rgba(139,92,246,0.35)] flex items-center justify-center gap-2 text-sm"
                 >
                   <Swords size={16} /> Terima
                 </motion.button>

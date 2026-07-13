@@ -88,40 +88,40 @@ export default function Quest() {
         whileHover={{ scale: isCompleted && !isClaimed ? 1.03 : 1.01 }}
         className={`p-4 md:p-5 rounded-2xl border flex items-center gap-4 relative overflow-hidden transition-all shadow-sm ${
           isClaimed 
-            ? 'bg-skd-success/5 border-skd-success/20 opacity-60' 
+            ? 'bg-surface-subtle border-border opacity-70' 
             : isCompleted
-              ? 'bg-gradient-to-r from-skd-success/15 via-skd-success/5 to-transparent border-skd-success/60 shadow-lg shadow-skd-success/5'
-              : 'bg-skd-card border-skd-border hover:border-skd-muted/30'
+              ? 'bg-success-subtle border-success shadow-sm'
+              : 'bg-surface border-border hover:border-border'
         }`}
       >
         {isCompleted && !isClaimed && (
-          <div className="absolute top-0 right-0 w-24 h-24 bg-skd-success/10 blur-2xl rounded-full animate-pulse pointer-events-none z-0" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-success/10 blur-2xl rounded-full animate-pulse pointer-events-none z-0" />
         )}
         
         <div className={`relative z-10 w-12 h-12 md:w-14 md:h-14 flex shrink-0 items-center justify-center rounded-xl ${
           isClaimed 
-            ? 'bg-skd-success/20 text-skd-success' 
-            : isCompleted ? 'bg-skd-success text-white shadow-lg shadow-skd-success/20' : 'bg-skd-muted/10 text-skd-text'
+            ? 'bg-surface-subtle text-success' 
+            : isCompleted ? 'bg-success text-success-fg shadow-md shadow-success/20' : 'bg-locked-subtle text-fg'
         }`}>
           {isClaimed ? <CheckCircle2 size={24} /> : <quest.icon size={24} />}
         </div>
         
         <div className="relative z-10 flex-1 min-w-0">
           <h3 className={`font-bold text-xs md:text-sm truncate mb-1.5 ${
-            isClaimed ? 'text-skd-success' : isCompleted ? 'text-skd-success animate-pulse' : 'text-skd-text'
+            isClaimed ? 'text-success' : isCompleted ? 'text-success animate-pulse' : 'text-fg'
           }`}>
             {quest.title}
           </h3>
           <div className="flex items-center gap-3">
-            <div className="flex-1 h-2 bg-skd-muted/20 rounded-full overflow-hidden">
+            <div className="flex-1 h-2 bg-locked-subtle rounded-full overflow-hidden">
               <div 
                 className={`h-full rounded-full transition-all duration-1000 ${
-                  isClaimed || isCompleted ? 'bg-skd-success' : 'bg-skd-accent'
+                  isClaimed || isCompleted ? 'bg-success' : 'bg-primary'
                 }`}
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
-            <span className="text-[10px] font-space font-bold text-skd-muted shrink-0">
+            <span className="text-[10px] font-space font-bold text-fg-muted shrink-0">
               {progress}/{quest.total}
             </span>
           </div>
@@ -129,24 +129,24 @@ export default function Quest() {
         
         <div className="relative z-10 flex flex-col items-end gap-2 shrink-0">
           <div className={`flex items-center gap-1 font-space font-bold text-xs md:text-sm ${
-            isClaimed ? 'text-skd-success' : isCompleted ? 'text-skd-success' : 'text-yellow-500'
+            isClaimed ? 'text-success' : isCompleted ? 'text-success' : 'text-coin'
           }`}>
-            +{quest.reward} <Coins size={14} className={isClaimed || isCompleted ? 'text-skd-success fill-skd-success/20' : 'text-yellow-500 fill-yellow-500'} />
+            +{quest.reward} <Coins size={14} className={isClaimed || isCompleted ? 'text-success' : 'text-coin fill-yellow-500'} />
           </div>
           
           {isClaimed ? (
-            <span className="text-[9px] text-skd-success font-bold px-2 py-0.5 bg-skd-success/15 rounded-full border border-skd-success/20">
+            <span className="text-[9px] text-success font-bold px-2 py-0.5 bg-surface-subtle rounded-full border border-border text-fg-muted">
               Klaim Selesai
             </span>
           ) : isCompleted ? (
             <button
               onClick={() => handleClaim(quest.id, quest.reward, quest.title)}
-              className="text-[10px] text-white bg-skd-success hover:bg-skd-success/90 font-black px-3 py-1 rounded-full shadow-md shadow-skd-success/20 active:scale-95 transition-all"
+              className="text-[10px] text-white bg-success hover:bg-success/90 text-success-fg font-black px-3 py-1 rounded-full shadow-md shadow-sm/20 active:scale-95 transition-all"
             >
               Klaim
             </button>
           ) : (
-            <span className="text-[9px] text-skd-muted font-bold px-2 py-0.5 bg-skd-muted/10 rounded-full">
+            <span className="text-[9px] text-fg-muted font-bold px-2 py-0.5 bg-locked-subtle rounded-full">
               Berjalan
             </span>
           )}
@@ -165,7 +165,7 @@ export default function Quest() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 bg-skd-success text-white px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap text-xs md:text-sm"
+            className="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 bg-success text-success-fg px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap text-xs md:text-sm"
           >
             {toastMessage}
           </motion.div>
@@ -174,23 +174,23 @@ export default function Quest() {
 
       <header className="pt-2 md:pt-4 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tighter text-skd-text">Quest Harian & Mingguan</h1>
-          <p className="text-sm text-skd-muted mt-1">Selesaikan misi untuk mendapatkan koin ekstra!</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tighter text-fg">Quest Harian & Mingguan</h1>
+          <p className="text-sm text-fg-muted mt-1">Selesaikan misi untuk mendapatkan koin ekstra!</p>
         </div>
-        <div className="flex items-center gap-1.5 bg-skd-card px-4 py-2 md:px-5 md:py-2.5 rounded-full border border-skd-border shadow-sm">
-          <Coins size={20} className="text-yellow-500 fill-yellow-500 animate-pulse" />
-          <span className="font-space font-bold text-skd-text md:text-lg">
+        <div className="flex items-center gap-1.5 bg-surface px-4 py-2 md:px-5 md:py-2.5 rounded-full border border-border shadow-sm">
+          <Coins size={20} className="text-coin fill-yellow-500 animate-pulse" />
+          <span className="font-space font-bold text-fg md:text-lg">
             {profile ? profile.coins.toLocaleString() : '1,240'}
           </span>
         </div>
       </header>
 
       <section>
-        <div className="flex items-center justify-between mb-4 md:mb-6 border-b border-skd-border pb-2">
-          <h2 className="text-lg md:text-xl font-bold flex items-center gap-2 text-skd-text">
-            <Flame className="text-skd-danger" size={24} /> Quest Harian
+        <div className="flex items-center justify-between mb-4 md:mb-6 border-b border-border pb-2">
+          <h2 className="text-lg md:text-xl font-bold flex items-center gap-2 text-fg">
+            <Flame className="text-danger" size={24} /> Quest Harian
           </h2>
-          <span className="text-xs md:text-sm text-skd-muted font-space font-bold bg-skd-muted/10 px-3 py-1 rounded-full">Reset: {timeLeftStr}</span>
+          <span className="text-xs md:text-sm text-fg-muted font-space font-bold bg-locked-subtle px-3 py-1 rounded-full">Reset: {timeLeftStr}</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {DAILY_QUESTS_METADATA.map(renderQuestCard)}
@@ -198,11 +198,11 @@ export default function Quest() {
       </section>
 
       <section>
-        <div className="flex items-center justify-between mb-4 md:mb-6 border-b border-skd-border pb-2">
-          <h2 className="text-lg md:text-xl font-bold flex items-center gap-2 text-skd-text">
-            <Target className="text-skd-premium" size={24} /> Quest Mingguan
+        <div className="flex items-center justify-between mb-4 md:mb-6 border-b border-border pb-2">
+          <h2 className="text-lg md:text-xl font-bold flex items-center gap-2 text-fg">
+            <Target className="text-premium" size={24} /> Quest Mingguan
           </h2>
-          <span className="text-xs md:text-sm text-skd-muted font-space font-bold bg-skd-muted/10 px-3 py-1 rounded-full">Reset: Hari Minggu</span>
+          <span className="text-xs md:text-sm text-fg-muted font-space font-bold bg-locked-subtle px-3 py-1 rounded-full">Reset: Hari Minggu</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {WEEKLY_QUESTS_METADATA.map(renderQuestCard)}

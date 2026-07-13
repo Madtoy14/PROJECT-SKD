@@ -404,7 +404,7 @@ export default function Quiz() {
   const totalQuestions = questions.length;
   const progress = (timeLeft / TOTAL_TIME) * 100;
   const strokeDashoffset = ((100 - progress) / 100) * 113.097;
-  const timerColor = timeLeft <= 10 ? 'text-skd-danger' : timeLeft <= 20 ? 'text-skd-accent' : 'text-skd-success';
+  const timerColor = timeLeft <= 10 ? 'text-danger font-bold' : timeLeft <= 20 ? 'text-primary' : 'text-success';
   // Calculate score for a picked option (safe-guarded)
   const calcScore = (optionId: string): number => {
     if (!currentQuestion) return 0;
@@ -649,24 +649,24 @@ const scoreBadge = (optionId: string) => {
 */
   if (profile && (gameMode === 'survival' || gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && profile.energy <= 0) {
     return (
-      <div className="min-h-screen bg-skd-bg flex flex-col items-center justify-center p-6 text-center font-syne">
-        <div className="w-16 h-16 bg-red-500/10 text-skd-danger rounded-2xl flex items-center justify-center mb-4 border border-red-500/20">
-          <Battery size={32} className="text-red-500 fill-red-500/30 animate-pulse" />
+      <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-6 text-center font-syne">
+        <div className="w-16 h-16 bg-danger/10 text-danger rounded-2xl flex items-center justify-center mb-4 border border-danger/20">
+          <Battery size={32} className="text-danger fill-red-500/30 animate-pulse" />
         </div>
-        <h2 className="text-xl font-black text-skd-text mb-2">Energi Anda Habis!</h2>
-        <p className="text-xs text-skd-muted max-w-sm mb-6 leading-relaxed">
+        <h2 className="text-xl font-black text-fg mb-2">Energi Anda Habis!</h2>
+        <p className="text-xs text-fg-muted max-w-sm mb-6 leading-relaxed">
           Untuk menjaga kestabilan belajar, Anda memerlukan energi untuk bermain di mode kompetitif. Pulihkan energi Anda secara instan di Toko menggunakan koin, atau tunggu pemulihan otomatis (+1 energi setiap 15 menit).
         </p>
         <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs justify-center">
           <Link
             to="/toko"
-            className="px-6 py-3 bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] font-bold rounded-xl shadow-md transition-colors text-center w-full"
+            className="px-6 py-3 bg-primary hover:bg-slate-800 text-primary-fg font-bold rounded-xl shadow-md transition-colors text-center w-full"
           >
             Beli Energi di Toko
           </Link>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-skd-muted/10 hover:bg-skd-muted/20 text-skd-text font-bold rounded-xl transition-colors w-full"
+            className="px-6 py-3 bg-locked-subtle hover:bg-locked-subtle text-fg font-bold rounded-xl transition-colors w-full"
           >
             Kembali ke Beranda
           </button>
@@ -674,12 +674,12 @@ const scoreBadge = (optionId: string) => {
         {/* Tinta Hitam crisp overlay */}
         {tintaHitamActive && (
           <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/75 backdrop-blur-md p-4 text-center">
-            <div className="bg-[#1A1924]/95 border-2 border-red-500/30 rounded-[2rem] p-8 shadow-[0_0_50px_rgba(239,68,68,0.4)] max-w-xs flex flex-col items-center gap-4 animate-bounce">
-              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 text-3xl font-black shadow-inner">
+            <div className="bg-surface shadow-sm/95 border-2 border-danger rounded-[2rem] p-8 shadow-[0_0_50px_rgba(239,68,68,0.4)] max-w-xs flex flex-col items-center gap-4 animate-bounce">
+              <div className="w-16 h-16 rounded-full bg-danger/10 flex items-center justify-center text-danger border border-danger/20 text-3xl font-black shadow-inner">
                 💀
               </div>
-              <h3 className="text-xl font-black text-white">Efek Tinta Hitam!</h3>
-              <p className="text-xs text-gray-400 leading-relaxed font-medium">Lawan mengaburkan layarmu. Tunggu 5 detik hingga tinta memudar...</p>
+              <h3 className="text-xl font-black text-fg">Efek Tinta Hitam!</h3>
+              <p className="text-xs text-fg-muted leading-relaxed font-medium">Lawan mengaburkan layarmu. Tunggu 5 detik hingga tinta memudar...</p>
             </div>
           </div>
         )}
@@ -687,11 +687,11 @@ const scoreBadge = (optionId: string) => {
     );
   }
   return (
-        <div className="flex flex-col h-screen bg-skd-bg relative transition-colors">
+        <div className="flex flex-col h-screen bg-bg relative transition-colors">
       {/* Real-time PvP Notifications */}
       {pvpNotification && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#8B5CF6]/95 border border-purple-500 text-white font-bold py-2 px-6 rounded-2xl shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-md text-xs animate-bounce flex items-center gap-2">
-          <Users size={14} className="text-[#F5A623]" />
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-premium/95 border border-premium text-white font-bold py-2 px-6 rounded-2xl shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-md text-xs animate-bounce flex items-center gap-2">
+          <Users size={14} className="text-warning" />
           <span>{pvpNotification}</span>
         </div>
       )}
@@ -701,27 +701,27 @@ const scoreBadge = (optionId: string) => {
       )}
       {/* Loading Screen */}
       {(loadingQuestions || (!currentQuestion && !noCatatanSalah)) && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-skd-bg gap-4">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-bg gap-4">
           <Loader2 className="animate-spin text-blue-500" size={48} />
-          <h2 className="text-xl font-bold text-skd-text animate-pulse">Mempersiapkan Arena...</h2>
+          <h2 className="text-xl font-bold text-fg animate-pulse">Mempersiapkan Arena...</h2>
         </div>
       )}
 
       {/* Layar kosong Catatan Salah */}
       {noCatatanSalah && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-skd-bg gap-6 p-8 text-center">
-          <div className="w-24 h-24 rounded-full bg-skd-success/10 border-2 border-skd-success/30 flex items-center justify-center text-5xl">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-bg gap-6 p-8 text-center">
+          <div className="w-24 h-24 rounded-full bg-success-subtle border-2 border-success/30 flex items-center justify-center text-5xl">
             🎉
           </div>
           <div>
-            <h2 className="text-2xl font-black text-skd-text mb-2">Catatan Bersih!</h2>
-            <p className="text-skd-muted text-sm max-w-xs leading-relaxed">
+            <h2 className="text-2xl font-black text-fg mb-2">Catatan Bersih!</h2>
+            <p className="text-fg-muted text-sm max-w-xs leading-relaxed">
               Kamu belum pernah menjawab soal dengan salah, atau sudah berhasil mempelajari semua soal yang pernah salah. Pertahankan!
             </p>
           </div>
           <button
             onClick={() => navigate('/dashboard', { replace: true })}
-            className="px-8 py-3 bg-skd-accent hover:bg-yellow-400 text-[#0F0E17] font-black rounded-xl transition-all shadow-lg text-sm"
+            className="px-8 py-3 bg-primary hover:bg-slate-800 text-primary-fg font-black rounded-xl transition-all shadow-lg text-sm"
           >
             Kembali ke Dashboard
           </button>
@@ -738,7 +738,7 @@ const scoreBadge = (optionId: string) => {
             transition={{ duration: 0.8, ease: 'easeOut' }}
             className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
           >
-            <span className="text-3xl font-black text-yellow-400 drop-shadow-xl">
+            <span className="text-3xl font-black text-coin drop-shadow-xl">
               +{showRewardFloat.pts} pts
             </span>
           </motion.div>
@@ -749,16 +749,16 @@ const scoreBadge = (optionId: string) => {
         {/* === Quiz Panel === */}
         <div className="flex flex-col flex-1 h-full min-w-0 w-full max-w-5xl mx-auto">
           {/* Header */}
-          <header className="p-4 flex items-center justify-between border-b border-skd-border bg-skd-card/60 backdrop-blur-sm z-10">
-            <button onClick={() => setShowExitConfirm(true)} className="p-2 hover:bg-skd-muted/10 rounded-full transition-colors text-skd-text">
+          <header className="p-4 flex items-center justify-between border-b border-border bg-surface/60 backdrop-blur-sm z-10">
+            <button onClick={() => setShowExitConfirm(true)} className="p-2 hover:bg-locked-subtle rounded-full transition-colors text-fg">
               <X size={20} />
             </button>
             <div className="flex-1 px-4">
-              <div className="flex justify-between items-center text-xs mb-1.5 font-space font-bold text-skd-muted">
+              <div className="flex justify-between items-center text-xs mb-1.5 font-space font-bold text-fg-muted">
                 <span>Soal {currentQuestionIndex + 1}{gameMode !== 'survival' && `/${totalQuestions}`}</span>
                 <div className="flex items-center gap-2">
-                  {gameMode === 'survival' && <span className="flex items-center gap-1 text-skd-danger bg-skd-danger/10 px-2 py-0.5 rounded-full"><Skull size={12} /> Survival</span>}
-                  {gameMode === 'tryout'  && <span className="flex items-center gap-1 text-skd-premium bg-skd-premium/10 px-2 py-0.5 rounded-full"><Trophy size={12} /> Try Out</span>}
+                  {gameMode === 'survival' && <span className="flex items-center gap-1 text-danger bg-danger-subtle px-2 py-0.5 rounded-full"><Skull size={12} /> Survival</span>}
+                  {gameMode === 'tryout'  && <span className="flex items-center gap-1 text-premium-text bg-premium-subtle px-2 py-0.5 rounded-full"><Trophy size={12} /> Try Out</span>}
                   {(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && <span className="flex items-center gap-1 text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-full"><Users size={12} /> {gameMode === 'pvp1v1' ? '1v1 Duel' : 'PvP'}</span>}
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                     currentQuestion.category === 'TWK' ? 'bg-purple-500/10 text-purple-400' :
@@ -767,9 +767,9 @@ const scoreBadge = (optionId: string) => {
                   }`}>{currentQuestion.category}</span>
                 </div>
               </div>
-              <div className="h-1.5 bg-skd-muted/20 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-locked-subtle rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-skd-premium rounded-full"
+                  className="h-full bg-premium text-primary-fg rounded-full"
                   initial={{ width: `${(currentQuestionIndex / totalQuestions) * 100}%` }}
                   animate={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
                   transition={{ duration: 0.5 }}
@@ -780,7 +780,7 @@ const scoreBadge = (optionId: string) => {
             <div className="flex items-center gap-2">
               <div className="relative w-16 h-11 flex items-center justify-center">
                 {gameMode === 'tryout' ? (
-                  <div className={`font-space font-bold text-xs bg-skd-card px-2 py-1 rounded border border-skd-border ${timerColor}`}>
+                  <div className={`font-space font-bold text-xs bg-surface px-2 py-1 rounded border border-border ${timerColor}`}>
                     {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
                   </div>
                 ) : (
@@ -802,7 +802,7 @@ const scoreBadge = (optionId: string) => {
               {gameMode === 'tryout' && (
                 <button 
                   onClick={() => setShowSidebarMobile(true)} 
-                  className="lg:hidden p-2 text-skd-text hover:bg-skd-muted/10 rounded-xl transition-colors shrink-0"
+                  className="lg:hidden p-2 text-fg hover:bg-locked-subtle rounded-xl transition-colors shrink-0"
                 >
                   <Menu size={20} />
                 </button>
@@ -811,12 +811,12 @@ const scoreBadge = (optionId: string) => {
                     </header>
           {/* Quick Slots */}
           {gameMode !== 'tryout' && profile && (
-            <div className="flex gap-2 px-4 py-2 border-b border-skd-border bg-skd-card/30 overflow-x-auto shrink-0">
+            <div className="flex gap-2 px-4 py-2 border-b border-border bg-surface/30 overflow-x-auto shrink-0">
               {profile.inventory?.item_5050 > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_5050') && (
                 <button onClick={use5050} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"><Scale size={12}/> 50:50 ({profile.inventory.item_5050})</button>
               )}
               {profile.inventory?.item_hint > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_hint') && (
-                <button onClick={useHint} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20"><Lightbulb size={12}/> Bocoran Rumus ({profile.inventory.item_hint})</button>
+                <button onClick={useHint} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-info-subtle text-info-fg hover:bg-info-subtle"><Lightbulb size={12}/> Bocoran Rumus ({profile.inventory.item_hint})</button>
               )}
               {profile.inventory?.item_waktu_beku > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_waktu_beku') && (
                 <button onClick={useWaktuBeku} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 ${activePowerUps.waktuBeku ? 'bg-cyan-500/30 text-cyan-300' : 'bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20'}`}><Clock size={12}/> Waktu Beku ({profile.inventory.item_waktu_beku})</button>
@@ -828,10 +828,10 @@ const scoreBadge = (optionId: string) => {
                 <button onClick={useTerawangan} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 ${activePowerUps.terawangan ? 'bg-purple-500/30 text-purple-300' : 'bg-purple-500/10 text-purple-400 hover:bg-purple-500/20'}`}><Eye size={12}/> Terawangan ({profile.inventory.item_terawangan})</button>
               )}
               {profile.inventory?.item_tinta_hitam > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_tinta_hitam') && (
-                <button onClick={useTintaHitam} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 shrink-0"><Skull size={12}/> Tinta Hitam ({profile.inventory.item_tinta_hitam})</button>
+                <button onClick={useTintaHitam} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-danger/10 text-red-400 hover:bg-danger-subtle shrink-0"><Skull size={12}/> Tinta Hitam ({profile.inventory.item_tinta_hitam})</button>
               )}
               {profile.inventory?.item_lompatan_kilat > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_lompatan_kilat') && !lompatanKilatUsed && (
-                <button onClick={useLompatanKilat} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 shrink-0"><Zap size={12}/> Lompatan Kilat ({profile.inventory.item_lompatan_kilat})</button>
+                <button onClick={useLompatanKilat} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-info-subtle text-info-fg hover:bg-info-subtle shrink-0"><Zap size={12}/> Lompatan Kilat ({profile.inventory.item_lompatan_kilat})</button>
               )}
               {(profile.inventory?.item_kesempatan_kedua > 0 || profile.inventory?.item_shield > 0) && ALLOWED_POWER_UPS[gameMode]?.includes('item_kesempatan_kedua') && (
                 <div className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 shrink-0"><Shield size={12}/> Perisai Aktif ({(profile.inventory.item_kesempatan_kedua || 0) + (profile.inventory.item_shield || 0)})</div>
@@ -840,13 +840,13 @@ const scoreBadge = (optionId: string) => {
           )}
           {/* PvP: My rank badge (mobile, under header) */}
           {(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && (
-            <div className="lg:hidden px-4 py-2 border-b border-skd-border bg-skd-card/30 flex items-center justify-between text-xs">
-              <span className="text-skd-muted font-bold">Peringkat Saya:</span>
+            <div className="lg:hidden px-4 py-2 border-b border-border bg-surface/30 flex items-center justify-between text-xs">
+              <span className="text-fg-muted font-bold">Peringkat Saya:</span>
               <span className="font-black text-blue-500 flex items-center gap-1">
                 #{myRankPosition}
-                <span className="font-normal text-skd-muted">dari {liveRanks.length}</span>
+                <span className="font-normal text-fg-muted">dari {liveRanks.length}</span>
               </span>
-              <span className="font-space font-bold text-skd-text">{liveRanks.find(r => r.isMe)?.score ?? 0} pts</span>
+              <span className="font-space font-bold text-fg">{liveRanks.find(r => r.isMe)?.score ?? 0} pts</span>
             </div>
           )}
           {/* Question Body */}
@@ -865,16 +865,16 @@ const scoreBadge = (optionId: string) => {
                 {currentQuestion.category === 'TKP' && (
                   <div className="flex items-center gap-2 text-xs text-orange-400 bg-orange-500/10 border border-orange-500/20 px-3 py-2 rounded-xl">
                     <span className="font-bold">TKP — Pilih jawaban terbaik.</span>
-                    <span className="text-skd-muted">Setiap pilihan memiliki bobot poin berbeda (10–50).</span>
+                    <span className="text-fg-muted">Setiap pilihan memiliki bobot poin berbeda (10–50).</span>
                   </div>
                 )}
-                <div className="bg-skd-card p-5 md:p-7 rounded-2xl border border-skd-border shadow-sm">
-                  <p className="text-base md:text-lg leading-relaxed text-skd-text font-medium" dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.text) }} />
+                <div className="bg-surface p-5 md:p-7 rounded-2xl border border-border shadow-sm">
+                  <p className="text-base md:text-lg leading-loose text-fg font-medium" dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.text) }} />
                 </div>
                 {/* Bocoran Rumus Hint Box */}
                 {showHint && currentQuestion.explanation && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-2xl text-yellow-400 text-xs sm:text-sm font-medium leading-relaxed shadow-sm">
-                    <span className="font-bold flex items-center gap-1.5 mb-1 text-skd-accent"><Lightbulb size={14}/> Petunjuk Rumus / Soal:</span>
+                  <div className="bg-coin-subtle border border-yellow-500/30 p-4 rounded-2xl text-coin text-xs sm:text-sm font-medium leading-relaxed shadow-sm">
+                    <span className="font-bold flex items-center gap-1.5 mb-1 text-primary"><Lightbulb size={14}/> Petunjuk Rumus / Soal:</span>
                     <span dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.explanation.slice(0, 180) + '...') }} />
                   </div>
                 )}
@@ -887,13 +887,13 @@ const scoreBadge = (optionId: string) => {
                     const isCorrect  = opt.id === currentQuestion.correct;
                     const showStatus = selected !== null;
                     const isTKP = currentQuestion.category === 'TKP';
-                    let cardClass = 'bg-skd-card hover:bg-skd-muted/5 border-skd-border';
-                    let markerClass = 'bg-skd-muted/10 text-skd-text';
+                    let cardClass = 'bg-surface hover:bg-surface-subtle border-border focus-visible:ring focus-visible:outline-none';
+                    let markerClass = 'bg-locked-subtle text-fg';
                     
                     if (gameMode === 'tryout') {
                       if (isSelected) {
-                        cardClass = 'bg-blue-500/15 border-blue-400';
-                        markerClass = 'bg-blue-500 text-white';
+                        cardClass = 'bg-info-subtle border-info';
+                        markerClass = 'bg-info text-info-fg';
                       }
                     } else if (showStatus) {
                       if (isTKP) {
@@ -901,17 +901,17 @@ const scoreBadge = (optionId: string) => {
                           cardClass = 'bg-orange-500/15 border-orange-400';
                           markerClass = 'bg-orange-400 text-white';
                         }
-                        else cardClass = 'bg-skd-card border-skd-border opacity-50';
+                        else cardClass = 'bg-surface border-border opacity-50';
                       } else {
                         if (isCorrect) {
-                          cardClass = 'bg-skd-success/20 border-skd-success';
-                          markerClass = 'bg-skd-success text-white';
+                          cardClass = 'bg-success/20 border-success';
+                          markerClass = 'bg-success text-white';
                         }
                         else if (isSelected) {
-                          cardClass = 'bg-skd-danger/20 border-skd-danger';
-                          markerClass = 'bg-skd-danger text-white';
+                          cardClass = 'bg-danger-subtle border-danger';
+                          markerClass = 'bg-danger text-white';
                         }
-                        else cardClass = 'bg-skd-card border-skd-border opacity-40';
+                        else cardClass = 'bg-surface border-border opacity-40';
                       }
                     }
                                         const terawanganPercent = activePowerUps.terawangan ? (isCorrect ? Math.floor(Math.random() * 20) + 60 : Math.floor(Math.random() * 30)) : 0;
@@ -929,19 +929,19 @@ const scoreBadge = (optionId: string) => {
                         <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base ${markerClass}`}>
                           {opt.id}
                         </div>
-                        <span className="flex-1 leading-snug text-sm md:text-base font-medium text-skd-text" dangerouslySetInnerHTML={{ __html: cleanMathText(opt.text) }} ></span>
+                        <span className="flex-1 leading-snug text-sm md:text-base font-medium text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(opt.text) }} ></span>
                         {/* TKP score badge revealed after answering (not in tryout) */}
                         {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
-                            ${opt.score === 50 ? 'bg-skd-success/20 text-skd-success' :
+                            ${opt.score === 50 ? 'bg-success/20 text-success' :
                               opt.score >= 30 ? 'bg-orange-500/15 text-orange-400' :
-                              'bg-skd-muted/10 text-skd-muted'}`}>
+                              'bg-locked-subtle text-fg-muted'}`}>
                             {opt.score} pts
                           </span>
                         )}
                         {/* Score tag for TWK/TIU revealed after answering (not in tryout) */}
                         {showStatus && !isTKP && isCorrect && gameMode !== 'tryout' && (
-                          <span className="ml-auto shrink-0 text-xs font-bold bg-skd-success/20 text-skd-success px-2 py-1 rounded-lg">50 pts</span>
+                          <span className="ml-auto shrink-0 text-xs font-bold bg-success/20 text-success px-2 py-1 rounded-lg">50 pts</span>
                         )}
                       </motion.button>
                     );
@@ -954,7 +954,7 @@ const scoreBadge = (optionId: string) => {
                       <div className="flex gap-3">
                         <button
                           onClick={handleShowExplanation}
-                          className="flex-1 py-3 bg-skd-primary/10 hover:bg-skd-primary/20 text-skd-primary rounded-xl font-bold text-sm transition-colors"
+                          className="flex-1 py-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl font-bold text-sm transition-colors"
                         >
                           Lihat Pembahasan
                         </button>
@@ -963,7 +963,7 @@ const scoreBadge = (optionId: string) => {
                             if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
                             goNextOrFinish(totalScoreRef.current);
                           }}
-                          className="flex-1 py-3 bg-skd-primary hover:bg-skd-primary-hover text-white rounded-xl font-bold text-sm transition-all shadow-md active:scale-95"
+                          className="flex-1 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold text-sm transition-all shadow-md active:scale-95"
                         >
                           Lanjut
                         </button>
@@ -975,7 +975,7 @@ const scoreBadge = (optionId: string) => {
                         className="bg-blue-500/10 border border-blue-500/20 p-5 rounded-xl space-y-3"
                       >
                         <h4 className="font-bold text-blue-400">Pembahasan:</h4>
-                        <p className="text-sm md:text-base text-skd-text leading-relaxed">
+                        <p className="text-sm md:text-base text-fg leading-relaxed">
                           <MathCard explanation={cleanMathText(currentQuestion.explanation || "Pembahasan tidak tersedia untuk soal ini.")} category={currentQuestion.category} />
                         </p>
                         <button
@@ -983,7 +983,7 @@ const scoreBadge = (optionId: string) => {
                             if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
                             goNextOrFinish(totalScoreRef.current);
                           }}
-                          className="mt-4 w-full py-3 bg-skd-primary hover:bg-skd-primary-hover text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
+                          className="mt-4 w-full py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
                         >
                           Lanjut ke Soal Berikutnya
                         </button>
@@ -993,16 +993,16 @@ const scoreBadge = (optionId: string) => {
                 )}
                 {/* Tryout Navigation Buttons */}
                 {gameMode === 'tryout' && (
-                  <div className="flex flex-col gap-4 pt-4 mt-6 border-t border-skd-border">
+                  <div className="flex flex-col gap-4 pt-4 mt-6 border-t border-border">
                     <div className="flex justify-end gap-2">
                       {selected && (
                         <button onClick={() => {
                           setAnswers(p => { const n = {...p}; delete n[currentQuestionIndex]; return n; });
-                        }} className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl text-sm font-bold hover:bg-red-500/20 transition-colors shadow-sm">
+                        }} className="px-4 py-2 bg-danger/10 text-danger border border-danger/20 rounded-xl text-sm font-bold hover:bg-danger-subtle transition-colors shadow-sm">
                           Batalkan Jawaban
                         </button>
                       )}
-                      <button onClick={() => setDoubtful(p => ({...p, [currentQuestionIndex]: !p[currentQuestionIndex]}))} className={`px-4 py-2 border rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95 ${doubtful[currentQuestionIndex] ? 'bg-red-500 text-white border-red-500 shadow-md' : 'bg-orange-500/10 text-orange-500 border-orange-500/20 hover:bg-orange-500/20'}`}>
+                      <button onClick={() => setDoubtful(p => ({...p, [currentQuestionIndex]: !p[currentQuestionIndex]}))} className={`px-4 py-2 border rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95 ${doubtful[currentQuestionIndex] ? 'bg-danger text-white border-danger shadow-md' : 'bg-orange-500/10 text-orange-500 border-orange-500/20 hover:bg-orange-500/20'}`}>
                         Ragu-Ragu
                       </button>
                     </div>
@@ -1010,7 +1010,7 @@ const scoreBadge = (optionId: string) => {
                     <button
                       onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
                       disabled={currentQuestionIndex === 0}
-                      className="px-5 py-2.5 bg-skd-card border border-skd-border rounded-xl font-bold text-skd-text disabled:opacity-30 transition-all hover:bg-skd-muted/10"
+                      className="px-5 py-2.5 bg-surface border border-border rounded-xl font-bold text-fg disabled:opacity-30 transition-all hover:bg-locked-subtle"
                     >
                       Sebelumnya
                     </button>
@@ -1018,14 +1018,14 @@ const scoreBadge = (optionId: string) => {
                     {currentQuestionIndex < totalQuestions - 1 ? (
                       <button
                         onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
-                        className="px-5 py-2.5 bg-skd-primary hover:bg-skd-primary-hover text-white rounded-xl font-bold shadow-md transition-all active:scale-95"
+                        className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold shadow-md transition-all active:scale-95"
                       >
                         Selanjutnya
                       </button>
                     ) : (
                       <button
                         onClick={finishTryout}
-                        className="px-6 py-2.5 bg-skd-success hover:bg-skd-success/90 text-white rounded-xl font-black shadow-lg shadow-skd-success/20 transition-all active:scale-95"
+                        className="px-6 py-2.5 bg-success hover:bg-success/90 text-white rounded-xl font-black shadow-lg shadow-sm transition-all active:scale-95"
                       >
                         Kumpulkan Ujian
                       </button>
@@ -1039,8 +1039,8 @@ const scoreBadge = (optionId: string) => {
         </div>
         {/* === PvP Live Leaderboard Sidebar (desktop) === */}
         {(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && (
-          <div className="hidden lg:flex flex-col w-64 xl:w-72 border-l border-skd-border bg-skd-card/40 backdrop-blur-sm">
-            <div className="p-4 border-b border-skd-border">
+          <div className="hidden lg:flex flex-col w-64 xl:w-72 border-l border-border bg-surface/40 backdrop-blur-sm">
+            <div className="p-4 border-b border-border">
               <h3 className="font-bold text-blue-400 flex items-center gap-2 text-sm">
                 <Users size={16} /> Live Ranking
               </h3>
@@ -1059,20 +1059,20 @@ const scoreBadge = (optionId: string) => {
                       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                       className={`flex items-center gap-3 p-3 rounded-xl border transition-colors
                         ${rank.isMe
-                          ? 'bg-blue-500/15 border-blue-500/40 shadow-md shadow-blue-500/10'
-                          : 'bg-skd-bg/50 border-skd-border/50'}`}
+                          ? 'bg-info-subtle border-blue-500/40 shadow-md shadow-blue-500/10'
+                          : 'bg-bg/50 border-border/50'}`}
                     >
                       <span className="text-base w-6 text-center">{medal}</span>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs font-bold truncate ${rank.isMe ? 'text-blue-400' : 'text-skd-text'}`}>
+                        <p className={`text-xs font-bold truncate ${rank.isMe ? 'text-blue-400' : 'text-fg'}`}>
                           {rank.name}{rank.isMe && ' 👤'}
                         </p>
-                        <p className="text-[10px] text-skd-muted font-space">{rank.score} pts</p>
+                        <p className="text-[10px] text-fg-muted font-space">{rank.score} pts</p>
                       </div>
                       {/* Score bar */}
-                      <div className="w-10 h-1.5 bg-skd-muted/20 rounded-full overflow-hidden">
+                      <div className="w-10 h-1.5 bg-locked-subtle rounded-full overflow-hidden">
                         <motion.div
-                          className={`h-full rounded-full ${rank.isMe ? 'bg-blue-400' : 'bg-skd-muted/50'}`}
+                          className={`h-full rounded-full ${rank.isMe ? 'bg-blue-400' : 'bg-surface-subtle0'}`}
                           animate={{ width: `${Math.min((rank.score / 300) * 100, 100)}%` }}
                           transition={{ duration: 0.4 }}
                         />
@@ -1083,20 +1083,20 @@ const scoreBadge = (optionId: string) => {
               </AnimatePresence>
             </div>
             {/* My score summary at bottom */}
-            <div className="p-4 border-t border-skd-border bg-blue-500/5">
+            <div className="p-4 border-t border-border bg-blue-500/5">
               <div className="text-center">
-                <p className="text-[10px] text-skd-muted uppercase font-bold tracking-wider mb-1">Total Skor Anda</p>
+                <p className="text-[10px] text-fg-muted uppercase font-bold tracking-wider mb-1">Total Skor Anda</p>
                 <p className="text-2xl font-black text-blue-400 font-space">{liveRanks.find(r => r.isMe)?.score ?? 0}</p>
-                <p className="text-[10px] text-skd-muted mt-0.5">Soal {currentQuestionIndex + 1}/{totalQuestions}</p>
+                <p className="text-[10px] text-fg-muted mt-0.5">Soal {currentQuestionIndex + 1}/{totalQuestions}</p>
               </div>
             </div>
           </div>
         )}
         {/* === Try Out Sidebar (desktop & tablet) === */}
         {gameMode === 'tryout' && (
-          <div className="hidden lg:flex flex-col w-72 xl:w-80 border-l border-skd-border bg-skd-card/40 backdrop-blur-sm">
-            <div className="p-4 border-b border-skd-border">
-              <h3 className="font-bold text-skd-text flex items-center gap-2 text-sm">
+          <div className="hidden lg:flex flex-col w-72 xl:w-80 border-l border-border bg-surface/40 backdrop-blur-sm">
+            <div className="p-4 border-b border-border">
+              <h3 className="font-bold text-fg flex items-center gap-2 text-sm">
                 Navigasi Soal
               </h3>
             </div>
@@ -1109,7 +1109,7 @@ const scoreBadge = (optionId: string) => {
                   <div key={cat} className="mb-4">
                     <button
                       onClick={() => toggleCategory(cat)}
-                      className="flex items-center justify-between w-full p-2 mb-2 bg-skd-muted/10 hover:bg-skd-muted/20 rounded-lg text-sm font-bold text-skd-text transition-colors"
+                      className="flex items-center justify-between w-full p-2 mb-2 bg-locked-subtle hover:bg-locked-subtle rounded-lg text-sm font-bold text-fg transition-colors"
                     >
                       <span>{cat}</span>
                       {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -1125,13 +1125,13 @@ const scoreBadge = (optionId: string) => {
                           {catQuestions.map(({ idx }) => {
                             const isAnswered = answers[idx] !== undefined;
                             const isCurrent = currentQuestionIndex === idx;
-                            let btnClass = 'bg-skd-bg border-skd-border text-skd-muted hover:bg-skd-muted/20';
+                            let btnClass = 'bg-bg border-border text-fg-muted hover:bg-locked-subtle';
                             if (isCurrent) {
-                              btnClass = 'bg-blue-500 text-white border-blue-500 shadow-md ring-2 ring-blue-500/50 ring-offset-1 ring-offset-skd-card';
+                              btnClass = 'bg-info text-info-fg border-blue-500 shadow-md ring-2 ring-blue-500/50 ring-offset-1 ring-offset-skd-card';
                             } else if (doubtful[idx]) {
-                              btnClass = 'bg-red-500 text-white border-red-600 shadow-sm';
+                              btnClass = 'bg-danger text-white border-red-600 shadow-sm';
                             } else if (isAnswered) {
-                              btnClass = 'bg-skd-success text-white border-skd-success shadow-sm';
+                              btnClass = 'bg-success text-white border-success shadow-sm';
                             }
                             return (
                               <button
@@ -1150,10 +1150,10 @@ const scoreBadge = (optionId: string) => {
                 );
               })}
             </div>
-            <div className="p-4 border-t border-skd-border bg-skd-bg">
+            <div className="p-4 border-t border-border bg-bg">
               <button
                 onClick={finishTryout}
-                className="w-full py-3 bg-skd-success hover:bg-skd-success/90 text-white rounded-xl font-black shadow-lg shadow-skd-success/20 transition-all active:scale-95"
+                className="w-full py-3 bg-success hover:bg-success/90 text-white rounded-xl font-black shadow-lg shadow-sm transition-all active:scale-95"
               >
                 Kumpulkan Ujian
               </button>
@@ -1179,15 +1179,15 @@ const scoreBadge = (optionId: string) => {
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="fixed right-0 top-0 bottom-0 w-80 bg-skd-card border-l border-skd-border z-50 flex flex-col lg:hidden"
+                className="fixed right-0 top-0 bottom-0 w-80 bg-surface border-l border-border z-50 flex flex-col lg:hidden"
               >
-                <div className="p-4 border-b border-skd-border flex items-center justify-between">
-                  <h3 className="font-bold text-skd-text flex items-center gap-2 text-sm">
+                <div className="p-4 border-b border-border flex items-center justify-between">
+                  <h3 className="font-bold text-fg flex items-center gap-2 text-sm">
                     Navigasi Soal
                   </h3>
                   <button 
                     onClick={() => setShowSidebarMobile(false)}
-                    className="p-1 hover:bg-skd-muted/10 rounded-full transition-colors text-skd-text"
+                    className="p-1 hover:bg-locked-subtle rounded-full transition-colors text-fg"
                   >
                     <X size={20} />
                   </button>
@@ -1202,7 +1202,7 @@ const scoreBadge = (optionId: string) => {
                       <div key={cat} className="mb-4">
                         <button
                           onClick={() => toggleCategory(cat)}
-                          className="flex items-center justify-between w-full p-2 mb-2 bg-skd-muted/10 hover:bg-skd-muted/20 rounded-lg text-sm font-bold text-skd-text transition-colors"
+                          className="flex items-center justify-between w-full p-2 mb-2 bg-locked-subtle hover:bg-locked-subtle rounded-lg text-sm font-bold text-fg transition-colors"
                         >
                           <span>{cat}</span>
                           {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -1218,13 +1218,13 @@ const scoreBadge = (optionId: string) => {
                               {catQuestions.map(({ idx }) => {
                                 const isAnswered = answers[idx] !== undefined;
                                 const isCurrent = currentQuestionIndex === idx;
-                                let btnClass = 'bg-skd-bg border-skd-border text-skd-muted hover:bg-skd-muted/20';
+                                let btnClass = 'bg-bg border-border text-fg-muted hover:bg-locked-subtle';
                                 if (isCurrent) {
-                                  btnClass = 'bg-blue-500 text-white border-blue-500 shadow-md ring-2 ring-blue-500/50 ring-offset-1 ring-offset-skd-card';
+                                  btnClass = 'bg-info text-info-fg border-blue-500 shadow-md ring-2 ring-blue-500/50 ring-offset-1 ring-offset-skd-card';
                                 } else if (doubtful[idx]) {
-                                  btnClass = 'bg-red-500 text-white border-red-600 shadow-sm';
+                                  btnClass = 'bg-danger text-white border-red-600 shadow-sm';
                                 } else if (isAnswered) {
-                                  btnClass = 'bg-skd-success text-white border-skd-success shadow-sm';
+                                  btnClass = 'bg-success text-white border-success shadow-sm';
                                 }
                                 return (
                                   <button
@@ -1247,13 +1247,13 @@ const scoreBadge = (optionId: string) => {
                   })}
                 </div>
                 
-                <div className="p-4 border-t border-skd-border bg-skd-bg">
+                <div className="p-4 border-t border-border bg-bg">
                   <button
                     onClick={() => {
                       setShowSidebarMobile(false);
                       finishTryout();
                     }}
-                    className="w-full py-3 bg-skd-success hover:bg-skd-success/90 text-white rounded-xl font-black shadow-lg shadow-skd-success/20 transition-all active:scale-95"
+                    className="w-full py-3 bg-success hover:bg-success/90 text-white rounded-xl font-black shadow-lg shadow-sm transition-all active:scale-95"
                   >
                     Kumpulkan Ujian
                   </button>
@@ -1271,20 +1271,20 @@ const scoreBadge = (optionId: string) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-overlay backdrop-blur-sm backdrop-blur-sm"
               onClick={() => setShowExitConfirm(false)}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-skd-bg border border-skd-border rounded-3xl p-6 md:p-8 max-w-sm w-full relative z-10 shadow-2xl"
+              className="bg-bg border border-border rounded-3xl p-6 md:p-8 max-w-sm w-full relative z-10 shadow-2xl"
             >
-              <div className="w-16 h-16 bg-red-500/10 text-skd-danger rounded-2xl flex items-center justify-center mb-6 mx-auto border border-red-500/20">
+              <div className="w-16 h-16 bg-danger/10 text-danger rounded-2xl flex items-center justify-center mb-6 mx-auto border border-danger/20">
                 <X size={32} />
               </div>
-              <h2 className="text-xl font-black text-center text-skd-text mb-3">Yakin Ingin Keluar?</h2>
-              <p className="text-sm text-center text-skd-muted mb-8 leading-relaxed">
+              <h2 className="text-xl font-black text-center text-fg mb-3">Yakin Ingin Keluar?</h2>
+              <p className="text-sm text-center text-fg-muted mb-8 leading-relaxed">
                 {!isEnergyDeducted 
                   ? "Kuis belum selesai. Jika Anda keluar sekarang, biaya permainan (energi/koin) Anda tidak akan terpotong."
                   : "Kuis belum selesai. Anda sudah menjawab soal sehingga biaya permainan sudah terpotong. Progress tidak akan tersimpan!"}
@@ -1292,7 +1292,7 @@ const scoreBadge = (optionId: string) => {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => setShowExitConfirm(false)}
-                  className="flex-1 py-3 px-4 bg-skd-muted/10 hover:bg-skd-muted/20 text-skd-text font-bold rounded-xl transition-colors"
+                  className="flex-1 py-3 px-4 bg-locked-subtle hover:bg-locked-subtle text-fg font-bold rounded-xl transition-colors"
                 >
                   Batal
                 </button>
@@ -1301,7 +1301,7 @@ const scoreBadge = (optionId: string) => {
                     if (sessionId) abandonSession(sessionId);
                     navigate('/');
                   }}
-                  className="flex-1 py-3 px-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
+                  className="flex-1 py-3 px-4 bg-danger hover:bg-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
                 >
                   Ya, Keluar
                 </button>

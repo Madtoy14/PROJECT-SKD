@@ -7,17 +7,17 @@ import { logCoinPurchase, logItemSale, logEnergyPurchase, validatePurchase } fro
 
 const POWER_UPS = [
   { id: 'item_5050', title: 'Eliminasi 50:50', description: 'Hapus 2 opsi jawaban yang salah.', cost: 300, icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-  { id: 'item_hint', title: 'Bocoran Rumus', description: 'Tampilkan rumus/petunjuk untuk soal hitungan.', cost: 250, icon: Lightbulb, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+  { id: 'item_hint', title: 'Bocoran Rumus', description: 'Tampilkan rumus/petunjuk untuk soal hitungan.', cost: 250, icon: Lightbulb, color: 'text-info', bg: 'bg-info-subtle' },
   { id: 'item_waktu_beku', title: 'Waktu Beku', description: 'Bekukan timer selama 30 detik.', cost: 300, icon: Clock, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
   { id: 'item_skor_ganda', title: 'Skor Ganda', description: 'Gandakan perolehan poin untuk 1 soal berikutnya.', cost: 350, icon: Zap, color: 'text-amber-400', bg: 'bg-amber-500/10' },
   { id: 'item_terawangan', title: 'Terawangan', description: 'Lihat tebakan mayoritas pengguna lain.', cost: 400, icon: Eye, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-  { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', description: 'Batalkan 1x kesalahan di mode Survival.', cost: 500, icon: Heart, color: 'text-red-400', bg: 'bg-red-500/10' },
-  { id: 'item_shield', title: 'Perisai Survival', description: 'Membatalkan 1x kesalahan (Lama).', cost: 500, icon: Shield, color: 'text-skd-success', bg: 'bg-skd-success/10' },
-  { id: 'item_energy_refill', title: 'Isi Ulang Energi', description: 'Pulihkan 5 energi.', cost: 150, icon: Battery, color: 'text-green-400', bg: 'bg-green-500/10' },
+  { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', description: 'Batalkan 1x kesalahan di mode Survival.', cost: 500, icon: Heart, color: 'text-red-400', bg: 'bg-danger/10' },
+  { id: 'item_shield', title: 'Perisai Survival', description: 'Membatalkan 1x kesalahan (Lama).', cost: 500, icon: Shield, color: 'text-success', bg: 'bg-success/10' },
+  { id: 'item_energy_refill', title: 'Isi Ulang Energi', description: 'Pulihkan 5 energi.', cost: 150, icon: Battery, color: 'text-green-400', bg: 'bg-success/10' },
   { id: 'item_streak_protector', title: 'Streak Protector', description: 'Melindungi streak harian belajar Anda jika lupa login.', cost: 500, icon: Shield, color: 'text-orange-400', bg: 'bg-orange-500/10' },
-  { id: 'item_coin_booster', title: 'Koin Booster 2x', description: 'Gandakan koin yang didapat untuk 3 kuis berikutnya.', cost: 300, icon: Sparkles, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-  { id: 'item_tinta_hitam', title: 'Tinta Hitam (PvP)', description: 'Mengaburkan layar soal lawan selama 5 detik.', cost: 350, icon: Skull, color: 'text-red-500', bg: 'bg-red-500/10' },
-  { id: 'item_lompatan_kilat', title: 'Lompatan Kilat (PvP)', description: 'Lewati soal sulit tanpa penalti skor (1x match).', cost: 450, icon: Zap, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+  { id: 'item_coin_booster', title: 'Koin Booster 2x', description: 'Gandakan koin yang didapat untuk 3 kuis berikutnya.', cost: 300, icon: Sparkles, color: 'text-coin', bg: 'bg-coin-subtle' },
+  { id: 'item_tinta_hitam', title: 'Tinta Hitam (PvP)', description: 'Mengaburkan layar soal lawan selama 5 detik.', cost: 350, icon: Skull, color: 'text-danger', bg: 'bg-danger/10' },
+  { id: 'item_lompatan_kilat', title: 'Lompatan Kilat (PvP)', description: 'Otomatis temukan jawaban benar tanpa menghabiskan waktu.', cost: 450, icon: Zap, color: 'text-info', bg: 'bg-info-subtle' },
 ];
 
 const PREMIUM_PACKAGES = [
@@ -197,8 +197,8 @@ export default function Shop() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
             className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 ${
-              toastType === 'success' ? 'bg-skd-success shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'bg-skd-danger shadow-[0_0_20px_rgba(239,68,68,0.4)]'
-            } text-white px-6 py-3 rounded-full font-bold whitespace-nowrap`}
+              toastType === 'success' ? 'bg-success shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'bg-danger shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+            } text-fg px-6 py-3 rounded-full font-bold whitespace-nowrap`}
           >
             {toastMessage}
           </motion.div>
@@ -207,23 +207,23 @@ export default function Shop() {
 
       <header className="pt-2 md:pt-4 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tighter text-skd-text">Shop & Power up</h1>
-          <p className="text-sm text-skd-muted mt-1">Belanjakan koin untuk meningkatkan peluang kelulusanmu atau cairkan kembali barang berlebih!</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tighter text-fg">Shop & Power up</h1>
+          <p className="text-sm text-fg-muted mt-1">Belanjakan koin untuk meningkatkan peluang kelulusanmu atau cairkan kembali barang berlebih!</p>
         </div>
-        <div className="flex items-center gap-1.5 bg-skd-card px-4 py-2 md:px-5 md:py-2.5 rounded-full border border-skd-border shadow-sm">
-          <Coins size={20} className="text-yellow-500 fill-yellow-500 animate-pulse" />
-          <span className="font-space font-bold text-skd-text md:text-lg">
+        <div className="flex items-center gap-1.5 bg-surface px-4 py-2 md:px-5 md:py-2.5 rounded-full border border-border shadow-sm">
+          <Coins size={20} className="text-coin fill-yellow-500 animate-pulse" />
+          <span className="font-space font-bold text-fg md:text-lg">
             {profile ? profile.coins.toLocaleString() : '1,240'}
           </span>
         </div>
       </header>
 
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-skd-border pb-1 shrink-0">
+      <div className="flex gap-6 border-b border-border pb-1 shrink-0">
         <button
           onClick={() => setActiveTab('buy')}
           className={`pb-3 font-bold text-sm md:text-base border-b-2 transition-all ${
-            activeTab === 'buy' ? 'border-skd-primary text-skd-primary' : 'border-transparent text-skd-muted hover:text-skd-text'
+            activeTab === 'buy' ? 'border-primary text-primary' : 'border-transparent text-fg-muted hover:text-fg'
           }`}
         >
           Beli Item
@@ -231,7 +231,7 @@ export default function Shop() {
         <button
           onClick={() => setActiveTab('sell')}
           className={`pb-3 font-bold text-sm md:text-base border-b-2 transition-all ${
-            activeTab === 'sell' ? 'border-skd-primary text-skd-primary' : 'border-transparent text-skd-muted hover:text-skd-text'
+            activeTab === 'sell' ? 'border-primary text-primary' : 'border-transparent text-fg-muted hover:text-fg'
           }`}
         >
           Jual Balik (Sell Back)
@@ -250,7 +250,7 @@ export default function Shop() {
           >
             {/* Power up Section */}
             <section>
-              <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-skd-text border-b border-skd-border pb-2">Power up Kuis</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-fg border-b border-border pb-2">Power up Kuis</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {POWER_UPS.map((item) => {
                   const count = profile?.inventory?.[item.id as keyof NonNullable<typeof profile.inventory>] || 0;
@@ -265,10 +265,10 @@ export default function Shop() {
                         ? handlePurchase(item.id, item.title, item.cost, 'energy')
                         : handlePurchase(item.id, item.title, item.cost, 'inventory')
                       }
-                      className="bg-skd-card border border-skd-border hover:border-skd-muted/30 p-5 md:p-6 rounded-3xl flex flex-col items-start gap-4 text-left transition-all shadow-sm hover:shadow-md w-full relative overflow-hidden group"
+                      className="bg-surface border border-border hover:border-border p-5 md:p-6 rounded-3xl flex flex-col items-start gap-4 text-left transition-all shadow-sm hover:shadow-md w-full relative overflow-hidden group"
                     >
                       {count > 0 && (
-                        <div className="absolute top-0 right-0 bg-skd-primary/20 text-skd-accent border-l border-b border-skd-primary/30 px-3 py-1 text-xs font-bold rounded-bl-xl font-space">
+                        <div className="absolute top-0 right-0 bg-primary-subtle text-primary border-l border-b border-primary px-3 py-1 text-xs font-bold rounded-bl-xl font-space">
                           Miliki: {count}
                         </div>
                       )}
@@ -277,15 +277,15 @@ export default function Shop() {
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${item.bg} ${item.color}`}>
                           <item.icon size={28} />
                         </div>
-                        <div className="flex items-center gap-1.5 bg-skd-muted/10 px-4 py-2 rounded-xl shrink-0">
-                          <Coins size={16} className="text-yellow-500 fill-yellow-500" />
-                          <span className="font-space font-bold text-yellow-600 dark:text-yellow-400">{item.cost}</span>
+                        <div className="flex items-center gap-1.5 bg-locked-subtle px-4 py-2 rounded-xl shrink-0">
+                          <Coins size={16} className="text-coin fill-yellow-500" />
+                          <span className="font-space font-bold text-yellow-600 ">{item.cost}</span>
                         </div>
                       </div>
                       
                       <div className="flex-1 mt-2">
-                        <h3 className="font-bold text-base md:text-lg mb-2 text-skd-text">{item.title}</h3>
-                        <p className="text-sm text-skd-muted leading-relaxed">{item.description}</p>
+                        <h3 className="font-bold text-base md:text-lg mb-2 text-fg">{item.title}</h3>
+                        <p className="text-sm text-fg-muted leading-relaxed">{item.description}</p>
                       </div>
                     </motion.button>
                   );
@@ -295,8 +295,8 @@ export default function Shop() {
 
             {/* Premium Section */}
             <section className="pt-4">
-              <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 flex items-center gap-2 text-skd-text border-b border-skd-border pb-2">
-                <Sparkles className="text-skd-premium" size={24} /> Paket Pembahasan Premium
+              <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 flex items-center gap-2 text-fg border-b border-border pb-2">
+                <Sparkles className="text-premium" size={24} /> Paket Pembahasan Premium
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -309,33 +309,33 @@ export default function Shop() {
                     <motion.div
                       key={pkg.id}
                       whileHover={{ scale: 1.02 }}
-                      className="bg-skd-card border border-skd-border p-6 rounded-3xl flex flex-col justify-between transition-all shadow-sm hover:shadow-md relative overflow-hidden group text-left"
+                      className="bg-surface border border-border p-6 rounded-3xl flex flex-col justify-between transition-all shadow-sm hover:shadow-md relative overflow-hidden group text-left"
                     >
                       <div>
-                        <div className="w-12 h-12 bg-gradient-to-br from-skd-premium to-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
-                          <LockKeyhole size={24} className="text-white" />
+                        <div className="w-12 h-12 bg-gradient-to-br from-premium to-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
+                          <LockKeyhole size={24} className="text-fg" />
                         </div>
-                        <h3 className="font-bold text-base text-skd-text mb-2 tracking-tight">{pkg.title}</h3>
-                        <p className="text-xs text-skd-muted leading-relaxed mb-6 h-12 overflow-hidden">{pkg.description}</p>
+                        <h3 className="font-bold text-base text-fg mb-2 tracking-tight">{pkg.title}</h3>
+                        <p className="text-xs text-fg-muted leading-relaxed mb-6 h-12 overflow-hidden">{pkg.description}</p>
                       </div>
 
-                      <div className="flex items-center justify-between gap-4 pt-4 border-t border-skd-border/40">
+                      <div className="flex items-center justify-between gap-4 pt-4 border-t border-border/40">
                         {isUnlocked ? (
-                          <div className="w-full py-2.5 bg-skd-success text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-1.5 justify-center">
+                          <div className="w-full py-2.5 bg-success text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-1.5 justify-center">
                             <Check size={16} /> Terbuka
                           </div>
                         ) : (
                           <>
-                            <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5 shrink-0">
-                              <Coins size={14} className="text-yellow-400 fill-yellow-400" />
-                              <span className="font-space font-bold text-yellow-400 text-sm">{pkg.cost}</span>
+                            <div className="flex items-center gap-1.5 bg-surface-subtle px-3 py-1.5 rounded-xl border border-border shrink-0">
+                              <Coins size={14} className="text-coin fill-yellow-400" />
+                              <span className="font-space font-bold text-coin text-sm">{pkg.cost}</span>
                             </div>
                             <button
                               disabled={isLoading}
                               onClick={() => handlePurchase(pkg.id, pkg.title, pkg.cost, 'premium_package')}
-                              className="px-4 py-2 bg-skd-premium hover:bg-purple-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-1.5"
+                              className="px-4 py-2 bg-premium text-primary-fg hover:bg-purple-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-1.5"
                             >
-                              {isLoading ? <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Memproses...</> : 'Buka Akses'}
+                              {isLoading ? <><span className="w-3 h-3 border-2 border-white/30 border-t-primary rounded-full animate-spin" /> Memproses...</> : 'Buka Akses'}
                             </button>
                           </>
                         )}
@@ -356,8 +356,8 @@ export default function Shop() {
             className="space-y-6"
           >
             <section>
-              <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-skd-text border-b border-skd-border pb-2">Jual Balik Power up</h2>
-              <p className="text-xs text-skd-muted mb-6 leading-relaxed max-w-xl">
+              <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-fg border-b border-border pb-2">Jual Balik Power up</h2>
+              <p className="text-xs text-fg-muted mb-6 leading-relaxed max-w-xl">
                 Jual kembali Power up cadangan Anda yang tidak terpakai ke Toko. Dapatkan pengembalian **50% Koin instan** dari harga belinya!
               </p>
 
@@ -372,9 +372,9 @@ export default function Shop() {
                     <motion.div
                       key={item.id}
                       whileHover={{ scale: 1.03 }}
-                      className="bg-skd-card border border-skd-border p-5 md:p-6 rounded-3xl flex flex-col items-start justify-between gap-4 text-left transition-all shadow-sm hover:shadow-md w-full relative overflow-hidden group"
+                      className="bg-surface border border-border p-5 md:p-6 rounded-3xl flex flex-col items-start justify-between gap-4 text-left transition-all shadow-sm hover:shadow-md w-full relative overflow-hidden group"
                     >
-                      <div className="absolute top-0 right-0 bg-skd-success/20 text-skd-success border-l border-b border-skd-success/30 px-3 py-1 text-xs font-bold rounded-bl-xl font-space">
+                      <div className="absolute top-0 right-0 bg-success/20 text-success border-l border-b border-success px-3 py-1 text-xs font-bold rounded-bl-xl font-space">
                         Miliki: {count}
                       </div>
                       
@@ -382,19 +382,19 @@ export default function Shop() {
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${item.bg} ${item.color}`}>
                           <item.icon size={28} />
                         </div>
-                        <div className="flex items-center gap-1.5 bg-skd-muted/10 px-4 py-2 rounded-xl shrink-0">
-                          <Coins size={16} className="text-yellow-500 fill-yellow-500" />
-                          <span className="font-space font-bold text-yellow-600 dark:text-yellow-400">Jual: {sellReward}</span>
+                        <div className="flex items-center gap-1.5 bg-locked-subtle px-4 py-2 rounded-xl shrink-0">
+                          <Coins size={16} className="text-coin fill-yellow-500" />
+                          <span className="font-space font-bold text-yellow-600 ">Jual: {sellReward}</span>
                         </div>
                       </div>
                       
                       <div className="flex-1 mt-2 w-full">
-                        <h3 className="font-bold text-base md:text-lg mb-2 text-skd-text">{item.title}</h3>
-                        <p className="text-xs text-skd-muted leading-relaxed mb-4">{item.description}</p>
+                        <h3 className="font-bold text-base md:text-lg mb-2 text-fg">{item.title}</h3>
+                        <p className="text-xs text-fg-muted leading-relaxed mb-4">{item.description}</p>
                         
                         <button
                           onClick={() => handleSellBack(item.id, item.title, item.cost)}
-                          className="w-full py-2.5 bg-skd-success hover:bg-emerald-600 text-white text-xs font-black rounded-xl shadow-md transition-colors flex items-center justify-center gap-1.5"
+                          className="w-full py-2.5 bg-success hover:bg-emerald-600 text-white text-xs font-black rounded-xl shadow-md transition-colors flex items-center justify-center gap-1.5"
                         >
                           <Coins size={14} className="text-yellow-200 fill-yellow-200" />
                           <span>Jual Balik (+{sellReward} Koin)</span>
@@ -406,8 +406,8 @@ export default function Shop() {
 
                 {/* If no items are owned */}
                 {(!profile?.inventory || Object.entries(profile.inventory).filter(([k, v]) => k.startsWith('item_') && (v as number) > 0).length === 0) && (
-                  <div className="col-span-full py-12 text-center text-sm text-skd-muted bg-skd-card/30 rounded-[32px] border border-dashed border-skd-border max-w-lg mx-auto w-full">
-                    <Shield className="mx-auto text-skd-muted mb-3 opacity-40 animate-pulse" size={40} />
+                  <div className="col-span-full py-12 text-center text-sm text-fg-muted bg-surface/30 rounded-[32px] border border-dashed border-border max-w-lg mx-auto w-full">
+                    <Shield className="mx-auto text-fg-muted mb-3 opacity-40 animate-pulse" size={40} />
                     <span>Anda tidak memiliki stok Power up apa pun di inventori untuk dijual saat ini.</span>
                   </div>
                 )}
