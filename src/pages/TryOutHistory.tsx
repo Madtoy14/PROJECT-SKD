@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
 import { AVAILABLE_PACKAGES } from '../data/tryout_packages';
 import { Loader2 } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function TryOutHistory() {
   interface TryOutHistoryItem {
@@ -51,6 +52,17 @@ export default function TryOutHistory() {
   const latestScore = filteredHistory.length > 0 ? filteredHistory[0].score : 0;
   const bestScore = filteredHistory.length > 0 ? Math.max(...filteredHistory.map(h => h.score)) : 0;
 
+  // Chart data needs to be chronological (oldest to newest)
+  const chartData = [...filteredHistory].reverse().map((h, index) => {
+    const pkg = AVAILABLE_PACKAGES.find(p => p.id === h.package_id);
+    return {
+      name: `Try Out ${index + 1}`,
+      date: new Date(h.completed_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+      score: h.score,
+      package: pkg?.title || 'Paket Try Out'
+    };
+  });
+
   return (
     <div className="w-full">
       {/* Stats & Filter */}
@@ -78,6 +90,35 @@ export default function TryOutHistory() {
           </select>
         </div>
       </div>
+
+      {/* Trend Chart */}
+      {!loading && chartData.length > 1 && (
+        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm mb-8">
+          <h3 className="font-bold text-fg text-lg mb-4">Grafik Perkembangan Nilai</h3>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} domain={[0, 550]} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  labelStyle={{ fontWeight: 'bold', color: '#0f172a', marginBottom: '4px' }}
+                  itemStyle={{ fontWeight: 'bold' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="score" 
+                  name="Skor Total"
+                  stroke="#3b82f6" 
+                  strokeWidth={3}
+                  activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* List */}
       {loading ? (
