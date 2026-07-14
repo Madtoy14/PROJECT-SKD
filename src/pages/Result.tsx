@@ -36,7 +36,35 @@ export default function Result() {
   const [error, setError] = useState<string | null>(null);
   
   // NEW: Result data from database
-  const [resultData, setResultData] = useState<any>(null);
+  // Define proper types instead of any
+  interface Option {
+    id: string;
+    points?: number;
+    score?: number;
+  }
+  interface QuizQuestion {
+    id: string;
+    category: string;
+    correct?: string;
+    options?: Option[];
+  }
+  interface QuizResultData {
+    score: number;
+    twk_score: number;
+    tiu_score: number;
+    tkp_score: number;
+    passed_twk: boolean;
+    passed_tiu: boolean;
+    passed_tkp: boolean;
+    passed_overall: boolean;
+    mode?: string;
+    coins_earned?: number;
+    xp_earned?: number;
+    questions_json?: QuizQuestion[];
+    answers_json?: Record<string, string>;
+  }
+
+  const [resultData, setResultData] = useState<QuizResultData | null>(null);
 
   useEffect(() => {
     const loadResult = async () => {
@@ -118,16 +146,16 @@ export default function Result() {
   const receivedRanks: { name: string; score: number; isMe?: boolean }[] = location.state?.liveRanks || [];
 
   const totalQuestions = quizQuestions?.length || 0;
-  const correctCount = quizQuestions?.filter((q: any, i: number) => {
+  const correctCount = quizQuestions?.filter((q: QuizQuestion, i: number) => {
     const ansId = userAnswers?.[i];
     const isTKP = q.category === 'TKP';
     if (isTKP) {
-      const opt = q.options?.find((o: any) => o.id === ansId);
+      const opt = q.options?.find((o: Option) => o.id === ansId);
       return (opt?.score ?? 0) >= 50;
     }
     return ansId === q.correct;
   }).length || 0;
-  const emptyCount = quizQuestions?.filter((q: any, i: number) => !userAnswers?.[i]).length || 0;
+  const emptyCount = quizQuestions?.filter((q: QuizQuestion, i: number) => !userAnswers?.[i]).length || 0;
   const incorrectCount = totalQuestions - correctCount - emptyCount;
 
   const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
@@ -149,9 +177,9 @@ export default function Result() {
     ].sort((a, b) => b.score - a.score);
 
   // Dynamic Passing Grade Ambang Batas Calculations based on questions count
-  const twkQuestionsCount = quizQuestions?.filter((q: any) => q.category === 'TWK').length || 30;
-  const tiuQuestionsCount = quizQuestions?.filter((q: any) => q.category === 'TIU').length || 35;
-  const tkpQuestionsCount = quizQuestions?.filter((q: any) => q.category === 'TKP').length || 45;
+  const twkQuestionsCount = quizQuestions?.filter((q: QuizQuestion) => q.category === 'TWK').length || 30;
+  const tiuQuestionsCount = quizQuestions?.filter((q: QuizQuestion) => q.category === 'TIU').length || 35;
+  const tkpQuestionsCount = quizQuestions?.filter((q: QuizQuestion) => q.category === 'TKP').length || 45;
 
   // Scale passing grades proportionally if question count is less than CPNS standard
   const twkPassThreshold = twkQuestionsCount < 30 ? Math.ceil(twkQuestionsCount * 0.433 * 5) : 65;

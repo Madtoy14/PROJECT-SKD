@@ -52,7 +52,23 @@ export default function ReviewDetail() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
+  // Define interfaces to replace any
+  interface Option {
+    id: string;
+    text: string;
+    points?: number;
+    score?: number;
+  }
+  interface QuizQuestion {
+    id: string;
+    category: string;
+    text: string;
+    correct?: string;
+    explanation?: string;
+    options: Option[];
+  }
+  
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -129,7 +145,7 @@ export default function ReviewDetail() {
     if (!ansId) return 'empty';
     
     if (q.category === 'TKP') {
-      const opt = q.options?.find((o: any) => o.id === ansId);
+      const opt = q.options?.find((o: Option) => o.id === ansId);
       return (opt?.score ?? 0) === 5 ? 'correct' : 'incorrect';
     } else {
       return ansId === q.correct ? 'correct' : 'incorrect';
@@ -202,7 +218,7 @@ export default function ReviewDetail() {
               </div>
 
               <div className="space-y-2 md:space-y-3">
-                {currentQuestion.options.map((opt: any) => {
+                {currentQuestion.options.map((opt: Option) => {
                   const ansId = hasAnswers ? userAnswers[currentQuestionIndex] : null;
                   const isSelected = ansId === opt.id;
                   const isTKP = currentQuestion.category === 'TKP';
@@ -231,10 +247,10 @@ export default function ReviewDetail() {
                       
                       {isTKP && (
                         <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
-                          ${opt.score === 5 ? 'bg-success/20 text-success' :
-                            opt.score >= 3 ? 'bg-orange-500/15 text-orange-400' :
+                          ${(opt.score || 0) === 5 ? 'bg-success/20 text-success' :
+                            (opt.score || 0) >= 3 ? 'bg-orange-500/15 text-orange-400' :
                             'bg-locked-subtle text-fg-muted'}`}>
-                          {opt.score} pts
+                          {opt.score || 0} pts
                         </span>
                       )}
                       
@@ -289,7 +305,7 @@ export default function ReviewDetail() {
         </div>
         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
           {['TWK', 'TIU', 'TKP'].map(cat => {
-            const catQuestions = quizQuestions.map((q: any, idx: number) => ({ q, idx })).filter((item: any) => item.q.category === cat);
+            const catQuestions = quizQuestions.map((q: QuizQuestion, idx: number) => ({ q, idx })).filter((item) => item.q.category === cat);
             if (catQuestions.length === 0) return null;
             const isOpen = openCategories[cat];
             
@@ -372,7 +388,7 @@ export default function ReviewDetail() {
               </div>
               <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
                 {['TWK', 'TIU', 'TKP'].map(cat => {
-                  const catQuestions = quizQuestions.map((q: any, idx: number) => ({ q, idx })).filter((item: any) => item.q.category === cat);
+                  const catQuestions = quizQuestions.map((q: QuizQuestion, idx: number) => ({ q, idx })).filter((item) => item.q.category === cat);
                   if (catQuestions.length === 0) return null;
                   const isOpen = openCategories[cat];
                   

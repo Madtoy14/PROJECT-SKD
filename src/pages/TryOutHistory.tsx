@@ -5,7 +5,18 @@ import { AVAILABLE_PACKAGES } from '../data/tryout_packages';
 import { Loader2 } from 'lucide-react';
 
 export default function TryOutHistory() {
-  const [history, setHistory] = useState<any[]>([]);
+  interface TryOutHistoryItem {
+    id: string;
+    session_id: string;
+    package_id: string;
+    score: number;
+    twk_score: number;
+    tiu_score: number;
+    tkp_score: number;
+    passed_overall: boolean;
+    completed_at: string;
+  }
+  const [history, setHistory] = useState<TryOutHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<string>('all');
 
