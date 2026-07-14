@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coins, Scale, Lightbulb, Zap, LockKeyhole, Sparkles, Check, Clock, Eye, Heart, Battery, Shield, Skull } from 'lucide-react';
+import { Coins, Scale, Lightbulb, Zap, LockKeyhole, Sparkles, Check, Clock, Eye, Heart, Battery, Shield, Skull, Plus, X } from 'lucide-react';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
 import { logCoinPurchase, logItemSale, logEnergyPurchase, validatePurchase } from '../lib/transactions';
+import { TopUpModal } from '../components/modals/TopUpModal';
+import { Button } from '../components/ui/Button';
 
 const POWER_UPS = [
   { id: 'item_5050', title: 'Eliminasi 50:50', description: 'Hapus 2 opsi jawaban yang salah.', cost: 300, icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
@@ -38,6 +40,13 @@ export default function Shop() {
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
   const [purchasing, setPurchasing] = useState<string | null>(null); // loading state per item
+  
+  // Top-up State
+  const [isTopUpOpen, setIsTopUpOpen] = useState(false);
+  
+  // Bulk Purchase State
+  const [bulkItem, setBulkItem] = useState<{ id: string, title: string, cost: number, type: 'inventory' | 'avatar' | 'premium_package' | 'energy' } | null>(null);
+  const [bulkQuantity, setBulkQuantity] = useState<number>(1);
 
   useEffect(() => {
     fetchProfile().then(p => setProfile(p));
@@ -54,7 +63,8 @@ export default function Shop() {
     itemId: string,
     itemTitle: string,
     cost: number,
-    itemType: 'inventory' | 'avatar' | 'premium_package' | 'energy' = 'inventory'
+    itemType: 'inventory' | 'avatar' | 'premium_package' | 'energy' = 'inventory',
+    quantity: number = 1
   ) => {
     if (!profile || purchasing) return;
 
@@ -68,28 +78,34 @@ export default function Shop() {
       return;
     }
 
+    // ── Calculate Final Cost with Discount ──
+    let finalCost = cost * quantity;
+    if (quantity >= 10) {
+      finalCost = Math.floor(finalCost * 0.9); // Diskon Grosir 10%
+    }
+
     // ── Guard client-side koin (UX only) ──
-    if (profile.coins < cost) {
-      showToast(`Koin tidak cukup untuk membeli ${itemTitle}!`, 'error');
+    if (profile.coins < finalCost) {
+      showToast(`Koin tidak cukup untuk membeli ${quantity > 1 ? quantity + 'x ' : ''}${itemTitle}!`, 'error');
       return;
     }
 
     setPurchasing(itemId);
     try {
       // ── Validasi rate-limit client ──
-      const validation = await validatePurchase(itemId, cost);
+      const validation = await validatePurchase(itemId, finalCost);
       if (!validation.valid) {
         showToast(validation.reason || 'Pembelian tidak valid', 'error');
         return;
       }
 
-      let coinsAfter = profile.coins - cost;
+      let coinsAfter = profile.coins - finalCost;
 
       // ── SERVER-SIDE VALIDATION via RPC (atomic deduct koin) ──
       if (isSupabaseConfigured()) {
         const { data: rpcResult, error: rpcError } = await supabase!.rpc('purchase_item', {
           p_item_id: itemId,
-          p_cost: cost,
+          p_cost: finalCost,
           p_item_type: itemType
         });
 
@@ -115,8 +131,8 @@ export default function Shop() {
       } else if (itemType === 'avatar') {
         profileUpdate.unlocked_avatars = [...(profile.unlocked_avatars || []), itemId];
       } else if (itemType === 'energy') {
-        profileUpdate.energy = Math.min(25, (profile.energy || 0) + 5);
-        await logEnergyPurchase(cost, 5, coinsAfter);
+        profileUpdate.energy = Math.min(25, (profile.energy || 0) + (5 * quantity));
+        await logEnergyPurchase(finalCost, 5 * quantity, coinsAfter);
       } else {
         // inventory biasa
         const currentInv = profile.inventory || {
@@ -126,7 +142,7 @@ export default function Shop() {
           item_tinta_hitam: 0, item_lompatan_kilat: 0
         };
         const invKey = itemId as keyof NonNullable<typeof profile.inventory>;
-        profileUpdate.inventory = { ...currentInv, [invKey]: (currentInv[invKey] || 0) + 1 };
+        profileUpdate.inventory = { ...currentInv, [invKey]: (currentInv[invKey] || 0) + quantity };
       }
 
       const updatedProfile = await updateProfile(profileUpdate);
@@ -134,13 +150,14 @@ export default function Shop() {
 
       // ── Log transaksi ──
       if (itemType !== 'energy') {
-        await logCoinPurchase(itemId, cost, coinsAfter, {
+        await logCoinPurchase(itemId, finalCost, coinsAfter, {
           item_title: itemTitle,
-          item_type: itemType
+          item_type: itemType,
+          quantity: quantity
         });
       }
 
-      showToast(`Berhasil membeli ${itemTitle}!`, 'success');
+      showToast(`Berhasil membeli ${quantity > 1 ? quantity + 'x ' : ''}${itemTitle}!`, 'success');
     } catch (err: any) {
       console.error('Purchase error:', err);
       showToast('Terjadi kesalahan saat pembelian', 'error');
@@ -210,12 +227,16 @@ export default function Shop() {
           <h1 className="text-2xl md:text-3xl font-bold tracking-tighter text-fg">Shop & Power up</h1>
           <p className="text-sm text-fg-muted mt-1">Belanjakan koin untuk meningkatkan peluang kelulusanmu atau cairkan kembali barang berlebih!</p>
         </div>
-        <div className="flex items-center gap-1.5 bg-surface px-4 py-2 md:px-5 md:py-2.5 rounded-full border border-border shadow-sm">
-          <Coins size={20} className="text-coin fill-yellow-500 animate-pulse" />
+        <button 
+          onClick={() => setIsTopUpOpen(true)}
+          className="flex items-center gap-1.5 bg-surface hover:bg-surface-subtle transition-colors px-4 py-2 md:px-5 md:py-2.5 rounded-full border border-border shadow-sm cursor-pointer group"
+        >
+          <Coins size={20} className="text-coin fill-yellow-500 group-hover:animate-pulse" />
           <span className="font-space font-bold text-fg md:text-lg">
             {profile ? profile.coins.toLocaleString() : '1,240'}
           </span>
-        </div>
+          <Plus size={16} className="text-primary ml-1 hidden md:block" />
+        </button>
       </header>
 
       {/* Tabs */}
@@ -261,10 +282,10 @@ export default function Shop() {
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
                       disabled={purchasing === item.id}
-                      onClick={() => item.id === 'item_energy_refill'
-                        ? handlePurchase(item.id, item.title, item.cost, 'energy')
-                        : handlePurchase(item.id, item.title, item.cost, 'inventory')
-                      }
+                      onClick={() => {
+                        setBulkItem({ id: item.id, title: item.title, cost: item.cost, type: item.id === 'item_energy_refill' ? 'energy' : 'inventory' });
+                        setBulkQuantity(1);
+                      }}
                       className="bg-surface border border-border hover:border-border p-5 md:p-6 rounded-3xl flex flex-col items-start gap-4 text-left transition-all shadow-sm hover:shadow-md w-full relative overflow-hidden group"
                     >
                       {count > 0 && (
@@ -416,6 +437,101 @@ export default function Shop() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <TopUpModal 
+        isOpen={isTopUpOpen} 
+        onClose={() => setIsTopUpOpen(false)} 
+        onSuccess={() => setIsTopUpOpen(false)} 
+      />
+
+      {/* Bulk Purchase Modal */}
+      <AnimatePresence>
+        {bulkItem && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 font-syne"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="bg-surface w-full max-w-md rounded-3xl shadow-2xl overflow-hidden p-6"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-bold text-xl text-fg">Beli {bulkItem.title}</h3>
+                <button onClick={() => setBulkItem(null)} className="p-2 bg-surface-subtle rounded-full hover:bg-border transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between p-4 border border-border rounded-2xl bg-surface-subtle">
+                  <span className="font-bold text-fg-muted">Harga Satuan</span>
+                  <div className="flex items-center gap-1.5">
+                    <Coins size={16} className="text-coin fill-yellow-500" />
+                    <span className="font-space font-bold text-yellow-600">{bulkItem.cost}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <label className="font-bold text-sm text-fg">Kuantitas</label>
+                    <span className="font-space font-bold text-primary">{bulkQuantity}x</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={bulkQuantity}
+                    onChange={(e) => setBulkQuantity(parseInt(e.target.value))}
+                    className="w-full accent-primary"
+                  />
+                  <div className="flex justify-between mt-1 px-1">
+                    <span className="text-xs text-fg-muted">1</span>
+                    <span className="text-xs text-fg-muted">100</span>
+                  </div>
+                </div>
+
+                <div className="p-4 border border-primary/20 bg-primary/5 rounded-2xl flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-bold text-fg-muted">Subtotal</span>
+                    <span className="font-space font-bold text-fg">{bulkItem.cost * bulkQuantity} Koin</span>
+                  </div>
+                  {bulkQuantity >= 10 && (
+                    <div className="flex justify-between items-center text-success">
+                      <span className="text-sm font-bold">Diskon Grosir (10%)</span>
+                      <span className="font-space font-bold">- {Math.floor(bulkItem.cost * bulkQuantity * 0.1)} Koin</span>
+                    </div>
+                  )}
+                  <div className="h-px bg-border my-1" />
+                  <div className="flex justify-between items-center">
+                    <span className="font-black text-fg text-lg">Total Bayar</span>
+                    <div className="flex items-center gap-2">
+                      <Coins size={20} className="text-coin fill-yellow-500" />
+                      <span className="font-space font-black text-2xl text-coin">
+                        {bulkQuantity >= 10 ? Math.floor(bulkItem.cost * bulkQuantity * 0.9) : bulkItem.cost * bulkQuantity}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={() => {
+                    handlePurchase(bulkItem.id, bulkItem.title, bulkItem.cost, bulkItem.type, bulkQuantity);
+                    setBulkItem(null);
+                  }}
+                  className="w-full py-3.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold"
+                >
+                  Konfirmasi Pembelian
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

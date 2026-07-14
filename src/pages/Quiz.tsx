@@ -53,9 +53,9 @@ function cleanMathText(text: string): string {
 }
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Check, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
+import { X, Check, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, HeartCrack, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
+import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery } from '../lib/supabase';
 import { useQuizSession } from '../context/QuizSessionContext';
 import MathCard from '../components/MathCard';
 import { Button } from '../components/ui/Button';
@@ -64,9 +64,18 @@ const ALLOWED_POWER_UPS: Record<string, string[]> = {
   latihan: ['item_5050', 'item_hint', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan'],
   pvp: ['item_5050', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan', 'item_tinta_hitam', 'item_lompatan_kilat'],
   pvp1v1: ['item_5050', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan', 'item_tinta_hitam', 'item_lompatan_kilat'],
-  pvp_bot: ['item_5050', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan'],
+  pvp_bot: ['item_5050', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan', 'item_tinta_hitam', 'item_lompatan_kilat'],
   survival: ['item_waktu_beku', 'item_terawangan', 'item_kesempatan_kedua', 'item_shield'],
-  catatansalah: ['item_5050', 'item_hint', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan']
+  catatan_salah: ['item_5050', 'item_hint', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan']
+};
+
+const MAX_POWERUP_USAGE: Record<string, Record<string, number>> = {
+  latihan: { item_5050: 3, item_hint: 3, item_waktu_beku: 3, item_skor_ganda: 3, item_terawangan: 3 },
+  catatan_salah: { item_5050: 3, item_hint: 3, item_waktu_beku: 3, item_skor_ganda: 3, item_terawangan: 3 },
+  survival: { item_waktu_beku: 1, item_terawangan: 1, item_kesempatan_kedua: 3, item_shield: 3 },
+  pvp: { item_5050: 1, item_waktu_beku: 1, item_skor_ganda: 1, item_terawangan: 1, item_tinta_hitam: 1, item_lompatan_kilat: 1 },
+  pvp1v1: { item_5050: 1, item_waktu_beku: 1, item_skor_ganda: 1, item_terawangan: 1, item_tinta_hitam: 1, item_lompatan_kilat: 1 },
+  pvp_bot: { item_5050: 1, item_waktu_beku: 1, item_skor_ganda: 1, item_terawangan: 1, item_tinta_hitam: 1, item_lompatan_kilat: 1 }
 };
 
 type RankEntry = { name: string; score: number; isMe?: boolean; delta?: number };
@@ -85,7 +94,7 @@ export default function Quiz() {
   const packageVersion = location.state?.packageVersion || 1;
   
   // --- Quiz Session ---
-  const { createSession, updateSession, abandonSession, completeSession } = useQuizSession();
+  const { activeSession, createSession, updateSession, abandonSession, completeSession } = useQuizSession();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const answersRef = useRef<Record<number, string>>({});
   
@@ -95,6 +104,7 @@ export default function Quiz() {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [questions, setQuestions] = useState<any[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [noCatatanSalah, setNoCatatanSalah] = useState(false); // state untuk layar kosong catatan salah
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const TOTAL_TIME = gameMode === 'tryout' 
@@ -106,6 +116,7 @@ export default function Quiz() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const selected = answers[currentQuestionIndex] || null;
   const [isGameOver, setIsGameOver] = useState(false);
+  const [heartBroken, setHeartBroken] = useState(false); // Sudden death visual
   const [totalScore, setTotalScore] = useState(0);
   const [doubtful, setDoubtful] = useState<Record<number, boolean>>({});
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
@@ -114,7 +125,8 @@ export default function Quiz() {
     skorGanda: boolean;
     terawangan: boolean;
     secondChanceUsed: boolean;
-  }>({ waktuBeku: false, skorGanda: false, terawangan: false, secondChanceUsed: false });
+    perisaiActive: boolean;
+  }>({ waktuBeku: false, skorGanda: false, terawangan: false, secondChanceUsed: false, perisaiActive: false });
   const [profile, setProfile] = useState<any>(null);
   useEffect(() => {
     fetchProfile().then(p => {
@@ -125,24 +137,46 @@ export default function Quiz() {
   const [showHint, setShowHint] = useState(false);
   const [tintaHitamActive, setTintaHitamActive] = useState(false);
   const [lompatanKilatUsed, setLompatanKilatUsed] = useState(false);
+  const [powerUpUsageCount, setPowerUpUsageCount] = useState<Record<string, number>>({});
+  const [isFinishing, setIsFinishing] = useState(false);
+
+  const checkPowerupLimit = (itemKey: string): boolean => {
+    const limits = MAX_POWERUP_USAGE[gameMode] || {};
+    const max = limits[itemKey] || 0;
+    const current = powerUpUsageCount[itemKey] || 0;
+    return current < max;
+  };
 
   const useTintaHitam = () => {
-    if (!profile || !profile.inventory || (profile.inventory.item_tinta_hitam || 0) <= 0) return;
+    if (!profile || !profile.inventory || (profile.inventory.item_tinta_hitam || 0) <= 0 || !checkPowerupLimit('item_tinta_hitam')) return;
+    setPowerUpUsageCount(p => ({ ...p, item_tinta_hitam: (p.item_tinta_hitam || 0) + 1 }));
     const updatedInv = { ...profile.inventory, item_tinta_hitam: profile.inventory.item_tinta_hitam - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     broadcastPowerUp('item_tinta_hitam');
   };
 
   const useLompatanKilat = () => {
-    if (!profile || !profile.inventory || (profile.inventory.item_lompatan_kilat || 0) <= 0 || lompatanKilatUsed) return;
+    if (!profile || !profile.inventory || (profile.inventory.item_lompatan_kilat || 0) <= 0 || lompatanKilatUsed || !checkPowerupLimit('item_lompatan_kilat')) return;
+    setPowerUpUsageCount(p => ({ ...p, item_lompatan_kilat: (p.item_lompatan_kilat || 0) + 1 }));
     const updatedInv = { ...profile.inventory, item_lompatan_kilat: profile.inventory.item_lompatan_kilat - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     setLompatanKilatUsed(true);
     broadcastPowerUp('item_lompatan_kilat');
-    goNextOrFinish(totalScore);
+    
+    // Otomatis pilih jawaban paling benar agar dapat poin!
+    const correctOpt = currentQuestion.category === 'TKP' 
+       ? currentQuestion.options.find((o: any) => o.score === 5)?.id 
+       : currentQuestion.correct;
+       
+    if (correctOpt) {
+       handleSelect(correctOpt);
+    } else {
+       goNextOrFinish(totalScoreRef.current);
+    }
   };
   const use5050 = () => {
-    if (!profile || !profile.inventory || profile.inventory.item_5050 <= 0 || !currentQuestion) return;
+    if (!profile || !profile.inventory || profile.inventory.item_5050 <= 0 || !currentQuestion || !checkPowerupLimit('item_5050')) return;
+    setPowerUpUsageCount(p => ({ ...p, item_5050: (p.item_5050 || 0) + 1 }));
     const updatedInv = { ...profile.inventory, item_5050: profile.inventory.item_5050 - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     
@@ -154,33 +188,53 @@ export default function Quiz() {
     broadcastPowerUp('item_5050');
   };
   const useHint = () => {
-    if (!profile || !profile.inventory || profile.inventory.item_hint <= 0) return;
+    if (!profile || !profile.inventory || profile.inventory.item_hint <= 0 || !checkPowerupLimit('item_hint')) return;
+    setPowerUpUsageCount(p => ({ ...p, item_hint: (p.item_hint || 0) + 1 }));
     const updatedInv = { ...profile.inventory, item_hint: profile.inventory.item_hint - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     setShowHint(true);
     broadcastPowerUp('item_hint');
   };
   const useWaktuBeku = () => {
-    if (!profile || !profile.inventory || profile.inventory.item_waktu_beku <= 0) return;
+    if (!profile || !profile.inventory || profile.inventory.item_waktu_beku <= 0 || !checkPowerupLimit('item_waktu_beku')) return;
+    setPowerUpUsageCount(p => ({ ...p, item_waktu_beku: (p.item_waktu_beku || 0) + 1 }));
     const updatedInv = { ...profile.inventory, item_waktu_beku: profile.inventory.item_waktu_beku - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     setActivePowerUps(p => ({...p, waktuBeku: true}));
-    setTimeout(() => setActivePowerUps(p => ({...p, waktuBeku: false})), 30000);
+    setTimeout(() => setActivePowerUps(p => ({...p, waktuBeku: false})), 5000);
     broadcastPowerUp('item_waktu_beku');
+
+    // Mencegah timer anjlok setelah freeze, kita geser startedAt 5 detik ke masa depan
+    if (sessionId && activeSession?.startedAt) {
+       const newStart = new Date(new Date(activeSession.startedAt).getTime() + 5000).toISOString();
+       updateSession(sessionId, { startedAt: newStart });
+    }
   };
   const useSkorGanda = () => {
-    if (!profile || !profile.inventory || profile.inventory.item_skor_ganda <= 0) return;
+    if (!profile || !profile.inventory || profile.inventory.item_skor_ganda <= 0 || !checkPowerupLimit('item_skor_ganda')) return;
+    setPowerUpUsageCount(p => ({ ...p, item_skor_ganda: (p.item_skor_ganda || 0) + 1 }));
     const updatedInv = { ...profile.inventory, item_skor_ganda: profile.inventory.item_skor_ganda - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     setActivePowerUps(p => ({...p, skorGanda: true}));
     broadcastPowerUp('item_skor_ganda');
   };
   const useTerawangan = () => {
-    if (!profile || !profile.inventory || profile.inventory.item_terawangan <= 0) return;
+    if (!profile || !profile.inventory || profile.inventory.item_terawangan <= 0 || !checkPowerupLimit('item_terawangan')) return;
+    setPowerUpUsageCount(p => ({ ...p, item_terawangan: (p.item_terawangan || 0) + 1 }));
     const updatedInv = { ...profile.inventory, item_terawangan: profile.inventory.item_terawangan - 1 };
     updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
     setActivePowerUps(p => ({...p, terawangan: true}));
     broadcastPowerUp('item_terawangan');
+  };
+
+  const togglePerisai = () => {
+    // Hanya bisa toggle jika punya stok dan belum limit
+    if (!profile || !profile.inventory) return;
+    const hasStock = profile.inventory.item_kesempatan_kedua > 0 || profile.inventory.item_shield > 0;
+    const underLimit = checkPowerupLimit('item_kesempatan_kedua') || checkPowerupLimit('item_shield');
+    if (hasStock && underLimit) {
+      setActivePowerUps(p => ({ ...p, perisaiActive: !p.perisaiActive }));
+    }
   };
   const [showRewardFloat, setShowRewardFloat] = useState<{ pts: number } | null>(null);
   
@@ -312,13 +366,17 @@ export default function Quiz() {
         try {
           const id = await createSession(gameMode, data, packageId, packageVersion);
           if (mounted) setSessionId(id);
-        } catch (err) {
+        } catch (err: any) {
           console.error("Failed to create quiz session:", err);
+          if (mounted) {
+            setError(err.message || "Gagal membuat sesi kuis.");
+            setLoadingQuestions(false);
+          }
         }
       }
     };
 
-    if (gameMode === 'catatansalah') {
+    if (gameMode === 'catatan_salah') {
       // Fetch catatan_salah langsung dari Supabase agar selalu up-to-date
       const loadCatatanSalah = async () => {
         try {
@@ -365,7 +423,15 @@ export default function Quiz() {
       };
       loadCatatanSalah();
     } else {
-      fetchQuestionsFromSupabase(gameMode).then(initQuestions);
+      fetchQuestionsFromSupabase(gameMode)
+        .then(initQuestions)
+        .catch((err: any) => {
+          console.error("Failed to fetch questions:", err);
+          if (mounted) {
+            setError(err.message || "Gagal memuat soal dari database.");
+            setLoadingQuestions(false);
+          }
+        });
     }
     return () => { mounted = false; };
   }, [gameMode]);
@@ -413,27 +479,39 @@ export default function Quiz() {
   const calcScore = (optionId: string): number => {
     if (!currentQuestion) return 0;
     const opt = currentQuestion.options.find((o: any) => o.id === optionId);
-    let pts = opt?.score ?? 0;
+    let pts = Number(opt?.score ?? 0);
     if (activePowerUps.skorGanda) {
       pts *= 2;
       setActivePowerUps(p => ({ ...p, skorGanda: false }));
     }
     return pts;
   };
-  // --- Timer ---
+  const questionStartTimeRef = useRef<number>(Date.now());
+
+  // --- Timer Sync (Hardcore Anti-Cheat) ---
   useEffect(() => {
-    if (isGameOver || activePowerUps.waktuBeku) return;
-    if (timeLeft <= 0) {
-      if (gameMode === 'tryout') {
-        finishTryout();
-      } else {
-        goNextOrFinish(totalScoreRef.current);
-      }
+    if (isGameOver || !activeSession?.startedAt) return;
+    
+    // Jika waktuBeku aktif, timer berhenti secara visual (server sudah di-offset +5 detik)
+    if (activePowerUps.waktuBeku) {
       return;
     }
-    const t = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
+
+    if (timeLeft <= 0) {
+      if (gameMode === 'tryout') finishTryout();
+      else goNextOrFinish(totalScoreRef.current);
+      return;
+    }
+
+    const t = setTimeout(() => {
+      const now = Date.now();
+      const start = new Date(activeSession.startedAt).getTime();
+      const elapsed = Math.floor((now - start) / 1000);
+      const newTimeLeft = Math.max(0, TOTAL_TIME - elapsed);
+      setTimeLeft(newTimeLeft);
+    }, 1000);
     return () => clearTimeout(t);
-  }, [timeLeft, isGameOver, gameMode]);
+  }, [timeLeft, isGameOver, gameMode, activePowerUps.waktuBeku, activeSession?.startedAt, TOTAL_TIME]);
   // --- Simulate Bot AI answering ---
   useEffect(() => {
     if (gameMode !== 'pvp_bot' || !currentQuestion) return;
@@ -504,7 +582,11 @@ export default function Quiz() {
 
     if (gameMode === 'tryout') {
       // In tryout, user can change answer freely, no auto-advance
-      setAnswers(prev => ({ ...prev, [currentQuestionIndex]: optionId }));
+      const newAnswers = { ...answers, [currentQuestionIndex]: optionId };
+      setAnswers(newAnswers);
+      if (sessionId) {
+        updateSession(sessionId, { answers: newAnswers });
+      }
       return;
     }
     if (selected) return; // Prevent changing in normal modes
@@ -512,52 +594,92 @@ export default function Quiz() {
     const earned = calcScore(optionId);
     const isTKP = currentQuestion.category === 'TKP';
     const isCorrect = optionId === currentQuestion.correct;
-    const isFullyCorrect = (!isTKP && isCorrect) || (isTKP && earned >= 50);
+    const isFullyCorrect = (!isTKP && isCorrect) || (isTKP && earned >= 5);
+
+    // Tracker Catatan Salah / Mastery
+    if (profile?.id) {
+      if (!isFullyCorrect) {
+        saveWrongQuestion(profile.id, currentQuestion.id, currentQuestion.category);
+      } else if (gameMode === 'catatan_salah') {
+        incrementMastery(profile.id, currentQuestion.id);
+      }
+    }
 
     // Supabase stats update dipindahkan ke Result.tsx agar dilakukan dalam satu kali API call
-    // Survival: wrong = game over (TKP not applicable for survival)
-    if (gameMode === 'survival' && ((!isTKP && !isCorrect) || (isTKP && earned < 50))) {
-      if (!activePowerUps.secondChanceUsed) {
-        if (profile?.inventory?.item_kesempatan_kedua > 0) {
-          setActivePowerUps(p => ({...p, secondChanceUsed: true}));
+    // Survival: wrong = game over (TKP not applicable for survival usually, but handled)
+    if (gameMode === 'survival' && ((!isTKP && !isCorrect) || (isTKP && earned < 5))) {
+      // Perisai tak terbatas (sesuai limit max)
+      // TAPI HANYA BEKERJA JIKA DIAKTIFKAN OLEH PEMAIN (perisaiActive === true)
+      if (activePowerUps.perisaiActive) {
+        if (profile?.inventory?.item_kesempatan_kedua > 0 && checkPowerupLimit('item_kesempatan_kedua')) {
+          setPowerUpUsageCount(p => ({ ...p, item_kesempatan_kedua: (p.item_kesempatan_kedua || 0) + 1 }));
           const updatedInv = { ...profile.inventory, item_kesempatan_kedua: profile.inventory.item_kesempatan_kedua - 1 };
           updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
-          return;
-        } else if (profile?.inventory?.item_shield > 0) {
-          setActivePowerUps(p => ({...p, secondChanceUsed: true}));
+          setActivePowerUps(p => ({ ...p, perisaiActive: false })); // Matikan setelah dipakai
+          // biarkan lanjut, shield menangkal Game Over
+        } else if (profile?.inventory?.item_shield > 0 && checkPowerupLimit('item_shield')) {
+          setPowerUpUsageCount(p => ({ ...p, item_shield: (p.item_shield || 0) + 1 }));
           const updatedInv = { ...profile.inventory, item_shield: profile.inventory.item_shield - 1 };
           updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
-          return;
+          setActivePowerUps(p => ({ ...p, perisaiActive: false })); // Matikan setelah dipakai
+          // biarkan lanjut, shield menangkal Game Over
+        } else {
+           // Shield limit reached or not enough stock
+           triggerSuddenDeath();
+           return;
         }
+      } else {
+         triggerSuddenDeath();
+         return;
       }
-      setIsGameOver(true);
-      
-      const earnedCoins = gameMode === 'survival' ? Math.floor((currentQuestionIndex * 50 + earned) * 0.2) : 50;
-      const gainedXP = gameMode === 'survival' ? (currentQuestionIndex * 50 + earned) : 150;
+    }
 
-      completeSession(sessionId!, {
-        score: currentQuestionIndex * 50 + earned,
-        coinsEarned: earnedCoins,
-        xpEarned: gainedXP
-      }).then(() => {
-        setTimeout(() => {
-          navigate(`/result/${sessionId}`, { 
+    function triggerSuddenDeath() {
+      setHeartBroken(true);
+      setTimeout(() => {
+        setIsGameOver(true);
+        const finalScore = totalScore + earned;
+        const earnedCoins = Math.floor(finalScore * 0.2 * 10);
+        const gainedXP = finalScore * 10;
+        
+        completeSession(sessionId!, {
+          score: finalScore,
+          coinsEarned: earnedCoins,
+          xpEarned: gainedXP,
+          finalAnswers: { ...answers, [currentQuestionIndex]: optionId }
+        }).then((resultId) => {
+          navigate(`/result/${resultId}`, { 
             state: { 
-              score: currentQuestionIndex * 50 + earned, 
+              score: finalScore, 
               mode: gameMode,
               sessionId,
               userAnswers: { ...answers, [currentQuestionIndex]: optionId },
               quizQuestions: questions
             } 
           });
-        }, 1800);
-      });
-      return;
+          // Show toast after navigation
+          setTimeout(() => {
+             alert('Satu kesalahan fatal! Game Over.');
+          }, 100);
+        });
+      }, 1000); // Wait 1 second to show red flash
+    };
+
+    if (gameMode === 'survival' && !(!isTKP && !isCorrect) && !(isTKP && earned < 5)) {
+      // if correct, continue normal
     }
     // Update my score
-    const newTotal = totalScore + earned;
+    const newTotal = totalScoreRef.current + earned;
     setTotalScore(newTotal);
     totalScoreRef.current = newTotal;
+    
+    // Real-time Update Database (Crucial for LiveRanking)
+    const newAnswers = { ...answers, [currentQuestionIndex]: optionId };
+    setAnswers(newAnswers);
+    if (sessionId) {
+      updateSession(sessionId, { score: newTotal, answers: newAnswers });
+    }
+
     // Floating reward
     if (earned > 0) {
       setShowRewardFloat({ pts: earned });
@@ -566,7 +688,15 @@ export default function Quiz() {
     // Update live rank for PvP
     if (gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') {
       setLiveRanks(prev => {
-        const updated = prev.map(r => r.isMe ? { ...r, score: r.score + earned } : r);
+        let updated = prev.map(r => r.isMe ? { ...r, score: r.score + earned } : r);
+        if (gameMode === 'pvp_bot') {
+          // Simulasi bot mencetak skor: 60% peluang benar (50 pts)
+          const botEarned = currentQuestion?.category === 'TKP' 
+            ? Math.floor(Math.random() * 3 + 3) // 3-5 poin TKP
+            : (Math.random() > 0.4 ? 50 : 0);
+          
+          updated = updated.map(r => (!r.isMe && r.name.includes('Bot')) ? { ...r, score: r.score + botEarned } : r);
+        }
         return updated.sort((a, b) => b.score - a.score);
       });
       if (isRealtimePvP && channelRef.current) {
@@ -577,10 +707,10 @@ export default function Quiz() {
         });
       }
       
-      // Auto-advance in PvP/1v1 modes after 2 seconds for a fast-paced multiplayer experience!
+      // Auto-advance in PvP/1v1 modes after 1 second
       autoAdvanceTimer.current = setTimeout(() => {
         goNextOrFinish(newTotal);
-      }, 2000);
+      }, 1000);
     }
     // Auto advance removed, user must manually proceed after seeing Pembahasan
   };
@@ -591,6 +721,7 @@ export default function Quiz() {
 
     questions.forEach((q, idx) => {
       const ansId = answers[idx];
+      let isFullyCorrect = false;
       if (ansId) {
         const opt = q.options.find((o: any) => o.id === ansId);
         const pts = opt?.score ?? 0;
@@ -598,16 +729,25 @@ export default function Quiz() {
         if (q.category === 'TWK') twkScore += pts;
         else if (q.category === 'TIU') tiuScore += pts;
         else if (q.category === 'TKP') tkpScore += pts;
+        
+        const isTKP = q.category === 'TKP';
+        isFullyCorrect = (!isTKP && ansId === q.correct) || (isTKP && pts >= 5);
+      }
+      
+      // Tracking Catatan Salah (Tryout batch)
+      if (!isFullyCorrect && profile?.id) {
+        saveWrongQuestion(profile.id, q.id, q.category);
       }
     });
     
     const earnedCoins = gameMode === 'tryout' ? 300 : 50;
     const gainedXP = gameMode === 'tryout' ? 500 : 150;
 
+    setIsFinishing(true);
     completeSession(sessionId!, {
       score: finalScore, twkScore, tiuScore, tkpScore, coinsEarned: earnedCoins, xpEarned: gainedXP
-    }).then(() => {
-      navigate(`/result/${sessionId}`, { 
+    }).then((resultId) => {
+      navigate(`/result/${resultId}`, { 
         state: { 
           score: finalScore, 
           mode: gameMode,
@@ -646,13 +786,34 @@ export default function Quiz() {
       } else if (gameMode !== 'tryout') {
         setTimeLeft(TOTAL_TIME);
       }
-    } else {
-      const earnedCoins = gameMode === 'survival' ? Math.floor(scoreSnapshot * 0.2) : 50;
-      const gainedXP = gameMode === 'survival' ? scoreSnapshot : 150;
 
+      if (sessionId) {
+        const updates: any = { currentIndex: nextIdx };
+        if (gameMode !== 'tryout') {
+          updates.startedAt = new Date().toISOString();
+        }
+        updateSession(sessionId, updates);
+      }
+    } else {
+      setIsFinishing(true);
       completeSession(sessionId!, {
-        score: scoreSnapshot, coinsEarned: earnedCoins, xpEarned: gainedXP
-      }).then(() => {
+        score: totalScoreRef.current,
+        coinsEarned: Math.floor(totalScore * 0.2 * 10),
+        xpEarned: totalScore * 10,
+        finalAnswers: answers
+      }).then((resultId) => {
+        navigate(`/result/${resultId}`, { 
+          state: { 
+            score: scoreSnapshot, 
+            mode: gameMode, 
+            sessionId,
+            liveRanks,
+            userAnswers: answers,
+            quizQuestions: questions
+          } 
+        });
+      }).catch((err) => {
+        console.error("Failed to complete session:", err);
         navigate(`/result/${sessionId}`, { 
           state: { 
             score: scoreSnapshot, 
@@ -678,7 +839,12 @@ const scoreBadge = (optionId: string) => {
 */
   if (profile && (gameMode === 'survival' || gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && profile.energy <= 0) {
     return (
-      <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-6 text-center font-syne">
+    <div className="min-h-screen bg-background font-syne pb-24 md:pb-8 flex justify-center text-center">
+      {/* Sudden Death Flash Overlay */}
+      <div className={`fixed inset-0 z-50 pointer-events-none transition-colors duration-300 ${heartBroken ? 'bg-danger/30' : 'bg-transparent'}`} />
+
+      {/* Main Container */}
+      <div className="w-full max-w-7xl px-4 md:px-8 flex gap-6 relative">
         <div className="w-16 h-16 bg-danger/10 text-danger rounded-2xl flex items-center justify-center mb-4 border border-danger/20">
           <Battery size={32} className="text-danger fill-red-500/30 animate-pulse" />
         </div>
@@ -713,6 +879,7 @@ const scoreBadge = (optionId: string) => {
           </div>
         )}
       </div>
+    </div>
     );
   }
   return (
@@ -729,10 +896,31 @@ const scoreBadge = (optionId: string) => {
           style={{ boxShadow: 'inset 0 0 80px 20px rgba(34,211,238,0.25)' }} />
       )}
       {/* Loading Screen */}
-      {(loadingQuestions || (!currentQuestion && !noCatatanSalah)) && (
+      {(loadingQuestions || (!currentQuestion && !noCatatanSalah && !error)) && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-bg gap-4">
           <Loader2 className="animate-spin text-primary" size={48} />
           <h2 className="text-xl font-bold text-fg animate-pulse">Mempersiapkan Arena...</h2>
+        </div>
+      )}
+
+      {/* Error Screen */}
+      {error && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-bg gap-6 p-8 text-center">
+          <div className="w-24 h-24 rounded-full bg-danger-subtle border-2 border-danger/30 flex items-center justify-center text-5xl">
+            ⚠️
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-fg mb-2">Terjadi Kesalahan</h2>
+            <p className="text-fg-muted text-sm max-w-xs leading-relaxed">
+              {error}
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate('/', { replace: true })}
+            className="px-8 py-3 bg-primary hover:bg-primary-hover text-primary-fg font-black rounded-xl transition-all shadow-lg text-sm"
+          >
+            Kembali ke Beranda
+          </Button>
         </div>
       )}
 
@@ -794,7 +982,7 @@ const scoreBadge = (optionId: string) => {
                     currentQuestion.category === 'TWK' ? 'bg-purple-50 text-purple-600 border-purple-100' :
                     currentQuestion.category === 'TIU' ? 'bg-blue-50 text-primary border-blue-100' :
                     'bg-amber-50 text-warning border-amber-100'
-                  }`}>{currentQuestion.category}</span>
+                  }`}>Bagian: {currentQuestion.category}</span>
                 </div>
               </div>
             </div>
@@ -810,8 +998,17 @@ const scoreBadge = (optionId: string) => {
               </div>
             </div>
 
-            {/* Timer */}
+            {/* Timer and Survival Heart */}
             <div className="flex items-center gap-2 shrink-0">
+              {gameMode === 'survival' && (
+                <div className="flex items-center justify-center mr-2">
+                  {heartBroken ? (
+                    <HeartCrack size={28} className="text-danger animate-ping" />
+                  ) : (
+                    <Heart size={28} className="text-danger fill-danger animate-pulse" />
+                  )}
+                </div>
+              )}
               <div className="relative w-14 h-10 flex items-center justify-center">
                 {gameMode === 'tryout' ? (
                   <div className={`font-space font-bold text-xs bg-white px-2 py-1 rounded-md border border-slate-200 ${timerColor}`}>
@@ -846,13 +1043,17 @@ const scoreBadge = (optionId: string) => {
           </header>
           {/* PvP: My rank badge (mobile, under header) */}
           {(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && (
-            <div className="lg:hidden px-4 py-2 border-b border-border bg-surface/30 flex items-center justify-between text-xs">
-              <span className="text-fg-muted font-bold">Peringkat Saya:</span>
-              <span className="font-black text-primary flex items-center gap-1">
-                #{myRankPosition}
-                <span className="font-normal text-fg-muted">dari {liveRanks.length}</span>
-              </span>
-              <span className="font-space font-bold text-fg">{liveRanks.find(r => r.isMe)?.score ?? 0} pts</span>
+            <div className="lg:hidden px-4 py-2 border-b border-border bg-surface/30 flex flex-col gap-1 text-xs">
+              <div className="flex justify-between items-center">
+                <span className="text-fg-muted font-bold">Peringkat Saya: <span className="text-primary font-black">#{myRankPosition} <span className="font-normal text-fg-muted">/ {liveRanks.length}</span></span></span>
+                <span className="font-space font-bold text-primary">{liveRanks.find(r => r.isMe)?.score ?? 0} pts (Anda)</span>
+              </div>
+              {liveRanks.length > 1 && (
+                <div className="flex justify-between items-center pt-1 border-t border-border/50">
+                  <span className="text-fg-muted font-bold truncate pr-2">Lawan ({liveRanks.find(r => !r.isMe)?.name}):</span>
+                  <span className="font-space font-bold text-fg">{liveRanks.find(r => !r.isMe)?.score ?? 0} pts</span>
+                </div>
+              )}
             </div>
           )}
           {/* Question Body */}
@@ -903,11 +1104,19 @@ const scoreBadge = (optionId: string) => {
                       }
                     } else if (showStatus) {
                       if (isTKP) {
+                        const optScoreNum = Number(opt.score || 0);
                         if (isSelected) {
-                          cardClass = 'bg-blue-50 border-primary shadow-sm';
-                          markerClass = 'bg-primary text-white';
+                            cardClass = optScoreNum === 5 ? 'bg-emerald-50 border-emerald-500 shadow-sm' : 
+                                        optScoreNum >= 3 ? 'bg-orange-50 border-orange-400 shadow-sm' : 
+                                        'bg-rose-50 border-destructive shadow-sm';
+                            markerClass = optScoreNum === 5 ? 'bg-emerald-500 text-white' : 
+                                          optScoreNum >= 3 ? 'bg-orange-400 text-white' : 
+                                          'bg-destructive text-white';
+                        } else if (optScoreNum === 5) {
+                            cardClass = 'bg-emerald-50 border-emerald-500 shadow-sm opacity-60';
+                            markerClass = 'bg-emerald-500 text-white';
                         } else {
-                          cardClass = 'bg-white border-slate-200 opacity-50';
+                            cardClass = 'bg-white border-slate-200 opacity-40';
                         }
                       } else {
                         if (isCorrect) {
@@ -940,15 +1149,15 @@ const scoreBadge = (optionId: string) => {
                         {/* TKP score badge revealed after answering (not in tryout) */}
                         {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
-                            ${opt.score === 50 ? 'bg-success/20 text-success' :
-                              opt.score >= 30 ? 'bg-orange-500/15 text-orange-400' :
+                            ${Number(opt.score) === 5 ? 'bg-success/20 text-success' :
+                              Number(opt.score) >= 3 ? 'bg-orange-500/15 text-orange-400' :
                               'bg-locked-subtle text-fg-muted'}`}>
                             {opt.score} pts
                           </span>
                         )}
                         {/* Score tag for TWK/TIU revealed after answering (not in tryout) */}
                         {showStatus && !isTKP && isCorrect && gameMode !== 'tryout' && (
-                          <span className="ml-auto shrink-0 text-xs font-bold bg-success/20 text-success px-2 py-1 rounded-lg">50 pts</span>
+                          <span className="ml-auto shrink-0 text-xs font-bold bg-success/20 text-success px-2 py-1 rounded-lg">5 pts</span>
                         )}
                       </motion.button>
                     );
@@ -968,13 +1177,20 @@ const scoreBadge = (optionId: string) => {
                         </Button>
                         <Button
                           variant="primary"
+                          disabled={isFinishing}
                           onClick={() => {
                             if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
                             goNextOrFinish(totalScoreRef.current);
                           }}
                           className="flex-1 py-3 rounded-xl shadow-md active:scale-95"
                         >
-                          Lanjut
+                          {isFinishing ? (
+                            <span className="flex items-center justify-center gap-2">
+                               <Loader2 className="w-5 h-5 animate-spin" /> Memproses...
+                            </span>
+                          ) : (
+                            currentQuestionIndex === totalQuestions - 1 ? 'Selesai' : 'Lanjut'
+                          )}
                         </Button>
                       </div>
                     ) : (
@@ -989,13 +1205,20 @@ const scoreBadge = (optionId: string) => {
                         </p>
                         <Button
                           variant="primary"
+                          disabled={isFinishing}
                           onClick={() => {
                             if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
                             goNextOrFinish(totalScoreRef.current);
                           }}
                           className="mt-4 w-full py-3 rounded-xl shadow-lg active:scale-95"
                         >
-                          Lanjut ke Soal Berikutnya
+                          {isFinishing ? (
+                            <span className="flex items-center justify-center gap-2">
+                               <Loader2 className="w-5 h-5 animate-spin" /> Memproses...
+                            </span>
+                          ) : (
+                            currentQuestionIndex === totalQuestions - 1 ? 'Selesai' : 'Lanjut ke Soal Berikutnya'
+                          )}
                         </Button>
                       </motion.div>
                     )}
@@ -1035,13 +1258,20 @@ const scoreBadge = (optionId: string) => {
                         Selanjutnya
                       </Button>
                     ) : (
-                      <Button
-                        variant="success"
-                        onClick={finishTryout}
-                        className="px-6 py-2.5 rounded-xl shadow-lg shadow-sm active:scale-95"
-                      >
-                        Kumpulkan Ujian
-                      </Button>
+                        <Button
+                          variant="success"
+                          disabled={isFinishing}
+                          onClick={finishTryout}
+                          className="px-6 py-2.5 rounded-xl shadow-lg shadow-sm active:scale-95"
+                        >
+                          {isFinishing ? (
+                            <span className="flex items-center justify-center gap-2">
+                               <Loader2 className="w-5 h-5 animate-spin" /> Memproses...
+                            </span>
+                          ) : (
+                            'Kumpulkan Ujian'
+                          )}
+                        </Button>
                     )}
                   </div>
                   </div>
@@ -1054,28 +1284,28 @@ const scoreBadge = (optionId: string) => {
           {gameMode !== 'tryout' && profile && (
             <div className="flex gap-4 px-4 py-3 border-t border-slate-100 bg-white/50 backdrop-blur-md overflow-x-auto shrink-0 mt-auto shadow-[0_-4px_20px_rgba(0,0,0,0.02)] relative z-30">
               {profile.inventory?.item_5050 > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_5050') && (
-                <Button variant="custom" onClick={use5050} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary hover:bg-blue-100 transition-colors border border-blue-100 shadow-sm"><Scale size={14}/> 50:50 ({profile.inventory.item_5050})</Button>
+                <Button variant="custom" onClick={use5050} disabled={!checkPowerupLimit('item_5050')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary transition-colors border border-blue-100 shadow-sm ${!checkPowerupLimit('item_5050') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-blue-100'}`}><Scale size={14}/> 50:50 ({profile.inventory.item_5050})</Button>
               )}
               {profile.inventory?.item_hint > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_hint') && (
-                <Button variant="custom" onClick={useHint} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-amber-50 text-warning hover:bg-amber-100 transition-colors border border-amber-100 shadow-sm"><Lightbulb size={14}/> Petunjuk ({profile.inventory.item_hint})</Button>
+                <Button variant="custom" onClick={useHint} disabled={!checkPowerupLimit('item_hint')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-amber-50 text-warning transition-colors border border-amber-100 shadow-sm ${!checkPowerupLimit('item_hint') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-amber-100'}`}><Lightbulb size={14}/> Petunjuk ({profile.inventory.item_hint})</Button>
               )}
               {profile.inventory?.item_waktu_beku > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_waktu_beku') && (
-                <Button variant="custom" onClick={useWaktuBeku} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${activePowerUps.waktuBeku ? 'bg-cyan-50 border-cyan-200 text-cyan-600 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Clock size={14}/> Waktu Beku ({profile.inventory.item_waktu_beku})</Button>
+                <Button variant="custom" onClick={useWaktuBeku} disabled={!checkPowerupLimit('item_waktu_beku')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${!checkPowerupLimit('item_waktu_beku') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.waktuBeku ? 'bg-cyan-50 border-cyan-200 text-cyan-600 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Clock size={14}/> Waktu Beku ({profile.inventory.item_waktu_beku})</Button>
               )}
               {profile.inventory?.item_skor_ganda > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_skor_ganda') && (
-                <Button variant="custom" onClick={useSkorGanda} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${activePowerUps.skorGanda ? 'bg-amber-50 border-amber-200 text-warning shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Zap size={14}/> Skor Ganda ({profile.inventory.item_skor_ganda})</Button>
+                <Button variant="custom" onClick={useSkorGanda} disabled={!checkPowerupLimit('item_skor_ganda')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${!checkPowerupLimit('item_skor_ganda') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.skorGanda ? 'bg-amber-50 border-amber-200 text-warning shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Zap size={14}/> Skor Ganda ({profile.inventory.item_skor_ganda})</Button>
               )}
               {profile.inventory?.item_terawangan > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_terawangan') && (
-                <Button variant="custom" onClick={useTerawangan} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${activePowerUps.terawangan ? 'bg-purple-50 border-purple-200 text-purple-600 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Eye size={14}/> Terawangan ({profile.inventory.item_terawangan})</Button>
+                <Button variant="custom" onClick={useTerawangan} disabled={!checkPowerupLimit('item_terawangan')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${!checkPowerupLimit('item_terawangan') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.terawangan ? 'bg-purple-50 border-purple-200 text-purple-600 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Eye size={14}/> Terawangan ({profile.inventory.item_terawangan})</Button>
               )}
               {profile.inventory?.item_tinta_hitam > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_tinta_hitam') && (
-                <Button variant="custom" onClick={useTintaHitam} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-rose-50 text-destructive hover:bg-rose-100 transition-colors border border-rose-100 shrink-0 shadow-sm"><Skull size={14}/> Tinta Hitam ({profile.inventory.item_tinta_hitam})</Button>
+                <Button variant="custom" onClick={useTintaHitam} disabled={!checkPowerupLimit('item_tinta_hitam')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-rose-50 text-destructive transition-colors border border-rose-100 shrink-0 shadow-sm ${!checkPowerupLimit('item_tinta_hitam') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-rose-100'}`}><Skull size={14}/> Tinta Hitam ({profile.inventory.item_tinta_hitam})</Button>
               )}
               {profile.inventory?.item_lompatan_kilat > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_lompatan_kilat') && !lompatanKilatUsed && (
-                <Button variant="custom" onClick={useLompatanKilat} className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary hover:bg-blue-100 transition-colors border border-blue-100 shrink-0 shadow-sm"><Zap size={14}/> Lompatan Kilat ({profile.inventory.item_lompatan_kilat})</Button>
+                <Button variant="custom" onClick={useLompatanKilat} disabled={!checkPowerupLimit('item_lompatan_kilat')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary transition-colors border border-blue-100 shrink-0 shadow-sm ${!checkPowerupLimit('item_lompatan_kilat') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-blue-100'}`}><Zap size={14}/> Lompatan Kilat ({profile.inventory.item_lompatan_kilat})</Button>
               )}
               {(profile.inventory?.item_kesempatan_kedua > 0 || profile.inventory?.item_shield > 0) && ALLOWED_POWER_UPS[gameMode]?.includes('item_kesempatan_kedua') && (
-                <div className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0"><Shield size={14}/> Perisai ({(profile.inventory.item_kesempatan_kedua || 0) + (profile.inventory.item_shield || 0)})</div>
+                <Button variant="custom" onClick={togglePerisai} disabled={!checkPowerupLimit('item_kesempatan_kedua') && !checkPowerupLimit('item_shield')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border shrink-0 ${(!checkPowerupLimit('item_kesempatan_kedua') && !checkPowerupLimit('item_shield')) ? 'opacity-50 grayscale bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : activePowerUps.perisaiActive ? 'bg-emerald-50 text-emerald-600 border-emerald-200 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Shield size={14}/> Perisai ({(profile.inventory.item_kesempatan_kedua || 0) + (profile.inventory.item_shield || 0)})</Button>
               )}
             </div>
           )}
@@ -1105,7 +1335,10 @@ const scoreBadge = (optionId: string) => {
                           ? 'bg-info-subtle border-info/40 shadow-md shadow-primary/10'
                           : 'bg-bg/50 border-border/50'}`}
                     >
-                      <span className="text-base w-6 text-center">{medal}</span>
+                      <div className="flex items-center gap-4 bg-surface p-2 md:p-3 rounded-2xl shadow-sm border border-border shrink-0">
+                        {/* Score */}
+                        <span className="text-base w-6 text-center">{medal}</span>
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p className={`text-xs font-bold truncate ${rank.isMe ? 'text-primary' : 'text-fg'}`}>
                           {rank.name}{rank.isMe && ' 👤'}

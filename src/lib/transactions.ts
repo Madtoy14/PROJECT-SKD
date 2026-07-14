@@ -350,7 +350,7 @@ export async function validatePurchase(
     }
 
     // Check if cost is reasonable (basic sanity check)
-    if (cost < 0 || cost > 10000) {
+    if (cost < 0 || cost > 100000) {
       return { valid: false, reason: 'Harga tidak valid' };
     }
 

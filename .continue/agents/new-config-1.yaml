@@ -1,0 +1,25 @@
+name: SKDQuest AI
+version: v1
+
+models:
+  - name: "SKDQuest Logic (Claude 4.5)"
+    provider: openai
+    model: claude-sonnet-4.5-thinking
+    apiBase: https://openagentic.id/api/v1
+    apiKey: sk-6c9a13d2b048e7692070aeef265385dabd07b7142fa2393529d51fc4a37c5cc9
+    contextLength: 200000
+    roles: [chat, edit, apply]
+
+  - name: "SKDQuest UI (DeepSeek V4)"
+    provider: openai
+    model: deepseek-v4-flash
+    apiBase: https://openagentic.id/api/v1
+    apiKey: sk-6c9a13d2b048e7692070aeef265385dabd07b7142fa2393529d51fc4a37c5cc9
+    roles: [chat, edit, apply]
+
+  - name: "DeepSeek Autocomplete"
+    provider: openai
+    model: deepseek-v4-flash
+    apiBase: https://openagentic.id/api/v1
+    apiKey: sk-6c9a13d2b048e7692070aeef265385dabd07b7142fa2393529d51fc4a37c5cc9
+    roles: [autocomplete]

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
@@ -12,6 +12,33 @@ import { ProfileSkeleton } from '../components/LoadingSkeleton';
 import PlayerProfileModal from '../components/PlayerProfileModal';
 import avatarPdh from '../assets/avatar_pdh.png';
 import RankBadge, { RankCard } from '../components/RankBadge';
+import { getUserAnalytics } from '../lib/supabase';
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  Title
+} from 'chart.js';
+import { Radar, Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  Title
+);
+
 const ALL_BADGES_DATA = [
   { id: 1, name: 'Pawang TWK', icon: '📜', desc: 'Total >100 jawaban benar.' },
   { id: 2, name: 'Veteran Silogisme', icon: '✨', desc: 'Skor Survival >10.' },
@@ -50,6 +77,7 @@ export default function Profile() {
   const [availableCharacters, setAvailableCharacters] = useState<Character[]>([]);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [analytics, setAnalytics] = useState<any>(null);
   // Accuracy & Radar Chart state
   const [akurasi, setAkurasi] = useState<{
     TWK: { correct: number; total: number };
@@ -78,26 +106,76 @@ export default function Profile() {
   const tiuAcc = getAcc('TIU') || 60;
   const tkpAcc = getAcc('TKP') || 60;
 
-  const cx = 120;
-  const cy = 110;
-  const rMax = 80;
-  const angles = [
-    -Math.PI / 2, // TWK at 12 o'clock
-    (7 * Math.PI) / 6, // TIU at 7 o'clock
-    (11 * Math.PI) / 6 // TKP at 5 o'clock
-  ];
+  // Estimasi skor berdasarkan passing grade maksimum: TWK(150), TIU(175), TKP(225)
+  const twkScore = Math.round((twkAcc / 100) * 150);
+  const tiuScore = Math.round((tiuAcc / 100) * 175);
+  const tkpScore = Math.round((tkpAcc / 100) * 225);
 
-  const getPoint = (index: number, radius: number) => {
-    const x = cx + radius * Math.cos(angles[index]);
-    const y = cy + radius * Math.sin(angles[index]);
-    return `${x},${y}`;
-  };
+  let radarTwk = twkAcc;
+  let radarTiu = tiuAcc;
+  let radarTkp = tkpAcc;
+  
+  if (analytics?.wrongStats) {
+    const ws = analytics.wrongStats;
+    if (ws.total > 0) {
+      radarTwk = Math.max(0, 100 - ((ws.twk / ws.total) * 100));
+      radarTiu = Math.max(0, 100 - ((ws.tiu / ws.total) * 100));
+      radarTkp = Math.max(0, 100 - ((ws.tkp / ws.total) * 100));
+    }
+  }
 
-  const userPoints = [
-    getPoint(0, rMax * (twkAcc / 100)),
-    getPoint(1, rMax * (tiuAcc / 100)),
-    getPoint(2, rMax * (tkpAcc / 100))
-  ].join(' ');
+  const radarData = useMemo(() => ({
+    labels: ['TWK', 'TIU', 'TKP'],
+    datasets: [
+      {
+        label: 'SKD Mastery',
+        data: [radarTwk, radarTiu, radarTkp],
+        backgroundColor: 'rgba(243, 160, 76, 0.2)',
+        borderColor: '#F3A04C',
+        borderWidth: 2,
+        pointBackgroundColor: '#F3A04C',
+      },
+    ],
+  }), [radarTwk, radarTiu, radarTkp]);
+  
+  const radarOptions = useMemo(() => ({
+    scales: {
+      r: {
+        angleLines: { color: 'rgba(150, 150, 150, 0.2)' },
+        grid: { color: 'rgba(150, 150, 150, 0.2)' },
+        pointLabels: { color: '#888', font: { size: 11, weight: 'bold' as const } },
+        ticks: { display: false, min: 0, max: 100 }
+      }
+    },
+    plugins: { legend: { display: false } },
+    maintainAspectRatio: false
+  }), []);
+
+  const lineData = useMemo(() => ({
+    labels: analytics?.trend?.labels || ['Hari Ini'],
+    datasets: [
+      {
+        label: 'Skor Rata-rata',
+        data: analytics?.trend?.data || [0],
+        borderColor: '#40B43E',
+        backgroundColor: 'rgba(64, 180, 62, 0.1)',
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2,
+        pointBackgroundColor: '#40B43E'
+      }
+    ]
+  }), [analytics?.trend?.labels, analytics?.trend?.data]);
+
+  const lineOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: { grid: { color: 'rgba(150, 150, 150, 0.1)' }, ticks: { color: '#888', font: { size: 10 } } },
+      x: { grid: { display: false }, ticks: { color: '#888', font: { size: 10 } } }
+    },
+    plugins: { legend: { display: false } }
+  }), []);
 
   // Title badges logic
   const checkTitle = (cat: 'TWK' | 'TIU' | 'TKP') => {
@@ -111,9 +189,9 @@ export default function Profile() {
   // Compute recommendations
   let rekomendasiAI = 'Selesaikan kuis untuk mendapatkan analisis detail kemampuan dan rekomendasi belajar Anda.';
   const failedCategories: string[] = [];
-  if (getAcc('TWK') > 0 && getAcc('TWK') < 65) failedCategories.push('TWK (Akurasi < 65%)');
-  if (getAcc('TIU') > 0 && getAcc('TIU') < 80) failedCategories.push('TIU (Akurasi < 80%)');
-  if (getAcc('TKP') > 0 && getAcc('TKP') < 72) failedCategories.push('TKP (Akurasi < 72%)');
+  if (getAcc('TWK') > 0 && twkScore < 65) failedCategories.push('TWK (Skor < 65)');
+  if (getAcc('TIU') > 0 && tiuScore < 80) failedCategories.push('TIU (Skor < 80)');
+  if (getAcc('TKP') > 0 && tkpScore < 166) failedCategories.push('TKP (Skor < 166)');
 
   if (getAcc('TWK') === 0 && getAcc('TIU') === 0 && getAcc('TKP') === 0) {
     rekomendasiAI = 'Mari mulai belajar dengan kuis Latihan Harian, PvP, atau Tryout agar AI kami bisa memetakan kekuatan Anda!';
@@ -202,6 +280,8 @@ export default function Profile() {
             supabase!.from('friends').select('id', { count: 'exact', head: true })
               .eq('user_id', p.id).eq('status', 'accepted')
               .then(({ count }) => setFollowingCount(count || 0));
+              
+            getUserAnalytics(p.id).then(a => setAnalytics(a));
           }
         })
         .finally(() => setLoading(false));
@@ -711,36 +791,25 @@ export default function Profile() {
                 📊 Analisis Kemampuan & Rekomendasi AI
               </h3>
 
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                {/* SVG Radar Chart */}
-                <div className="w-full max-w-[240px] flex justify-center shrink-0">
-                  <svg width="240" height="220" className="overflow-visible">
-                    {/* Concentric grid lines (triangles) */}
-                    <polygon points={`${cx + rMax * Math.cos(angles[0])},${cy + rMax * Math.sin(angles[0])} ${cx + rMax * Math.cos(angles[1])},${cy + rMax * Math.sin(angles[1])} ${cx + rMax * Math.cos(angles[2])},${cy + rMax * Math.sin(angles[2])}`} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
-                    <polygon points={`${cx + rMax * 0.75 * Math.cos(angles[0])},${cy + rMax * 0.75 * Math.sin(angles[0])} ${cx + rMax * 0.75 * Math.cos(angles[1])},${cy + rMax * 0.75 * Math.sin(angles[1])} ${cx + rMax * 0.75 * Math.cos(angles[2])},${cy + rMax * 0.75 * Math.sin(angles[2])}`} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
-                    <polygon points={`${cx + rMax * 0.5 * Math.cos(angles[0])},${cy + rMax * 0.5 * Math.sin(angles[0])} ${cx + rMax * 0.5 * Math.cos(angles[1])},${cy + rMax * 0.5 * Math.sin(angles[1])} ${cx + rMax * 0.5 * Math.cos(angles[2])},${cy + rMax * 0.5 * Math.sin(angles[2])}`} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
-                    <polygon points={`${cx + rMax * 0.25 * Math.cos(angles[0])},${cy + rMax * 0.25 * Math.sin(angles[0])} ${cx + rMax * 0.25 * Math.cos(angles[1])},${cy + rMax * 0.25 * Math.sin(angles[1])} ${cx + rMax * 0.25 * Math.cos(angles[2])},${cy + rMax * 0.25 * Math.sin(angles[2])}`} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
-
-                    {/* Axis lines */}
-                    <line x1={cx} y1={cy} x2={cx + rMax * Math.cos(angles[0])} y2={cy + rMax * Math.sin(angles[0])} stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
-                    <line x1={cx} y1={cy} x2={cx + rMax * Math.cos(angles[1])} y2={cy + rMax * Math.sin(angles[1])} stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
-                    <line x1={cx} y1={cy} x2={cx + rMax * Math.cos(angles[2])} y2={cy + rMax * Math.sin(angles[2])} stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
-
-                    {/* User accuracy polygon */}
-                    <polygon points={userPoints} fill="rgba(139,92,246,0.3)" stroke="#8B5CF6" strokeWidth="2" strokeLinejoin="round" />
-
-                    {/* Dots on vertices */}
-                    <circle cx={cx + rMax * (twkAcc / 100) * Math.cos(angles[0])} cy={cy + rMax * (twkAcc / 100) * Math.sin(angles[0])} r="4" fill="#8B5CF6" />
-                    <circle cx={cx + rMax * (tiuAcc / 100) * Math.cos(angles[1])} cy={cy + rMax * (tiuAcc / 100) * Math.sin(angles[1])} r="4" fill="#8B5CF6" />
-                    <circle cx={cx + rMax * (tkpAcc / 100) * Math.cos(angles[2])} cy={cy + rMax * (tkpAcc / 100) * Math.sin(angles[2])} r="4" fill="#8B5CF6" />
-
-                    {/* Vertex Labels */}
-                    <text x={cx} y={cy - rMax - 12} textAnchor="middle" fill="#1E293B" fontSize="10" fontWeight="bold">TWK ({twkAcc.toFixed(0)}%)</text>
-                    <text x={cx - rMax - 14} y={cy + rMax * 0.5 + 14} textAnchor="middle" fill="#1E293B" fontSize="10" fontWeight="bold">TIU ({tiuAcc.toFixed(0)}%)</text>
-                    <text x={cx + rMax + 14} y={cy + rMax * 0.5 + 14} textAnchor="middle" fill="#1E293B" fontSize="10" fontWeight="bold">TKP ({tkpAcc.toFixed(0)}%)</text>
-                  </svg>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {/* Radar Chart AI */}
+                <div className="bg-surface shadow-sm border border-border rounded-2xl p-4 flex flex-col">
+                  <h4 className="text-sm font-black tracking-wider text-[#F3A04C] uppercase mb-4 text-center">SKD Balance AI</h4>
+                  <div className="w-full flex-1 min-h-[220px] flex justify-center items-center">
+                    <Radar data={radarData} options={radarOptions} />
+                  </div>
                 </div>
 
+                {/* Progress Line Chart */}
+                <div className="bg-surface shadow-sm border border-border rounded-2xl p-4 flex flex-col">
+                  <h4 className="text-sm font-black tracking-wider text-[#40B43E] uppercase mb-4 text-center">Trend Skor (7 Hari)</h4>
+                  <div className="w-full flex-1 min-h-[220px] flex justify-center items-center">
+                    <Line data={lineData} options={lineOptions} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-8">
                 {/* Recommendation Texts */}
                 <div className="flex-1 space-y-4 w-full">
                   <div className="bg-surface shadow-sm border border-border rounded-2xl p-4 space-y-3">
@@ -748,26 +817,26 @@ export default function Profile() {
                     <div className="grid grid-cols-3 gap-2">
                       <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
                         <span className="block text-[10px] text-fg-muted font-bold">TWK (Min 65)</span>
-                        <span className={`text-xs font-black font-space ${twkAcc >= 65 ? 'text-success' : 'text-danger'}`}>
-                          {twkAcc >= 65 ? 'LULUS' : 'GAGAL'}
+                        <span className={`text-xs font-black font-space ${twkScore >= 65 ? 'text-success' : 'text-danger'}`}>
+                          {twkScore >= 65 ? 'LULUS' : 'GAGAL'}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
                         <span className="block text-[10px] text-fg-muted font-bold">TIU (Min 80)</span>
-                        <span className={`text-xs font-black font-space ${tiuAcc >= 80 ? 'text-success' : 'text-danger'}`}>
-                          {tiuAcc >= 80 ? 'LULUS' : 'GAGAL'}
+                        <span className={`text-xs font-black font-space ${tiuScore >= 80 ? 'text-success' : 'text-danger'}`}>
+                          {tiuScore >= 80 ? 'LULUS' : 'GAGAL'}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
-                        <span className="block text-[10px] text-fg-muted font-bold">TKP (Min 72)</span>
-                        <span className={`text-xs font-black font-space ${tkpAcc >= 72 ? 'text-success' : 'text-danger'}`}>
-                          {tkpAcc >= 72 ? 'LULUS' : 'GAGAL'}
+                        <span className="block text-[10px] text-fg-muted font-bold">TKP (Min 166)</span>
+                        <span className={`text-xs font-black font-space ${tkpScore >= 166 ? 'text-success' : 'text-danger'}`}>
+                          {tkpScore >= 166 ? 'LULUS' : 'GAGAL'}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-1.5 text-xs text-gray-300 leading-relaxed font-medium">
+                  <div className="space-y-1.5 text-xs text-fg-muted leading-relaxed font-medium">
                     <p className="flex items-start gap-2">
                       <span className="text-[#F5A623]">🤖</span>
                       <span>{rekomendasiAI}</span>

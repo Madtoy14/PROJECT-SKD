@@ -7,33 +7,25 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } f
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from './lib/supabase';
 
-import { Home, Trophy, BookOpen, Store, User, BookOpenCheck } from 'lucide-react';
+import { Home, Trophy, BookOpen, Store, User, BookOpenCheck, Target, Bookmark } from 'lucide-react';
 
 
-import Dashboard from './pages/Dashboard';
+import { lazy, Suspense } from 'react';
 
-import Quiz from './pages/Quiz';
-
-import Result from './pages/Result';
-
-import Leaderboard from './pages/Leaderboard';
-
-import Quest from './pages/Quest';
-
-import Shop from './pages/Shop';
-
-import TryOutLobby from './pages/TryOutLobby';
-import ReviewDetail from './pages/ReviewDetail';
-
-import Profile from './pages/Profile';
-
-import Auth from './pages/Auth';
-
-import Onboarding from './pages/Onboarding';
-
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Quiz = lazy(() => import('./pages/Quiz'));
+const Result = lazy(() => import('./pages/Result'));
+const Leaderboard = lazy(() => import('./pages/Leaderboard'));
+const Quest = lazy(() => import('./pages/Quest'));
+const Shop = lazy(() => import('./pages/Shop'));
+const WrongBook = lazy(() => import('./pages/WrongBook'));
+const TryOutLobby = lazy(() => import('./pages/TryOutLobby'));
+const ReviewDetail = lazy(() => import('./pages/ReviewDetail'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Auth = lazy(() => import('./pages/Auth'));
+const Onboarding = lazy(() => import('./pages/Onboarding'));
 
 import { DuelProvider } from './context/DuelContext';
-
 import IncomingDuelRequest from './components/IncomingDuelRequest';
 
 
@@ -55,11 +47,11 @@ function Navigation() {
   const navItems = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/pembahasan', icon: BookOpenCheck, label: 'Pembahasan' },
+    { path: '/catatan-salah', icon: Bookmark, label: 'Catatan' },
     { path: '/liga', icon: Trophy, label: 'Liga' },
-    { path: '/quest', icon: BookOpen, label: 'Quest' },
+    { path: '/quest', icon: Target, label: 'Quest' },
     { path: '/toko', icon: Store, label: 'Toko' },
     { path: '/profil', icon: User, label: 'Profil' },
-
   ];
 
 
@@ -316,19 +308,28 @@ function AppLayout() {
       <IncomingDuelRequest />
       <main className={`flex-1 min-w-0 ${!isFullScreen ? 'md:ml-[88px] pb-20 md:pb-0' : ''} min-h-screen transition-all duration-300`}>
         <div className={`w-full h-full ${!isFullScreen ? 'max-w-7xl mx-auto' : ''}`}>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/"                  element={<ProtectedRoute authState={authState}><Dashboard /></ProtectedRoute>} />
-            <Route path="/onboarding"        element={<ProtectedRoute authState={authState}><Onboarding /></ProtectedRoute>} />
-            <Route path="/quiz"              element={<ProtectedRoute authState={authState}><Quiz /></ProtectedRoute>} />
-            <Route path="/result/:attemptId" element={<ProtectedRoute authState={authState}><Result /></ProtectedRoute>} />
-            <Route path="/liga"              element={<ProtectedRoute authState={authState}><Leaderboard /></ProtectedRoute>} />
-            <Route path="/quest"             element={<ProtectedRoute authState={authState}><Quest /></ProtectedRoute>} />
-            <Route path="/toko"              element={<ProtectedRoute authState={authState}><Shop /></ProtectedRoute>} />
-            <Route path="/pembahasan"        element={<ProtectedRoute authState={authState}><TryOutLobby /></ProtectedRoute>} />
-            <Route path="/review/:attemptId" element={<ProtectedRoute authState={authState}><ReviewDetail /></ProtectedRoute>} />
-            <Route path="/profil"            element={<ProtectedRoute authState={authState}><Profile /></ProtectedRoute>} />
-          </Routes>
+          <Suspense fallback={
+            <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3 text-primary font-bold">
+              <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+              <span className="text-sm text-fg-muted">Memuat Modul...</span>
+            </div>
+          }>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/"                  element={<ProtectedRoute authState={authState}><Dashboard /></ProtectedRoute>} />
+              <Route path="/onboarding"        element={<ProtectedRoute authState={authState}><Onboarding /></ProtectedRoute>} />
+              <Route path="/quiz"              element={<ProtectedRoute authState={authState}><Quiz /></ProtectedRoute>} />
+              <Route path="/result/:attemptId" element={<ProtectedRoute authState={authState}><Result /></ProtectedRoute>} />
+              <Route path="/liga"              element={<ProtectedRoute authState={authState}><Leaderboard /></ProtectedRoute>} />
+              <Route path="/quest"             element={<ProtectedRoute authState={authState}><Quest /></ProtectedRoute>} />
+              <Route path="/toko"              element={<ProtectedRoute authState={authState}><Shop /></ProtectedRoute>} />
+              <Route path="/catatan-salah"     element={<ProtectedRoute authState={authState}><WrongBook /></ProtectedRoute>} />
+              <Route path="/pembahasan"        element={<ProtectedRoute authState={authState}><TryOutLobby /></ProtectedRoute>} />
+              <Route path="/review/:attemptId" element={<ProtectedRoute authState={authState}><ReviewDetail /></ProtectedRoute>} />
+              <Route path="/review/:packageId/:attemptId" element={<ProtectedRoute authState={authState}><ReviewDetail /></ProtectedRoute>} />
+              <Route path="/profil"            element={<ProtectedRoute authState={authState}><Profile /></ProtectedRoute>} />
+            </Routes>
+          </Suspense>
         </div>
       </main>
     </div>

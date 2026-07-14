@@ -69,6 +69,11 @@ export function useFocusTrap(isOpen: boolean, onClose?: () => void) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const restoreTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (restoreTimerRef.current) {
@@ -123,9 +128,9 @@ export function useFocusTrap(isOpen: boolean, onClose?: () => void) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (modalStack[modalStack.length - 1] !== modalElement) return;
 
-      if (e.key === 'Escape' && onClose) {
+      if (e.key === 'Escape' && onCloseRef.current) {
         e.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -185,7 +190,7 @@ export function useFocusTrap(isOpen: boolean, onClose?: () => void) {
         }, 0);
       }
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   return modalRef;
 }

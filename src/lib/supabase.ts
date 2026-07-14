@@ -233,6 +233,54 @@ export const createPvpRoom = async (hostId: string, code: string): Promise<any> 
   return data;
 };
 
+export async function getUserAnalytics(userId: string) {
+  if (!supabase) return null;
+  
+  const wrongStats = await getWrongBooksStats(userId);
+  
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+  const { data: results, error } = await supabase
+    .from('quiz_results')
+    .select('created_at, score')
+    .eq('user_id', userId)
+    .gte('created_at', sevenDaysAgo.toISOString())
+    .order('created_at', { ascending: true });
+    
+  if (error) {
+    console.error('Error fetching quiz results:', error);
+  }
+  
+  const dailyScores: Record<string, { total: number, count: number }> = {};
+  
+  results?.forEach(res => {
+    const date = new Date(res.created_at).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' });
+    if (!dailyScores[date]) {
+      dailyScores[date] = { total: 0, count: 0 };
+    }
+    dailyScores[date].total += (res.score || 0);
+    dailyScores[date].count += 1;
+  });
+  
+  const trendLabels = Object.keys(dailyScores);
+  const trendData = trendLabels.map(date => Math.round(dailyScores[date].total / dailyScores[date].count));
+
+  if (trendLabels.length === 0) {
+    const today = new Date().toLocaleDateString('id-ID', { month: 'short', day: 'numeric' });
+    trendLabels.push(today);
+    trendData.push(0);
+  }
+  
+  return {
+    wrongStats,
+    trend: {
+      labels: trendLabels,
+      data: trendData
+    }
+  };
+}
+
 // 5. Mengambil Soal dari Supabase (Soal SKD)
 export const fetchQuestionsFromSupabase = async (gameMode: string) => {
   if (!isSupabaseConfigured()) {
@@ -424,3 +472,75 @@ export const fetchAvailableCharacters = async (): Promise<Character[]> => {
     return [];
   }
 };
+
+export async function saveWrongQuestion(userId: string, questionId: string, quizType: string) {
+  if (!supabase) return;
+  const { error } = await supabase.from('wrong_books').upsert({
+    user_id: userId,
+    question_id: questionId,
+    quiz_type: quizType,
+    mastery_count: 0,
+    last_attempted_at: new Date().toISOString()
+  });
+  if (error) console.error("Error saving wrong question:", error);
+}
+
+export async function getWrongQuestions(userId: string, filter?: string) {
+  if (!supabase) return [];
+  let query = supabase
+    .from('wrong_books')
+    .select(`
+      id, mastery_count, quiz_type, question_id,
+      questions (*)
+    `)
+    .eq('user_id', userId)
+    .lt('mastery_count', 3);
+    
+  if (filter) {
+    query = query.eq('quiz_type', filter.toUpperCase());
+  }
+  
+  const { data, error } = await query;
+
+  
+  if (error) {
+    console.error("Error fetching wrong questions:", error);
+    return [];
+  }
+  return data;
+}
+
+export async function incrementMastery(userId: string, questionId: string) {
+  if (!supabase) return;
+  const { error } = await supabase.rpc('increment_mastery', {
+    p_user_id: userId,
+    p_question_id: questionId
+  });
+  if (error) console.error("Error incrementing mastery:", error);
+}
+
+export async function getWrongBooksStats(userId: string) {
+  if (!supabase) return { twk: 0, tiu: 0, tkp: 0, total: 0 };
+  const { data, error } = await supabase
+    .from('wrong_books')
+    .select('quiz_type, mastery_count')
+    .eq('user_id', userId)
+    .lt('mastery_count', 3);
+
+  if (error) {
+    console.error("Error fetching wrong books stats:", error);
+    return { twk: 0, tiu: 0, tkp: 0, total: 0 };
+  }
+
+  const stats = { twk: 0, tiu: 0, tkp: 0, total: 0 };
+
+  data?.forEach(item => {
+    const type = item.quiz_type?.toLowerCase() as keyof typeof stats;
+    if (stats[type] !== undefined) {
+      stats[type]++;
+    }
+    stats.total++;
+  });
+
+  return stats;
+}

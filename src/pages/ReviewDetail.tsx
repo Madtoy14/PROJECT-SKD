@@ -70,6 +70,7 @@ export default function ReviewDetail() {
   
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
+  const [quizMode, setQuizMode] = useState<string>('latihan');
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
@@ -89,13 +90,14 @@ export default function ReviewDetail() {
       try {
         const { data, error: err } = await supabase!
           .from('quiz_results')
-          .select('questions_json, answers_json')
-          .eq('session_id', attemptId)
+          .select('questions_json, answers_json, mode')
+          .or(`id.eq.${attemptId},session_id.eq.${attemptId}`)
           .single();
         
         if (err) throw err;
         setQuizQuestions(data.questions_json || []);
         setUserAnswers(data.answers_json || {});
+        setQuizMode(data.mode || 'latihan');
       } catch (err) {
         console.error(err);
         setError("Gagal memuat detail pembahasan.");
@@ -171,7 +173,7 @@ export default function ReviewDetail() {
               </span>
               <div className="flex items-center gap-1.5">
                 <span className="flex items-center gap-1 text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold border border-purple-100">
-                  Pembahasan Try Out
+                  Pembahasan {quizMode === 'tryout' ? 'Try Out' : quizMode === 'survival' ? 'Survival' : quizMode.includes('pvp') ? 'PvP' : 'Latihan'}
                 </span>
                 <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${
                   currentQuestion.category === 'TWK' ? 'bg-purple-50 text-purple-600 border-purple-100' :

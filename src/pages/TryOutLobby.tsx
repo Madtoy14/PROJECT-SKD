@@ -117,7 +117,7 @@ export default function TryOutLobby() {
                     onClick={() => handleStart(pkg.id)}
                   >
                     <Play size={16} className="mr-2" />
-                    <span>Mulai Try Out</span>
+                    <span>Mulai Sekarang</span>
                   </Button>
                   <Button 
                     variant="outline" 
@@ -134,7 +134,7 @@ export default function TryOutLobby() {
                   className="w-full justify-between group"
                   onClick={() => navigate('/toko')}
                 >
-                  <span>Beli di Toko ({pkg.cost} Koin)</span>
+                  <span>Buka Akses ({pkg.cost} Koin)</span>
                   <Lock size={18} className="text-slate-400" />
                 </Button>
               )}

@@ -13,7 +13,7 @@ const GAME_MODES = [
   { id: 'survival', title: 'Survival Mode', desc: '1 Kesalahan = Game Over', cost: 2, costType: 'energy', icon: Target, color: 'text-danger', bg: 'bg-danger-subtle', border: 'border-danger/30 hover:border-danger hover:shadow-sm', badge: 'Hardcore' },
   { id: 'pvp', title: 'PvP Battle', desc: 'Main bareng maks 50 player', cost: 2, costType: 'energy', icon: Swords, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-sm', badge: 'Multiplayer' },
   { id: 'tryout', title: 'Try Out Mode', desc: 'Simulasi SKD', cost: 1500, costType: 'coin', icon: Trophy, color: 'text-premium', bg: 'bg-premium-subtle', border: 'border-premium/30 hover:border-premium hover:shadow-sm', badge: 'Premium' },
-  { id: 'catatansalah', title: 'Buku Catatan Salah', desc: 'Latih ulang soal yang pernah salah', cost: 0, costType: 'energy', icon: BookOpen, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-card', badge: 'Evaluasi' },
+  { id: 'catatan_salah', title: 'Buku Catatan Salah', desc: 'Latih ulang soal yang pernah salah', cost: 0, costType: 'energy', icon: BookOpen, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-card', badge: 'Evaluasi' },
 ];
 const MONTHLY_LEADERBOARD = [
   { rank: 1, name: 'Raden Saori', xp: 3800, isMe: true },
@@ -343,7 +343,7 @@ export default function Dashboard() {
       setActiveRoom(code);
       setIsHost(true);
       setPlayersCount(1);
-      setPvpState('waiting');
+      setPvpState('waiting_friend');
     }, 1000);
   };
   const handleJoinRoom = () => {
@@ -352,9 +352,11 @@ export default function Dashboard() {
     setTimeout(() => {
       setActiveRoom(roomCode.toUpperCase());
       setIsHost(false);
-      setPvpState('waiting');
+      setPvpState('waiting_friend');
       if (roomCode.toUpperCase().startsWith('D')) {
         setPvpSubMode('friend_duel');
+      } else {
+        setPvpSubMode('custom');
       }
     }, 1500);
   };
@@ -366,13 +368,13 @@ export default function Dashboard() {
       setIsHost(true);
       setPlayersCount(1);
       setPvpSubMode('friend_duel');
-      setPvpState('waiting');
+      setPvpState('waiting_friend');
     }, 1000);
   };
 
   // Supabase Real-time: Custom Room & Friend Duel Lobby
   useEffect(() => {
-    if (!activeRoom || !isSupabaseConfigured() || pvpState !== 'waiting') return;
+    if (!activeRoom || !isSupabaseConfigured() || pvpState !== 'waiting_friend') return;
     
     const channel = supabase!.channel(`lobby_${activeRoom}`);
     
@@ -494,7 +496,7 @@ export default function Dashboard() {
   const handlePlayGame = (e: React.MouseEvent, path: string, modeId?: string, extraState: any = {}) => {
     if (isProcessing) return;
     setIsProcessing(true);
-    if (modeId === 'catatansalah') {
+    if (modeId === 'catatan_salah') {
       try {
         const parsed = profile?.catatan_salah || [];
         if (parsed.length === 0) {
@@ -1126,7 +1128,7 @@ export default function Dashboard() {
                         </div>
                         {/* Option 1.5: 1v1 Duel Teman */}
                         <div
-                          onClick={handleCreateFriendDuel}
+                          onClick={() => setPvpSubMode('friend_duel')}
                           className="p-4 rounded-2xl border border-premium bg-premium-subtle hover:bg-premium-subtle cursor-pointer transition-all flex items-center gap-4 group"
                         >
                           <div className="w-12 h-12 rounded-xl bg-premium-subtle text-premium-text flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -1192,7 +1194,7 @@ export default function Dashboard() {
                       </motion.div>
                     )}
                     {/* Custom Room Lobby Setup */}
-                    {pvpState === 'idle' && pvpSubMode === 'custom' && (
+                    {pvpState === 'idle' && (pvpSubMode === 'custom' || pvpSubMode === 'friend_duel') && (
                       <motion.div initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                         <button
                           onClick={() => setPvpSubMode('selection')}
@@ -1201,9 +1203,9 @@ export default function Dashboard() {
                           ← Kembali ke Pilihan Mode
                         </button>
                         <div className="bg-info/10 p-4 rounded-xl border border-info/20">
-                          <h4 className="text-sm font-bold text-info mb-2 flex items-center gap-2"><Users size={16} /> Multiplayer Custom Room</h4>
+                          <h4 className="text-sm font-bold text-info mb-2 flex items-center gap-2"><Users size={16} /> {pvpSubMode === 'custom' ? 'Multiplayer Custom Room' : 'Duel Bersama Teman'}</h4>
                           <p className="text-xs text-fg mb-3">Lawan teman-temanmu secara real-time. Siapa yang tercepat dan paling akurat?</p>
-                          <button onClick={handleCreateRoom} className="w-full bg-info text-info-fg hover:bg-info-hover text-white font-bold py-2.5 rounded-lg text-sm transition-colors shadow-lg shadow-blue-500/20">
+                          <button onClick={pvpSubMode === 'custom' ? handleCreateRoom : handleCreateFriendDuel} className="w-full bg-info text-info-fg hover:bg-info-hover text-white font-bold py-2.5 rounded-lg text-sm transition-colors shadow-lg shadow-blue-500/20">
                             Buat Room Baru
                           </button>
                         </div>

@@ -62,6 +62,7 @@ export default function Result() {
     xp_earned?: number;
     questions_json?: QuizQuestion[];
     answers_json?: Record<string, string>;
+    package_id?: string;
   }
 
   const [resultData, setResultData] = useState<QuizResultData | null>(null);
@@ -74,20 +75,41 @@ export default function Result() {
         setProfile(p);
         
         if (attemptId) {
-          const { data, error: resultError } = await supabase!
-            .from('quiz_results')
-            .select('*')
-            .eq('session_id', attemptId)
-            .single();
+          let data = null;
+          let resultError = null;
+          let retries = 3;
+          
+          while (retries > 0) {
+            const res = await supabase!
+              .from('quiz_results')
+              .select('*')
+              .or(`id.eq.${attemptId},session_id.eq.${attemptId}`)
+              .limit(1)
+              .maybeSingle();
+            
+            data = res.data;
+            resultError = res.error;
+            
+            if (data && !resultError) {
+              break; // Success
+            }
+            
+            console.warn(`Fetch result failed. Retries left: ${retries - 1}`, resultError);
+            retries--;
+            if (retries > 0) {
+              // Wait 1 second before retrying
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+          }
           
           if (resultError) throw resultError;
           setResultData(data);
         } else {
           setError('Attempt ID tidak ditemukan');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to load result:', err);
-        setError('Gagal memuat hasil kuis');
+        setError(`Gagal memuat hasil kuis. Detail: ${err.message || JSON.stringify(err)}`);
       } finally {
         setLoading(false);
       }
@@ -258,10 +280,10 @@ export default function Result() {
                     transition={{ delay: idx * 0.2, type: 'spring' }}
                     className="flex flex-col items-center flex-1"
                   >
-                    <span className="text-xs font-bold text-fg mb-2 truncate max-w-[80px]">{rank.name}</span>
+                    <span className="text-sm md:text-base font-bold text-fg mb-3 truncate max-w-[120px]">{rank.name}</span>
                     <div className={`w-full ${height} ${color} rounded-t-2xl shadow-lg border border-white/5 flex flex-col justify-center items-center text-skd-bg`}>
-                      <span className="text-2xl font-black font-space">{isFirst ? '1' : isSecond ? '2' : '3'}</span>
-                      <span className="text-[10px] font-black font-space">{rank.score} pts</span>
+                      <span className="text-4xl md:text-5xl font-black font-space">{isFirst ? '1' : isSecond ? '2' : '3'}</span>
+                      <span className="text-sm md:text-base font-black font-space mt-1">{rank.score} pts</span>
                     </div>
                   </motion.div>
                 );
@@ -452,20 +474,20 @@ export default function Result() {
         {/* Stats Grid */}
         {!isTryout && quizQuestions && (
           <div className="grid grid-cols-3 gap-3 md:gap-4 w-full max-w-xl mb-6">
-            <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex flex-col items-center shadow-sm">
-              <CheckCircle className="text-emerald-600 mb-2" size={24} />
-              <div className="text-2xl font-black font-space text-emerald-700">{correctCount}</div>
-              <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider mt-1">Benar</p>
+            <div className="bg-emerald-50 border border-emerald-200 p-4 md:p-6 rounded-2xl flex flex-col items-center shadow-sm">
+              <CheckCircle className="text-emerald-600 mb-2" size={32} />
+              <div className="text-3xl md:text-4xl font-black font-space text-emerald-700">{correctCount}</div>
+              <p className="text-xs md:text-sm text-emerald-600 font-bold uppercase tracking-wider mt-1">Benar</p>
             </div>
-            <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex flex-col items-center shadow-sm">
-              <XCircle className="text-destructive mb-2" size={24} />
-              <div className="text-2xl font-black font-space text-rose-700">{incorrectCount}</div>
-              <p className="text-[10px] text-destructive font-bold uppercase tracking-wider mt-1">Salah</p>
+            <div className="bg-rose-50 border border-rose-200 p-4 md:p-6 rounded-2xl flex flex-col items-center shadow-sm">
+              <XCircle className="text-destructive mb-2" size={32} />
+              <div className="text-3xl md:text-4xl font-black font-space text-rose-700">{incorrectCount}</div>
+              <p className="text-xs md:text-sm text-destructive font-bold uppercase tracking-wider mt-1">Salah</p>
             </div>
-            <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col items-center shadow-sm">
-              <Circle className="text-slate-500 mb-2" size={24} />
-              <div className="text-2xl font-black font-space text-fg">{emptyCount}</div>
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Kosong</p>
+            <div className="bg-slate-50 border border-slate-200 p-4 md:p-6 rounded-2xl flex flex-col items-center shadow-sm">
+              <Circle className="text-slate-500 mb-2" size={32} />
+              <div className="text-3xl md:text-4xl font-black font-space text-fg">{emptyCount}</div>
+              <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wider mt-1">Kosong</p>
             </div>
           </div>
         )}
@@ -503,7 +525,10 @@ export default function Result() {
           <div className="w-full max-w-xl mt-8">
             <Button
               variant="outline"
-              onClick={() => navigate(`/review/${attemptId}`)}
+              onClick={() => {
+                const reviewPkg = resultData.package_id || 'latihan';
+                navigate(`/review/${reviewPkg}/${attemptId}`);
+              }}
               className="w-full py-4 rounded-2xl shadow-sm border-2 border-slate-200 text-fg hover:bg-slate-50 hover:border-blue-200 active:scale-[0.99] font-bold"
             >
               Lihat Pembahasan Detail
