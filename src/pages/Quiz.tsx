@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { getRandomQuestions } from '../data/questions/index';
 
 const cleanMathText = (text: string): string => {
   if (!text) return "";
@@ -429,10 +430,16 @@ export default function Quiz() {
     } else {
       fetchQuestionsFromSupabase(gameMode)
         .then(initQuestions)
-        .catch((err: any) => {
+        .catch(() => {
+          // Fallback ke data lokal jika Supabase gagal
           if (mounted) {
-            setError(err.message || "Gagal memuat soal dari database.");
-            setLoadingQuestions(false);
+            const localData = getRandomQuestions('ALL');
+            if (localData.length > 0) {
+              initQuestions(localData);
+            } else {
+              setError("Gagal memuat soal dari database.");
+              setLoadingQuestions(false);
+            }
           }
         });
     }
@@ -454,11 +461,17 @@ export default function Quiz() {
   const progress = (timeLeft / TOTAL_TIME) * 100;
   const strokeDashoffset = ((100 - progress) / 100) * 113.097;
   const timerColor = timeLeft <= 10 ? 'text-danger font-bold' : timeLeft <= 20 ? 'text-primary' : 'text-success';
-  // Calculate score for a picked option (safe-guarded)
+  // Calculate score: TWK/TIU = +5 flat if correct, TKP = opt.score (1-5)
   const calcScore = (optionId: string): number => {
     if (!currentQuestion) return 0;
-    const opt = currentQuestion.options.find((o: any) => o.id === optionId);
-    let pts = Number(opt?.score ?? 0);
+    const isTKP = currentQuestion.category === 'TKP';
+    let pts: number;
+    if (isTKP) {
+      const opt = currentQuestion.options.find((o: any) => o.id === optionId);
+      pts = Number(opt?.score ?? 0); // bobot 1-5
+    } else {
+      pts = optionId === currentQuestion.correct ? 5 : 0; // TWK/TIU: +5 atau 0
+    }
     if (activePowerUps.skorGanda) {
       pts *= 2;
       setActivePowerUps(p => ({ ...p, skorGanda: false }));
@@ -697,32 +710,32 @@ export default function Quiz() {
     }
     // Auto advance removed, user must manually proceed after seeing Pembahasan
   };
-  const finishTryout = () => {
+    const finishTryout = () => {
     let finalScore = 0, twkScore = 0, tiuScore = 0, tkpScore = 0;
-    
-    // Supabase stats update dipindahkan ke Result.tsx
 
     questions.forEach((q, idx) => {
       const ansId = answers[idx];
       let isFullyCorrect = false;
       if (ansId) {
         const opt = q.options.find((o: any) => o.id === ansId);
-        const pts = opt?.score ?? 0;
+        // Score sudah dinormalisasi ke skala 0-5 oleh fetchQuestionsFromSupabase
+        const pts = Number(opt?.score ?? 0);
         finalScore += pts;
         if (q.category === 'TWK') twkScore += pts;
         else if (q.category === 'TIU') tiuScore += pts;
         else if (q.category === 'TKP') tkpScore += pts;
-        
+
         const isTKP = q.category === 'TKP';
-        isFullyCorrect = (!isTKP && ansId === q.correct) || (isTKP && pts >= 5);
+        // TKP: jawaban terbaik = score 5 (maks); TWK/TIU: benar = score 5
+        isFullyCorrect = isTKP ? pts >= 5 : pts === 5;
       }
-      
+
       // Tracking Catatan Salah (Tryout batch)
       if (!isFullyCorrect && profile?.id) {
         saveWrongQuestion(profile.id, q.id, q.category);
       }
     });
-    
+
     const earnedCoins = gameMode === 'tryout' ? 300 : 50;
     const gainedXP = gameMode === 'tryout' ? 500 : 150;
 

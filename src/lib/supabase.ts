@@ -50,8 +50,8 @@ export interface UserProfile {
     TIU: { correct: number; total: number };
     TKP: { correct: number; total: number };
   };
-  friends?: any[];
-  catatan_salah?: any[];
+    friends?: string[];       // array user_id pertemanan
+  catatan_salah?: Array<{ id: string; type: string }>;
   last_spin_date?: string;
   last_claim_date?: string;
   badges?: number[];
@@ -71,9 +71,7 @@ export interface Character {
   is_free: boolean;
 }
 
-// ── API SUPABASE SAJA (GUEST MODE DIHAPUS) ──
-
-// ── PETA API SUPABASE DAN FALLBACK GUEST ──
+// ── Supabase-only API ──
 
 const normalizeProfile = (data: any): UserProfile | null => {
   if (!data) return null;
@@ -137,7 +135,7 @@ export const updateProfile = async (profileUpdate: Partial<UserProfile>): Promis
     const { data: { user } } = await supabase!.auth.getUser();
     if (!user) return null;
 
-    const payload: any = { ...profileUpdate, updated_at: new Date() };
+    const payload: Partial<UserProfile> & { updated_at: Date } = { ...profileUpdate, updated_at: new Date() };
 
     const { data, error } = await supabase!
       .from('profiles')
@@ -266,14 +264,19 @@ export async function getUserAnalytics(userId: string) {
 
 // 5. Mengambil Soal dari Supabase (Soal SKD)
 export const fetchQuestionsFromSupabase = async (gameMode: string) => {
-  if (!isSupabaseConfigured()) {
-    // Fallback ke data statis jika Supabase belum disetup
+    if (!isSupabaseConfigured()) {
+    // Fallback ke data lokal terstruktur jika Supabase belum dikonfigurasi
+    const { getRandomQuestions } = await import('../data/questions/index');
     if (gameMode === 'tryout') {
-      const { SOAL_TRYOUT } = await import('../data/soal_tryout');
-      return SOAL_TRYOUT;
+      return [
+        ...getRandomQuestions('TWK', 30),
+        ...getRandomQuestions('TIU', 35),
+        ...getRandomQuestions('TKP', 45)
+      ];
     }
-    const { SOAL_SKD } = await import('../data/soal');
-    return SOAL_SKD;
+    if (gameMode === 'survival') return getRandomQuestions('ALL');
+    if (gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') return getRandomQuestions('ALL', 15);
+    return getRandomQuestions('ALL', 10);
   }
 
   try {
@@ -346,22 +349,20 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
       questions = shuffle(data).slice(0, 10);
     }
 
-    // Jika database berhasil dihubungi tapi tabel masih KOSONG, gunakan data fallback lokal
+        // Jika database berhasil dihubungi tapi tabel masih KOSONG, gunakan data lokal terstruktur
     if (!questions || questions.length === 0) {
-      console.warn('Tabel Supabase kosong, menggunakan data lokal.');
+      console.warn('Tabel Supabase kosong, fallback ke questions/index.ts');
+      const { getRandomQuestions } = await import('../data/questions/index');
       if (gameMode === 'tryout') {
-        const { SOAL_TRYOUT } = await import('../data/soal_tryout');
-        return SOAL_TRYOUT;
+        return [
+          ...getRandomQuestions('TWK', 30),
+          ...getRandomQuestions('TIU', 35),
+          ...getRandomQuestions('TKP', 45)
+        ];
       }
-      const { SOAL_SKD } = await import('../data/soal');
-      // Berikan sebagian saja agar mirip sesuai mode (atau semuanya jika tryout)
-      if (gameMode === 'latihan' || gameMode === 'survival') {
-        return SOAL_SKD.sort(() => 0.5 - Math.random()).slice(0, gameMode === "survival" ? 500 : 10);
-      }
-      if (gameMode === 'pvp' || gameMode === 'pvp1v1') {
-        return SOAL_SKD.sort(() => 0.5 - Math.random()).slice(0, 15);
-      }
-      return SOAL_SKD;
+      if (gameMode === 'survival') return getRandomQuestions('ALL');
+      if (gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') return getRandomQuestions('ALL', 15);
+      return getRandomQuestions('ALL', 10);
     }
 
     // Mapping agar formatnya sesuai dengan interface Soal di aplikasi
@@ -401,18 +402,18 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
         console.error('Failed parsing opsi', q.opsi, err);
       }
 
-      // Normalisasi & penskalaan bobot opsi TKP dan TWK/TIU sesuai gameMode
+            // Normalisasi score ke skala 0-5 (contract Question interface)
+      // TWK/TIU: benar = 5, salah = 0
+      // TKP: ambil score langsung (1-5), normalisasi jika masih skala lama (>5)
       const normalizedOptions = parsedOptions.map((o: any) => {
         let score = typeof o.score === 'number' ? o.score : (parseInt(o.score) || 0);
         if (q.tipe === 'TKP') {
-          if (gameMode === 'tryout') {
-            if (score > 5) score = Math.round(score / 10);
-          } else {
-            if (score <= 5) score = score * 10;
-          }
+          // Jika data lama masih pakai skala 10-50, konversi ke 1-5
+          if (score > 5) score = Math.round(score / 10);
+          score = Math.max(1, Math.min(5, score)); // clamp 1-5
         } else {
-          const isCorrect = o.id === q.kunci;
-          score = isCorrect ? (gameMode === 'tryout' ? 5 : 50) : 0;
+          // TWK / TIU: benar = 5, salah = 0 (skala konsisten dengan JSON lokal)
+          score = o.id === q.kunci ? 5 : 0;
         }
         return { ...o, score };
       });
@@ -429,16 +430,19 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
       };
     });
 
-  } catch (err) {
-    console.error('Gagal mengambil soal dari Supabase, fallback ke data lokal:', err);
+    } catch (err) {
+    console.error('Gagal mengambil soal dari Supabase, fallback ke questions/index.ts:', err);
+    const { getRandomQuestions } = await import('../data/questions/index');
     if (gameMode === 'tryout') {
-      const { SOAL_TRYOUT } = await import('../data/soal_tryout');
-      return SOAL_TRYOUT;
+      return [
+        ...getRandomQuestions('TWK', 30),
+        ...getRandomQuestions('TIU', 35),
+        ...getRandomQuestions('TKP', 45)
+      ];
     }
-    const { SOAL_SKD } = await import('../data/soal');
-    if (gameMode === 'latihan' || gameMode === 'survival') return SOAL_SKD.sort(() => 0.5 - Math.random()).slice(0, gameMode === "survival" ? 500 : 10);
-    if (gameMode === 'pvp' || gameMode === 'pvp1v1') return SOAL_SKD.sort(() => 0.5 - Math.random()).slice(0, 15);
-    return SOAL_SKD;
+    if (gameMode === 'survival') return getRandomQuestions('ALL');
+    if (gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') return getRandomQuestions('ALL', 15);
+    return getRandomQuestions('ALL', 10);
   }
 };
 

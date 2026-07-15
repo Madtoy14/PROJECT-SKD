@@ -98,57 +98,37 @@ export default function Shop() {
         return;
       }
 
-      let coinsAfter = profile.coins - finalCost;
-
-      // ── SERVER-SIDE VALIDATION via RPC (atomic deduct koin) ──
-      if (isSupabaseConfigured()) {
-        const { data: rpcResult, error: rpcError } = await supabase!.rpc('purchase_item', {
-          p_item_id: itemId,
-          p_cost: finalCost,
-          p_item_type: itemType
-        });
-
-        if (rpcError || !rpcResult?.success) {
-          // RPC belum ada (fungsi belum dibuat di Supabase) — fallback ke client-side
-          if (rpcError?.code === 'PGRST202' || rpcError?.message?.includes('Could not find')) {
-            console.warn('RPC purchase_item belum tersedia, menggunakan client-side fallback');
-            // Lanjut dengan client-side deduct di bawah
-          } else {
-            showToast(rpcResult?.reason || rpcError?.message || 'Pembelian gagal di server', 'error');
-            return;
-          }
-        } else {
-          coinsAfter = rpcResult.coins_after;
-        }
+            // ── SERVER-SIDE TRANSACTION via RPC (wajib, tidak ada fallback) ──
+      // RPC purchase_item harus atomic: validasi koin, deduct, update inventory/paket
+      if (!isSupabaseConfigured() || !supabase) {
+        showToast('Koneksi server tidak tersedia. Coba lagi nanti.', 'error');
+        return;
       }
 
-      // ── Update item / avatar / paket di profil ──
-      let profileUpdate: Partial<UserProfile> = { coins: coinsAfter };
+      const { data: rpcResult, error: rpcError } = await supabase.rpc('purchase_item', {
+        p_item_id: itemId,
+        p_cost: finalCost,
+        p_item_type: itemType,
+        p_quantity: quantity
+      });
 
-      if (itemType === 'premium_package') {
-        profileUpdate.purchased_packages = [...(profile.purchased_packages || []), itemId];
-      } else if (itemType === 'avatar') {
-        profileUpdate.unlocked_avatars = [...(profile.unlocked_avatars || []), itemId];
-      } else if (itemType === 'energy') {
-        profileUpdate.energy = Math.min(25, (profile.energy || 0) + (5 * quantity));
+      if (rpcError || !rpcResult?.success) {
+        // Tidak ada fallback — gagal di server berarti transaksi dibatalkan
+        const reason = rpcResult?.reason ?? rpcError?.message ?? 'Pembelian gagal di server';
+        showToast(reason, 'error');
+        return;
+      }
+
+      const coinsAfter: number = rpcResult.coins_after;
+
+      // ── Sync state lokal dari hasil server (bukan hitung sendiri) ──
+      const freshProfile = await fetchProfile();
+      if (freshProfile) setProfile(freshProfile);
+
+      // ── Log transaksi (audit trail, bukan penentu saldo) ──
+      if (itemType === 'energy') {
         await logEnergyPurchase(finalCost, 5 * quantity, coinsAfter);
       } else {
-        // inventory biasa
-        const currentInv = profile.inventory || {
-          item_5050: 0, item_hint: 0, item_shield: 0, item_waktu_beku: 0,
-          item_skor_ganda: 0, item_terawangan: 0, item_kesempatan_kedua: 0,
-          item_energy_refill: 0, item_streak_protector: 0, item_coin_booster: 0,
-          item_tinta_hitam: 0, item_lompatan_kilat: 0
-        };
-        const invKey = itemId as keyof NonNullable<typeof profile.inventory>;
-        profileUpdate.inventory = { ...currentInv, [invKey]: (currentInv[invKey] || 0) + quantity };
-      }
-
-      const updatedProfile = await updateProfile(profileUpdate);
-      setProfile(updatedProfile);
-
-      // ── Log transaksi ──
-      if (itemType !== 'energy') {
         await logCoinPurchase(itemId, finalCost, coinsAfter, {
           item_title: itemTitle,
           item_type: itemType,
@@ -165,42 +145,57 @@ export default function Shop() {
     }
   };
 
-  const handleSellBack = async (itemId: string, itemTitle: string, cost: number) => {
-    if (!profile || !profile.inventory) return;
-    const currentInv = profile.inventory;
-    const count = currentInv[itemId as keyof typeof currentInv] || 0;
+    const handleSellBack = async (itemId: string, itemTitle: string, cost: number) => {
+    if (!profile || !profile.inventory || purchasing) return;
+
+    const count = profile.inventory[itemId as keyof typeof profile.inventory] || 0;
     if (count <= 0) {
-      setToastType('error');
-      setToastMessage(`Anda tidak memiliki ${itemTitle} untuk dijual!`);
-      setTimeout(() => setToastMessage(null), 3000);
+      showToast(`Anda tidak memiliki ${itemTitle} untuk dijual!`, 'error');
       return;
     }
 
-    const reward = Math.floor(cost * 0.5);
-    const updatedCoins = profile.coins + reward;
-    
-    const updatedInv = {
-      ...currentInv,
-      [itemId]: count - 1
-    };
+    // ── SERVER-SIDE TRANSACTION via RPC (wajib, tidak ada fallback) ──
+    // RPC sell_item harus atomic: validasi qty, tambah koin, kurang inventory
+    if (!isSupabaseConfigured() || !supabase) {
+      showToast('Koneksi server tidak tersedia. Coba lagi nanti.', 'error');
+      return;
+    }
 
-    // Update profile
-    const updatedProfile = await updateProfile({
-      coins: updatedCoins,
-      inventory: updatedInv
-    });
-    setProfile(updatedProfile);
-    
-    // Log transaction
-    await logItemSale(itemId, reward, updatedCoins, {
-      item_title: itemTitle,
-      original_price: cost,
-      quantity_remaining: count - 1
-    });
-    
-    setToastType('success');
-    setToastMessage(`Berhasil menjual 1 ${itemTitle} (+${reward} Koin)!`);
-    setTimeout(() => setToastMessage(null), 3000);
+    setPurchasing(itemId);
+    try {
+      const { data: rpcResult, error: rpcError } = await supabase.rpc('sell_item', {
+        p_item_id: itemId,
+        p_original_cost: cost
+      });
+
+      if (rpcError || !rpcResult?.success) {
+        // Tidak ada fallback — gagal di server berarti transaksi dibatalkan
+        const reason = rpcResult?.reason ?? rpcError?.message ?? 'Penjualan gagal di server';
+        showToast(reason, 'error');
+        return;
+      }
+
+      const coinsAfter: number = rpcResult.coins_after;
+      const reward: number = rpcResult.reward;
+
+      // ── Sync state lokal dari hasil server ──
+      const freshProfile = await fetchProfile();
+      if (freshProfile) setProfile(freshProfile);
+
+      // ── Log transaksi (audit trail) ──
+      await logItemSale(itemId, reward, coinsAfter, {
+        item_title: itemTitle,
+        original_price: cost,
+        quantity_remaining: rpcResult.quantity_remaining
+      });
+
+      showToast(`Berhasil menjual 1 ${itemTitle} (+${reward} Koin)!`, 'success');
+    } catch (err: any) {
+      console.error('Sell back error:', err);
+      showToast('Terjadi kesalahan saat penjualan', 'error');
+    } finally {
+      setPurchasing(null);
+    }
   };
 
   return (

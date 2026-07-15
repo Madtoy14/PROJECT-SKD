@@ -286,15 +286,6 @@ export default function ReviewDetail() {
               </div>
           </div>
         </main>
-                  disabled={currentQuestionIndex === totalQuestions - 1}
-                  className="px-5 py-2.5 rounded-xl shadow-md active:scale-95 disabled:opacity-30"
-                >
-                  Selanjutnya
-                </Button>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </main>
       </div>
 
       {/* Sidebar (Desktop) */}

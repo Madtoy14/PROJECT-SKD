@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
-  Coins, Zap, ArrowRight, Award, AlertTriangle, CheckCircle, XCircle, Circle, ChevronDown, ChevronUp
+  Coins, Zap, Award, AlertTriangle, CheckCircle, XCircle, Circle, BookOpen, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { fetchProfile, supabase } from '../lib/supabase';
-import type { UserProfile } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
+import MathCard from '../components/MathCard';
 
 function AnimatedCounter({ end, duration = 2, suffix = '' }: { end: number, duration?: number, suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -26,86 +26,275 @@ function AnimatedCounter({ end, duration = 2, suffix = '' }: { end: number, dura
   return <span>{count}{suffix}</span>;
 }
 
+// Interfaces diletakkan di module scope agar bisa dipakai QuickReviewSummary
+interface Option {
+  id: string;
+  text?: string;
+  points?: number;
+  score?: number;
+}
+interface QuizQuestion {
+  id: string;
+  text?: string;
+  category: string;
+  correct?: string;
+  explanation?: string;
+  options?: Option[];
+}
+interface QuizResultData {
+  score: number;
+  twk_score: number;
+  tiu_score: number;
+  tkp_score: number;
+  passed_twk: boolean;
+  passed_tiu: boolean;
+  passed_tkp: boolean;
+  passed_overall: boolean;
+  mode?: string;
+  coins_earned?: number;
+  xp_earned?: number;
+  questions_json?: QuizQuestion[];
+  answers_json?: Record<string, string>;
+  package_id?: string;
+}
+
+// Komponen ringkasan pembahasan yang ditampilkan langsung di halaman Result
+function QuickReviewSummary({
+  questions,
+  userAnswers,
+  isTryout,
+}: {
+  questions: QuizQuestion[];
+  userAnswers: Record<string, string>;
+  isTryout: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  // Batasi preview ke 5 soal, sisanya toggle
+  const PREVIEW_COUNT = 5;
+  const visibleQuestions = expanded ? questions : questions.slice(0, PREVIEW_COUNT);
+
+  // Normalise key: answers_json bisa pakai index string "0","1",... atau question id
+  const getAnswer = (q: QuizQuestion, i: number): string | undefined =>
+    userAnswers?.[String(i)] ?? userAnswers?.[q.id] ?? undefined;
+
+  const getStatus = (q: QuizQuestion, i: number): 'correct' | 'wrong' | 'empty' => {
+    const ansId = getAnswer(q, i);
+    if (!ansId) return 'empty';
+    if (q.category === 'TKP') {
+      const opt = q.options?.find((o) => o.id === ansId);
+      return (opt?.score ?? 0) >= 5 ? 'correct' : 'wrong';
+    }
+    return ansId === q.correct ? 'correct' : 'wrong';
+  };
+
+  const getCategoryColor = (cat: string) => {
+    if (cat === 'TWK') return 'text-purple-500 bg-purple-50 border-purple-200';
+    if (cat === 'TIU') return 'text-blue-500 bg-blue-50 border-blue-200';
+    return 'text-orange-500 bg-orange-50 border-orange-200';
+  };
+
+  return (
+    <div className="w-full max-w-xl">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-black text-fg uppercase tracking-wider">
+          Ringkasan Jawaban
+        </h3>
+        <span className="text-xs text-fg-muted font-bold">
+          {questions.length} soal{isTryout ? ' (tryout)' : ''}
+        </span>
+      </div>
+
+      <div className="space-y-2">
+        {visibleQuestions.map((q, i) => {
+          const status = getStatus(q, i);
+          const ansId = getAnswer(q, i);
+          const selectedOpt = q.options?.find((o) => o.id === ansId);
+          const correctOpt = q.options?.find((o) => o.id === q.correct);
+          const hasExplanation = !!q.explanation;
+
+          return (
+            <QuickReviewItem
+              key={q.id ?? i}
+              index={i}
+              question={q}
+              status={status}
+              selectedOpt={selectedOpt}
+              correctOpt={correctOpt}
+              hasExplanation={hasExplanation}
+              getCategoryColor={getCategoryColor}
+            />
+          );
+        })}
+      </div>
+
+      {questions.length > PREVIEW_COUNT && (
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-3 w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border text-xs font-bold text-fg-muted hover:bg-surface active:scale-[0.99] transition-all"
+        >
+          {expanded ? (
+            <><ChevronUp size={14} /> Sembunyikan</>
+          ) : (
+            <><ChevronDown size={14} /> Tampilkan {questions.length - PREVIEW_COUNT} soal lainnya</>
+          )}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// Item per-soal dengan toggle untuk menampilkan explanation
+function QuickReviewItem({
+  index,
+  question,
+  status,
+  selectedOpt,
+  correctOpt,
+  hasExplanation,
+  getCategoryColor,
+}: {
+  index: number;
+  question: QuizQuestion;
+  status: 'correct' | 'wrong' | 'empty';
+  selectedOpt?: Option;
+  correctOpt?: Option;
+  hasExplanation: boolean;
+  getCategoryColor: (cat: string) => string;
+}) {
+  const [showExplanation, setShowExplanation] = useState(false);
+
+  const statusConfig = {
+    correct: { icon: <CheckCircle size={15} className="text-emerald-500" />, bg: 'bg-emerald-50 border-emerald-200' },
+    wrong:   { icon: <XCircle size={15} className="text-rose-500" />,    bg: 'bg-rose-50 border-rose-200' },
+    empty:   { icon: <Circle size={15} className="text-slate-400" />,    bg: 'bg-slate-50 border-slate-200' },
+  };
+
+  const { icon, bg } = statusConfig[status];
+
+  return (
+    <div className={`rounded-xl border p-3 ${bg} transition-all`}>
+      <div className="flex items-start gap-2.5">
+        {/* Status icon */}
+        <div className="mt-0.5 shrink-0">{icon}</div>
+
+        <div className="flex-1 min-w-0">
+          {/* Header row */}
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-black text-fg-muted">#{index + 1}</span>
+            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${getCategoryColor(question.category)}`}>
+              {question.category}
+            </span>
+            {question.category === 'TKP' && selectedOpt && (
+              <span className="text-[9px] text-fg-muted font-bold ml-1">
+                Skor: {selectedOpt.score ?? selectedOpt.points ?? 0}
+              </span>
+            )}
+          </div>
+
+          {/* Teks soal — maks 2 baris */}
+          {question.text && (
+            <MathCard
+              text={question.text}
+              className="text-xs text-fg font-medium line-clamp-2 mb-1.5"
+            />
+          )}
+
+          {/* Jawaban user vs benar (hanya untuk wrong/empty di TWK & TIU) */}
+          {status !== 'correct' && question.category !== 'TKP' && (
+            <div className="flex flex-col gap-0.5 mt-1">
+              {status === 'wrong' && selectedOpt && (
+                <div className="flex items-center gap-1 text-[10px] text-rose-600 font-bold">
+                  <XCircle size={10} />
+                  <span>Jawabanmu: {selectedOpt.text || selectedOpt.id}</span>
+                </div>
+              )}
+              {status === 'empty' && (
+                <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold">
+                  <Circle size={10} />
+                  <span>Tidak dijawab</span>
+                </div>
+              )}
+              {correctOpt && (
+                <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold">
+                  <CheckCircle size={10} />
+                  <span>Kunci: {correctOpt.text || correctOpt.id}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Toggle explanation jika ada */}
+          {hasExplanation && (
+            <button
+              onClick={() => setShowExplanation((v) => !v)}
+              className="mt-1.5 flex items-center gap-1 text-[10px] font-bold text-blue-500 hover:text-blue-600"
+            >
+              <BookOpen size={11} />
+              {showExplanation ? 'Sembunyikan pembahasan' : 'Lihat pembahasan'}
+              {showExplanation ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+            </button>
+          )}
+
+          {/* Explanation text */}
+          {showExplanation && question.explanation && (
+            <div className="mt-2 p-2.5 rounded-lg bg-white/70 border border-blue-100">
+              <MathCard
+                text={question.explanation}
+                className="text-[11px] text-fg leading-relaxed"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Result() {
   const { attemptId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // NEW: Result data from database
-  // Define proper types instead of any
-  interface Option {
-    id: string;
-    points?: number;
-    score?: number;
-  }
-  interface QuizQuestion {
-    id: string;
-    category: string;
-    correct?: string;
-    options?: Option[];
-  }
-  interface QuizResultData {
-    score: number;
-    twk_score: number;
-    tiu_score: number;
-    tkp_score: number;
-    passed_twk: boolean;
-    passed_tiu: boolean;
-    passed_tkp: boolean;
-    passed_overall: boolean;
-    mode?: string;
-    coins_earned?: number;
-    xp_earned?: number;
-    questions_json?: QuizQuestion[];
-    answers_json?: Record<string, string>;
-    package_id?: string;
-  }
+    const [resultData, setResultData] = useState<QuizResultData | null>(null);
 
-  const [resultData, setResultData] = useState<QuizResultData | null>(null);
+    useEffect(() => {
+    if (!attemptId) {
+      setError('Attempt ID tidak ditemukan');
+      setLoading(false);
+      return;
+    }
 
-  useEffect(() => {
     const loadResult = async () => {
       setLoading(true);
       try {
-        const p = await fetchProfile();
-        setProfile(p);
-        
-        if (attemptId) {
-          let data = null;
-          let resultError = null;
-          let retries = 3;
-          
-          while (retries > 0) {
-            const res = await supabase!
-              .from('quiz_results')
-              .select('*')
-              .or(`id.eq.${attemptId},session_id.eq.${attemptId}`)
-              .limit(1)
-              .maybeSingle();
-            
-            data = res.data;
-            resultError = res.error;
-            
-            if (data && !resultError) {
-              break; // Success
-            }
-            
-            console.warn(`Fetch result failed. Retries left: ${retries - 1}`, resultError);
-            retries--;
-            if (retries > 0) {
-              // Wait 1 second before retrying
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            }
+        // Jalankan parallel — tidak ada dependency antar keduanya
+        let data = null;
+        let resultError = null;
+        let retries = 3;
+
+        while (retries > 0) {
+          const res = await supabase!
+            .from('quiz_results')
+            .select('*')
+            .or(`id.eq.${attemptId},session_id.eq.${attemptId}`)
+            .limit(1)
+            .maybeSingle();
+
+          data = res.data;
+          resultError = res.error;
+
+          if (data && !resultError) break;
+
+          retries--;
+          if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
-          
-          if (resultError) throw resultError;
-          setResultData(data);
-        } else {
-          setError('Attempt ID tidak ditemukan');
         }
+
+        if (resultError) throw resultError;
+        setResultData(data);
       } catch (err: any) {
         console.error('Failed to load result:', err);
         setError(`Gagal memuat hasil kuis. Detail: ${err.message || JSON.stringify(err)}`);
@@ -113,7 +302,7 @@ export default function Result() {
         setLoading(false);
       }
     };
-    
+
     loadResult();
   }, [attemptId]);
 
@@ -152,12 +341,14 @@ export default function Result() {
   const gameMode = resultData.mode || 'latihan';
   const isTryout = gameMode === 'tryout';
   
-  const score = resultData.score || 0;
-  const twkScore = resultData.twk_score || 0;
-  const tiuScore = resultData.tiu_score || 0;
-  const tkpScore = resultData.tkp_score || 0;
+    const score = resultData.score || 0;
+  // Skor kategori diambil langsung dari DB — akurat karena dihitung server-side di completeSession
+  const twkScore = resultData.twk_score ?? 0;
+  const tiuScore = resultData.tiu_score ?? 0;
+  const tkpScore = resultData.tkp_score ?? 0;
 
-  const userAnswers = resultData.answers_json || {};
+  // answers_json disimpan dengan key string (dari Object.entries di completeSession)
+  const userAnswers: Record<string, string> = resultData.answers_json || {};
   const quizQuestions = resultData.questions_json || [];
 
   const earnedCoins = resultData.coins_earned || 0;
@@ -166,25 +357,26 @@ export default function Result() {
   // PvP Support
   const receivedRanks: { name: string; score: number; isMe?: boolean }[] = location.state?.liveRanks || [];
 
-  const totalQuestions = quizQuestions?.length || 0;
-  const correctCount = quizQuestions?.filter((q: QuizQuestion, i: number) => {
-    const ansId = userAnswers?.[i];
-    const isTKP = q.category === 'TKP';
-    if (isTKP) {
-      const opt = q.options?.find((o: Option) => o.id === ansId);
-      return (opt?.score ?? 0) >= 50;
-    }
-    return ansId === q.correct;
-  }).length || 0;
-  const emptyCount = quizQuestions?.filter((q: QuizQuestion, i: number) => !userAnswers?.[i]).length || 0;
-  const incorrectCount = totalQuestions - correctCount - emptyCount;
+    const totalQuestions = quizQuestions?.length || 0;
+    // answers_json key bisa berupa index angka ("0", "1", ...) — normalisasi ke string
+    const correctCount = quizQuestions?.filter((q: QuizQuestion, i: number) => {
+      const ansId = userAnswers?.[String(i)] ?? userAnswers?.[i as unknown as string];
+      if (!ansId) return false;
+      if (q.category === 'TKP') {
+        const opt = q.options?.find((o: Option) => o.id === ansId);
+        // threshold TKP >= 5 (skala 0-5), konsisten dengan finishTryout di Quiz.tsx
+        return (opt?.score ?? 0) >= 5;
+      }
+      return ansId === q.correct;
+    }).length || 0;
+    const emptyCount = quizQuestions?.filter((_q: QuizQuestion, i: number) =>
+      !userAnswers?.[String(i)] && !userAnswers?.[i as unknown as string]
+    ).length || 0;
+    const incorrectCount = totalQuestions - correctCount - emptyCount;
 
   const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
   const circleCircumference = 2 * Math.PI * 120;
   const strokeDashoffset = circleCircumference - (percentage / 100) * circleCircumference;
-
-  // Strict compiler workaround (read vars)
-  if (profile) { }
 
   // PvP Leaderboard rendering fallback
   const finalRanks = receivedRanks.length > 0
@@ -216,23 +408,20 @@ export default function Result() {
     <div className="min-h-screen bg-bg flex flex-col items-center transition-colors pb-24">
       <div className="w-full max-w-3xl p-4 md:p-8 flex flex-col items-center pt-8 md:pt-12 space-y-8 md:space-y-12">
 
-        {/* Header Badges */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", bounce: 0.5 }}
+                {/* Header Badges */}
+        <div
+          style={{ animation: 'fadeInScale 0.4s ease-out' }}
           className="bg-gradient-to-r p-[2px] rounded-full shadow-lg from-skd-premium to-skd-accent"
         >
-          <div className="bg-bg px-6 py-2 rounded-full font-bold tracking-widest text-xs text-fg uppercase">
+                    <div className="bg-bg px-6 py-2 rounded-full font-bold tracking-widest text-xs text-fg uppercase">
             {isTryout ? 'TRY OUT CPNS SELESAI' : (gameMode === 'pvp' || gameMode === 'pvp1v1') ? 'PvP BATTLE SELESAI' : gameMode === 'survival' ? 'SURVIVAL BERAKHIR' : 'LATIHAN SELESAI'}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Passing Grade Banner for Try Out */}
+                {/* Passing Grade Banner for Try Out */}
         {isTryout && (
-          <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+          <div
+            style={{ animation: 'slideDown 0.35s ease-out' }}
             className={`w-full max-w-xl rounded-3xl p-[2px] overflow-hidden shadow-2xl relative ${isLulusSkd
               ? 'bg-gradient-to-r from-skd-success via-emerald-400 to-green-500 shadow-sm'
               : 'bg-gradient-to-r from-skd-danger via-rose-500 to-red-600 shadow-sm/20'
@@ -253,11 +442,11 @@ export default function Result() {
                     : 'Jangan berkecil hati. Masih ada kategori nilai yang berada di bawah standar kelulusan nasional. Mari tinjau kembali pembahasan soal dan perbanyak latihan!'}
                 </p>
               </div>
-            </div>
-          </motion.div>
+                        </div>
+          </div>
         )}
 
-        {/* PvP Leaderboard podiums */}
+                {/* PvP Leaderboard podiums */}
         {(gameMode === 'pvp' || gameMode === 'pvp1v1') ? (
           <div className="w-full max-w-xl space-y-6">
             <h2 className="text-3xl md:text-4xl font-black text-center text-fg mb-8">Papan Peringkat Akhir</h2>
@@ -271,20 +460,18 @@ export default function Result() {
                 const height = isFirst ? 'h-40' : isSecond ? 'h-32' : 'h-24';
                 const color = isFirst ? 'bg-warning shadow-yellow-500/20' : isSecond ? 'bg-gray-300 shadow-white/10' : 'bg-warning shadow-amber-500/10';
 
-                return (
-                  <motion.div
+                                return (
+                  <div
                     key={rank.name}
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: idx * 0.2, type: 'spring' }}
+                    style={{ animation: `slideUp 0.4s ease-out ${idx * 0.1}s both` }}
                     className="flex flex-col items-center flex-1"
                   >
                     <span className="text-sm md:text-base font-bold text-fg mb-3 truncate max-w-[120px]">{rank.name}</span>
                     <div className={`w-full ${height} ${color} rounded-t-2xl shadow-lg border border-white/5 flex flex-col justify-center items-center text-skd-bg`}>
                       <span className="text-4xl md:text-5xl font-black font-space">{isFirst ? '1' : isSecond ? '2' : '3'}</span>
                       <span className="text-sm md:text-base font-black font-space mt-1">{rank.score} pts</span>
-                    </div>
-                  </motion.div>
+                                        </div>
+                  </div>
                 );
               })}
             </div>
@@ -307,13 +494,15 @@ export default function Result() {
             <div className="relative w-64 h-64 flex items-center justify-center">
               <svg className="w-full h-full transform -rotate-90 drop-shadow-sm" viewBox="0 0 256 256">
                 <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" strokeWidth="16" className="text-destructive" />
-                <motion.circle 
-                  cx="128" cy="128" r="120" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" 
-                  className="text-emerald-500"
-                  initial={{ strokeDasharray: circleCircumference, strokeDashoffset: circleCircumference }}
-                  animate={{ strokeDashoffset }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                />
+                <circle
+                    cx="128" cy="128" r="120" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round"
+                    className="text-emerald-500"
+                    style={{
+                      strokeDasharray: circleCircumference,
+                      strokeDashoffset,
+                      transition: 'stroke-dashoffset 1.5s ease-out'
+                    }}
+                  />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-5xl font-black text-fg font-space"><AnimatedCounter end={score} /></span>
@@ -491,11 +680,9 @@ export default function Result() {
           </div>
         )}
 
-        {/* Rewards section */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
+                {/* Rewards section */}
+        <div
+          style={{ animation: 'fadeInUp 0.4s ease-out 0.3s both' }}
           className="w-full max-w-xl bg-surface/80 border border-border rounded-3xl p-5 md:p-6 flex justify-around items-center shadow-sm"
         >
           <div className="flex items-center gap-3 md:gap-4">
@@ -516,21 +703,31 @@ export default function Result() {
               <p className="text-xs md:text-sm text-fg-muted font-bold">XP Diperoleh</p>
               <p className="font-bold font-space text-xl md:text-2xl text-premium">+<AnimatedCounter end={gainedXP} duration={2.5} /></p>
             </div>
-          </div>
-        </motion.div>
+                    </div>
+        </div>
+
+                {/* Ringkasan Pembahasan — tampil jika questions_json tersedia */}
+        {quizQuestions.length > 0 && (
+          <QuickReviewSummary
+            questions={quizQuestions}
+            userAnswers={userAnswers}
+            isTryout={isTryout}
+          />
+        )}
 
         {/* Pembahasan Action */}
-        {quizQuestions && userAnswers && (
-          <div className="w-full max-w-xl mt-8">
+        {quizQuestions.length > 0 && (
+          <div className="w-full max-w-xl">
             <Button
               variant="outline"
               onClick={() => {
                 const reviewPkg = resultData.package_id || 'latihan';
                 navigate(`/review/${reviewPkg}/${attemptId}`);
               }}
-              className="w-full py-4 rounded-2xl shadow-sm border-2 border-slate-200 text-fg hover:bg-slate-50 hover:border-blue-200 active:scale-[0.99] font-bold"
+              className="w-full py-4 rounded-2xl shadow-sm border-2 border-slate-200 text-fg hover:bg-slate-50 hover:border-blue-200 active:scale-[0.99] font-bold flex items-center justify-center gap-2"
             >
-              Lihat Pembahasan Detail
+              <BookOpen size={18} />
+              Lihat Pembahasan Detail Lengkap
             </Button>
           </div>
         )}
