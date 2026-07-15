@@ -1,0 +1,63 @@
+[
+  {
+    "id": "TIU-001",
+    "kategori": "TIU",
+    "sub": "Deret Angka",
+    "tanya": "Tentukan nilai X pada deret berikut: 3, 6, 12, 24, 48, X",
+    "opsi": ["72", "84", "96", "108", "120"],
+    "kunci": 2,
+    "pembahasan": "Pola deret adalah perkalian 2 secara berturut-turut (deret geometri dengan rasio r = 2). Sehingga: 3 × 2 = 6, 6 × 2 = 12, 12 × 2 = 24, 24 × 2 = 48, 48 × 2 = 96. Jadi X = 96.",
+    "xp": 10,
+    "coin": 5
+  },
+  {
+    "id": "TIU-002",
+    "kategori": "TIU",
+    "sub": "Analogi Verbal",
+    "tanya": "DOKTER : PASIEN = GURU : ?",
+    "opsi": ["Sekolah", "Ilmu", "Murid", "Pelajaran", "Ruang Kelas"],
+    "kunci": 2,
+    "pembahasan": "Hubungan dalam analogi ini adalah hubungan pelaku dan penerima layanan/jasa. DOKTER memberikan layanan kesehatan kepada PASIEN. Dengan pola yang sama, GURU memberikan pengajaran kepada MURID. Jawaban: MURID.",
+    "xp": 10,
+    "coin": 5
+  },
+  {
+    "id": "TIU-003",
+    "kategori": "TIU",
+    "sub": "Aritmetika",
+    "tanya": "Sebuah proyek dapat diselesaikan oleh 8 pekerja dalam 15 hari. Jika proyek tersebut harus selesai dalam 6 hari, berapa banyak pekerja tambahan yang dibutuhkan?",
+    "opsi": ["10 orang", "12 orang", "14 orang", "20 orang", "28 orang"],
+    "kunci": 1,
+    "pembahasan": "Gunakan rumus pekerjaan: pekerja × hari = konstan. Awalnya: 8 × 15 = 120 unit pekerjaan. Target selesai 6 hari: 120 / 6 = 20 pekerja dibutuhkan. Pekerja tambahan = 20 - 8 = 12 orang.",
+    "xp": 10,
+    "coin": 5
+  },
+  {
+    "id": "TIU-004",
+    "kategori": "TIU",
+    "sub": "Silogisme",
+    "tanya": "Premis 1: Semua PNS wajib menjaga kerahasiaan data negara. Premis 2: Budi adalah seorang PNS. Kesimpulan yang TEPAT adalah...",
+    "opsi": [
+      "Budi mungkin wajib menjaga kerahasiaan data negara",
+      "Budi tidak perlu menjaga kerahasiaan data negara",
+      "Budi wajib menjaga kerahasiaan data negara",
+      "Semua yang menjaga data negara adalah PNS",
+      "Hanya PNS tertentu yang wajib menjaga data negara"
+    ],
+    "kunci": 2,
+    "pembahasan": "Ini adalah pola silogisme kategoris: Semua A adalah B (Premis 1), C adalah A (Premis 2), maka C adalah B (Kesimpulan). Semua PNS (A) wajib menjaga data negara (B). Budi (C) adalah PNS (A). Kesimpulan: Budi (C) wajib menjaga kerahasiaan data negara (B).",
+    "xp": 10,
+    "coin": 5
+  },
+  {
+    "id": "TIU-005",
+    "kategori": "TIU",
+    "sub": "Hitungan Cepat",
+    "tanya": "Jika $\\frac{3x + 6}{3} = 7$, maka nilai $x$ adalah...",
+    "opsi": ["3", "5", "7", "9", "11"],
+    "kunci": 1,
+    "pembahasan": "Langkah penyelesaian: (3x + 6) / 3 = 7. Kalikan kedua sisi dengan 3: 3x + 6 = 21. Kurangi 6 dari kedua sisi: 3x = 15. Bagi kedua sisi dengan 3: x = 5. Verifikasi: (3(5) + 6) / 3 = (15 + 6) / 3 = 21 / 3 = 7. ✓",
+    "xp": 10,
+    "coin": 5
+  }
+]

@@ -1,0 +1,87 @@
+[
+  {
+    "id": "TKP-001",
+    "kategori": "TKP",
+    "sub": "Pelayanan Publik",
+    "tanya": "Anda adalah petugas pelayanan publik. Seorang warga datang dengan ekspresi frustrasi karena berkas pengajuannya sudah 3 kali dikembalikan dengan alasan yang berbeda-beda. Apa tindakan TERBAIK yang Anda lakukan?",
+    "opsi": [
+      "Menyampaikan permohonan maaf, menjelaskan secara rinci semua persyaratan yang masih kurang, dan menawarkan panduan langkah demi langkah agar prosesnya selesai di kunjungan berikutnya",
+      "Menerima berkas dan berjanji akan memprosesnya secepat mungkin tanpa memberikan penjelasan lebih lanjut",
+      "Menyarankan warga untuk datang kembali esok hari saat petugas senior hadir",
+      "Menjelaskan bahwa prosedur sudah sesuai aturan dan warga harus mengikutinya",
+      "Meminta warga untuk mengisi formulir pengaduan formal jika merasa tidak puas"
+    ],
+    "kunci": 0,
+    "pembahasan": "Tindakan terbaik adalah menunjukkan empati, mengambil tanggung jawab atas ketidaknyamanan yang dialami warga, dan memberikan solusi konkret. Minta maaf, jelaskan SEMUA persyaratan secara lengkap sekaligus, dan bimbing warga agar dapat menyelesaikannya. Ini mencerminkan nilai Berorientasi Pelayanan dan Harmonis dalam ASN BerAKHLAK.",
+    "xp": 10,
+    "coin": 5
+  },
+  {
+    "id": "TKP-002",
+    "kategori": "TKP",
+    "sub": "Profesionalisme",
+    "tanya": "Atasan Anda meminta Anda mengerjakan tugas di luar jobdesk Anda, sementara pekerjaan utama Anda sendiri belum selesai. Apa yang Anda lakukan?",
+    "opsi": [
+      "Sampaikan kondisi pekerjaan Anda secara terbuka kepada atasan, tanyakan prioritas mana yang harus diselesaikan lebih dulu, lalu kerjakan sesuai arahan dengan penuh tanggung jawab",
+      "Mengerjakan tugas dari atasan terlebih dahulu karena perintah atasan harus selalu diutamakan",
+      "Menolak tugas tambahan tersebut karena bukan bagian dari jobdesk Anda",
+      "Mengerjakan keduanya sekaligus meskipun hasilnya kurang maksimal agar tidak mengecewakan siapapun",
+      "Mendelegasikan pekerjaan utama Anda kepada rekan kerja tanpa meminta izin atasan"
+    ],
+    "kunci": 0,
+    "pembahasan": "Komunikasi yang terbuka dan asertif adalah kunci profesionalisme. Dengan menyampaikan kondisi nyata dan meminta klarifikasi prioritas, Anda menunjukkan akuntabilitas terhadap semua pekerjaan sekaligus menghormati kewenangan atasan. Ini mencerminkan nilai Akuntabel dan Kompeten dalam ASN BerAKHLAK.",
+    "xp": 10,
+    "coin": 5
+  },
+  {
+    "id": "TKP-003",
+    "kategori": "TKP",
+    "sub": "Kerja Sama",
+    "tanya": "Dalam sebuah rapat tim, rekan kerja Anda mengajukan usulan yang menurut Anda kurang tepat secara teknis. Namun rekan tersebut tampak sangat yakin dan antusias. Sikap Anda adalah...",
+    "opsi": [
+      "Menyampaikan pandangan teknis yang berbeda secara sopan dengan memberikan data atau argumen yang mendukung, sambil tetap terbuka mendengar penjelasan dari rekan tersebut",
+      "Diam dan menyetujui usulan tersebut agar rapat berjalan lancar dan rekan tidak tersinggung",
+      "Langsung menyanggah usulan tersebut di depan semua peserta rapat agar masalah segera terselesaikan",
+      "Membicarakan kelemahan usulan tersebut kepada rekan kerja lain setelah rapat selesai",
+      "Melaporkan kelemahan usulan tersebut langsung kepada atasan tanpa sepengetahuan rekan yang bersangkutan"
+    ],
+    "kunci": 0,
+    "pembahasan": "Menyampaikan pendapat berbeda secara konstruktif dan berbasis data adalah tanda profesionalisme yang dewasa. Menghindari konflik dengan diam justru bisa merugikan hasil kerja tim. Sikap ini mencerminkan nilai Harmonis (menghargai perbedaan) dan Kolaboratif (terbuka bekerja sama) dalam ASN BerAKHLAK.",
+    "xp": 10,
+    "coin": 5
+  },
+  {
+    "id": "TKP-004",
+    "kategori": "TKP",
+    "sub": "Integritas",
+    "tanya": "Anda mengetahui bahwa rekan kerja terdekat Anda secara rutin memalsukan laporan kehadiran dengan mencatatkan jam datang lebih awal dari kenyataannya. Apa yang Anda lakukan?",
+    "opsi": [
+      "Secara pribadi mengingatkan rekan tersebut bahwa tindakannya melanggar aturan dan berpotensi merugikan dirinya sendiri dan instansi, sambil memintanya untuk menghentikan kebiasaan tersebut",
+      "Membiarkannya karena itu bukan urusan Anda dan tidak berdampak langsung pada pekerjaan Anda",
+      "Langsung melaporkan kepada atasan atau bagian kepegawaian tanpa berbicara kepada rekan tersebut lebih dulu",
+      "Ikut melakukan hal yang sama agar tidak diperlakukan berbeda",
+      "Membicarakannya kepada rekan-rekan kerja lain sebagai peringatan"
+    ],
+    "kunci": 0,
+    "pembahasan": "Tindakan terbaik adalah menegur rekan secara langsung dan personal terlebih dahulu, memberikan kesempatan untuk berubah. Ini lebih manusiawi dan efektif daripada langsung melapor. Sikap ini mencerminkan nilai Loyal (menjaga nama baik instansi) dan Berakhlak (berbuat baik kepada sesama) dalam ASN BerAKHLAK.",
+    "xp": 10,
+    "coin": 5
+  },
+  {
+    "id": "TKP-005",
+    "kategori": "TKP",
+    "sub": "Adaptasi",
+    "tanya": "Instansi Anda baru saja menerapkan sistem digital baru untuk pengelolaan arsip. Sebagian besar rekan Anda, termasuk yang senior, merasa kesulitan dan menolak menggunakan sistem baru tersebut. Apa sikap Anda?",
+    "opsi": [
+      "Mempelajari sistem baru secara mandiri dengan cepat, kemudian secara proaktif membantu rekan-rekan yang kesulitan untuk beradaptasi",
+      "Ikut menolak sistem baru bersama rekan-rekan senior agar tidak dianggap tidak solid",
+      "Menggunakan sistem baru hanya saat diawasi atasan, dan kembali ke cara lama saat tidak ada pengawasan",
+      "Menyampaikan kepada atasan bahwa sistem baru terlalu sulit dan sebaiknya kembali ke sistem lama",
+      "Menggunakan sistem baru untuk diri sendiri saja tanpa peduli kesulitan rekan-rekan lain"
+    ],
+    "kunci": 0,
+    "pembahasan": "Adaptabilitas dan kolaborasi adalah dua kunci sukses di era transformasi digital. Dengan menguasai sistem baru lebih cepat dan membantu rekan-rekan lain, Anda berkontribusi pada keberhasilan transformasi instansi secara keseluruhan. Ini mencerminkan nilai Kompeten (terus belajar) dan Kolaboratif (bekerja sama untuk hasil terbaik) dalam ASN BerAKHLAK.",
+    "xp": 10,
+    "coin": 5
+  }
+]
