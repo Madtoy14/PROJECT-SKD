@@ -1,87 +1,87 @@
 [
   {
     "id": "TWK-001",
-    "kategori": "TWK",
+    "category": "TWK",
     "sub": "Nasionalisme",
-    "tanya": "Sikap yang paling mencerminkan nilai nasionalisme seorang ASN dalam menjalankan tugasnya adalah...",
-    "opsi": [
-      "Mengutamakan kepentingan pribadi dan golongan di atas kepentingan negara",
-      "Mendahulukan kepentingan bangsa dan negara di atas kepentingan pribadi atau kelompok",
-      "Mengikuti perintah atasan tanpa mempertimbangkan dampak terhadap masyarakat",
-      "Bersikap acuh tak acuh terhadap isu-isu yang menyangkut kedaulatan negara",
-      "Hanya loyal kepada instansi tempat bekerja tanpa peduli kondisi nasional"
+    "text": "Sikap yang paling mencerminkan nilai nasionalisme seorang ASN dalam menjalankan tugasnya adalah...",
+    "options": [
+      { "id": "A", "text": "Mengutamakan kepentingan pribadi dan golongan di atas kepentingan negara", "score": 0 },
+      { "id": "B", "text": "Mendahulukan kepentingan bangsa dan negara di atas kepentingan pribadi atau kelompok", "score": 5 },
+      { "id": "C", "text": "Mengikuti perintah atasan tanpa mempertimbangkan dampak terhadap masyarakat", "score": 0 },
+      { "id": "D", "text": "Bersikap acuh tak acuh terhadap isu-isu yang menyangkut kedaulatan negara", "score": 0 },
+      { "id": "E", "text": "Hanya loyal kepada instansi tempat bekerja tanpa peduli kondisi nasional", "score": 0 }
     ],
-    "kunci": 1,
-    "pembahasan": "Nasionalisme ASN diwujudkan dengan mendahulukan kepentingan bangsa dan negara di atas kepentingan pribadi atau kelompok. Hal ini merupakan penjabaran dari nilai-nilai Pancasila sila ketiga 'Persatuan Indonesia' dan merupakan kewajiban dasar setiap ASN sebagaimana diatur dalam UU No. 5 Tahun 2014.",
-    "xp": 10,
-    "coin": 5
+    "correct": "B",
+    "explanation": "Nasionalisme ASN diwujudkan dengan mendahulukan kepentingan bangsa dan negara di atas kepentingan pribadi atau kelompok. Hal ini merupakan penjabaran dari nilai-nilai Pancasila sila ketiga 'Persatuan Indonesia' dan merupakan kewajiban dasar setiap ASN sebagaimana diatur dalam UU No. 5 Tahun 2014.",
+    "xp_reward": 10,
+    "coin_reward": 5
   },
   {
     "id": "TWK-002",
-    "kategori": "TWK",
+    "category": "TWK",
     "sub": "Integritas",
-    "tanya": "Seorang ASN menerima tawaran uang dari pihak swasta agar permohonan izin usahanya dipercepat prosesnya. Tindakan yang PALING tepat dilakukan ASN tersebut adalah...",
-    "opsi": [
-      "Menerima uang tersebut karena nominal kecil dan tidak merugikan negara secara langsung",
-      "Menolak dengan tegas dan memproses perizinan sesuai prosedur yang berlaku",
-      "Menerima uang namun melaporkannya kepada bendahara instansi",
-      "Menunda proses perizinan hingga mendapat petunjuk dari atasan",
-      "Meminta pendapat rekan kerja terlebih dahulu sebelum mengambil keputusan"
+    "text": "Seorang ASN menerima tawaran uang dari pihak swasta agar permohonan izin usahanya dipercepat prosesnya. Tindakan yang PALING tepat dilakukan ASN tersebut adalah...",
+    "options": [
+      { "id": "A", "text": "Menerima uang tersebut karena nominal kecil dan tidak merugikan negara secara langsung", "score": 0 },
+      { "id": "B", "text": "Menolak dengan tegas dan memproses perizinan sesuai prosedur yang berlaku", "score": 5 },
+      { "id": "C", "text": "Menerima uang namun melaporkannya kepada bendahara instansi", "score": 0 },
+      { "id": "D", "text": "Menunda proses perizinan hingga mendapat petunjuk dari atasan", "score": 0 },
+      { "id": "E", "text": "Meminta pendapat rekan kerja terlebih dahulu sebelum mengambil keputusan", "score": 0 }
     ],
-    "kunci": 1,
-    "pembahasan": "ASN wajib menolak pemberian dalam bentuk apapun yang berkaitan dengan tugasnya (gratifikasi), dan memproses setiap layanan sesuai prosedur tanpa diskriminasi. Hal ini sesuai dengan Pasal 5 ayat 2 UU No. 20 Tahun 2001 tentang Pemberantasan Tipikor dan nilai integritas dalam core values ASN BerAKHLAK.",
-    "xp": 10,
-    "coin": 5
+    "correct": "B",
+    "explanation": "ASN wajib menolak pemberian dalam bentuk apapun yang berkaitan dengan tugasnya (gratifikasi), dan memproses setiap layanan sesuai prosedur tanpa diskriminasi. Hal ini sesuai dengan Pasal 5 ayat 2 UU No. 20 Tahun 2001 tentang Pemberantasan Tipikor dan nilai integritas dalam core values ASN BerAKHLAK.",
+    "xp_reward": 10,
+    "coin_reward": 5
   },
   {
     "id": "TWK-003",
-    "kategori": "TWK",
+    "category": "TWK",
     "sub": "Pilar Negara",
-    "tanya": "Pancasila sebagai dasar negara memiliki kedudukan sebagai norma dasar (Grundnorm) dalam sistem hukum Indonesia. Konsekuensi dari kedudukan tersebut adalah...",
-    "opsi": [
-      "Pancasila dapat diubah melalui referendum jika disetujui mayoritas rakyat",
-      "Semua peraturan perundang-undangan harus bersumber dan tidak boleh bertentangan dengan Pancasila",
-      "Pancasila hanya berlaku sebagai pedoman moral, bukan norma hukum yang mengikat",
-      "Pengadilan dapat mengenyampingkan Pancasila jika bertentangan dengan hukum internasional",
-      "Pancasila berlaku setara kedudukannya dengan UUD 1945"
+    "text": "Pancasila sebagai dasar negara memiliki kedudukan sebagai norma dasar (Grundnorm) dalam sistem hukum Indonesia. Konsekuensi dari kedudukan tersebut adalah...",
+    "options": [
+      { "id": "A", "text": "Pancasila dapat diubah melalui referendum jika disetujui mayoritas rakyat", "score": 0 },
+      { "id": "B", "text": "Semua peraturan perundang-undangan harus bersumber dan tidak boleh bertentangan dengan Pancasila", "score": 5 },
+      { "id": "C", "text": "Pancasila hanya berlaku sebagai pedoman moral, bukan norma hukum yang mengikat", "score": 0 },
+      { "id": "D", "text": "Pengadilan dapat mengenyampingkan Pancasila jika bertentangan dengan hukum internasional", "score": 0 },
+      { "id": "E", "text": "Pancasila berlaku setara kedudukannya dengan UUD 1945", "score": 0 }
     ],
-    "kunci": 1,
-    "pembahasan": "Sebagai Grundnorm (norma dasar), Pancasila menjadi sumber dari segala sumber hukum. Seluruh peraturan perundang-undangan — dari UUD 1945 hingga Peraturan Daerah — harus bersumber dan tidak boleh bertentangan dengan nilai-nilai Pancasila. Ini ditegaskan dalam Ketetapan MPR No. III/MPR/2000.",
-    "xp": 10,
-    "coin": 5
+    "correct": "B",
+    "explanation": "Sebagai Grundnorm (norma dasar), Pancasila menjadi sumber dari segala sumber hukum. Seluruh peraturan perundang-undangan dari UUD 1945 hingga Peraturan Daerah harus bersumber dan tidak boleh bertentangan dengan nilai-nilai Pancasila. Ini ditegaskan dalam Ketetapan MPR No. III/MPR/2000.",
+    "xp_reward": 10,
+    "coin_reward": 5
   },
   {
     "id": "TWK-004",
-    "kategori": "TWK",
+    "category": "TWK",
     "sub": "Bela Negara",
-    "tanya": "Wujud bela negara yang PALING sesuai dengan profesi seorang guru ASN di era digital adalah...",
-    "opsi": [
-      "Mengikuti latihan militer secara sukarela setiap akhir pekan",
-      "Mendidik generasi muda dengan nilai-nilai Pancasila dan mencegah penyebaran hoaks di lingkungan sekolah",
-      "Membeli produk-produk dalam negeri untuk mendukung perekonomian nasional",
-      "Menghindari penggunaan media sosial agar tidak terpapar konten negatif",
-      "Melaporkan warga negara asing yang dicurigai kepada pihak berwenang"
+    "text": "Wujud bela negara yang PALING sesuai dengan profesi seorang guru ASN di era digital adalah...",
+    "options": [
+      { "id": "A", "text": "Mengikuti latihan militer secara sukarela setiap akhir pekan", "score": 0 },
+      { "id": "B", "text": "Mendidik generasi muda dengan nilai-nilai Pancasila dan mencegah penyebaran hoaks di lingkungan sekolah", "score": 5 },
+      { "id": "C", "text": "Membeli produk-produk dalam negeri untuk mendukung perekonomian nasional", "score": 0 },
+      { "id": "D", "text": "Menghindari penggunaan media sosial agar tidak terpapar konten negatif", "score": 0 },
+      { "id": "E", "text": "Melaporkan warga negara asing yang dicurigai kepada pihak berwenang", "score": 0 }
     ],
-    "kunci": 1,
-    "pembahasan": "Bela negara tidak harus melalui jalur militer. Bagi seorang guru, bentuk bela negara yang paling relevan adalah mendidik generasi penerus dengan nilai-nilai kebangsaan dan membekali mereka dengan literasi digital untuk menangkal hoaks dan radikalisme. Ini sejalan dengan 5 nilai dasar bela negara: cinta tanah air, sadar berbangsa dan bernegara, setia pada Pancasila, rela berkorban, dan memiliki kemampuan awal bela negara.",
-    "xp": 10,
-    "coin": 5
+    "correct": "B",
+    "explanation": "Bela negara tidak harus melalui jalur militer. Bagi seorang guru, bentuk bela negara yang paling relevan adalah mendidik generasi penerus dengan nilai-nilai kebangsaan dan membekali mereka dengan literasi digital untuk menangkal hoaks dan radikalisme. Ini sejalan dengan 5 nilai dasar bela negara.",
+    "xp_reward": 10,
+    "coin_reward": 5
   },
   {
     "id": "TWK-005",
-    "kategori": "TWK",
+    "category": "TWK",
     "sub": "UUD 1945",
-    "tanya": "Berdasarkan UUD 1945 Pasal 33 ayat (3), 'Bumi dan air dan kekayaan alam yang terkandung di dalamnya dikuasai oleh negara dan dipergunakan untuk sebesar-besar kemakmuran rakyat.' Pasal ini menjadi landasan konstitusional bagi...",
-    "opsi": [
-      "Privatisasi seluruh sumber daya alam kepada pihak swasta asing",
-      "Penguasaan negara atas sumber daya alam vital guna mencapai kemakmuran seluruh rakyat",
-      "Pemberian hak kepemilikan penuh sumber daya alam kepada pemerintah daerah",
-      "Larangan total investasi asing di sektor pertambangan dan energi",
-      "Kewenangan individu untuk mengelola sumber daya alam di wilayahnya"
+    "text": "Berdasarkan UUD 1945 Pasal 33 ayat (3), bumi dan air dan kekayaan alam yang terkandung di dalamnya dikuasai oleh negara dan dipergunakan untuk sebesar-besar kemakmuran rakyat. Pasal ini menjadi landasan konstitusional bagi...",
+    "options": [
+      { "id": "A", "text": "Privatisasi seluruh sumber daya alam kepada pihak swasta asing", "score": 0 },
+      { "id": "B", "text": "Penguasaan negara atas sumber daya alam vital guna mencapai kemakmuran seluruh rakyat", "score": 5 },
+      { "id": "C", "text": "Pemberian hak kepemilikan penuh sumber daya alam kepada pemerintah daerah", "score": 0 },
+      { "id": "D", "text": "Larangan total investasi asing di sektor pertambangan dan energi", "score": 0 },
+      { "id": "E", "text": "Kewenangan individu untuk mengelola sumber daya alam di wilayahnya", "score": 0 }
     ],
-    "kunci": 1,
-    "pembahasan": "Pasal 33 ayat (3) UUD 1945 menegaskan prinsip 'dikuasai negara' yang bermakna negara berwenang mengatur, mengelola, dan mengawasi sumber daya alam. Tujuannya bukan monopoli, melainkan untuk memastikan pemanfaatannya memberikan kemakmuran sebesar-besarnya bagi seluruh rakyat Indonesia, bukan hanya segelintir pihak.",
-    "xp": 10,
-    "coin": 5
+    "correct": "B",
+    "explanation": "Pasal 33 ayat (3) UUD 1945 menegaskan prinsip 'dikuasai negara' yang bermakna negara berwenang mengatur, mengelola, dan mengawasi sumber daya alam. Tujuannya untuk memastikan pemanfaatannya memberikan kemakmuran sebesar-besarnya bagi seluruh rakyat Indonesia.",
+    "xp_reward": 10,
+    "coin_reward": 5
   }
 ]
