@@ -1,5 +1,3 @@
-import { motion } from 'framer-motion';
-
 // Profile Page Skeleton
 export function ProfileSkeleton() {
   return (
@@ -68,12 +66,10 @@ export function CardSkeleton({ count = 3 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {Array.from({ length: count }).map((_, i) => (
-        <motion.div
+        <div
           key={i}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.1 }}
           className="animate-pulse"
+          style={{ animationDelay: `${i * 100}ms` }}
         >
           <div className="bg-surface border border-border p-5 md:p-6 rounded-3xl space-y-4">
             <div className="flex items-center justify-between">
@@ -86,7 +82,7 @@ export function CardSkeleton({ count = 3 }: { count?: number }) {
               <div className="h-4 bg-surface-subtle rounded w-5/6" />
             </div>
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
   );
@@ -97,12 +93,10 @@ export function ListSkeleton({ count = 5 }: { count?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: count }).map((_, i) => (
-        <motion.div
+        <div
           key={i}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.05 }}
           className="animate-pulse"
+          style={{ animationDelay: `${i * 50}ms` }}
         >
           <div className="flex items-center gap-4 p-4 bg-surface border border-border rounded-xl">
             <div className="w-12 h-12 bg-surface-subtle rounded-full" />
@@ -112,7 +106,7 @@ export function ListSkeleton({ count = 5 }: { count?: number }) {
             </div>
             <div className="h-8 w-16 bg-surface-subtle rounded-lg" />
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
   );

@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-function cleanMathText(text: string): string {
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+
+const cleanMathText = (text: string): string => {
   if (!text) return "";
   let cleaned = text;
   if (typeof document !== 'undefined') { const txt = document.createElement('textarea'); txt.innerHTML = cleaned; cleaned = txt.value; }
@@ -51,7 +52,6 @@ function cleanMathText(text: string): string {
   
   return cleaned.trim();
 }
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Check, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, HeartCrack, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -59,6 +59,8 @@ import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, supabase, isSu
 import { useQuizSession } from '../context/QuizSessionContext';
 import MathCard from '../components/MathCard';
 import { Button } from '../components/ui/Button';
+import { ExitConfirmModal } from '../components/modals/ExitConfirmModal';
+import { SubmitConfirmModal } from '../components/modals/SubmitConfirmModal';
 // Konfigurasi Power up yang diijinkan per mode kuis
 const ALLOWED_POWER_UPS: Record<string, string[]> = {
   latihan: ['item_5050', 'item_hint', 'item_waktu_beku', 'item_skor_ganda', 'item_terawangan'],
@@ -93,15 +95,19 @@ export default function Quiz() {
   const packageId = location.state?.packageId || undefined;
   const packageVersion = location.state?.packageVersion || 1;
   
-  // --- Quiz Session ---
-  const { activeSession, createSession, updateSession, abandonSession, completeSession } = useQuizSession();
+    // --- Quiz Session ---
+  const { activeSession, createSession, updateSession, abandonSession, completeSession, debouncedSave } = useQuizSession();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const answersRef = useRef<Record<number, string>>({});
   
   // --- Quiz state ---
-  const [isEnergyDeducted, setIsEnergyDeducted] = useState(false);
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+    const [isEnergyDeducted, setIsEnergyDeducted] = useState(false);
+  // Modal state digabung jadi satu object untuk mengurangi re-render
+  const [modals, setModals] = useState({ exitConfirm: false, submitConfirm: false });
+  const showExitConfirm = modals.exitConfirm;
+  const showSubmitConfirm = modals.submitConfirm;
+  const setShowExitConfirm = (v: boolean) => setModals(m => ({ ...m, exitConfirm: v }));
+  const setShowSubmitConfirm = (v: boolean) => setModals(m => ({ ...m, submitConfirm: v }));
   const [questions, setQuestions] = useState<any[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -367,7 +373,6 @@ export default function Quiz() {
           const id = await createSession(gameMode, data, packageId, packageVersion);
           if (mounted) setSessionId(id);
         } catch (err: any) {
-          console.error("Failed to create quiz session:", err);
           if (mounted) {
             setError(err.message || "Gagal membuat sesi kuis.");
             setLoadingQuestions(false);
@@ -414,7 +419,6 @@ export default function Quiz() {
             initQuestions(shuffled);
           }
         } catch (err) {
-          console.error('Gagal fetch catatan salah:', err);
           if (mounted) {
             setNoCatatanSalah(true);
             setLoadingQuestions(false);
@@ -426,7 +430,6 @@ export default function Quiz() {
       fetchQuestionsFromSupabase(gameMode)
         .then(initQuestions)
         .catch((err: any) => {
-          console.error("Failed to fetch questions:", err);
           if (mounted) {
             setError(err.message || "Gagal memuat soal dari database.");
             setLoadingQuestions(false);
@@ -439,38 +442,14 @@ export default function Quiz() {
   // Keep answers ref synced for auto-save
   useEffect(() => { answersRef.current = answers; }, [answers]);
 
-  // --- Auto-Save Sync ---
-  useEffect(() => {
-    if (!sessionId) return;
-    const interval = setInterval(() => {
-      // Hitung skor tiap kategori dari answersRef
-      let twkPts = 0, tiuPts = 0, tkpPts = 0;
-      questions.forEach((q, idx) => {
-        const ansId = answersRef.current[idx];
-        if (ansId) {
-          const opt = q.options.find((o: any) => o.id === ansId);
-          if (opt) {
-            if (q.category === 'TWK') twkPts += opt.score;
-            else if (q.category === 'TIU') tiuPts += opt.score;
-            else if (q.category === 'TKP') tkpPts += opt.score;
-          }
-        }
-      });
-      
-      updateSession(sessionId, {
-        currentIndex: currentQuestionIndex,
-        answers: answersRef.current,
-        score: totalScoreRef.current,
-        twkScore: twkPts,
-        tiuScore: tiuPts,
-        tkpScore: tkpPts,
-        timeSpent: TOTAL_TIME - timeLeft
-      }).catch(err => console.error("Auto-save failed", err));
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [sessionId, currentQuestionIndex, timeLeft, questions]);
+    // Auto-Save interval 30 detik dihapus.
+  // Digantikan oleh debouncedSave yang dipanggil langsung di handleSelect (save-on-answer).
   // Derived values – safely computed after hooks (not hooks themselves)
-  const currentQuestion = questions[currentQuestionIndex] ?? null;
+  // Memoize currentQuestion agar tidak dihitung ulang setiap render
+  const currentQuestion = useMemo(
+    () => questions[currentQuestionIndex] ?? null,
+    [questions, currentQuestionIndex]
+  );
   const totalQuestions = questions.length;
   const progress = (timeLeft / TOTAL_TIME) * 100;
   const strokeDashoffset = ((100 - progress) / 100) * 113.097;
@@ -580,12 +559,14 @@ export default function Quiz() {
       setIsEnergyDeducted(true);
     }
 
-    if (gameMode === 'tryout') {
+        if (gameMode === 'tryout') {
       // In tryout, user can change answer freely, no auto-advance
       const newAnswers = { ...answers, [currentQuestionIndex]: optionId };
       setAnswers(newAnswers);
+      answersRef.current = newAnswers;
+      // Save-on-answer dengan debounce 3 detik (menggantikan interval 30 detik)
       if (sessionId) {
-        updateSession(sessionId, { answers: newAnswers });
+        debouncedSave(sessionId, { currentIndex: currentQuestionIndex, answers: newAnswers });
       }
       return;
     }
@@ -673,11 +654,13 @@ export default function Quiz() {
     setTotalScore(newTotal);
     totalScoreRef.current = newTotal;
     
-    // Real-time Update Database (Crucial for LiveRanking)
+        // Real-time Update Database (Crucial for LiveRanking)
     const newAnswers = { ...answers, [currentQuestionIndex]: optionId };
     setAnswers(newAnswers);
+    answersRef.current = newAnswers;
+    // Save-on-answer dengan debounce 3 detik
     if (sessionId) {
-      updateSession(sessionId, { score: newTotal, answers: newAnswers });
+      debouncedSave(sessionId, { score: newTotal, answers: newAnswers, currentIndex: currentQuestionIndex });
     }
 
     // Floating reward
@@ -812,8 +795,7 @@ export default function Quiz() {
             quizQuestions: questions
           } 
         });
-      }).catch((err) => {
-        console.error("Failed to complete session:", err);
+      }).catch(() => {
         navigate(`/result/${sessionId}`, { 
           state: { 
             score: scoreSnapshot, 
@@ -945,22 +927,13 @@ const scoreBadge = (optionId: string) => {
         </div>
       )}
       {/* Floating Score Reward */}
-      <AnimatePresence>
-        {showRewardFloat && (
-          <motion.div
-            key="reward"
-            initial={{ opacity: 0, y: 0, scale: 0.6 }}
-            animate={{ opacity: 1, y: -80, scale: 1.3 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
-          >
-            <span className="text-3xl font-black text-coin drop-shadow-xl">
-              +{showRewardFloat.pts} pts
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {showRewardFloat && (
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none animate-bounce">
+          <span className="text-3xl font-black text-coin drop-shadow-xl">
+            +{showRewardFloat.pts} pts
+          </span>
+        </div>
+      )}
       {/* Main layout — only render when data is ready */}
       {currentQuestion && <div className={`flex flex-1 overflow-hidden ${(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'tryout') ? 'flex-row' : 'flex-col items-center'}`}>
         {/* === Quiz Panel === */}
@@ -989,11 +962,9 @@ const scoreBadge = (optionId: string) => {
 
             <div className="flex-1 hidden md:block px-6">
               <div className="h-2 bg-slate-100 rounded-full overflow-hidden w-full max-w-md mx-auto">
-                <motion.div
-                  className="h-full bg-primary rounded-full"
-                  initial={{ width: `${(currentQuestionIndex / totalQuestions) * 100}%` }}
-                  animate={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
-                  transition={{ duration: 0.5 }}
+                <div
+                  className="h-full bg-primary rounded-full transition-all duration-500"
+                  style={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
                 />
               </div>
             </div>
@@ -1058,16 +1029,7 @@ const scoreBadge = (optionId: string) => {
           )}
           {/* Question Body */}
           <main className={`flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 pb-24 relative ${tintaHitamActive ? 'blur-md pointer-events-none transition-all duration-300' : 'transition-all duration-300'}`}>
-            {/* Tinta Hitam overlay inside main is blurred, but let's make an overlay outside it to be sharp */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentQuestion.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-4"
-              >
+            <div key={currentQuestion.id} className="space-y-4">
                 {/* TKP indicator */}
                 {currentQuestion.category === 'TKP' && (
                   <div className="flex items-center gap-2 text-xs text-orange-400 bg-orange-500/10 border border-orange-500/20 px-3 py-2 rounded-xl">
@@ -1132,9 +1094,8 @@ const scoreBadge = (optionId: string) => {
                     }
                                         const terawanganPercent = activePowerUps.terawangan ? (isCorrect ? ((opt.text.length * 7) % 20) + 60 : ((opt.text.length * 13) % 30)) : 0;
                     return (
-                      <motion.button
+                      <button
                         key={opt.id}
-                        whileTap={(!selected || gameMode === 'tryout') ? { scale: 0.98 } : {}}
                         onClick={() => handleSelect(opt.id)}
                         disabled={selected !== null && gameMode !== 'tryout'}
                         className={`w-full p-3.5 md:p-4 rounded-xl border-2 text-left flex items-center gap-3 transition-all shadow-sm relative z-0 overflow-hidden active:scale-[0.98] ${cardClass}`}
@@ -1159,7 +1120,7 @@ const scoreBadge = (optionId: string) => {
                         {showStatus && !isTKP && isCorrect && gameMode !== 'tryout' && (
                           <span className="ml-auto shrink-0 text-xs font-bold bg-success/20 text-success px-2 py-1 rounded-lg">5 pts</span>
                         )}
-                      </motion.button>
+                      </button>
                     );
                   })}
                 </div>
@@ -1194,11 +1155,7 @@ const scoreBadge = (optionId: string) => {
                         </Button>
                       </div>
                     ) : (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        className="bg-info/10 border border-info/20 p-5 rounded-xl space-y-3"
-                      >
+                      <div className="bg-info/10 border border-info/20 p-5 rounded-xl space-y-3">
                         <h4 className="font-bold text-primary">Pembahasan:</h4>
                         <p className="text-sm md:text-base text-fg leading-relaxed">
                           <MathCard explanation={cleanMathText(currentQuestion.explanation || "Pembahasan tidak tersedia untuk soal ini.")} category={currentQuestion.category} />
@@ -1220,7 +1177,7 @@ const scoreBadge = (optionId: string) => {
                             currentQuestionIndex === totalQuestions - 1 ? 'Selesai' : 'Lanjut ke Soal Berikutnya'
                           )}
                         </Button>
-                      </motion.div>
+                      </div>
                     )}
                   </div>
                 )}
@@ -1276,8 +1233,7 @@ const scoreBadge = (optionId: string) => {
                   </div>
                   </div>
                 )}
-              </motion.div>
-            </AnimatePresence>
+              </div>
           </main>
 
           {/* Quick Slots (Power Ups) at the bottom */}
@@ -1319,44 +1275,36 @@ const scoreBadge = (optionId: string) => {
               </h3>
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
-              <AnimatePresence>
-                {liveRanks.map((rank, idx) => {
-                  // const prevIdx = 0; // simplified
-                  const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
-                  return (
-                    <motion.div
-                      key={rank.name}
-                      layout
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                      className={`flex items-center gap-3 p-3 rounded-xl border transition-colors
-                        ${rank.isMe
-                          ? 'bg-info-subtle border-info/40 shadow-md shadow-primary/10'
-                          : 'bg-bg/50 border-border/50'}`}
-                    >
-                      <div className="flex items-center gap-4 bg-surface p-2 md:p-3 rounded-2xl shadow-sm border border-border shrink-0">
-                        {/* Score */}
-                        <span className="text-base w-6 text-center">{medal}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-xs font-bold truncate ${rank.isMe ? 'text-primary' : 'text-fg'}`}>
-                          {rank.name}{rank.isMe && ' 👤'}
-                        </p>
-                        <p className="text-[10px] text-fg-muted font-space">{rank.score} pts</p>
-                      </div>
-                      {/* Score bar */}
-                      <div className="w-10 h-1.5 bg-locked-subtle rounded-full overflow-hidden">
-                        <motion.div
-                          className={`h-full rounded-full ${rank.isMe ? 'bg-primary' : 'bg-surface-subtle0'}`}
-                          animate={{ width: `${Math.min((rank.score / 300) * 100, 100)}%` }}
-                          transition={{ duration: 0.4 }}
-                        />
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
+              {liveRanks.map((rank, idx) => {
+                const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+                return (
+                  <div
+                    key={rank.name}
+                    className={`flex items-center gap-3 p-3 rounded-xl border transition-colors
+                      ${rank.isMe
+                        ? 'bg-info-subtle border-info/40 shadow-md shadow-primary/10'
+                        : 'bg-bg/50 border-border/50'}`}
+                  >
+                    <div className="flex items-center gap-4 bg-surface p-2 md:p-3 rounded-2xl shadow-sm border border-border shrink-0">
+                      {/* Score */}
+                      <span className="text-base w-6 text-center">{medal}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-xs font-bold truncate ${rank.isMe ? 'text-primary' : 'text-fg'}`}>
+                        {rank.name}{rank.isMe && ' 👤'}
+                      </p>
+                      <p className="text-[10px] text-fg-muted font-space">{rank.score} pts</p>
+                    </div>
+                    {/* Score bar */}
+                    <div className="w-10 h-1.5 bg-locked-subtle rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-400 ${rank.isMe ? 'bg-primary' : 'bg-surface-subtle0'}`}
+                        style={{ width: `${Math.min((rank.score / 300) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             {/* My score summary at bottom */}
             <div className="p-4 border-t border-border bg-info/5">
@@ -1391,39 +1339,32 @@ const scoreBadge = (optionId: string) => {
                       <span>{cat}</span>
                       {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </Button>
-                    <AnimatePresence>
-                      {isOpen && (
-                        <motion.div 
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="grid grid-cols-5 gap-2 overflow-hidden"
-                        >
-                          {catQuestions.map(({ idx }) => {
-                            const isAnswered = answers[idx] !== undefined;
-                            const isCurrent = currentQuestionIndex === idx;
-                            let btnClass = 'bg-bg border-border text-fg-muted hover:bg-locked-subtle';
-                            if (isCurrent) {
-                              btnClass = 'bg-info text-info-fg border-info shadow-md ring-2 ring-info/50 ring-offset-1 ring-offset-skd-card';
-                            } else if (doubtful[idx]) {
-                              btnClass = 'bg-danger text-white border-danger shadow-sm';
-                            } else if (isAnswered) {
-                              btnClass = 'bg-success text-white border-success shadow-sm';
-                            }
-                            return (
-                              <Button
-                                variant="custom"
-                                key={idx}
-                                onClick={() => setCurrentQuestionIndex(idx)}
-                                className={`w-10 h-10 rounded-md border flex items-center justify-center text-xs font-bold transition-all ${btnClass}`}
-                              >
-                                {idx + 1}
-                              </Button>
-                            );
-                          })}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    {isOpen && (
+                      <div className="grid grid-cols-5 gap-2 overflow-hidden transition-all">
+                        {catQuestions.map(({ idx }) => {
+                          const isAnswered = answers[idx] !== undefined;
+                          const isCurrent = currentQuestionIndex === idx;
+                          let btnClass = 'bg-bg border-border text-fg-muted hover:bg-locked-subtle';
+                          if (isCurrent) {
+                            btnClass = 'bg-info text-info-fg border-info shadow-md ring-2 ring-info/50 ring-offset-1 ring-offset-skd-card';
+                          } else if (doubtful[idx]) {
+                            btnClass = 'bg-danger text-white border-danger shadow-sm';
+                          } else if (isAnswered) {
+                            btnClass = 'bg-success text-white border-success shadow-sm';
+                          }
+                          return (
+                            <Button
+                              variant="custom"
+                              key={idx}
+                              onClick={() => setCurrentQuestionIndex(idx)}
+                              className={`w-10 h-10 rounded-md border flex items-center justify-center text-xs font-bold transition-all ${btnClass}`}
+                            >
+                              {idx + 1}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -1440,26 +1381,16 @@ const scoreBadge = (optionId: string) => {
           </div>
         )}
         {/* === Try Out Sidebar (mobile drawer) === */}
-        <AnimatePresence>
-          {gameMode === 'tryout' && showSidebarMobile && (
-            <>
-              {/* Overlay Backdrop */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setShowSidebarMobile(false)}
-                className="fixed inset-0 bg-overlay backdrop-blur-sm z-40 lg:hidden"
-              />
-              
-              {/* Drawer Container */}
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="fixed right-0 top-0 bottom-0 w-80 bg-surface border-l border-border z-50 flex flex-col lg:hidden"
-              >
+        {gameMode === 'tryout' && showSidebarMobile && (
+          <>
+            {/* Overlay Backdrop */}
+            <div 
+              onClick={() => setShowSidebarMobile(false)}
+              className="fixed inset-0 bg-overlay backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+            />
+            
+            {/* Drawer Container */}
+            <div className="fixed right-0 top-0 bottom-0 w-80 bg-surface border-l border-border z-50 flex flex-col lg:hidden transition-transform duration-300">
                 <div className="p-4 border-b border-border flex items-center justify-between">
                   <h3 className="font-bold text-fg flex items-center gap-2 text-sm">
                     Navigasi Soal
@@ -1488,42 +1419,35 @@ const scoreBadge = (optionId: string) => {
                           <span>{cat}</span>
                           {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </Button>
-                        <AnimatePresence>
-                          {isOpen && (
-                            <motion.div 
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              className="grid grid-cols-5 gap-2 overflow-hidden"
-                            >
-                              {catQuestions.map(({ idx }) => {
-                                const isAnswered = answers[idx] !== undefined;
-                                const isCurrent = currentQuestionIndex === idx;
-                                let btnClass = 'bg-bg border-border text-fg-muted hover:bg-locked-subtle';
-                                if (isCurrent) {
-                                  btnClass = 'bg-info text-info-fg border-info shadow-md ring-2 ring-info/50 ring-offset-1 ring-offset-skd-card';
-                                } else if (doubtful[idx]) {
-                                  btnClass = 'bg-danger text-white border-danger shadow-sm';
-                                } else if (isAnswered) {
-                                  btnClass = 'bg-success text-white border-success shadow-sm';
-                                }
-                                return (
-                                  <Button
-                                    variant="custom"
-                                    key={idx}
-                                    onClick={() => {
-                                      setCurrentQuestionIndex(idx);
-                                      setShowSidebarMobile(false);
-                                    }}
-                                    className={`w-10 h-10 rounded-md border flex items-center justify-center text-xs font-bold ${btnClass}`}
-                                  >
-                                    {idx + 1}
-                                  </Button>
-                                );
-                              })}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                        {isOpen && (
+                          <div className="grid grid-cols-5 gap-2 overflow-hidden transition-all">
+                            {catQuestions.map(({ idx }) => {
+                              const isAnswered = answers[idx] !== undefined;
+                              const isCurrent = currentQuestionIndex === idx;
+                              let btnClass = 'bg-bg border-border text-fg-muted hover:bg-locked-subtle';
+                              if (isCurrent) {
+                                btnClass = 'bg-info text-info-fg border-info shadow-md ring-2 ring-info/50 ring-offset-1 ring-offset-skd-card';
+                              } else if (doubtful[idx]) {
+                                btnClass = 'bg-danger text-white border-danger shadow-sm';
+                              } else if (isAnswered) {
+                                btnClass = 'bg-success text-white border-success shadow-sm';
+                              }
+                              return (
+                                <Button
+                                  variant="custom"
+                                  key={idx}
+                                  onClick={() => {
+                                    setCurrentQuestionIndex(idx);
+                                    setShowSidebarMobile(false);
+                                  }}
+                                  className={`w-10 h-10 rounded-md border flex items-center justify-center text-xs font-bold ${btnClass}`}
+                                >
+                                  {idx + 1}
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -1541,107 +1465,30 @@ const scoreBadge = (optionId: string) => {
                     Kumpulkan Ujian
                   </Button>
                 </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+            </div>
+          </>
+        )}
       </div>}
       {/* Exit Confirmation Modal */}
-      <AnimatePresence>
-        {showExitConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-overlay backdrop-blur-sm"
-              onClick={() => setShowExitConfirm(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-bg border border-border rounded-3xl p-6 md:p-8 max-w-sm w-full relative z-10 shadow-2xl"
-            >
-              <div className="w-16 h-16 bg-danger/10 text-danger rounded-2xl flex items-center justify-center mb-6 mx-auto border border-danger/20">
-                <X size={32} />
-              </div>
-              <h2 className="text-xl font-black text-center text-fg mb-3">Yakin Ingin Keluar?</h2>
-              <p className="text-sm text-center text-fg-muted mb-8 leading-relaxed">
-                {!isEnergyDeducted 
-                  ? "Kuis belum selesai. Jika Anda keluar sekarang, biaya permainan (energi/koin) Anda tidak akan terpotong."
-                  : "Kuis belum selesai. Anda sudah menjawab soal sehingga biaya permainan sudah terpotong. Progress tidak akan tersimpan!"}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowExitConfirm(false)}
-                  className="flex-1 py-3 px-4 bg-locked-subtle hover:bg-locked-subtle text-fg rounded-xl"
-                >
-                  Batal
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    if (sessionId) abandonSession(sessionId);
-                    navigate('/');
-                  }}
-                  className="flex-1 py-3 px-4 rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
-                >
-                  Ya, Keluar
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <ExitConfirmModal
+        isOpen={showExitConfirm}
+        onClose={() => setShowExitConfirm(false)}
+        onConfirm={() => {
+          if (sessionId) abandonSession(sessionId);
+          navigate('/');
+        }}
+        isEnergyDeducted={isEnergyDeducted}
+      />
+      
       {/* Submit Confirmation Modal */}
-      <AnimatePresence>
-        {showSubmitConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-overlay backdrop-blur-sm"
-              onClick={() => setShowSubmitConfirm(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-bg border border-border rounded-3xl p-6 md:p-8 max-w-sm w-full relative z-10 shadow-2xl"
-            >
-              <div className="w-16 h-16 bg-success/10 text-success rounded-2xl flex items-center justify-center mb-6 mx-auto border border-success/20">
-                <Check size={32} />
-              </div>
-              <h2 className="text-xl font-black text-center text-fg mb-3">Kumpulkan Ujian?</h2>
-              <p className="text-sm text-center text-fg-muted mb-8 leading-relaxed">
-                Apakah Anda yakin ingin menyelesaikan kuis ini? Pastikan Anda sudah mengecek kembali seluruh jawaban Anda.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowSubmitConfirm(false)}
-                  className="flex-1 py-3 px-4 bg-locked-subtle hover:bg-locked-subtle text-fg rounded-xl"
-                >
-                  Batal
-                </Button>
-                <Button
-                  variant="success"
-                  onClick={() => {
-                    setShowSubmitConfirm(false);
-                    finishTryout();
-                  }}
-                  className="flex-1 py-3 px-4 rounded-xl shadow-lg shadow-success/20 transition-all active:scale-95"
-                >
-                  Ya, Kumpulkan
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <SubmitConfirmModal
+        isOpen={showSubmitConfirm}
+        onClose={() => setShowSubmitConfirm(false)}
+        onConfirm={() => {
+          setShowSubmitConfirm(false);
+          finishTryout();
+        }}
+      />
     </div>
   );
 }

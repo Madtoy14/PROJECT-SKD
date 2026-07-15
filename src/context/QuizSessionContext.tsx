@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, fetchProfile, updateProfile } from '../lib/supabase';
 
 interface QuizSession {
   id: string;
@@ -37,6 +37,8 @@ interface QuizSessionContextType {
   recoverSession: () => Promise<QuizSession | null>;
   abandonSession: (sessionId: string) => Promise<void>;
   clearSession: () => void;
+  /** Save-on-answer dengan debounce 3 detik. Panggil ini setiap user memilih jawaban. */
+  debouncedSave: (sessionId: string, updates: Partial<QuizSession>) => void;
 }
 
 const QuizSessionContext = createContext<QuizSessionContextType | undefined>(undefined);
@@ -47,6 +49,8 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
 
   const activeSessionRef = useRef<QuizSession | null>(null);
   const isAutoSavingRef = useRef(false);
+  // Debounce timer ref untuk save-on-answer (3 detik)
+  const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     activeSessionRef.current = activeSession;
@@ -104,46 +108,39 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Auto-save every 30 seconds if there's an active session
-  useEffect(() => {
-    // Only initialize the interval if there's an active session
-    if (!activeSession) return;
+  // Save-on-answer dengan debounce 3 detik — menggantikan interval auto-save 30 detik.
+  // Dipanggil dari Quiz.tsx setiap kali user memilih jawaban.
+  const debouncedSave = useCallback((sessionId: string, updates: Partial<QuizSession>) => {
+    // Update local state langsung agar UI tetap responsif
+    setActiveSession(prev => prev && prev.id === sessionId ? { ...prev, ...updates } : prev);
 
-    const interval = setInterval(async () => {
-      // Always get the latest session data from the ref so we don't need activeSession in deps
+    // Debounce API call ke Supabase selama 3 detik
+    if (saveDebounceRef.current) clearTimeout(saveDebounceRef.current);
+    saveDebounceRef.current = setTimeout(async () => {
+      if (isAutoSavingRef.current) return;
       const currentSession = activeSessionRef.current;
-      if (!currentSession) return;
-
-      if (isAutoSavingRef.current) {
-        console.warn('Auto-save skipped: previous save still in progress');
-        return;
-      }
+      if (!currentSession || currentSession.id !== sessionId) return;
       try {
         setIsAutoSaving(true);
-        await updateSession(currentSession.id, {
-          currentIndex: currentSession.currentIndex,
-          answers: currentSession.answers,
-          score: currentSession.score,
-          twkScore: currentSession.twkScore,
-          tiuScore: currentSession.tiuScore,
-          tkpScore: currentSession.tkpScore,
-          usedPowerups: currentSession.usedPowerups
-        });
-        console.log('✅ Auto-saved quiz session:', currentSession.id);
-      } catch (error) {
-        console.error('❌ Auto-save failed:', error);
+        await updateSession(sessionId, updates);
+      } catch {
+        // Silent fail — data tetap aman di local state
       } finally {
         setIsAutoSaving(false);
       }
-    }, 30000); // 30 seconds
+    }, 3000);
+  }, [updateSession]);
 
-    return () => clearInterval(interval);
-  }, [activeSession?.id, updateSession]); // Only depend on ID so it doesn't reset on every answer/tick
+  // Cleanup debounce timer saat unmount
+  useEffect(() => {
+    return () => {
+      if (saveDebounceRef.current) clearTimeout(saveDebounceRef.current);
+    };
+  }, []);
 
   const createSession = useCallback(async (mode: string, questions: any[], packageId?: string, packageVersion?: number): Promise<string> => {
     let { data: { user } } = await supabase!.auth.getUser();
     if (!user) {
-      console.warn("auth.getUser() returned null, attempting fallback to getSession()...");
       const { data: sessionData } = await supabase!.auth.getSession();
       user = sessionData.session?.user || null;
     }
@@ -278,7 +275,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
 
     // AI Analytics Update: Update akurasi in profiles
     try {
-      const { data: profile } = await supabase!.from('profiles').select('id, akurasi').eq('id', (await supabase!.auth.getUser()).data.user?.id).single();
+      const profile = await fetchProfile('current');
       if (profile) {
         let currentAkurasi: any = profile.akurasi || {
           TWK: { correct: 0, total: 0 },
@@ -314,7 +311,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
         currentAkurasi.TIU = { correct: (currentAkurasi.TIU?.correct || 0) + tiuCor, total: (currentAkurasi.TIU?.total || 0) + tiuTot };
         currentAkurasi.TKP = { correct: (currentAkurasi.TKP?.correct || 0) + tkpCor, total: (currentAkurasi.TKP?.total || 0) + tkpTot };
 
-        await supabase!.from('profiles').update({ akurasi: currentAkurasi }).eq('id', profile.id);
+        await updateProfile({ akurasi: currentAkurasi });
       }
     } catch (e) {
        // ignore error
@@ -387,7 +384,8 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
       completeSession,
       recoverSession,
       abandonSession,
-      clearSession
+      clearSession,
+      debouncedSave
     }}>
       {children}
     </QuizSessionContext.Provider>

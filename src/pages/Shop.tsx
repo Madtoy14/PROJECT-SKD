@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 import { Coins, Scale, Lightbulb, Zap, LockKeyhole, Sparkles, Check, Clock, Eye, Heart, Battery, Shield, Skull, Plus, X } from 'lucide-react';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
@@ -206,21 +205,16 @@ export default function Shop() {
 
   return (
     <div className="p-4 md:p-8 space-y-6 md:space-y-10 pb-24 relative min-h-screen max-w-5xl mx-auto font-syne">
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 ${
-              toastType === 'success' ? 'bg-success shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'bg-danger shadow-[0_0_20px_rgba(239,68,68,0.4)]'
-            } text-fg px-6 py-3 rounded-full font-bold whitespace-nowrap`}
-          >
-            {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {/* Toast Notification */}
+      <div
+        className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
+          toastMessage ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+        } ${
+          toastType === 'success' ? 'bg-success shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'bg-danger shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+        } text-fg px-6 py-3 rounded-full font-bold whitespace-nowrap`}
+      >
+        {toastMessage}
+      </div>
 
       <header className="pt-2 md:pt-4 flex items-center justify-between">
         <div>
@@ -259,16 +253,9 @@ export default function Shop() {
         </button>
       </div>
 
-      <AnimatePresence mode="wait">
+            <div>
         {activeTab === 'buy' ? (
-          <motion.div
-            key="buy"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-8 md:space-y-12"
-          >
+          <div className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-left-2 duration-200">
             {/* Power up Section */}
             <section>
               <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-fg border-b border-border pb-2">Power up Kuis</h2>
@@ -277,16 +264,14 @@ export default function Shop() {
                   const count = profile?.inventory?.[item.id as keyof NonNullable<typeof profile.inventory>] || 0;
 
                   return (
-                    <motion.button
+                                        <button
                       key={item.id}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
                       disabled={purchasing === item.id}
                       onClick={() => {
                         setBulkItem({ id: item.id, title: item.title, cost: item.cost, type: item.id === 'item_energy_refill' ? 'energy' : 'inventory' });
                         setBulkQuantity(1);
                       }}
-                      className="bg-surface border border-border hover:border-border p-5 md:p-6 rounded-3xl flex flex-col items-start gap-4 text-left transition-all shadow-sm hover:shadow-md w-full relative overflow-hidden group"
+                      className="bg-surface border border-border hover:border-border p-5 md:p-6 rounded-3xl flex flex-col items-start gap-4 text-left transition-all shadow-sm hover:shadow-md hover:scale-[1.03] active:scale-[0.97] w-full relative overflow-hidden group"
                     >
                       {count > 0 && (
                         <div className="absolute top-0 right-0 bg-primary-subtle text-primary border-l border-b border-primary px-3 py-1 text-xs font-bold rounded-bl-xl font-space">
@@ -308,7 +293,7 @@ export default function Shop() {
                         <h3 className="font-bold text-base md:text-lg mb-2 text-fg">{item.title}</h3>
                         <p className="text-sm text-fg-muted leading-relaxed">{item.description}</p>
                       </div>
-                    </motion.button>
+                    </button>
                   );
                 })}
               </div>
@@ -327,10 +312,9 @@ export default function Shop() {
                   const isLoading = purchasing === pkg.id;
 
                   return (
-                    <motion.div
+                                        <div
                       key={pkg.id}
-                      whileHover={{ scale: 1.02 }}
-                      className="bg-surface border border-border p-6 rounded-3xl flex flex-col justify-between transition-all shadow-sm hover:shadow-md relative overflow-hidden group text-left"
+                      className="bg-surface border border-border p-6 rounded-3xl flex flex-col justify-between transition-all shadow-sm hover:shadow-md hover:scale-[1.02] relative overflow-hidden group text-left"
                     >
                       <div>
                         <div className="w-12 h-12 bg-gradient-to-br from-premium to-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
@@ -361,21 +345,14 @@ export default function Shop() {
                           </>
                         )}
                       </div>
-                    </motion.div>
+                                        </div>
                   );
                 })}
               </div>
             </section>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div
-            key="sell"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-6"
-          >
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-2 duration-200">
             <section>
               <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-fg border-b border-border pb-2">Jual Balik Power up</h2>
               <p className="text-xs text-fg-muted mb-6 leading-relaxed max-w-xl">
@@ -390,10 +367,9 @@ export default function Shop() {
                   if (count <= 0) return null;
 
                   return (
-                    <motion.div
+                                        <div
                       key={item.id}
-                      whileHover={{ scale: 1.03 }}
-                      className="bg-surface border border-border p-5 md:p-6 rounded-3xl flex flex-col items-start justify-between gap-4 text-left transition-all shadow-sm hover:shadow-md w-full relative overflow-hidden group"
+                      className="bg-surface border border-border p-5 md:p-6 rounded-3xl flex flex-col items-start justify-between gap-4 text-left transition-all shadow-sm hover:shadow-md hover:scale-[1.03] w-full relative overflow-hidden group"
                     >
                       <div className="absolute top-0 right-0 bg-success/20 text-success border-l border-b border-success px-3 py-1 text-xs font-bold rounded-bl-xl font-space">
                         Miliki: {count}
@@ -421,7 +397,7 @@ export default function Shop() {
                           <span>Jual Balik (+{sellReward} Koin)</span>
                         </button>
                       </div>
-                    </motion.div>
+                                        </div>
                   );
                 })}
 
@@ -433,10 +409,10 @@ export default function Shop() {
                   </div>
                 )}
               </div>
-            </section>
-          </motion.div>
+                        </section>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
 
       <TopUpModal 
         isOpen={isTopUpOpen} 
@@ -444,21 +420,10 @@ export default function Shop() {
         onSuccess={() => setIsTopUpOpen(false)} 
       />
 
-      {/* Bulk Purchase Modal */}
-      <AnimatePresence>
-        {bulkItem && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 font-syne"
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              className="bg-surface w-full max-w-md rounded-3xl shadow-2xl overflow-hidden p-6"
-            >
+            {/* Bulk Purchase Modal */}
+      {bulkItem && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 font-syne animate-in fade-in duration-200">
+          <div className="bg-surface w-full max-w-md rounded-3xl shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 slide-in-from-bottom-2 duration-200">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="font-bold text-xl text-fg">Beli {bulkItem.title}</h3>
                 <button onClick={() => setBulkItem(null)} className="p-2 bg-surface-subtle rounded-full hover:bg-border transition-colors">
@@ -527,10 +492,9 @@ export default function Shop() {
                   Konfirmasi Pembelian
                 </Button>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                      </div>
+        </div>
+      )}
 
     </div>
   );

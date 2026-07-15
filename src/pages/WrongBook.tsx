@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Target, Brain, Activity, Clock, Flame, Shield, ArrowRight, Play, Loader2, Sparkles } from 'lucide-react';
 import { fetchProfile, getWrongQuestions, getWrongBooksStats, isSupabaseConfigured } from '../lib/supabase';
@@ -140,15 +139,11 @@ export default function WrongBook() {
             </p>
           </div>
         ) : (
-          <AnimatePresence mode="popLayout">
+          <div>
             {questions.map((q, idx) => (
-              <motion.div
+              <div
                 key={q.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: idx * 0.05 }}
-                className="bg-surface border border-border p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden"
+                className="bg-surface border border-border p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden mb-4"
               >
                 <div className="flex flex-col md:flex-row md:items-start gap-4">
                   
@@ -199,9 +194,9 @@ export default function WrongBook() {
                   </div>
                   
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </AnimatePresence>
+          </div>
         )}
       </div>
     </div>

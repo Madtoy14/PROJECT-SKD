@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Coins, Zap, ArrowRight, Award, AlertTriangle, CheckCircle, XCircle, Circle, ChevronDown, ChevronUp
 } from 'lucide-react';

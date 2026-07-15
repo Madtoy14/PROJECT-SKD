@@ -1,5 +1,4 @@
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
 import { X, Users, Clock } from 'lucide-react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { getRankForScore, getCurrentSeason, getSeasonDates } from '../data/ranks';
@@ -24,25 +23,18 @@ export default function LeaderboardModal({ data, onClose }: LeaderboardModalProp
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      <div
         onClick={onClose}
         className="fixed inset-0 bg-overlay backdrop-blur-sm z-0"
         data-backdrop="true"
       />
 
       {/* Modal */}
-      <motion.div
+      <div
         ref={modalRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="leaderboard-title"
-        initial={{ opacity: 0, y: 60, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 60, scale: 0.97 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
         className="relative z-10 bg-surface w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl border border-border shadow-2xl flex flex-col max-h-[85vh]"
       >
         {/* Header */}
@@ -135,11 +127,8 @@ export default function LeaderboardModal({ data, onClose }: LeaderboardModalProp
             const tier = getRankForScore(player.xp);
             const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : null;
             return (
-              <motion.div
+              <div
                 key={player.rank}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.04 }}
                 className={`flex items-center gap-3 px-4 py-3 rounded-2xl border
                   ${player.isMe
                     ? 'bg-primary/8 border-primary/30 shadow-sm'
@@ -169,7 +158,7 @@ export default function LeaderboardModal({ data, onClose }: LeaderboardModalProp
                   <p className="text-sm font-black font-space text-fg">{player.xp.toLocaleString()}</p>
                   <p className="text-[9px] text-fg-muted">XP</p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -178,7 +167,7 @@ export default function LeaderboardModal({ data, onClose }: LeaderboardModalProp
         <div className="px-5 py-3 border-t border-border bg-bg/40 text-center shrink-0">
           <p className="text-[10px] text-fg-muted">Leaderboard di-reset setiap awal bulan baru</p>
         </div>
-      </motion.div>
+      </div>
     </div>,
     document.body
   );

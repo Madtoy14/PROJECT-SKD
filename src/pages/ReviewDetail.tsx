@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronDown, ChevronUp, Menu, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
@@ -199,15 +198,7 @@ export default function ReviewDetail() {
 
         {/* Scrollable Question Body */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 pb-24">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentQuestion.id || currentQuestionIndex}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.25 }}
-              className="space-y-4 max-w-3xl mx-auto"
-            >
+          <div key={currentQuestion.id || currentQuestionIndex} className="space-y-4 max-w-3xl mx-auto">
               {currentQuestion.category === 'TKP' && (
                 <div className="flex items-center gap-2 text-xs text-orange-400 bg-orange-500/10 border border-orange-500/20 px-3 py-2 rounded-xl">
                   <span className="font-bold">TKP — Pilih jawaban terbaik.</span>
@@ -287,6 +278,14 @@ export default function ReviewDetail() {
                 <Button
                   variant="primary"
                   onClick={() => setCurrentQuestionIndex(prev => Math.min(totalQuestions - 1, prev + 1))}
+                  disabled={currentQuestionIndex === totalQuestions - 1}
+                  className="px-5 py-2.5 rounded-xl shadow-md active:scale-95 disabled:opacity-30"
+                >
+                  Selanjutnya
+                </Button>
+              </div>
+          </div>
+        </main>
                   disabled={currentQuestionIndex === totalQuestions - 1}
                   className="px-5 py-2.5 rounded-xl shadow-md active:scale-95 disabled:opacity-30"
                 >

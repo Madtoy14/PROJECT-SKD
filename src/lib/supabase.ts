@@ -75,6 +75,25 @@ export interface Character {
 
 // ── PETA API SUPABASE DAN FALLBACK GUEST ──
 
+const normalizeProfile = (data: any): UserProfile | null => {
+  if (!data) return null;
+  const parseSafely = (val: any) => {
+    if (typeof val === 'string') {
+      try { return JSON.parse(val); } catch (e) { return val; }
+    }
+    return val;
+  };
+  data.quests_progress = parseSafely(data.quests_progress);
+  data.akurasi = parseSafely(data.akurasi);
+  data.inventory = parseSafely(data.inventory);
+  data.catatan_salah = parseSafely(data.catatan_salah);
+  data.friends = parseSafely(data.friends);
+  if (typeof data.purchased_packages === 'string') {
+    data.purchased_packages = parseSafely(data.purchased_packages);
+  }
+  return data as UserProfile;
+};
+
 // 1. Ambil Profil Pengguna
 export const fetchProfile = async (userId: string = 'current'): Promise<UserProfile | null> => {
   if (!isSupabaseConfigured()) {
@@ -100,26 +119,7 @@ export const fetchProfile = async (userId: string = 'current'): Promise<UserProf
 
     if (error) throw error;
     
-    if (data) {
-      const parseSafely = (val: any) => {
-        if (typeof val === 'string') {
-          try { return JSON.parse(val); } catch (e) { return val; }
-        }
-        return val;
-      };
-      data.quests_progress = parseSafely(data.quests_progress);
-      data.akurasi = parseSafely(data.akurasi);
-      data.inventory = parseSafely(data.inventory);
-      data.catatan_salah = parseSafely(data.catatan_salah);
-      data.friends = parseSafely(data.friends);
-      // purchased_packages adalah text[] di Postgres — sudah array, tidak perlu parse
-      // tapi jaga-jaga jika tersimpan sebagai string JSON
-      if (typeof data.purchased_packages === 'string') {
-        data.purchased_packages = parseSafely(data.purchased_packages);
-      }
-    }
-
-    return data as UserProfile;
+    return normalizeProfile(data) as UserProfile;
   } catch (err) {
     console.error('Gagal mengambil profil dari Supabase:', err);
     return null;
@@ -148,24 +148,7 @@ export const updateProfile = async (profileUpdate: Partial<UserProfile>): Promis
 
     if (error) throw error;
     
-    if (data) {
-      const parseSafely = (val: any) => {
-        if (typeof val === 'string') {
-          try { return JSON.parse(val); } catch (e) { return val; }
-        }
-        return val;
-      };
-      data.quests_progress = parseSafely(data.quests_progress);
-      data.akurasi = parseSafely(data.akurasi);
-      data.inventory = parseSafely(data.inventory);
-      data.catatan_salah = parseSafely(data.catatan_salah);
-      data.friends = parseSafely(data.friends);
-      if (typeof data.purchased_packages === 'string') {
-        data.purchased_packages = parseSafely(data.purchased_packages);
-      }
-    }
-
-    return data as UserProfile;
+    return normalizeProfile(data) as UserProfile;
   } catch (err) {
     console.error('Gagal menyimpan profil ke Supabase:', err);
     return null;
@@ -314,7 +297,7 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
         if (res.error) throw res.error;
         questions = shuffle(res.data).slice(0, 10);
       } else {
-        questions = shuffle(data);
+        questions = data;
       }
     } else if (gameMode === 'survival') {
       // Survival butuh lebih banyak soal — ambil semua lalu shuffle
@@ -324,7 +307,7 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
         if (res.error) throw res.error;
         questions = shuffle(res.data);
       } else {
-        questions = shuffle(data);
+        questions = data;
       }
     } else if (gameMode === 'pvp' || gameMode === 'pvp1v1') {
       // 15 soal acak — ambil lebih banyak lalu shuffle & slice
@@ -334,7 +317,7 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
         if (res.error) throw res.error;
         questions = shuffle(res.data).slice(0, 15);
       } else {
-        questions = shuffle(data).slice(0, 15);
+        questions = data;
       }
     } else if (gameMode === 'tryout') {
       // 110 soal berdasar kategori dari tabel 'soal_tryout' untuk Try Out BKN Standar
@@ -345,8 +328,7 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
           if (res.error) throw res.error;
           return shuffle(res.data).slice(0, limit);
         }
-        // Shuffle hasil RPC juga agar urutan tidak predictable
-        return shuffle(data).slice(0, limit);
+        return data;
       };
 
       const [twk, tiu, tkp] = await Promise.all([
@@ -441,7 +423,9 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
         text: q.pertanyaan,
         options: normalizedOptions,
         correct: q.kunci,
-        explanation: q.pembahasan
+        explanation: q.pembahasan || 'Tidak ada pembahasan.',
+        xp_reward: q.xp_reward || 10,
+        coin_reward: q.coin_reward || 5
       };
     });
 
@@ -475,6 +459,8 @@ export const fetchAvailableCharacters = async (): Promise<Character[]> => {
 
 export async function saveWrongQuestion(userId: string, questionId: string, quizType: string) {
   if (!supabase) return;
+  
+  // 1. Simpan ke tabel wrong_books
   const { error } = await supabase.from('wrong_books').upsert({
     user_id: userId,
     question_id: questionId,
@@ -483,6 +469,16 @@ export async function saveWrongQuestion(userId: string, questionId: string, quiz
     last_attempted_at: new Date().toISOString()
   });
   if (error) console.error("Error saving wrong question:", error);
+
+  // 2. Sinkronkan dengan field catatan_salah di profiles menggunakan logika normalizeProfile
+  const profile = await fetchProfile(userId);
+  if (profile) {
+    const catatan = profile.catatan_salah || [];
+    // Hindari duplikasi
+    if (!catatan.find((item: any) => (item === questionId || item?.id === questionId))) {
+      await updateProfile({ catatan_salah: [...catatan, { id: questionId, type: quizType }] });
+    }
+  }
 }
 
 export async function getWrongQuestions(userId: string, filter?: string) {
