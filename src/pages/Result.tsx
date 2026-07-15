@@ -194,8 +194,8 @@ function QuickReviewItem({
           {/* Teks soal — maks 2 baris */}
           {question.text && (
             <MathCard
-              text={question.text}
-              className="text-xs text-fg font-medium line-clamp-2 mb-1.5"
+              explanation={question.text}
+              category={question.category}
             />
           )}
 
@@ -239,8 +239,8 @@ function QuickReviewItem({
           {showExplanation && question.explanation && (
             <div className="mt-2 p-2.5 rounded-lg bg-white/70 border border-blue-100">
               <MathCard
-                text={question.explanation}
-                className="text-[11px] text-fg leading-relaxed"
+                explanation={question.explanation}
+                category={question.category}
               />
             </div>
           )}

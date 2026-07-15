@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle2, Loader2, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import authBg from '../assets/auth_bg.png';
@@ -126,18 +125,14 @@ export default function Auth() {
           }}
         />
         <div className="relative z-10 max-w-lg">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
+          <div className="animate-[fadeInUp_0.8s_ease-out_0.2s_both]">
             <h1 className="text-4xl lg:text-6xl font-black mb-4 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-skd-accent to-yellow-500">
               SKDQuest
             </h1>
             <p className="text-xl lg:text-2xl font-medium text-fg-muted font-mono">
               Taklukan Rintangannya<br />Raih Mimpimu.
             </p>
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -150,16 +145,11 @@ export default function Auth() {
           <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/20 rounded-full blur-[60px] pointer-events-none" />
 
           <div className="relative z-10">
-            <AnimatePresence mode="wait">
-
-              {/* ── Mode Google (default) ── */}
-              {mode === 'google' && (
-                <motion.div
+            {/* ── Mode Google (default) ── */}
+            {mode === 'google' && (
+                <div
                   key="google"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.3 }}
+                  className="animate-[fadeInUp_0.3s_ease-out_both]"
                 >
                   {/* Header */}
                   <div className="text-center mb-8">
@@ -173,27 +163,20 @@ export default function Auth() {
                   </div>
 
                   {/* Pesan error */}
-                  <AnimatePresence>
-                    {errorMsg && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="mb-5 flex items-start gap-2.5 bg-danger/10 border border-danger/30 text-red-400 text-sm px-4 py-3 rounded-xl"
+                  {errorMsg && (
+                      <div
+                        className="mb-5 flex items-start gap-2.5 bg-danger/10 border border-danger/30 text-red-400 text-sm px-4 py-3 rounded-xl animate-[fadeInUp_0.2s_ease-out_both]"
                       >
                         <AlertCircle size={16} className="shrink-0 mt-0.5" />
                         <span>{errorMsg}</span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                      </div>
+                  )}
 
                   {/* Tombol Google */}
-                  <motion.button
-                    whileHover={{ scale: loading ? 1 : 1.02 }}
-                    whileTap={{ scale: loading ? 1 : 0.97 }}
+                  <button
                     onClick={handleGoogleLogin}
                     disabled={loading}
-                    className="w-full bg-white text-gray-800 font-bold py-4 rounded-2xl shadow-lg hover:shadow-xl hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-3"
+                    className="w-full bg-white text-gray-800 font-bold py-4 rounded-2xl shadow-lg hover:shadow-xl hover:bg-gray-50 hover:scale-[1.02] active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-3"
                   >
                     {loading ? (
                       <>
@@ -211,7 +194,7 @@ export default function Auth() {
                         <span>Lanjutkan dengan Google</span>
                       </>
                     )}
-                  </motion.button>
+                  </button>
 
                   {/* Info pembeda akun baru vs lama */}
                   <div className="mt-6 space-y-2.5">
@@ -229,17 +212,14 @@ export default function Auth() {
                   <p className="text-center text-[11px] text-gray-600 mt-6 leading-relaxed">
                     Dengan masuk, kamu menyetujui penggunaan data untuk keperluan aplikasi SKDQuest.
                   </p>
-                </motion.div>
+                </div>
               )}
 
               {/* ── Mode Reset Password (dari link email) ── */}
               {mode === 'reset-password' && (
-                <motion.div
+                <div
                   key="reset"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.3 }}
+                  className="animate-[fadeInUp_0.3s_ease-out_both]"
                 >
                   <div className="text-center mb-6">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -250,30 +230,22 @@ export default function Auth() {
                   </div>
 
                   {/* Pesan error / sukses */}
-                  <AnimatePresence>
-                    {errorMsg && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="mb-4 flex items-start gap-2.5 bg-danger/10 border border-danger/30 text-red-400 text-sm px-4 py-3 rounded-xl"
-                      >
-                        <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                        <span>{errorMsg}</span>
-                      </motion.div>
-                    )}
-                    {successMsg && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="mb-4 flex items-start gap-2.5 bg-success/10 border border-success/30 text-green-400 text-sm px-4 py-3 rounded-xl"
-                      >
-                        <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
-                        <span>{successMsg}</span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {errorMsg && (
+                    <div
+                      className="mb-4 flex items-start gap-2.5 bg-danger/10 border border-danger/30 text-red-400 text-sm px-4 py-3 rounded-xl animate-[fadeInUp_0.2s_ease-out_both]"
+                    >
+                      <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                      <span>{errorMsg}</span>
+                    </div>
+                  )}
+                  {successMsg && (
+                    <div
+                      className="mb-4 flex items-start gap-2.5 bg-success/10 border border-success/30 text-green-400 text-sm px-4 py-3 rounded-xl animate-[fadeInUp_0.2s_ease-out_both]"
+                    >
+                      <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+                      <span>{successMsg}</span>
+                    </div>
+                  )}
 
                   <form onSubmit={handleResetPassword} className="space-y-4">
                     {/* Password Baru */}
@@ -341,24 +313,20 @@ export default function Auth() {
                       )}
                     </div>
 
-                    <motion.button
-                      whileHover={{ scale: loading ? 1 : 1.02 }}
-                      whileTap={{ scale: loading ? 1 : 0.97 }}
+                    <button
                       type="submit"
                       disabled={loading || (confirmPassword.length > 0 && confirmPassword !== newPassword)}
-                      className="w-full bg-gradient-to-r from-skd-accent to-yellow-500 text-[#0F0E17] font-black py-3.5 rounded-xl shadow-[0_0_20px_rgba(245,166,35,0.3)] hover:shadow-[0_0_30px_rgba(245,166,35,0.5)] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-2 group"
+                      className="w-full bg-gradient-to-r from-skd-accent to-yellow-500 text-[#0F0E17] font-black py-3.5 rounded-xl shadow-[0_0_20px_rgba(245,166,35,0.3)] hover:shadow-[0_0_30px_rgba(245,166,35,0.5)] hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-2 group"
                     >
                       {loading ? (
                         <><Loader2 size={17} className="animate-spin" /> Menyimpan...</>
                       ) : (
                         <>Simpan Password Baru <ChevronRight size={17} className="group-hover:translate-x-1 transition-transform" /></>
                       )}
-                    </motion.button>
+                    </button>
                   </form>
-                </motion.div>
+                </div>
               )}
-
-            </AnimatePresence>
           </div>
         </div>
       </div>

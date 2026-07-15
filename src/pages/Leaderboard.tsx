@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Users, Clock, Calendar, Star, Loader2 } from 'lucide-react';
+import { ChevronLeft, Users, Clock, Star, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getRankForScore, getCurrentSeason, getSeasonDates, RANK_TIERS } from '../data/ranks';
 import { fetchMonthlyLeaderboard, supabase, isSupabaseConfigured } from '../lib/supabase';
 import PlayerProfileModal from '../components/PlayerProfileModal';
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.05 } },
+
+const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.04 } },
 };
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 200, damping: 20 } },
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0 },
 };
 
 export default function Leaderboard() {
@@ -116,11 +117,7 @@ export default function Leaderboard() {
       <div className="max-w-2xl mx-auto px-4 space-y-5 pt-5">
 
         {/* ── Season Info Banner ── */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-lg shadow-blue-500/20"
-        >
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-lg shadow-blue-500/20 animate-[fadeInUp_0.3s_ease-out_both]">
           <div>
             <p className="text-fg/70 text-[10px] font-bold uppercase tracking-widest">Periode Musim</p>
             <p className="text-fg font-bold text-sm">{start} – {end}</p>
@@ -131,15 +128,11 @@ export default function Leaderboard() {
               <Users size={24} className="text-fg" />
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* ── My position card ── */}
         {myData && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className={`bg-gradient-to-br ${myRank.color}/10 border ${myRank.borderColor} rounded-2xl p-4 flex items-center gap-4 shadow-md`}
-          >
+          <div className={`bg-gradient-to-br ${myRank.color}/10 border ${myRank.borderColor} rounded-2xl p-4 flex items-center gap-4 shadow-md animate-[fadeInUp_0.3s_ease-out_both]`}>
             <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${myRank.color} flex items-center justify-center text-2xl shadow-sm`}>
               {myRank.emoji}
             </div>
@@ -149,7 +142,7 @@ export default function Leaderboard() {
               <p className="text-xs text-fg-muted">{myRank.name} · {myData.xp.toLocaleString()} XP</p>
             </div>
             <Star size={20} className="text-primary fill-skd-accent/30 shrink-0" />
-          </motion.div>
+          </div>
         )}
 
         {/* ── Tabs ── */}
@@ -170,11 +163,7 @@ export default function Leaderboard() {
 
         {/* ── Top 3 Podium ── */}
         {activeTab === 'all' && leaderboardData.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-end justify-center gap-3 pt-2"
-          >
+          <div className="flex items-end justify-center gap-3 pt-2 animate-[fadeInUp_0.3s_ease-out_both]">
             {[leaderboardData[1], leaderboardData[0], leaderboardData[2]].filter(Boolean).map((p, i) => {
               const tier = getRankForScore(p.xp);
               const isFirst = p.rank === 1;
@@ -187,11 +176,8 @@ export default function Leaderboard() {
               const medals = ['🥈', '🥇', '🥉'];
 
               return (
-                <motion.div
+                <div
                   key={p.rank}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
                   onClick={() => setSelectedPlayerId(p.id)}
                   className={`flex flex-col items-center gap-2 flex-1 cursor-pointer hover:scale-105 transition-transform ${isFirst ? '-translate-y-3' : ''}`}
                 >
@@ -204,10 +190,10 @@ export default function Leaderboard() {
                   <div className={`w-full ${heights[i]} ${podiumColors[i]} rounded-t-xl border flex items-center justify-center text-xl font-black`}>
                     {medals[i]}
                   </div>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
         )}
 
         {/* ── Full List ── */}

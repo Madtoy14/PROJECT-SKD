@@ -25,31 +25,25 @@ function RankModal({ score, onClose }: { score: number; onClose: () => void }) {
   const season = getCurrentSeason();
   const { start, end, daysLeft, resetDate } = getSeasonDates();
 
+  const progressPct = Math.min(
+    (score - currentRank.minScore) / ((nextRank?.minScore ?? currentRank.minScore + 1) - currentRank.minScore) * 100,
+    100
+  );
+
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      <div
         onClick={onClose}
-        className="absolute inset-0 bg-overlay backdrop-blur-sm backdrop-blur-md"
+        className="absolute inset-0 bg-overlay backdrop-blur-sm animate-[fadeInScale_0.2s_ease-out_both]"
       />
 
       {/* Modal sheet */}
-      <motion.div
-        initial={{ opacity: 0, y: 60, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 60, scale: 0.97 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-        className="relative z-10 bg-surface w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl border border-border shadow-2xl overflow-hidden"
-      >
+      <div className="relative z-10 bg-surface w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl border border-border shadow-2xl overflow-hidden animate-[fadeInUp_0.25s_ease-out_both]">
         {/* Gradient header */}
         <div className={`bg-gradient-to-br ${currentRank.color} p-6 relative overflow-hidden`}>
-          {/* Decorative overlay — pointer-events-none so it doesn't block the X button */}
           <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
-          {/* Close button — z-20 so it's always on top of the overlay */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 bg-black/40 hover:bg-black/60 rounded-full text-white transition-colors z-20"
@@ -78,11 +72,10 @@ function RankModal({ score, onClose }: { score: number; onClose: () => void }) {
                   )}
                 </div>
                 <div className="h-2.5 bg-black/30 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.min((score - currentRank.minScore) / ((nextRank?.minScore ?? currentRank.minScore + 1) - currentRank.minScore) * 100, 100)}%` }}
-                    transition={{ duration: 1.2, ease: 'easeOut', delay: 0.2 }}
-                    className="h-full bg-black/10 rounded-full"
+                  {/* ponytail: CSS transition replaces motion.div width animation */}
+                  <div
+                    className="h-full bg-black/10 rounded-full transition-[width] duration-[1200ms] ease-out"
+                    style={{ width: `${progressPct}%` }}
                   />
                 </div>
               </div>
@@ -109,18 +102,15 @@ function RankModal({ score, onClose }: { score: number; onClose: () => void }) {
         <div className="p-5 space-y-2.5 max-h-[50vh] overflow-y-auto">
           <p className="text-[10px] font-bold text-fg-muted uppercase tracking-widest mb-3">Semua Tingkatan Rank</p>
 
-          {[...RANK_TIERS].reverse().map((tier, revIdx) => {
+          {[...RANK_TIERS].reverse().map((tier) => {
             const isActive = tier.id === currentRank.id;
             const isUnlocked = score >= tier.minScore;
             const isNext = nextRank?.id === tier.id;
             const nextTierMinScore = RANK_TIERS[RANK_TIERS.findIndex(t => t.id === tier.id) + 1]?.minScore ?? null;
 
             return (
-              <motion.div
+              <div
                 key={tier.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: revIdx * 0.04 }}
                 className={`flex items-center gap-4 p-3.5 rounded-2xl border transition-all
                   ${isActive
                     ? `bg-gradient-to-r ${tier.color}/20 ${tier.borderColor} shadow-md`
@@ -131,13 +121,11 @@ function RankModal({ score, onClose }: { score: number; onClose: () => void }) {
                         : 'bg-bg/30 border-border/30 opacity-50'
                   }`}
               >
-                {/* Emoji icon */}
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl shrink-0
                   ${isUnlocked ? `bg-gradient-to-br ${tier.color}` : 'bg-skd-muted/10'}`}>
                   {tier.emoji}
                 </div>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={`font-black text-sm ${isActive ? tier.textColor : isUnlocked ? 'text-fg' : 'text-fg-muted'}`}>
@@ -157,7 +145,6 @@ function RankModal({ score, onClose }: { score: number; onClose: () => void }) {
                   <p className="text-[10px] text-fg-muted mt-0.5 truncate">{tier.description}</p>
                 </div>
 
-                {/* XP requirement */}
                 <div className="text-right shrink-0">
                   <p className={`text-sm font-black font-space ${isActive ? tier.textColor : isUnlocked ? 'text-fg' : 'text-fg-muted'}`}>
                     {tier.minScore.toLocaleString()}
@@ -166,7 +153,7 @@ function RankModal({ score, onClose }: { score: number; onClose: () => void }) {
                     {nextTierMinScore !== null ? `– ${(nextTierMinScore - 1).toLocaleString()} XP` : '+ XP'}
                   </p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -179,7 +166,7 @@ function RankModal({ score, onClose }: { score: number; onClose: () => void }) {
             <span className="text-primary font-bold">TWK / TIU benar = 50 XP · TKP = 10–50 XP per opsi</span>
           </p>
         </div>
-      </motion.div>
+      </div>
     </div>,
     document.body
   );
@@ -235,20 +222,16 @@ export default function RankBadge({
               )}
             </div>
             <div className="h-2 bg-surface-subtle rounded-full overflow-hidden border border-border/50">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 1.2, ease: 'easeOut', delay: 0.3 }}
-                className={`h-full rounded-full bg-gradient-to-r ${rank.color}`}
+              <div
+                className={`h-full rounded-full bg-gradient-to-r ${rank.color} transition-[width] duration-[1200ms] ease-out`}
+                style={{ width: `${progress}%` }}
               />
             </div>
           </div>
         )}
       </div>
 
-      <AnimatePresence>
-        {modalOpen && <RankModal score={score} onClose={() => setModalOpen(false)} />}
-      </AnimatePresence>
+      {modalOpen && <RankModal score={score} onClose={() => setModalOpen(false)} />}
     </>
   );
 }
@@ -305,14 +288,12 @@ export function RankCard({ score = 3800 }: { score?: number }) {
             )}
           </div>
           <div className="h-2.5 bg-surface-subtle rounded-full overflow-hidden border border-border/30">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 1.4, ease: 'easeOut', delay: 0.4 }}
-              className={`h-full rounded-full bg-gradient-to-r ${currentRank.color} relative overflow-hidden`}
+            <div
+              className={`h-full rounded-full bg-gradient-to-r ${currentRank.color} relative overflow-hidden transition-[width] duration-[1400ms] ease-out`}
+              style={{ width: `${progress}%` }}
             >
               <div className="absolute inset-0 bg-black/10 animate-pulse" />
-            </motion.div>
+            </div>
           </div>
         </div>
 
@@ -336,9 +317,7 @@ export function RankCard({ score = 3800 }: { score?: number }) {
         </div>
       </div>
 
-      <AnimatePresence>
-        {modalOpen && <RankModal score={score} onClose={() => setModalOpen(false)} />}
-      </AnimatePresence>
+      {modalOpen && <RankModal score={score} onClose={() => setModalOpen(false)} />}
     </>
   );
 }

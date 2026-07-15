@@ -115,31 +115,22 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
 
   // Gunakan portal agar modal selalu berada di atas semua stacking context
   const modalContent = (
-    <AnimatePresence>
+    <>
       {playerId && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          <motion.div
-            key="backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={onClose}
-            className="fixed inset-0 bg-overlay backdrop-blur-sm z-0"
+            className="fixed inset-0 bg-overlay backdrop-blur-sm z-0 animate-[fadeInScale_0.2s_ease-out_both]"
             data-backdrop="true"
           />
 
           {/* Modal Card */}
-          <motion.div
+          <div
             ref={modalRef}
-            key="card"
             role="dialog"
             aria-modal="true"
             aria-labelledby="player-profile-title"
-            initial={{ scale: 0.92, opacity: 0, y: 16 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.92, opacity: 0, y: 16 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-            className="bg-surface shadow-sm border border-border w-full max-w-xs rounded-[1.75rem] shadow-2xl relative z-10 overflow-hidden"
+            className="bg-surface shadow-sm border border-border w-full max-w-xs rounded-[1.75rem] shadow-2xl relative z-10 overflow-hidden animate-[fadeInUp_0.25s_ease-out_both]"
           >
             {loading ? (
               <div className="flex flex-col items-center justify-center p-10 text-fg-muted">
@@ -267,10 +258,10 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
                 </div>
               </div>
             ) : null}
-          </motion.div>
+          </div>
         </div>
       )}
-    </AnimatePresence>
+    </>
   );
 
   // Portal ke document.body — melewati semua stacking context parent

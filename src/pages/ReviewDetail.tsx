@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { X, ChevronDown, ChevronUp, Menu, Loader2, AlertTriangle } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
 import MathCard from '../components/MathCard';
@@ -311,12 +312,8 @@ export default function ReviewDetail() {
                   <span>{cat}</span>
                   {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </Button>
-                <AnimatePresence>
                   {isOpen && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
+                    <div 
                       className="grid grid-cols-5 gap-2 overflow-hidden"
                     >
                       {catQuestions.map(({ idx }: {idx: number}) => {
@@ -345,33 +342,24 @@ export default function ReviewDetail() {
                           </Button>
                         );
                       })}
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* Sidebar Mobile Overlay */}
-      <AnimatePresence>
-        {showSidebarMobile && (
-          <>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowSidebarMobile(false)}
-              className="fixed inset-0 bg-overlay backdrop-blur-sm z-[60] lg:hidden"
-            />
-            <motion.div 
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed inset-y-0 right-0 w-72 bg-surface border-l border-border z-[70] flex flex-col shadow-2xl lg:hidden"
-            >
+              {/* Sidebar Mobile Overlay */}
+              {showSidebarMobile && (
+                <>
+                  <div 
+                    onClick={() => setShowSidebarMobile(false)}
+                    className="fixed inset-0 bg-overlay backdrop-blur-sm z-[60] lg:hidden animate-[fadeInUp_0.2s_ease-out_both]"
+                  />
+                  <div 
+                    className="fixed inset-y-0 right-0 w-72 bg-surface border-l border-border z-[70] flex flex-col shadow-2xl lg:hidden transition-transform duration-300 ease-out translate-x-0"
+                  >
               <div className="p-4 border-b border-border flex items-center justify-between">
                 <h3 className="font-bold text-fg">Navigasi Soal</h3>
                 <Button variant="ghost" onClick={() => setShowSidebarMobile(false)} className="!p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full">
@@ -396,10 +384,7 @@ export default function ReviewDetail() {
                       </Button>
                       <AnimatePresence>
                         {isOpen && (
-                          <motion.div 
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
+                          <div 
                             className="grid grid-cols-5 gap-2 overflow-hidden"
                           >
                             {catQuestions.map(({ idx }: {idx: number}) => {
@@ -431,17 +416,16 @@ export default function ReviewDetail() {
                                 </Button>
                               );
                             })}
-                          </motion.div>
+                          </div>
                         )}
                       </AnimatePresence>
                     </div>
                   );
                 })}
               </div>
-            </motion.div>
+            </div>
           </>
         )}
-      </AnimatePresence>
     </div>
   );
 }
