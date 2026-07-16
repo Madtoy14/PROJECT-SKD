@@ -457,6 +457,26 @@ export default function Quiz() {
     () => questions[currentQuestionIndex] ?? null,
     [questions, currentQuestionIndex]
   );
+  
+  // Memoize cleaned text untuk menghindari 40+ string operations setiap render
+  const cleanedQuestionText = useMemo(
+    () => currentQuestion?.text ? cleanMathText(currentQuestion.text) : '',
+    [currentQuestion?.text]
+  );
+  
+  const cleanedExplanation = useMemo(
+    () => currentQuestion?.explanation ? cleanMathText(currentQuestion.explanation) : '',
+    [currentQuestion?.explanation]
+  );
+  
+  const cleanedOptions = useMemo(
+    () => currentQuestion?.options?.map(opt => ({
+      ...opt,
+      cleanedText: cleanMathText(opt.text || '')
+    })) ?? [],
+    [currentQuestion?.options]
+  );
+  
   const totalQuestions = questions.length;
   const progress = (timeLeft / TOTAL_TIME) * 100;
   const strokeDashoffset = ((100 - progress) / 100) * 113.097;
@@ -1051,17 +1071,17 @@ const scoreBadge = (optionId: string) => {
                   </div>
                 )}
                 <div className="bg-white rounded-3xl p-8 md:px-12 md:py-10 border border-slate-100 shadow-sm mb-6 mt-2 md:mt-4">
-                  <p className="text-xl font-semibold leading-loose text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.text) }} />
+                  <p className="text-xl font-semibold leading-loose text-fg" dangerouslySetInnerHTML={{ __html: cleanedQuestionText }} />
                 </div>
                 {/* Bocoran Rumus Hint Box */}
                 {showHint && currentQuestion.explanation && (
                   <div className="bg-coin-subtle border border-yellow-500/30 p-4 rounded-2xl text-coin text-xs sm:text-sm font-medium leading-relaxed shadow-sm">
                     <span className="font-bold flex items-center gap-1.5 mb-1 text-primary"><Lightbulb size={14}/> Petunjuk Rumus / Soal:</span>
-                    <span dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.explanation.slice(0, 180) + '...') }} />
+                    <span dangerouslySetInnerHTML={{ __html: cleanedExplanation.slice(0, 180) + (cleanedExplanation.length > 180 ? '...' : '') }} />
                   </div>
                 )}
                 <div className="space-y-2 md:space-y-3">
-                  {currentQuestion.options.map((opt: any) => {
+                  {cleanedOptions.map((opt: any) => {
                     const isSelected = selected === opt.id;
                     
                     // Sembunyikan opsi tereliminasi oleh Power up 50:50
@@ -1119,7 +1139,7 @@ const scoreBadge = (optionId: string) => {
                         <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base ${markerClass}`}>
                           {opt.id}
                         </div>
-                        <span className="flex-1 leading-snug text-sm md:text-base font-semibold text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(opt.text) }} ></span>
+                        <span className="flex-1 leading-snug text-sm md:text-base font-semibold text-fg" dangerouslySetInnerHTML={{ __html: opt.cleanedText }} ></span>
                         {/* TKP score badge revealed after answering (not in tryout) */}
                         {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
@@ -1171,7 +1191,7 @@ const scoreBadge = (optionId: string) => {
                       <div className="bg-info/10 border border-info/20 p-5 rounded-xl space-y-3">
                         <h4 className="font-bold text-primary">Pembahasan:</h4>
                         <p className="text-sm md:text-base text-fg leading-relaxed">
-                          <MathCard explanation={cleanMathText(currentQuestion.explanation || "Pembahasan tidak tersedia untuk soal ini.")} category={currentQuestion.category} />
+                          <MathCard explanation={cleanedExplanation || "Pembahasan tidak tersedia untuk soal ini."} category={currentQuestion.category} />
                         </p>
                         <Button
                           variant="primary"
