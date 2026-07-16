@@ -6,7 +6,7 @@ interface MathCardProps {
   category: string;
 }
 
-export default function MathCard({ explanation, category }: MathCardProps) {
+const MathCard = React.memo(function MathCard({ explanation, category }: MathCardProps) {
   if (category !== 'TIU' || !explanation) {
     return <span dangerouslySetInnerHTML={{ __html: explanation }} />;
   }
@@ -101,4 +101,6 @@ export default function MathCard({ explanation, category }: MathCardProps) {
       )}
     </div>
   );
-}
+});
+
+export default MathCard;
