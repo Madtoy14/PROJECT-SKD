@@ -1,0 +1,479 @@
+{
+  "name": "SKD",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        272,
+        -208
+      ],
+      "id": "0a76591d-af17-4b01-bfc5-33223c5d2c81",
+      "name": "Download file",
+      "credentials": {
+        "googleApi": {
+          "id": "jXZxGCWE6TB1if7Q",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -176,
+        80
+      ],
+      "id": "97ad03c0-adc7-4d67-9f3e-1c98d28277c8",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "tableId": "soal_skd",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "tipe",
+              "fieldValue": "={{ $json.tipe }}"
+            },
+            {
+              "fieldId": "pertanyaan",
+              "fieldValue": "={{ $json.soal }}"
+            },
+            {
+              "fieldId": "opsi",
+              "fieldValue": "={{ JSON.stringify($json.opsi) }}"
+            },
+            {
+              "fieldId": "kunci",
+              "fieldValue": "={{ $json.kunci }}"
+            },
+            {
+              "fieldId": "pembahasan",
+              "fieldValue": "={{ $json.pembahasan }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        288,
+        80
+      ],
+      "id": "a99430c0-88a1-4d79-b39d-d596c2a1cde2",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "BMWLLDp5tQX54sq5",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "fileFolder",
+        "queryString": "SKD",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "__rl": true,
+            "value": "My Drive",
+            "mode": "list",
+            "cachedResultName": "My Drive",
+            "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1FNCyW6kMPrIg97nSUGvLOQMZPF1mmGsT",
+            "mode": "list",
+            "cachedResultName": "SKD",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1FNCyW6kMPrIg97nSUGvLOQMZPF1mmGsT"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -32,
+        -208
+      ],
+      "id": "dad85a7e-ddba-41bd-9bb5-8047e251eb8e",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleApi": {
+          "id": "jXZxGCWE6TB1if7Q",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 12
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -208,
+        -208
+      ],
+      "id": "bb00727b-8cad-4240-a43d-bd19cda1279a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil semua daftar file (6 item) dari node Search sebelumnya\nconst allFiles = $input.all();\n\n// Pilih 1 nomor file secara acak\nconst randomIndex = Math.floor(Math.random() * allFiles.length);\n\n// Kirim hanya 1 file terpilih ke node berikutnya\nreturn [allFiles[randomIndex]];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        -208
+      ],
+      "id": "c31c65fa-2654-4d39-8019-0e0255c4b6ae",
+      "name": "Random Pick"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Ambil teks respons mentah dari AI\nconst rawContent = $input.first().json.choices[0].message.content;\n\n// 2. Ekstrak HANYA teks yang berada di dalam kurung siku [...] (Array JSON)\n// Regex ini akan mengabaikan basa-basi AI di awal atau akhir\nconst match = rawContent.match(/\\[[\\s\\S]*\\]/);\n\nif (!match) {\n  throw new Error(\"Gagal menemukan Array JSON dari respons AI.\");\n}\n\nconst cleanContent = match[0];\n\n// 3. Ubah teks string tadi menjadi Array objek asli\nconst arraySoal = JSON.parse(cleanContent);\n\n// 4. Kembalikan dalam format n8n agar otomatis terpecah jadi baris terpisah\nreturn arraySoal.map(soal => ({ json: soal }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        80
+      ],
+      "id": "404503a9-328a-4f78-88ca-04451b03d71f",
+      "name": "Parsing"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openagentic.id/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer sk-71cf101b9f1c33714c652c9c8a4f838befc2c76c205a66f58f9fcf93ff3f27c4"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ \n  JSON.stringify({\n    \"model\": \"claude-sonnet-4.5\",\n    \"messages\": [\n      {\n        \"role\": \"system\",\n        \"content\": \"Anda adalah ahli pembuat soal SKD CPNS tingkat HOTS. Anda harus mematuhi instruksi materi dan format JSON secara ketat.\"\n      },\n      {\n        \"role\": \"user\",\n        \"content\": \"Buatkan \" + $json.jumlah + \" soal \" + $json.tipe + \" CPNS berdasarkan kisi-kisi resmi. Fokuskan materi HANYA pada: \" + $json.materi + \".\\n\\nATURAN KHUSUS FIGURAL:\\nJika materi berkaitan dengan figural/pola gambar, buatlah pola logikanya menggunakan kode HTML <svg> (viewBox='0 0 100 100') yang bersih dan masukkan langsung ke dalam nilai teks pertanyaan atau opsi.\\n\\nATURAN OUTPUT:\\nOutput WAJIB 100% JSON Array murni. DILARANG KERAS menambahkan teks pembuka/penutup. Format yang wajib diikuti:\\n[\\n  {\\n    \\\"pertanyaan\\\": \\\"teks pertanyaan beserta <svg> jika ada...\\\",\\n    \\\"opsi\\\": [\\n      {\\\"id\\\":\\\"A\\\", \\\"text\\\":\\\"...\\\", \\\"score\\\": 0},\\n      {\\\"id\\\":\\\"B\\\", \\\"text\\\":\\\"...\\\", \\\"score\\\": 0},\\n      {\\\"id\\\":\\\"C\\\", \\\"text\\\":\\\"...\\\", \\\"score\\\": 0},\\n      {\\\"id\\\":\\\"D\\\", \\\"text\\\":\\\"...\\\", \\\"score\\\": 0},\\n      {\\\"id\\\":\\\"E\\\", \\\"text\\\":\\\"...\\\", \\\"score\\\": 0}\\n    ],\\n    \\\"kunci\\\": \\\"A/B/C/D/E\\\",\\n    \\\"pembahasan\\\": \\\"...\\\"\\n  }\\n]\"\n      }\n    ]\n  }) \n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        448
+      ],
+      "id": "13e19f32-d3a9-4388-b69d-d90439c17e53",
+      "name": "claude-sonnet-4.5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openagentic.id/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer sk-71cf101b9f1c33714c652c9c8a4f838befc2c76c205a66f58f9fcf93ff3f27c4"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"model\": \"open-agentic\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Anda adalah ahli pembuat soal SKD CPNS. Tugas Anda adalah membuat 5 soal baru yang UNIK dan BELUM PERNAH ADA (wajib 2 soal TIU, 2 soal TWK, dan 1 soal TKP), namun memiliki pola penalaran, tingkat kesulitan, dan gaya bahasa yang persis dengan teks referensi. Gunakan skenario kehidupan sehari-hari yang berbeda untuk setiap soal. PENTING: Pada bagian \\\"tipe\\\", isikan HANYA dengan kata \\\"TIU\\\", \\\"TWK\\\", atau \\\"TKP\\\" tanpa tambahan kata atau sub-materi apapun. Jika ada rumus matematika, gunakan format LaTeX dengan double-backslash (\\\\\\\\). Output WAJIB berupa ARRAY JSON murni tanpa teks tambahan: [{\\\"tipe\\\":\\\"...\\\",\\\"is_premium\\\":false,\\\"soal\\\":\\\"...\\\",\\\"opsi\\\":{\\\"A\\\":\\\"...\\\",\\\"B\\\":\\\"...\\\",\\\"C\\\":\\\"...\\\",\\\"D\\\":\\\"...\\\",\\\"E\\\":\\\"...\\\"},\\\"kunci\\\":\\\"...\\\",\\\"pembahasan\\\":\\\"...\\\"}]\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Ini referensi pola soalnya:\\n\\n\" + $json.text\n    }\n  ]\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -32,
+        80
+      ],
+      "id": "954f6f0a-7664-4e84-a18a-cf3e1da2605d",
+      "name": "open-agentic"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  // === TWK (Total 30 Soal - 5 Putaran @ 6 Soal) ===\n  { \"tipe\": \"TWK\", \"jumlah\": 6, \"materi\": \"Nasionalisme (Mewujudkan kepentingan nasional, mempertahankan identitas nasional)\" },\n  { \"tipe\": \"TWK\", \"jumlah\": 6, \"materi\": \"Integritas (Kejujuran, ketangguhan, komitmen, dan konsistensi sikap)\" },\n  { \"tipe\": \"TWK\", \"jumlah\": 6, \"materi\": \"Bela Negara (Berperan aktif dalam mempertahankan eksistensi bangsa dan negara)\" },\n  { \"tipe\": \"TWK\", \"jumlah\": 6, \"materi\": \"Pilar Negara (Pancasila, UUD 1945, NKRI, dan Bhinneka Tunggal Ika)\" },\n  { \"tipe\": \"TWK\", \"jumlah\": 6, \"materi\": \"Bahasa Negara (Bahasa Indonesia sebagai bahasa persatuan)\" },\n\n  // === TIU (Total 30 Soal Teks - 5 Putaran @ 6 Soal) ===\n  { \"tipe\": \"TIU\", \"jumlah\": 6, \"materi\": \"Kemampuan Verbal (Fokus penuh pada Analogi kata)\" },\n  { \"tipe\": \"TIU\", \"jumlah\": 6, \"materi\": \"Kemampuan Verbal (Fokus penuh pada Silogisme dan Analitis)\" },\n  { \"tipe\": \"TIU\", \"jumlah\": 6, \"materi\": \"Kemampuan Numerikal (Fokus penuh pada Berhitung Dasar)\" },\n  { \"tipe\": \"TIU\", \"jumlah\": 6, \"materi\": \"Kemampuan Numerikal (Fokus pada Deret Angka dan Perbandingan Kuantitatif)\" },\n  { \"tipe\": \"TIU\", \"jumlah\": 6, \"materi\": \"Kemampuan Numerikal (Fokus penuh pada Matematika Soal Cerita)\" },\n\n  // === TIU FIGURAL KHUSUS SVG (5 Soal - 1 Putaran) ===\n  { \"tipe\": \"TIU\", \"jumlah\": 5, \"materi\": \"Kemampuan Figural (Buat pola gambar rotasi/deret menggunakan murni kode HTML <svg>. Sisipkan kode SVG tersebut langsung di dalam string pertanyaan dan opsi jawaban jika diperlukan)\" },\n\n  // === TKP (Total 45 Soal - 6 Putaran @ 7-8 Soal) ===\n  { \"tipe\": \"TKP\", \"jumlah\": 8, \"materi\": \"Pelayanan Publik (Keramahan, memenuhi kebutuhan dan kepuasan orang lain)\" },\n  { \"tipe\": \"TKP\", \"jumlah\": 8, \"materi\": \"Jejaring Kerja (Membangun hubungan, kerja sama, kolaborasi secara efektif)\" },\n  { \"tipe\": \"TKP\", \"jumlah\": 8, \"materi\": \"Sosial Budaya (Adaptasi dan bekerja efektif dalam masyarakat majemuk/beragam)\" },\n  { \"tipe\": \"TKP\", \"jumlah\": 7, \"materi\": \"Teknologi, Informasi, dan Komunikasi (Pemanfaatan TIK untuk meningkatkan kinerja)\" },\n  { \"tipe\": \"TKP\", \"jumlah\": 7, \"materi\": \"Profesionalisme (Melaksanakan tugas dan fungsi sesuai tuntutan jabatan)\" },\n  { \"tipe\": \"TKP\", \"jumlah\": 7, \"materi\": \"Anti-radikalisme (Menjaring informasi individu tentang pengetahuan anti-radikalisme)\" }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        416
+      ],
+      "id": "790d1a7b-0552-4dd9-9ce2-b8bab8012ba7",
+      "name": "Inisialisasi Batch"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        416
+      ],
+      "id": "f46f2485-9159-483c-9139-518c7e612db2",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        416
+      ],
+      "id": "bd3c353d-e994-4b1e-8f29-2733fe8ad370",
+      "name": "Loop"
+    },
+    {
+      "parameters": {
+        "tableId": "soal_tryout",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "tipe",
+              "fieldValue": "={{ $('Loop').item.json.tipe }}"
+            },
+            {
+              "fieldId": "pertanyaan",
+              "fieldValue": "={{ $json.pertanyaan }}"
+            },
+            {
+              "fieldId": "opsi",
+              "fieldValue": "={{ JSON.stringify($json.opsi) }}"
+            },
+            {
+              "fieldId": "kunci",
+              "fieldValue": "={{ $json.kunci }}"
+            },
+            {
+              "fieldId": "pembahasan",
+              "fieldValue": "={{ $json.pembahasan }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        544,
+        480
+      ],
+      "id": "2e7f4e1f-f76e-46dc-8c8a-f5e030565aac",
+      "name": "Create a Try Out",
+      "credentials": {
+        "supabaseApi": {
+          "id": "BMWLLDp5tQX54sq5",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Ambil teks respons mentah dari AI\nconst rawContent = $input.first().json.choices[0].message.content;\n\n// 2. Ekstrak HANYA teks yang berada di dalam kurung siku [...] (Array JSON)\n// Regex ini akan mengabaikan basa-basi AI di awal atau akhir\nconst match = rawContent.match(/\\[[\\s\\S]*\\]/);\n\nif (!match) {\n  throw new Error(\"Gagal menemukan Array JSON dari respons AI.\");\n}\n\nconst cleanContent = match[0];\n\n// 3. Ubah teks string tadi menjadi Array objek asli\nconst arraySoal = JSON.parse(cleanContent);\n\n// 4. Kembalikan dalam format n8n agar otomatis terpecah jadi baris terpisah\nreturn arraySoal.map(soal => ({ json: soal }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        384
+      ],
+      "id": "35e96897-0ec2-48f5-bf03-8440e900d9c8",
+      "name": "Item Lists"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "open-agentic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Random Pick",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Random Pick": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsing": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "open-agentic": {
+      "main": [
+        [
+          {
+            "node": "Parsing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "claude-sonnet-4.5": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Inisialisasi Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inisialisasi Batch": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop": {
+      "main": [
+        [],
+        [
+          {
+            "node": "claude-sonnet-4.5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Create a Try Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a Try Out": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "589f02b0-6940-4ff9-9478-637f7699513e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "18ecedbfa7ce72f127dcaa81168e73d215efc35857a9e3b6500c2cefbe94438f"
+  },
+  "id": "3qqe7P9sM8vZqBAV",
+  "tags": []
+}
