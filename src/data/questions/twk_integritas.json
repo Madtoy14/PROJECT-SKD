@@ -1,0 +1,372 @@
+[
+  {
+    "id": "TWK-016",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Seorang ASN diminta atasannya untuk memalsukan data laporan keuangan. Tindakan yang paling tepat adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menuruti perintah karena atasan selalu benar",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Menolak dengan sopan dan melaporkan kepada pihak berwenang",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Melaksanakan perintah namun merasa tidak nyaman",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Diam saja dan pura-pura tidak tahu",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Meminta waktu untuk memikirkan ulang",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Integritas ASN menuntut keberanian menolak perintah yang melanggar hukum dan etika, serta melapor ke pihak berwenang.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-017",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Pengertian integritas dalam konteks ASN adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Kemampuan menyelesaikan pekerjaan tepat waktu",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Konsistensi antara ucapan, tindakan, dan nilai-nilai yang dianut",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Keahlian dalam bidang teknis tertentu",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Kemampuan memimpin tim dengan efektif",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Pengalaman kerja yang panjang dalam birokrasi",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Integritas adalah konsistensi antara ucapan, tindakan, dan nilai yang dianut sehingga dapat dipercaya dalam menjalankan tugas.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-018",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Gratifikasi yang diterima ASN wajib dilaporkan kepada...",
+    "options": [
+      {
+        "id": "A",
+        "text": "BPK (Badan Pemeriksa Keuangan)",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "KPK (Komisi Pemberantasan Korupsi)",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Inspektorat Kementerian",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "BPKP",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Atasan langsung",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Berdasarkan UU No. 20 Tahun 2001, gratifikasi wajib dilaporkan ke KPK dalam 30 hari kerja setelah diterima.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-019",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Korupsi, Kolusi, dan Nepotisme (KKN) diatur dalam...",
+    "options": [
+      {
+        "id": "A",
+        "text": "UU No. 5 Tahun 2014",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "UU No. 28 Tahun 1999",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "UU No. 30 Tahun 2002",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "UU No. 20 Tahun 2001",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "PP No. 53 Tahun 2010",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "KKN diatur dalam UU No. 28 Tahun 1999 tentang Penyelenggaraan Negara yang Bersih dan Bebas dari KKN.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-020",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Whistle blower dalam pemberantasan korupsi adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Petugas yang berwenang menangkap koruptor",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Pihak yang melaporkan dugaan tindak pidana korupsi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Hakim yang mengadili kasus korupsi",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Jaksa penuntut umum kasus korupsi",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Media yang memberitakan kasus korupsi",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Whistle blower adalah pihak yang melaporkan dugaan tindak pidana korupsi kepada pihak berwenang dan mendapat perlindungan hukum.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-021",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "LHKPN (Laporan Harta Kekayaan Penyelenggara Negara) wajib disampaikan kepada...",
+    "options": [
+      {
+        "id": "A",
+        "text": "BPK",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "KPK",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Presiden",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "DPR",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Mahkamah Agung",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "LHKPN wajib disampaikan kepada KPK sebagai bentuk transparansi dan akuntabilitas penyelenggara negara sesuai UU No. 28 Tahun 1999.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-022",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Seorang pegawai menemukan rekan kerjanya memanipulasi absensi. Tindakan yang mencerminkan integritas adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ikut melakukan hal yang sama agar tidak dikucilkan",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Melaporkan kejadian kepada atasan atau unit pengawas",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Diam karena bukan urusannya",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Menegur rekan tersebut secara langsung dan mengancam melapor",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Memberitahu rekan lain agar semua tahu",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Integritas menuntut keberanian melaporkan pelanggaran kepada pihak yang berwenang melalui jalur yang tepat.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-023",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Pungutan liar (pungli) merupakan pelanggaran yang termasuk dalam kategori...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pelanggaran administrasi ringan",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Tindak pidana korupsi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Pelanggaran disiplin berat",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Perbuatan tercela",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Pelanggaran etika profesi",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pungli termasuk tindak pidana korupsi (pemerasan) berdasarkan UU No. 20 Tahun 2001 tentang Pemberantasan Tindak Pidana Korupsi.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-024",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Konflik kepentingan (conflict of interest) dalam jabatan publik terjadi ketika...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Dua pegawai memiliki tugas yang tumpang tindih",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Kepentingan pribadi berpotensi mempengaruhi objektivitas tugas",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Atasan dan bawahan berbeda pendapat",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Dua instansi memiliki program yang sama",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Pegawai memiliki lebih dari satu jabatan",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Konflik kepentingan terjadi saat kepentingan pribadi/golongan berpotensi mempengaruhi objektivitas pengambilan keputusan dalam jabatan.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-025",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Zona Integritas menuju Wilayah Bebas dari Korupsi (WBK) ditetapkan berdasarkan...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keputusan DPR",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Penilaian KPK dan Kementerian PAN-RB",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Audit BPK",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Penilaian BPKP",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Keputusan Presiden",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Predikat WBK/WBBM diberikan oleh Kementerian PAN-RB berdasarkan penilaian Tim Penilai Nasional yang melibatkan KPK dan Ombudsman.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  }
+]

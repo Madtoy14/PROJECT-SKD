@@ -1,0 +1,372 @@
+[
+  {
+    "id": "TWK-006",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Sikap yang paling mencerminkan rasa nasionalisme seorang ASN adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengutamakan kepentingan pribadi dalam bekerja",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Mengutamakan kepentingan bangsa dan negara di atas kepentingan pribadi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengutamakan kepentingan kelompok atau golongan tertentu",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Mengutamakan kepentingan daerah asal",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Mengutamakan kepentingan atasan langsung",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Nasionalisme ASN berarti mengutamakan kepentingan bangsa dan negara di atas kepentingan pribadi, kelompok, maupun golongan.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-007",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Hari Kebangkitan Nasional diperingati setiap tanggal...",
+    "options": [
+      {
+        "id": "A",
+        "text": "17 Agustus",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "28 Oktober",
+        "score": 0
+      },
+      {
+        "id": "C",
+        "text": "20 Mei",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "10 November",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "2 Mei",
+        "score": 0
+      }
+    ],
+    "correct": "C",
+    "explanation": "Hari Kebangkitan Nasional diperingati setiap 20 Mei, menandai berdirinya Budi Utomo tahun 1908.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-008",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Sumpah Pemuda diikrarkan pada tanggal...",
+    "options": [
+      {
+        "id": "A",
+        "text": "28 Oktober 1928",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "17 Agustus 1945",
+        "score": 0
+      },
+      {
+        "id": "C",
+        "text": "20 Mei 1908",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "1 Juni 1945",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "18 Agustus 1945",
+        "score": 0
+      }
+    ],
+    "correct": "A",
+    "explanation": "Sumpah Pemuda diikrarkan 28 Oktober 1928 dalam Kongres Pemuda II: satu tanah air, satu bangsa, satu bahasa Indonesia.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-009",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Proklamasi kemerdekaan Indonesia dibacakan oleh Soekarno-Hatta pada tanggal...",
+    "options": [
+      {
+        "id": "A",
+        "text": "18 Agustus 1945",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "17 Agustus 1945",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "15 Agustus 1945",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "1 Juni 1945",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "29 Agustus 1945",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Proklamasi kemerdekaan dibacakan 17 Agustus 1945 di Jalan Pegangsaan Timur 56, Jakarta.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-010",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Organisasi pergerakan nasional pertama di Indonesia adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Sarekat Islam",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Indische Partij",
+        "score": 0
+      },
+      {
+        "id": "C",
+        "text": "Budi Utomo",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Perhimpunan Indonesia",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "PNI",
+        "score": 0
+      }
+    ],
+    "correct": "C",
+    "explanation": "Budi Utomo didirikan 20 Mei 1908 oleh Dr. Soetomo dan mahasiswa STOVIA, menjadi organisasi modern pertama pergerakan nasional Indonesia.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-011",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Wawasan Nusantara merupakan cara pandang bangsa Indonesia terhadap diri dan lingkungannya berdasarkan...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Undang-Undang Dasar 1945 saja",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Pancasila dan UUD NRI Tahun 1945",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Bhinneka Tunggal Ika saja",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Deklarasi Djuanda",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "GBHN",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Wawasan Nusantara didasarkan pada Pancasila dan UUD NRI 1945, mengutamakan persatuan dan kesatuan bangsa.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-012",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Bapak Pendidikan Nasional Indonesia adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ir. Soekarno",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Ki Hajar Dewantara",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Dr. Soetomo",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Mohammad Hatta",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "H.O.S. Tjokroaminoto",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Ki Hajar Dewantara dikenal sebagai Bapak Pendidikan Nasional. Kelahirannya 2 Mei diperingati sebagai Hari Pendidikan Nasional.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-013",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Semboyan bangsa Indonesia yang mencerminkan persatuan dalam keberagaman adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Tut Wuri Handayani",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Ing Ngarso Sung Tulodo",
+        "score": 0
+      },
+      {
+        "id": "C",
+        "text": "Bhinneka Tunggal Ika",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Rawe-Rawe Rantas Malang-Malang Putung",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Gemah Ripah Loh Jinawi",
+        "score": 0
+      }
+    ],
+    "correct": "C",
+    "explanation": "Bhinneka Tunggal Ika artinya berbeda-beda tetapi tetap satu. Tercantum dalam lambang negara Garuda Pancasila.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-014",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Deklarasi Djuanda 13 Desember 1957 menegaskan bahwa Indonesia adalah negara kepulauan dengan laut sebagai...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pemisah antar pulau",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Penghubung antar pulau",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Batas wilayah eksklusif",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Zona perdagangan bebas",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Wilayah internasional",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Deklarasi Djuanda menegaskan laut di antara pulau-pulau Indonesia adalah penghubung, bukan pemisah, sehingga membentuk satu kesatuan wilayah.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-015",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Menggunakan produk dalam negeri merupakan wujud nyata dari...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Chauvinisme",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Primordialisme",
+        "score": 0
+      },
+      {
+        "id": "C",
+        "text": "Nasionalisme",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Etnosentrisme",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Patrimonialisme",
+        "score": 0
+      }
+    ],
+    "correct": "C",
+    "explanation": "Menggunakan produk dalam negeri adalah wujud nyata nasionalisme di bidang ekonomi, mendukung produksi nasional dan memperkuat perekonomian bangsa.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  }
+]

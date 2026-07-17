@@ -1,0 +1,187 @@
+[
+  {
+    "id": "TWK-026",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Dasar hukum bela negara di Indonesia terdapat dalam UUD 1945 pasal...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pasal 27 ayat (1)",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Pasal 27 ayat (3)",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Pasal 28A",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Pasal 30 ayat (1)",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Pasal 29 ayat (1)",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pasal 27 ayat (3) UUD 1945: Setiap warga negara berhak dan wajib ikut serta dalam upaya pembelaan negara.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-027",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Komponen utama dalam sistem pertahanan negara Indonesia adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Polri",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "TNI",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Rakyat terlatih",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Perlindungan masyarakat",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Satpol PP",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Berdasarkan UU No. 3 Tahun 2002, TNI adalah komponen utama sistem pertahanan negara, didukung komponen cadangan dan komponen pendukung.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-028",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Ancaman terhadap negara yang berasal dari dalam negeri disebut ancaman...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Eksternal",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Militer",
+        "score": 0
+      },
+      {
+        "id": "C",
+        "text": "Internal",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Hibrida",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Asimetris",
+        "score": 0
+      }
+    ],
+    "correct": "C",
+    "explanation": "Ancaman internal adalah ancaman yang berasal dari dalam negeri seperti separatisme, pemberontakan bersenjata, dan konflik komunal.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-029",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Nilai-nilai dasar bela negara meliputi hal berikut, KECUALI...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cinta tanah air",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Sadar berbangsa dan bernegara",
+        "score": 0
+      },
+      {
+        "id": "C",
+        "text": "Yakin akan Pancasila",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Rela berkorban untuk bangsa",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Menguasai teknologi militer",
+        "score": 5
+      }
+    ],
+    "correct": "E",
+    "explanation": "Lima nilai dasar bela negara: cinta tanah air, sadar berbangsa bernegara, yakin Pancasila, rela berkorban, dan memiliki kemampuan awal bela negara. Menguasai teknologi militer bukan nilai dasar.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-030",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Sistem pertahanan rakyat semesta (sishankamrata) mengandung makna bahwa pertahanan negara...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Hanya menjadi tanggung jawab TNI",
+        "score": 0
+      },
+      {
+        "id": "B",
+        "text": "Menjadi tanggung jawab seluruh rakyat",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Dilaksanakan oleh pemerintah pusat saja",
+        "score": 0
+      },
+      {
+        "id": "D",
+        "text": "Bergantung pada teknologi persenjataan modern",
+        "score": 0
+      },
+      {
+        "id": "E",
+        "text": "Berfokus pada pertahanan wilayah perbatasan",
+        "score": 0
+      }
+    ],
+    "correct": "B",
+    "explanation": "Sishankamrata berarti pertahanan yang melibatkan seluruh rakyat, wilayah, dan sumber daya nasional secara terpadu. TNI sebagai komponen utama didukung seluruh rakyat.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  }
+]

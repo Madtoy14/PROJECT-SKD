@@ -5,11 +5,31 @@
     "sub": "Pelayanan Publik",
     "text": "Anda adalah petugas pelayanan publik. Seorang warga datang dengan ekspresi frustrasi karena berkas pengajuannya sudah 3 kali dikembalikan dengan alasan yang berbeda-beda. Apa tindakan TERBAIK yang Anda lakukan?",
     "options": [
-      { "id": "A", "text": "Menyampaikan permohonan maaf, menjelaskan secara rinci semua persyaratan yang masih kurang, dan menawarkan panduan langkah demi langkah agar prosesnya selesai di kunjungan berikutnya", "score": 5 },
-      { "id": "B", "text": "Menerima berkas dan berjanji akan memprosesnya secepat mungkin tanpa memberikan penjelasan lebih lanjut", "score": 4 },
-      { "id": "C", "text": "Menjelaskan kekurangan berkas saat ini dan meminta warga melengkapinya sebelum kembali lagi", "score": 3 },
-      { "id": "D", "text": "Menyarankan warga untuk datang kembali esok hari saat petugas senior hadir", "score": 2 },
-      { "id": "E", "text": "Meminta warga untuk mengisi formulir pengaduan formal jika merasa tidak puas", "score": 1 }
+      {
+        "id": "A",
+        "text": "Menyampaikan permohonan maaf, menjelaskan secara rinci semua persyaratan yang masih kurang, dan menawarkan panduan langkah demi langkah agar prosesnya selesai di kunjungan berikutnya",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Menerima berkas dan berjanji akan memprosesnya secepat mungkin tanpa memberikan penjelasan lebih lanjut",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Menjelaskan kekurangan berkas saat ini dan meminta warga melengkapinya sebelum kembali lagi",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Menyarankan warga untuk datang kembali esok hari saat petugas senior hadir",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Meminta warga untuk mengisi formulir pengaduan formal jika merasa tidak puas",
+        "score": 1
+      }
     ],
     "correct": "A",
     "explanation": "Tindakan terbaik adalah menunjukkan empati, mengambil tanggung jawab, dan memberikan solusi konkret. Minta maaf, jelaskan SEMUA persyaratan secara lengkap sekaligus, dan bimbing warga agar dapat menyelesaikannya. Ini mencerminkan nilai Berorientasi Pelayanan dan Harmonis dalam ASN BerAKHLAK.",
@@ -22,11 +42,31 @@
     "sub": "Profesionalisme",
     "text": "Atasan Anda meminta Anda mengerjakan tugas di luar jobdesk Anda, sementara pekerjaan utama Anda sendiri belum selesai. Apa yang Anda lakukan?",
     "options": [
-      { "id": "A", "text": "Sampaikan kondisi pekerjaan Anda secara terbuka kepada atasan, tanyakan prioritas mana yang harus diselesaikan lebih dulu, lalu kerjakan sesuai arahan dengan penuh tanggung jawab", "score": 5 },
-      { "id": "B", "text": "Mengerjakan tugas tambahan terlebih dahulu karena perintah atasan harus selalu diutamakan, lalu lanjutkan pekerjaan utama", "score": 4 },
-      { "id": "C", "text": "Mengerjakan keduanya sekaligus dengan membagi waktu agar tidak ada yang terbengkalai", "score": 3 },
-      { "id": "D", "text": "Menyelesaikan pekerjaan utama terlebih dahulu baru kemudian mengerjakan tugas tambahan tanpa memberitahu atasan", "score": 2 },
-      { "id": "E", "text": "Menolak tugas tambahan tersebut karena bukan bagian dari jobdesk Anda", "score": 1 }
+      {
+        "id": "A",
+        "text": "Sampaikan kondisi pekerjaan Anda secara terbuka kepada atasan, tanyakan prioritas mana yang harus diselesaikan lebih dulu, lalu kerjakan sesuai arahan dengan penuh tanggung jawab",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Mengerjakan tugas tambahan terlebih dahulu karena perintah atasan harus selalu diutamakan, lalu lanjutkan pekerjaan utama",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Mengerjakan keduanya sekaligus dengan membagi waktu agar tidak ada yang terbengkalai",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Menyelesaikan pekerjaan utama terlebih dahulu baru kemudian mengerjakan tugas tambahan tanpa memberitahu atasan",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Menolak tugas tambahan tersebut karena bukan bagian dari jobdesk Anda",
+        "score": 1
+      }
     ],
     "correct": "A",
     "explanation": "Komunikasi terbuka dan klarifikasi prioritas adalah kunci profesionalisme. Dengan menyampaikan kondisi nyata dan meminta arahan, Anda menunjukkan akuntabilitas sekaligus menghormati kewenangan atasan. Ini mencerminkan nilai Akuntabel dan Kompeten dalam ASN BerAKHLAK.",
@@ -39,11 +79,31 @@
     "sub": "Kerja Sama",
     "text": "Dalam sebuah rapat tim, rekan kerja Anda mengajukan usulan yang menurut Anda kurang tepat secara teknis. Namun rekan tersebut tampak sangat yakin dan antusias. Sikap Anda adalah...",
     "options": [
-      { "id": "A", "text": "Menyampaikan pandangan teknis yang berbeda secara sopan dengan memberikan data atau argumen yang mendukung, sambil tetap terbuka mendengar penjelasan dari rekan tersebut", "score": 5 },
-      { "id": "B", "text": "Menyampaikan keberatan secara singkat di rapat, lalu mendiskusikan lebih lanjut secara privat dengan rekan tersebut setelah rapat", "score": 4 },
-      { "id": "C", "text": "Mendukung usulan dalam rapat namun menyiapkan alternatif solusi untuk diajukan pada rapat berikutnya", "score": 3 },
-      { "id": "D", "text": "Diam dan menyetujui usulan tersebut agar rapat berjalan lancar dan rekan tidak tersinggung", "score": 2 },
-      { "id": "E", "text": "Melaporkan kelemahan usulan tersebut langsung kepada atasan tanpa sepengetahuan rekan yang bersangkutan", "score": 1 }
+      {
+        "id": "A",
+        "text": "Menyampaikan pandangan teknis yang berbeda secara sopan dengan memberikan data atau argumen yang mendukung, sambil tetap terbuka mendengar penjelasan dari rekan tersebut",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Menyampaikan keberatan secara singkat di rapat, lalu mendiskusikan lebih lanjut secara privat dengan rekan tersebut setelah rapat",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Mendukung usulan dalam rapat namun menyiapkan alternatif solusi untuk diajukan pada rapat berikutnya",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Diam dan menyetujui usulan tersebut agar rapat berjalan lancar dan rekan tidak tersinggung",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Melaporkan kelemahan usulan tersebut langsung kepada atasan tanpa sepengetahuan rekan yang bersangkutan",
+        "score": 1
+      }
     ],
     "correct": "A",
     "explanation": "Menyampaikan pendapat berbeda secara konstruktif dan berbasis data adalah tanda profesionalisme. Menghindari konflik dengan diam justru bisa merugikan tim. Sikap ini mencerminkan nilai Harmonis dan Kolaboratif dalam ASN BerAKHLAK.",
@@ -56,11 +116,31 @@
     "sub": "Integritas",
     "text": "Anda mengetahui bahwa rekan kerja terdekat Anda secara rutin memalsukan laporan kehadiran. Apa yang Anda lakukan?",
     "options": [
-      { "id": "A", "text": "Secara pribadi mengingatkan rekan tersebut bahwa tindakannya melanggar aturan dan memintanya untuk menghentikan kebiasaan tersebut", "score": 5 },
-      { "id": "B", "text": "Mengingatkan rekan tersebut dan memberikan batas waktu; jika tidak berubah, melaporkan kepada atasan", "score": 4 },
-      { "id": "C", "text": "Langsung melaporkan kepada atasan atau bagian kepegawaian agar ditindaklanjuti secara resmi", "score": 3 },
-      { "id": "D", "text": "Membiarkannya karena itu bukan urusan Anda dan tidak berdampak langsung pada pekerjaan Anda", "score": 2 },
-      { "id": "E", "text": "Ikut melakukan hal yang sama agar tidak diperlakukan berbeda oleh rekan-rekan lain", "score": 1 }
+      {
+        "id": "A",
+        "text": "Secara pribadi mengingatkan rekan tersebut bahwa tindakannya melanggar aturan dan memintanya untuk menghentikan kebiasaan tersebut",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Mengingatkan rekan tersebut dan memberikan batas waktu; jika tidak berubah, melaporkan kepada atasan",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Langsung melaporkan kepada atasan atau bagian kepegawaian agar ditindaklanjuti secara resmi",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Membiarkannya karena itu bukan urusan Anda dan tidak berdampak langsung pada pekerjaan Anda",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Ikut melakukan hal yang sama agar tidak diperlakukan berbeda oleh rekan-rekan lain",
+        "score": 1
+      }
     ],
     "correct": "A",
     "explanation": "Tindakan terbaik adalah menegur rekan secara langsung dan personal terlebih dahulu, memberikan kesempatan untuk berubah. Ini lebih manusiawi dan efektif. Sikap ini mencerminkan nilai Loyal (menjaga nama baik instansi) dan Berakhlak dalam ASN BerAKHLAK.",
@@ -73,15 +153,1885 @@
     "sub": "Adaptasi",
     "text": "Instansi Anda baru saja menerapkan sistem digital baru untuk pengelolaan arsip. Sebagian besar rekan Anda, termasuk yang senior, merasa kesulitan dan menolak menggunakan sistem baru tersebut. Apa sikap Anda?",
     "options": [
-      { "id": "A", "text": "Mempelajari sistem baru secara mandiri dengan cepat, kemudian secara proaktif membantu rekan-rekan yang kesulitan untuk beradaptasi", "score": 5 },
-      { "id": "B", "text": "Mempelajari sistem baru dan menggunakannya untuk diri sendiri; menunggu rekan-rekan meminta bantuan sebelum membantu", "score": 4 },
-      { "id": "C", "text": "Menggunakan sistem baru sembari menyarankan instansi untuk menyediakan pelatihan resmi bagi semua pegawai", "score": 3 },
-      { "id": "D", "text": "Menyampaikan kepada atasan bahwa sistem baru terlalu sulit dan sebaiknya kembali ke sistem lama", "score": 2 },
-      { "id": "E", "text": "Ikut menolak sistem baru bersama rekan-rekan senior agar tidak dianggap tidak solid", "score": 1 }
+      {
+        "id": "A",
+        "text": "Mempelajari sistem baru secara mandiri dengan cepat, kemudian secara proaktif membantu rekan-rekan yang kesulitan untuk beradaptasi",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Mempelajari sistem baru dan menggunakannya untuk diri sendiri; menunggu rekan-rekan meminta bantuan sebelum membantu",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Menggunakan sistem baru sembari menyarankan instansi untuk menyediakan pelatihan resmi bagi semua pegawai",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Menyampaikan kepada atasan bahwa sistem baru terlalu sulit dan sebaiknya kembali ke sistem lama",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Ikut menolak sistem baru bersama rekan-rekan senior agar tidak dianggap tidak solid",
+        "score": 1
+      }
     ],
     "correct": "A",
     "explanation": "Adaptabilitas dan kolaborasi adalah kunci sukses di era transformasi digital. Menguasai sistem baru dan membantu rekan berkontribusi pada keberhasilan instansi. Ini mencerminkan nilai Kompeten (terus belajar) dan Kolaboratif dalam ASN BerAKHLAK.",
     "xp_reward": 10,
     "coin_reward": 5
+  },
+  {
+    "id": "TKP-006",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Seorang warga datang mengurus dokumen di kantor Anda dan marah-marah karena antrian panjang. Sikap Anda adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Meminta warga tersebut pergi dan kembali besok",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Meminta maaf, menjelaskan situasi dengan tenang, dan menawarkan solusi alternatif",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengabaikannya karena itu bukan kesalahan Anda",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Meminta rekan kerja untuk menanganinya",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Melaporkan warga tersebut ke atasan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-007",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Anda mendapati prosedur pelayanan di instansi Anda sangat panjang dan menyulitkan masyarakat. Tindakan Anda adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Membiarkan karena itu sudah prosedur lama",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Mengusulkan penyederhanaan prosedur melalui jalur formal kepada atasan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mempersingkat sendiri tanpa koordinasi",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Menyalahkan pembuat prosedur kepada warga",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Meminta warga untuk maklum",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-008",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Warga meminta bantuan di luar jam kerja karena urusan mendesak. Sikap Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menolak karena sudah di luar jam kerja",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Membantu semampu mungkin dan mengarahkan ke prosedur darurat yang tersedia",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Memberikan nomor atasan agar warga menghubungi langsung",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Meminta warga datang keesokan harinya",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Berpura-pura tidak mendengar",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-009",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Anda mengetahui rekan kerja melayani warga secara diskriminatif. Tindakan Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Diam karena tidak mau ikut campur urusan orang lain",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menegur secara baik-baik dan melaporkan jika berlanjut",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Ikut melakukan hal yang sama agar tidak menjadi masalah",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Membicarakannya dengan rekan lain tanpa tindakan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Langsung melaporkan ke media",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-010",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Standar pelayanan publik yang baik mencakup...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Kecepatan pelayanan tanpa memperhatikan kualitas",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Kejelasan, kepastian waktu, kemudahan akses, dan keadilan bagi semua",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Pelayanan hanya untuk warga yang sopan",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Pelayanan berdasarkan kedekatan dengan petugas",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Pelayanan yang mengutamakan pejabat",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-011",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Anda mendapat keluhan dari warga tentang pelayanan yang lambat di unit Anda. Respons terbaik Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Membela diri dengan menjelaskan betapa sibuknya pekerjaan",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menerima masukan, menyelidiki penyebab, dan mencari solusi perbaikan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menyalahkan kurangnya sumber daya",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Mengabaikan keluhan tersebut",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Meminta warga untuk lebih sabar",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-012",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Saat melayani warga dengan keterbatasan fisik, sikap ASN yang tepat adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Meminta orang lain mendampingi warga tersebut",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Memberikan layanan khusus dan memastikan aksesibilitas terpenuhi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Memperlakukan sama persis seperti warga lainnya tanpa penyesuaian",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Mempercepat pelayanan agar tidak perlu bantuan khusus",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Menolak karena tidak tersedia fasilitas khusus",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-013",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Ketika menghadapi pertanyaan warga yang tidak bisa Anda jawab, tindakan yang tepat adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengarang jawaban agar terlihat kompeten",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Mengakui keterbatasan dan mengarahkan ke sumber yang tepat",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Diam dan berpura-pura tidak mendengar",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Meminta warga mencari tahu sendiri",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Menolak melayani",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-014",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Transparansi dalam pelayanan publik berarti...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Hanya memberikan informasi yang diminta",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Memberikan informasi yang jelas, akurat, dan mudah diakses kepada masyarakat",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menyembunyikan informasi internal instansi",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Hanya melaporkan kepada atasan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Memberikan informasi kepada media saja",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-015",
+    "category": "TKP",
+    "sub": "Pelayanan Publik",
+    "text": "Prinsip 'no wrong door' dalam pelayanan publik berarti...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Semua pintu kantor harus dibuka untuk warga",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Warga yang datang ke kantor manapun harus dilayani dan diarahkan dengan benar",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Petugas tidak boleh menolak tamu",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Setiap keluhan harus ditangani di tempat",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Warga bebas masuk ke ruangan mana saja",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pelayanan publik yang baik mengutamakan kepentingan dan kepuasan masyarakat dengan tetap profesional.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-016",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Rekan kerja dari divisi lain meminta bantuan menyelesaikan proyek padahal Anda sedang sibuk. Tindakan Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menolak karena itu bukan tanggung jawab Anda",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menilai urgensi kedua pekerjaan dan menawarkan bantuan sesuai kapasitas",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Langsung membantu tanpa memikirkan pekerjaan sendiri",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Menunda bantuan hingga pekerjaan Anda selesai sepenuhnya",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Menyarankan rekan mencari bantuan dari orang lain",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-017",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Cara terbaik membangun jejaring kerja yang efektif adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Bergaul hanya dengan pejabat senior",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Membangun hubungan profesional yang saling menguntungkan dengan berbagai pihak",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengumpulkan kontak sebanyak mungkin tanpa interaksi bermakna",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Fokus hanya pada rekan satu divisi",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Bergaul hanya saat ada kepentingan tertentu",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-018",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Dalam rapat lintas divisi, pendapat Anda ditolak mayoritas. Sikap Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ngotot mempertahankan pendapat karena yakin benar",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menerima keputusan, tetap menyampaikan catatan dengan sopan, dan berkomitmen mendukung keputusan bersama",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Diam dan tidak berpartisipasi lagi",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Meminta rapat diulang",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Mengeluh kepada atasan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-019",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Anda memiliki pengetahuan yang dibutuhkan rekan kerja junior. Sikap Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menyimpan pengetahuan agar tetap unggul",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Berbagi pengetahuan secara sukarela untuk kemajuan tim",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Berbagi hanya jika diminta secara formal",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Meminta imbalan sebelum berbagi",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Memberi tahu tapi tidak lengkap",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-020",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Kolaborasi antar instansi pemerintah diperlukan terutama untuk...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengurangi beban kerja masing-masing instansi",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menyelesaikan masalah kompleks yang membutuhkan sumber daya dan keahlian lintas sektor",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Membagi anggaran yang terbatas",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Menghindari duplikasi jabatan",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Memperlambat proses birokrasi",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-021",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Saat terjadi konflik dengan rekan kerja, pendekatan yang paling efektif adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mendiamkan konflik dan berharap selesai sendiri",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Membahas secara langsung, dewasa, dan mencari solusi bersama",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Melibatkan semua rekan sebagai mediator",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Langsung melapor ke atasan tanpa diskusi",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Membalas sikap negatif dengan sikap negatif",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-022",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Manfaat utama memiliki jejaring kerja yang luas bagi ASN adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Memudahkan promosi jabatan",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Memperluas akses informasi, sumber daya, dan kolaborasi untuk pelayanan yang lebih baik",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mendapatkan lebih banyak proyek sampingan",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Mengurangi beban kerja sendiri",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Memiliki pengaruh politik yang lebih besar",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-023",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Ketika bergabung dalam tim proyek baru, hal pertama yang sebaiknya dilakukan adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Langsung memimpin dan menentukan arah",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Memperkenalkan diri, memahami peran masing-masing anggota, dan mendengarkan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menunjukkan kompetensi dengan langsung mengerjakan tugas",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Menunggu instruksi dari atasan",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Mencari tahu siapa yang paling berpengaruh",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-024",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Sikap yang mendukung kerja sama tim yang baik adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengutamakan penilaian pribadi di atas keputusan tim",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menghargai kontribusi setiap anggota dan berkomunikasi secara terbuka",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Bersaing dengan rekan tim untuk mendapat pengakuan",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Hanya fokus pada tugas sendiri",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Menghindari konfrontasi meskipun ada kesalahan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-025",
+    "category": "TKP",
+    "sub": "Jejaring Kerja",
+    "text": "Seorang ASN yang memiliki jejaring kerja baik akan...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Selalu mendapatkan promosi lebih cepat",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Mampu berkoordinasi lebih efektif dan menghasilkan solusi lebih baik untuk masyarakat",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Tidak perlu bekerja keras karena bisa meminta bantuan orang lain",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Terhindar dari sanksi disiplin",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Mendapat proyek yang lebih mudah",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jejaring kerja yang baik mendukung kolaborasi dan pelayanan publik yang lebih efektif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-026",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Anda ditempatkan di daerah yang memiliki budaya sangat berbeda dari daerah asal Anda. Sikap Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Memaksakan kebiasaan dari daerah asal",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Mempelajari dan menghormati budaya setempat sambil tetap menjaga identitas diri",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menghindari interaksi dengan masyarakat setempat",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Meminta pindah ke daerah yang lebih familiar",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Menganggap budaya setempat lebih rendah",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-027",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Dalam melayani masyarakat yang multikultural, ASN sebaiknya...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Melayani hanya kelompok budaya yang mayoritas",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Memberikan pelayanan yang setara dan menghormati keberagaman budaya",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menyesuaikan pelayanan hanya berdasarkan permintaan khusus",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Mengabaikan perbedaan budaya dalam pelayanan",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Meminta masyarakat menyesuaikan diri dengan budaya ASN",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-028",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Toleransi antarumat beragama di lingkungan kerja dapat diwujudkan dengan...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menghindari diskusi tentang agama sama sekali",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Saling menghormati keyakinan dan memberikan ruang bagi praktik keagamaan masing-masing",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mewajibkan semua pegawai mengikuti satu tradisi",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Melarang ekspresi keagamaan di tempat kerja",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Menganggap semua agama sama saja",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-029",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Ketika ada rekan kerja yang merayakan hari besar keagamaannya, sikap yang tepat adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengabaikannya karena berbeda keyakinan",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Memberikan ucapan selamat sebagai bentuk penghormatan meskipun berbeda keyakinan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Ikut merayakan meskipun tidak sesuai keyakinan",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Melarangnya karena dapat mengganggu pekerjaan",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Membicarakan di belakang",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-030",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Keberagaman budaya di Indonesia sebaiknya dipandang sebagai...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Sumber konflik yang harus diwaspadai",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Kekuatan dan kekayaan bangsa yang perlu dijaga",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Hambatan dalam pembangunan nasional",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Masalah yang harus diseragamkan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Perbedaan yang membuat lemah",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-031",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Dalam menghadapi kasus yang melibatkan adat istiadat setempat yang bertentangan dengan aturan, ASN sebaiknya...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Langsung menerapkan aturan tanpa mempertimbangkan adat",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Mencari solusi yang menghormati adat setempat sekaligus sesuai dengan aturan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengabaikan aturan demi menghormati adat",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Melarang semua praktik adat",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Melaporkan ke pusat tanpa berusaha menyelesaikan sendiri",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-032",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Sensitivitas budaya dalam komunikasi berarti...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menggunakan bahasa daerah dalam semua komunikasi resmi",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Memahami dan menyesuaikan cara berkomunikasi agar sesuai dengan konteks budaya lawan bicara",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menghindari topik yang berkaitan dengan budaya",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Berbicara dengan cara yang sama kepada semua orang",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Hanya menggunakan Bahasa Indonesia baku",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-033",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Bentuk penghormatan terhadap nilai-nilai lokal yang tepat bagi ASN adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengadopsi semua nilai lokal tanpa filter",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Memahami nilai lokal dan mengintegrasikannya secara positif dengan kebijakan nasional",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengabaikan nilai lokal demi efisiensi",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Memaksakan nilai nasional menggantikan nilai lokal",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Membiarkan nilai lokal bertentangan dengan hukum",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-034",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Seorang ASN yang bertugas di daerah terpencil menghadapi resistensi masyarakat terhadap program pemerintah. Tindakan terbaik...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Memaksakan program dengan menggunakan otoritas",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Berdialog dengan tokoh masyarakat untuk memahami kekhawatiran dan mencari kesepahaman",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Membatalkan program karena mendapat resistensi",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Melaporkan masyarakat kepada polisi",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Mengancam akan menghentikan bantuan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-035",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Dampak positif keberagaman budaya terhadap pelayanan publik adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pelayanan menjadi lebih lambat karena banyak pertimbangan",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Pelayanan lebih inklusif dan responsif terhadap kebutuhan semua kelompok masyarakat",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Lebih banyak konflik yang perlu diselesaikan",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Standar pelayanan menjadi tidak seragam",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Biaya pelayanan meningkat",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Menghormati keberagaman sosial budaya adalah kunci pelayanan publik yang inklusif.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-036",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Anda menemukan data pribadi warga tersimpan tidak aman di sistem lama. Tindakan Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Membiarkan karena bukan tanggung jawab Anda",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Segera melaporkan ke tim IT dan atasan untuk ditindaklanjuti",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menghapus data tersebut sendiri",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Mengunduh data sebagai backup pribadi",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Memberi tahu rekan lain saja",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-037",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Penggunaan teknologi informasi dalam pelayanan publik bertujuan untuk...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengurangi jumlah pegawai",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Meningkatkan efisiensi, transparansi, dan kualitas pelayanan kepada masyarakat",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Membuat pekerjaan lebih kompleks",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Menggantikan semua proses manual",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Mengurangi interaksi dengan masyarakat",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-038",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Sikap yang tepat terhadap transformasi digital di instansi pemerintah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menolak karena sudah terbiasa dengan cara lama",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Mendukung dan aktif belajar untuk memanfaatkan teknologi baru demi pelayanan yang lebih baik",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menerima hanya jika dipaksa atasan",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Menunggu rekan lain yang lebih muda untuk mempelopori",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Menganggap teknologi hanya mempersulit",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-039",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Keamanan data dalam sistem pemerintahan dijaga dengan cara...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Hanya menggunakan password yang mudah diingat",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menerapkan enkripsi, akses berlapis, dan audit berkala",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menyimpan data di perangkat pribadi untuk backup",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Membagikan akses kepada semua pegawai untuk efisiensi",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Tidak mengubah password agar tidak lupa",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-040",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Literasi digital bagi ASN berarti...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mampu menggunakan semua aplikasi terbaru",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Memiliki kemampuan memanfaatkan teknologi secara produktif, aman, dan bertanggung jawab",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Selalu menggunakan gadget terbaru",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Menguasai pemrograman komputer",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Hanya mampu menggunakan email",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-041",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Ketika menerima email mencurigakan yang mengatasnamakan instansi pemerintah, tindakan Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Langsung mengklik tautan untuk memverifikasi",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Tidak membuka tautan, melaporkan ke tim IT, dan mengingatkan rekan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Membalas email untuk meminta klarifikasi",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Mengabaikan tanpa melaporkan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Meneruskan ke semua rekan sebagai peringatan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-042",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Pemanfaatan e-government yang optimal dapat...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengurangi akuntabilitas pemerintah",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Meningkatkan aksesibilitas, kecepatan layanan, dan pengurangan korupsi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mempersulit pengawasan publik",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Mengurangi partisipasi masyarakat",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Hanya menguntungkan masyarakat perkotaan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-043",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Saat menggunakan media sosial sebagai ASN, hal yang harus diperhatikan adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Bebas mengekspresikan pendapat apapun karena itu akun pribadi",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menjaga etika, tidak menyebarkan hoaks, dan tidak mencemarkan nama instansi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menggunakan akun anonim agar bebas berpendapat",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Hanya posting konten hiburan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Tidak perlu memiliki media sosial sama sekali",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-044",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Kebijakan BYOD (Bring Your Own Device) di instansi pemerintah perlu mempertimbangkan...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Merek dan spesifikasi perangkat pegawai",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Keamanan data, kebijakan akses, dan pemisahan data pribadi dengan data instansi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Biaya perangkat yang ditanggung pegawai",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Penampilan perangkat yang profesional",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Kompatibilitas dengan semua aplikasi hiburan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-045",
+    "category": "TKP",
+    "sub": "TIK",
+    "text": "Dalam era big data, ASN perlu memiliki kemampuan...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengumpulkan data sebanyak-banyaknya tanpa tujuan",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menganalisis data untuk mendukung pengambilan keputusan berbasis bukti",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menyimpan semua data tanpa batas",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Membagikan data kepada siapapun",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Menghindari penggunaan data dalam pengambilan keputusan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pemanfaatan TIK yang bijak dan bertanggung jawab penting bagi ASN modern.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-046",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Anda mendapat kritik dari atasan atas hasil kerja Anda. Respons terbaik adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Membela diri dan menjelaskan panjang lebar",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menerima kritik dengan lapang dada, mencatat poin perbaikan, dan memperbaiki hasil kerja",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Merasa tersinggung dan menurunkan motivasi kerja",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Mencari dukungan rekan untuk membela Anda",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Mengabaikan kritik karena menganggap atasan tidak paham",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-047",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Komitmen terhadap pengembangan diri sebagai ASN diwujudkan dengan...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Merasa cukup dengan kemampuan yang ada",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Aktif mengikuti pelatihan, membaca, dan mencari peluang belajar baru",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Hanya belajar saat ada perintah atasan",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Mengandalkan pengalaman kerja tanpa belajar hal baru",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Belajar hanya untuk kenaikan pangkat",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-048",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Ketika menghadapi deadline yang sangat ketat dan pekerjaan menumpuk, sikap profesional Anda...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Panik dan mengeluh kepada semua orang",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Membuat prioritas pekerjaan, bekerja sistematis, dan meminta bantuan jika diperlukan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengabaikan beberapa pekerjaan tanpa pemberitahuan",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Meminta semua deadline diperpanjang",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Menyalahkan sistem yang memberikan terlalu banyak pekerjaan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-049",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Disiplin waktu dalam lingkungan kerja pemerintahan berarti...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Datang tepat waktu hanya saat ada rapat penting",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Selalu hadir tepat waktu, menyelesaikan tugas sesuai jadwal, dan menepati janji",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Memanipulasi absensi agar terlihat disiplin",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Hanya disiplin ketika diawasi atasan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Datang lebih awal tapi pulang lebih awal juga",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-050",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Inisiatif dalam bekerja yang baik adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengerjakan tugas di luar tanggung jawab tanpa sepengetahuan atasan",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Mengidentifikasi peluang perbaikan dan mengusulkannya secara proaktif kepada atasan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menunggu perintah untuk setiap tindakan",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Berinovasi tanpa koordinasi",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Hanya berinovasi jika ada penghargaan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-051",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Etika berpakaian ASN dalam kedinasan mencerminkan...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Selera pribadi yang tidak perlu dibatasi",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Profesionalisme dan representasi instansi kepada masyarakat",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Kemampuan finansial pegawai",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Jabatan dan senioritas",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Kebebasan berekspresi",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-052",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Dalam menghadapi perubahan kebijakan yang tidak Anda setujui, sikap profesional adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menolak menerapkan kebijakan tersebut",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Melaksanakan kebijakan sambil menyampaikan masukan melalui jalur resmi yang tepat",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengeluh kepada masyarakat",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Sabotase implementasi kebijakan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Pura-pura tidak tahu kebijakan baru",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-053",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Dokumentasi pekerjaan yang baik penting karena...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Hanya untuk keperluan audit",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menjamin kesinambungan pekerjaan, akuntabilitas, dan kemudahan evaluasi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Sebagai bukti kerja keras pribadi",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Memenuhi formalitas administratif saja",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Diperlukan hanya untuk pekerjaan penting",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-054",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Ketika Anda tidak memahami instruksi atasan, tindakan yang tepat adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengerjakan berdasarkan asumsi sendiri",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Segera meminta klarifikasi secara hormat sebelum mulai mengerjakan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Bertanya kepada rekan yang juga tidak paham",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Menunda pekerjaan hingga ada instruksi lebih jelas",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Mengerjakan sebagian saja",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
+  },
+  {
+    "id": "TKP-055",
+    "category": "TKP",
+    "sub": "Profesionalisme",
+    "text": "Menjaga kerahasiaan informasi instansi adalah kewajiban ASN yang bertujuan untuk...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mempertahankan kekuasaan pejabat",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Melindungi kepentingan negara dan mencegah penyalahgunaan informasi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menyembunyikan kesalahan instansi",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Membatasi hak masyarakat atas informasi",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Menjaga persaingan antar instansi",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Profesionalisme ASN mencakup disiplin, integritas, dan komitmen terhadap pelayanan terbaik.",
+    "xp_reward": 8,
+    "coin_reward": 4
   }
 ]
