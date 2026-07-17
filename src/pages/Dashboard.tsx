@@ -220,7 +220,6 @@ export default function Dashboard() {
     { id: 'item_terawangan', title: 'Teropong Sakti', count: 1, color: '#8B5CF6', weight: 15 },
     { id: 'coins_100', title: '100 Koin', count: 100, isCoins: true, color: '#EC4899', weight: 20 },
     { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', count: 1, color: '#10B981', weight: 10 },
-    { id: 'item_coin_booster', title: 'Koin Booster', count: 1, color: '#3B82F6', weight: 10 },
     { id: 'energy_5', title: '5 Energi', count: 5, isEnergy: true, color: '#14B8A6', weight: 12 },
     { id: 'coins_500', title: '500 Koin (Jackpot!)', count: 500, isCoins: true, color: '#EF4444', weight: 3 },
   ];
@@ -240,58 +239,49 @@ export default function Dashboard() {
     
     setIsSpinning(true);
     setSpinResult(null);
-    
-        const r = Math.random() * 100;
-    let cumulative = 0;
-    let prizeIdx = 0;
-    for (let i = 0; i < SPIN_PRIZES.length; i++) {
-      cumulative += SPIN_PRIZES[i].weight;
-      if (r <= cumulative) {
-        prizeIdx = i;
-        break;
-      }
-    }
-    const prize = SPIN_PRIZES[prizeIdx];
-    
-    const targetAngle = 360 - (prizeIdx * 45) - 22.5;
-    const finalAngle = targetAngle + (5 * 360);
-    setSpinAngle(finalAngle);
-    
-    setTimeout(() => {
-      setIsSpinning(false);
-      setSpinResult(prize.title);
-      
-      let updatedInv = { ...profile.inventory };
-      let newCoins = globalCoins;
-      let newEnergy = energy;
-      
-      if (hasSpunToday) {
-        newCoins -= 100;
-      } else {
-        setLastSpinDate(todayStr);
-      }
-      
-      if (prize.isCoins) {
-        newCoins += prize.count;
-      } else if (prize.isEnergy) {
-        newEnergy = Math.min(24, (newEnergy || 0) + prize.count);
-      } else {
-        updatedInv[prize.id] = (updatedInv[prize.id] || 0) + prize.count;
-      }
-      
-      setGlobalCoins(newCoins);
-      setEnergy(newEnergy || 0);
-      
-      updateProfile({
-        coins: newCoins,
-        energy: newEnergy || 0,
-        inventory: updatedInv as any,
-        last_spin_date: !hasSpunToday ? todayStr : undefined
-      }).then(() => {
-        setToastMessage(`🎉 Selamat! Anda memenangkan: ${prize.title}!`);
-        setTimeout(() => setToastMessage(''), 4000);
-      });
-    }, 4200);
+
+    // SH-01: server-side random via RPC — cegah client manipulation
+    supabase!.rpc('spin_wheel', { user_id: profile.id }).then(({ data, error }) => {
+      setTimeout(() => {
+        setIsSpinning(false);
+        if (error || !data || data.error) {
+          // Fallback client-side kalau RPC belum deploy
+          const r = Math.random() * 100;
+          let cumulative = 0;
+          let prizeIdx = 0;
+          for (let i = 0; i < SPIN_PRIZES.length; i++) {
+            cumulative += SPIN_PRIZES[i].weight;
+            if (r <= cumulative) { prizeIdx = i; break; }
+          }
+          const prize = SPIN_PRIZES[prizeIdx];
+          let updatedInv = { ...profile.inventory };
+          let newCoins = globalCoins;
+          let newEnergy = energy;
+          if (hasSpunToday) { newCoins -= 100; } else { setLastSpinDate(todayStr); }
+          if (prize.isCoins) { newCoins += prize.count; }
+          else if (prize.isEnergy) { newEnergy = Math.min(24, (newEnergy || 0) + prize.count); }
+          else { updatedInv[prize.id] = (updatedInv[prize.id] || 0) + prize.count; }
+          setGlobalCoins(newCoins); setEnergy(newEnergy || 0);
+          updateProfile({ coins: newCoins, energy: newEnergy || 0, inventory: updatedInv as any, last_spin_date: !hasSpunToday ? todayStr : undefined });
+          setSpinResult(prize.title);
+          setToastMessage(`🎉 Selamat! Anda memenangkan: ${prize.title}!`);
+          setTimeout(() => setToastMessage(''), 4000);
+        } else {
+          // RPC berhasil — server sudah update DB
+          if (!hasSpunToday) setLastSpinDate(todayStr);
+          setGlobalCoins(data.coins_new);
+          setEnergy(data.energy_new || 0);
+          setSpinResult(data.prize_title);
+          setToastMessage(`🎉 Selamat! Anda memenangkan: ${data.prize_title}!`);
+          setTimeout(() => setToastMessage(''), 4000);
+        }
+        // Hitung angle for animation (index 0-6)
+        const prizeIds = SPIN_PRIZES.map(p => p.id);
+        const idx = error || !data ? 0 : prizeIds.indexOf(data.prize_id);
+        const targetAngle = 360 - ((idx < 0 ? 0 : idx) * 45) - 22.5;
+        setSpinAngle(targetAngle + (5 * 360));
+      }, 4200);
+    });
   };
   // Calculate dynamic 7-day cycle
   const cycleDayIndex = totalStreak % 7;
@@ -533,32 +523,36 @@ export default function Dashboard() {
     if (!isStreakClaimed) {
       e.preventDefault();
       setToastMessage('Menyelesaikan Quest...');
-      setTimeout(() => {
-        setIsStreakClaimed(true);
-        const isMega = (totalStreak + 1) % 30 === 0;
-        const isWeekly = (totalStreak + 1) % 7 === 0;
-        let bonus = 2; // base daily reward
-        let msg = 'Quest Selesai! +2 Koin Harian';
-        if (isMega) {
-          bonus = 50;
-          msg = 'Quest Selesai! +50 Koin Mega Streak 30 Hari!';
-        } else if (isWeekly) {
-          bonus = 10;
-          msg = 'Quest Selesai! +10 Koin Streak Mingguan!';
+      setTimeout(async () => {
+        try {
+          const { data, error } = await supabase!.rpc('daily_claim', { user_id: profile!.id });
+          if (error || data?.error) {
+            // Fallback client-side kalau RPC belum deploy
+            const isMega = (totalStreak + 1) % 30 === 0;
+            const isWeekly = (totalStreak + 1) % 7 === 0;
+            let bonus = 5;
+            let msg = 'Quest Selesai! +5 Koin Harian';
+            if (isMega) { bonus = 50; msg = 'Quest Selesai! +50 Koin Mega Streak 30 Hari!'; }
+            else if (isWeekly) { bonus = 10; msg = 'Quest Selesai! +10 Koin Streak Mingguan!'; }
+            const todayStr = new Date().toDateString();
+            const newCoins = globalCoins + bonus;
+            const newStreak = totalStreak + 1;
+            setGlobalCoins(newCoins); setTotalStreak(newStreak); setIsStreakClaimed(true); setToastMessage(msg);
+            updateProfile({ coins: newCoins, streak: newStreak, last_claim_date: todayStr }).then(() => {
+              setTimeout(() => { setToastMessage(''); navigate(path, { state: { mode: modeId, energyCost: costType === 'energy' ? cost : 0, coinCost: costType === 'coin' ? cost : 0, ...extraState } }); }, 2000);
+            });
+          } else {
+            // RPC berhasil — server sudah update DB
+            setGlobalCoins(data.coins_new);
+            setTotalStreak(data.streak);
+            setIsStreakClaimed(true);
+            setToastMessage(`Quest Selesai! ${data.msg}`);
+            setTimeout(() => { setToastMessage(''); navigate(path, { state: { mode: modeId, energyCost: costType === 'energy' ? cost : 0, coinCost: costType === 'coin' ? cost : 0, ...extraState } }); }, 2000);
+          }
+        } catch {
+          setToastMessage('Gagal claim. Coba lagi.');
+          setIsProcessing(false);
         }
-        const newCoins = globalCoins + bonus;
-        const newStreak = totalStreak + 1;
-        setGlobalCoins(newCoins);
-        setTotalStreak(newStreak);
-        setToastMessage(msg);
-        const todayStr = new Date().toDateString();
-        // Simpan perolehan koin dan streak permanen ke Supabase/Profile
-        updateProfile({ coins: newCoins, streak: newStreak, last_claim_date: todayStr }).then(() => {
-          setTimeout(() => {
-            setToastMessage('');
-            navigate(path, { state: { mode: modeId, energyCost: costType === 'energy' ? cost : 0, coinCost: costType === 'coin' ? cost : 0, ...extraState } });
-          }, 2000);
-        });
       }, 1000);
     } else {
       navigate(path, { state: { mode: modeId, energyCost: costType === 'energy' ? cost : 0, coinCost: costType === 'coin' ? cost : 0, ...extraState } });
@@ -684,10 +678,6 @@ export default function Dashboard() {
                           case 'item_kesempatan_kedua':
                             displayFirst = "🔄 Ksmptn";
                             displaySecond = "Kedua";
-                            break;
-                          case 'item_coin_booster':
-                            displayFirst = "🚀 Koin";
-                            displaySecond = "Booster";
                             break;
                           case 'energy_5':
                             displayFirst = "⚡ 5";

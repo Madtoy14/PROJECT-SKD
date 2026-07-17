@@ -2,18 +2,13 @@ import { useState } from 'react';
 import { X, Coins, MessageCircle, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../ui/Button';
+import { PACKAGES } from '../../lib/coins';
 
 interface TopUpModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 }
-
-const PACKAGES = [
-  { id: 'pkg_50', coins: 50, price: 5000, label: 'Koin Pemula', discount: 0 },
-  { id: 'pkg_200', coins: 200, price: 18000, label: 'Koin Favorit', discount: 10 },
-  { id: 'pkg_500', coins: 500, price: 40000, label: 'Koin Sultan', discount: 20 },
-];
 
 export function TopUpModal({ isOpen, onClose, onSuccess }: TopUpModalProps) {
   const [selectedPkg, setSelectedPkg] = useState<string | null>(null);
@@ -134,9 +129,9 @@ export function TopUpModal({ isOpen, onClose, onSuccess }: TopUpModalProps) {
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-bold text-fg text-lg">{pkg.coins} Koin</span>
-                            {pkg.discount > 0 && (
+                            {pkg.bonus_pct > 0 && (
                               <span className="px-2 py-0.5 bg-danger text-white text-[10px] font-black uppercase rounded-md tracking-wider">
-                                Hemat {pkg.discount}%
+                                Hemat {pkg.bonus_pct}%
                               </span>
                             )}
                           </div>
