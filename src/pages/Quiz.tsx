@@ -112,7 +112,10 @@ export default function Quiz() {
   const [questions, setQuestions] = useState<any[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [noCatatanSalah, setNoCatatanSalah] = useState(false); // state untuk layar kosong catatan salah
+  const [noCatatanSalah, setNoCatatanSalah] = useState(false);
+  const [showSecondChanceModal, setShowSecondChanceModal] = useState(false);
+  const [pendingDeathData, setPendingDeathData] = useState<{earned: number} | null>(null);
+  const pendingDeathCallback = useRef<(() => void) | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const TOTAL_TIME = gameMode === 'tryout' 
     ? 100 * 60 
@@ -396,16 +399,27 @@ export default function Quiz() {
                 .eq('id', user.id)
                 .maybeSingle();
               if (data?.catatan_salah) {
-                const raw = typeof data.catatan_salah === 'string'
+                const raw: Array<{id: string; type: string}> = typeof data.catatan_salah === 'string'
                   ? JSON.parse(data.catatan_salah)
                   : data.catatan_salah;
-                catatanData = Array.isArray(raw) ? raw : [];
+                if (Array.isArray(raw)) {
+                  const { ALL_QUESTIONS } = await import('../data/questions/index');
+                  catatanData = raw
+                    .map((ref: {id: string; type: string}) => ALL_QUESTIONS.find(q => q.id === ref.id))
+                    .filter((q): q is Question => !!q);
+                }
               }
             }
           } else {
             // Fallback ke profil lokal jika Supabase tidak terkonfigurasi
             const p = await fetchProfile();
-            catatanData = p?.catatan_salah as any[] || [];
+            const refs = p?.catatan_salah as Array<{id: string; type: string}> || [];
+            if (refs.length > 0) {
+              const { ALL_QUESTIONS } = await import('../data/questions/index');
+              catatanData = refs
+                .map((ref) => ALL_QUESTIONS.find(q => q.id === ref.id))
+                .filter((q): q is Question => !!q);
+            }
           }
 
           if (!mounted) return;
@@ -624,32 +638,29 @@ export default function Quiz() {
       }
     }
 
-    // Supabase stats update dipindahkan ke Result.tsx agar dilakukan dalam satu kali API call
-    // Survival: wrong = game over (TKP not applicable for survival usually, but handled)
+    // Survival: wrong = game over
     if (gameMode === 'survival' && ((!isTKP && !isCorrect) || (isTKP && earned < 5))) {
-      // Perisai tak terbatas (sesuai limit max)
-      // TAPI HANYA BEKERJA JIKA DIAKTIFKAN OLEH PEMAIN (perisaiActive === true)
+      // 1. Shield aktif (proaktif) — konsumsi langsung
       if (activePowerUps.perisaiActive) {
-        if (profile?.inventory?.item_kesempatan_kedua > 0 && checkPowerupLimit('item_kesempatan_kedua')) {
-          setPowerUpUsageCount(p => ({ ...p, item_kesempatan_kedua: (p.item_kesempatan_kedua || 0) + 1 }));
-          const updatedInv = { ...profile.inventory, item_kesempatan_kedua: profile.inventory.item_kesempatan_kedua - 1 };
-          updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
-          setActivePowerUps(p => ({ ...p, perisaiActive: false })); // Matikan setelah dipakai
-          // biarkan lanjut, shield menangkal Game Over
-        } else if (profile?.inventory?.item_shield > 0 && checkPowerupLimit('item_shield')) {
+        if (profile?.inventory?.item_shield > 0 && checkPowerupLimit('item_shield')) {
           setPowerUpUsageCount(p => ({ ...p, item_shield: (p.item_shield || 0) + 1 }));
           const updatedInv = { ...profile.inventory, item_shield: profile.inventory.item_shield - 1 };
           updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
-          setActivePowerUps(p => ({ ...p, perisaiActive: false })); // Matikan setelah dipakai
-          // biarkan lanjut, shield menangkal Game Over
+          setActivePowerUps(p => ({ ...p, perisaiActive: false }));
+          // lanjut kuis
         } else {
-           // Shield limit reached or not enough stock
-           triggerSuddenDeath();
-           return;
+          triggerSuddenDeath();
+          return;
         }
+      // 2. Punya kesempatan_kedua — tampilkan popup (reaktif)
+      } else if (profile?.inventory?.item_kesempatan_kedua > 0 && checkPowerupLimit('item_kesempatan_kedua')) {
+        setPendingDeathData({ earned });
+        pendingDeathCallback.current = triggerSuddenDeath;
+        setShowSecondChanceModal(true);
+        return;
       } else {
-         triggerSuddenDeath();
-         return;
+        triggerSuddenDeath();
+        return;
       }
     }
 
@@ -1523,6 +1534,48 @@ const scoreBadge = (optionId: string) => {
           </>
         )}
       </div>}
+      {/* Second Chance Modal — muncul otomatis saat jawab salah di Survival */}
+      {showSecondChanceModal && pendingDeathData && profile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-surface rounded-2xl border border-border shadow-2xl p-6 max-w-sm w-full space-y-4 text-center">
+            <div className="text-5xl">💔</div>
+            <h3 className="text-lg font-black text-fg">Jawaban Salah!</h3>
+            <p className="text-sm text-fg-muted leading-relaxed">
+              Pakai <span className="font-bold text-danger">Kesempatan Kedua</span> untuk lanjutkan?
+              <br/>
+              <span className="text-xs text-fg-muted">Stok: {profile.inventory?.item_kesempatan_kedua ?? 0} tersisa</span>
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowSecondChanceModal(false);
+                  setPendingDeathData(null);
+                  pendingDeathCallback.current?.();
+                  pendingDeathCallback.current = null;
+                }}
+                className="flex-1 py-2.5 rounded-xl border border-border text-fg-muted text-sm font-bold hover:bg-surface-subtle transition-colors"
+              >
+                Menyerah
+              </button>
+              <button
+                onClick={() => {
+                  // Terima — konsumsi item, lanjut kuis
+                  if (!profile?.inventory) return;
+                  setPowerUpUsageCount(p => ({ ...p, item_kesempatan_kedua: (p.item_kesempatan_kedua || 0) + 1 }));
+                  const updatedInv = { ...profile.inventory, item_kesempatan_kedua: profile.inventory.item_kesempatan_kedua - 1 };
+                  updateProfile({ inventory: updatedInv }).then(p => setProfile(p));
+                  setShowSecondChanceModal(false);
+                  setPendingDeathData(null);
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-danger text-white text-sm font-black hover:bg-danger/90 transition-colors shadow-lg"
+              >
+                Pakai! ❤️
+              </button>
+            </div>
+            <p className="text-[10px] text-fg-muted">Auto-menyerah dalam 5 detik jika tidak ada pilihan</p>
+          </div>
+        </div>
+      )}
       {/* Exit Confirmation Modal */}
       <ExitConfirmModal
         isOpen={showExitConfirm}
