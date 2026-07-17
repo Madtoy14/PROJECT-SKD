@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle2, Loader2, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import authBg from '../assets/auth_bg.png';
+import authBg from '../assets/auth_bg.webp';
 import { supabase } from '../lib/supabase';
 
 // Mode 'reset-password' dipertahankan untuk handle link email reset password
@@ -269,6 +269,7 @@ export default function Auth() {
                           onClick={() => setShowNewPwd(p => !p)}
                           className="absolute inset-y-0 right-0 pr-4 flex items-center text-fg-muted hover:text-fg transition-colors"
                           tabIndex={-1}
+                          aria-label={showNewPwd ? 'Sembunyikan password' : 'Tampilkan password'}
                         >
                           {showNewPwd ? <EyeOff size={15} /> : <Eye size={15} />}
                         </button>
@@ -302,6 +303,7 @@ export default function Auth() {
                           onClick={() => setShowConfirmPwd(p => !p)}
                           className="absolute inset-y-0 right-0 pr-4 flex items-center text-fg-muted hover:text-fg transition-colors"
                           tabIndex={-1}
+                          aria-label={showConfirmPwd ? 'Sembunyikan konfirmasi password' : 'Tampilkan konfirmasi password'}
                         >
                           {showConfirmPwd ? <EyeOff size={15} /> : <Eye size={15} />}
                         </button>

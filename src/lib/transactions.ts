@@ -10,6 +10,15 @@ import { supabase } from './supabase';
 export type TransactionType = 'purchase' | 'sell' | 'earn' | 'spend' | 'refund' | 'reward' | 'penalty';
 export type TransactionCategory = 'coin' | 'item' | 'energy' | 'xp';
 
+/** Typed metadata shapes per source — add new shapes as union members */
+export type TransactionMetadata =
+  | { mode: string; session_id?: string }          // quiz_completion, quiz_start
+  | { streak_day: number }                          // streak_bonus
+  | { quest_id: number }                            // quest_completion
+  | { cost: number; energy_gained: number }         // energy shop purchase
+  | { item_id: string; quantity?: number; original_price?: number; quantity_remaining?: number } // shop item
+  | Record<string, unknown>;                        // ponytail: escape hatch, narrow when new sources added
+
 interface TransactionParams {
   type: TransactionType;
   category: TransactionCategory;
@@ -17,7 +26,7 @@ interface TransactionParams {
   amount: number;
   balanceAfter: number;
   source: string;
-  metadata?: Record<string, any>;
+  metadata?: TransactionMetadata;
 }
 
 /**

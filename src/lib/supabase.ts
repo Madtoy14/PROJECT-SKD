@@ -153,6 +153,53 @@ export const updateProfile = async (profileUpdate: Partial<UserProfile>): Promis
   }
 };
 
+/**
+ * SEC-01: Atomic energy deduction via RPC to prevent race-condition exploits.
+ * Falls back to optimistic updateProfile when Supabase not configured (local dev).
+ *
+ * SQL RPC (run once in Supabase SQL editor):
+ * ─────────────────────────────────────────────────────────────────────────────
+ * create or replace function consume_energy(user_id uuid, amount int)
+ * returns int language plpgsql security definer as $$
+ * declare current_energy int;
+ * begin
+ *   select energy into current_energy from profiles
+ *     where id = user_id for update;
+ *   if current_energy < amount then
+ *     raise exception 'insufficient_energy';
+ *   end if;
+ *   update profiles set energy = energy - amount,
+ *     last_energy_update = now()
+ *   where id = user_id;
+ *   return current_energy - amount;
+ * end; $$;
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const consumeEnergy = async (
+  amount: number
+): Promise<{ success: boolean; energyAfter: number }> => {
+  if (!isSupabaseConfigured()) {
+    // local dev fallback — no race protection
+    return { success: true, energyAfter: 0 };
+  }
+  try {
+    const { data, error } = await supabase!.rpc('consume_energy', {
+      user_id: (await supabase!.auth.getUser()).data.user?.id,
+      amount,
+    });
+    if (error) {
+      if (error.message?.includes('insufficient_energy')) {
+        return { success: false, energyAfter: 0 };
+      }
+      throw error;
+    }
+    return { success: true, energyAfter: data as number };
+  } catch (err) {
+    console.error('consumeEnergy failed:', err);
+    return { success: false, energyAfter: 0 };
+  }
+};
+
 // 3. Gabung Papan Peringkat Bulanan (Leaderboard/Liga)
 export const fetchMonthlyLeaderboard = async () => {
   if (!isSupabaseConfigured()) {

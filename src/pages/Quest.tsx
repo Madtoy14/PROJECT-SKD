@@ -19,8 +19,10 @@ export default function Quest() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    fetchProfile().then(p => setProfile(p));
+    fetchProfile().then(p => { setProfile(p); setLoading(false); });
   }, []);
 
   // --- Real-time Midnight Reset Listener ---
@@ -157,6 +159,15 @@ export default function Quest() {
 
   return (
     <div className="p-4 md:p-8 space-y-6 md:space-y-10 pb-24 max-w-5xl mx-auto min-h-screen">
+      {/* Loading skeleton */}
+      {loading && (
+        <div className="space-y-4 animate-pulse">
+          <div className="h-8 bg-surface-subtle rounded-xl w-48" />
+          {[1,2,3].map(i => (
+            <div key={i} className="h-20 bg-surface-subtle rounded-2xl border border-border" />
+          ))}
+        </div>
+      )}
       
       {/* Toast Notification */}
       <AnimatePresence>

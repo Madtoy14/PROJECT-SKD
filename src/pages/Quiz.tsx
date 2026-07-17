@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { getRandomQuestions } from '../data/questions/index';
+import { getRandomQuestions, type Question, type QuestionOption } from '../data/questions/index';
 
 const cleanMathText = (text: string): string => {
   if (!text) return "";
@@ -56,7 +56,7 @@ const cleanMathText = (text: string): string => {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Check, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, HeartCrack, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery } from '../lib/supabase';
+import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, consumeEnergy, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery } from '../lib/supabase';
 import { useQuizSession } from '../context/QuizSessionContext';
 import MathCard from '../components/MathCard';
 import { Button } from '../components/ui/Button';
@@ -172,7 +172,7 @@ export default function Quiz() {
     
     // Otomatis pilih jawaban paling benar agar dapat poin!
     const correctOpt = currentQuestion.category === 'TKP' 
-       ? currentQuestion.options.find((o: any) => o.score === 5)?.id 
+       ? currentQuestion.options.find((o: QuestionOption) => o.score === 5)?.id 
        : currentQuestion.correct;
        
     if (correctOpt) {
@@ -189,7 +189,7 @@ export default function Quiz() {
     
     // Find incorrect options
     const correctId = currentQuestion.correct;
-    const incorrects = currentQuestion.options.filter((o: any) => o.id !== correctId).map((o: any) => o.id);
+    const incorrects = currentQuestion.options.filter((o: QuestionOption) => o.id !== correctId).map((o: QuestionOption) => o.id);
     const shuffled = incorrects.sort(() => 0.5 - Math.random());
     setEliminatedOptions(shuffled.slice(0, 2));
     broadcastPowerUp('item_5050');
@@ -373,9 +373,9 @@ export default function Quiz() {
         try {
           const id = await createSession(gameMode, data, packageId, packageVersion);
           if (mounted) setSessionId(id);
-        } catch (err: any) {
+        } catch (err: unknown) {
           if (mounted) {
-            setError(err.message || "Gagal membuat sesi kuis.");
+            setError((err as Error).message || "Gagal membuat sesi kuis.");
             setLoadingQuestions(false);
           }
         }
@@ -386,7 +386,7 @@ export default function Quiz() {
       // Fetch catatan_salah langsung dari Supabase agar selalu up-to-date
       const loadCatatanSalah = async () => {
         try {
-          let catatanData: any[] = [];
+          let catatanData: Question[] = [];
           if (isSupabaseConfigured()) {
             const { data: { user } } = await supabase!.auth.getUser();
             if (user) {
@@ -405,7 +405,7 @@ export default function Quiz() {
           } else {
             // Fallback ke profil lokal jika Supabase tidak terkonfigurasi
             const p = await fetchProfile();
-            catatanData = p?.catatan_salah || [];
+            catatanData = p?.catatan_salah as any[] || [];
           }
 
           if (!mounted) return;
@@ -470,10 +470,10 @@ export default function Quiz() {
   );
   
   const cleanedOptions = useMemo(
-    () => currentQuestion?.options?.map(opt => ({
+    () => currentQuestion?.options?.map((opt: QuestionOption) => ({
       ...opt,
       cleanedText: cleanMathText(opt.text || '')
-    })) ?? [],
+    })) ?? [] as (QuestionOption & { cleanedText: string })[],
     [currentQuestion?.options]
   );
   
@@ -487,7 +487,7 @@ export default function Quiz() {
     const isTKP = currentQuestion.category === 'TKP';
     let pts: number;
     if (isTKP) {
-      const opt = currentQuestion.options.find((o: any) => o.id === optionId);
+      const opt = currentQuestion.options.find((o: QuestionOption) => o.id === optionId);
       pts = Number(opt?.score ?? 0); // bobot 1-5
     } else {
       pts = optionId === currentQuestion.correct ? 5 : 0; // TWK/TIU: +5 atau 0
@@ -579,15 +579,20 @@ export default function Quiz() {
     // Deferred Cost Deduction: Potong energi/koin saat pemain PERTAMA KALI menjawab
     if (!isEnergyDeducted && profile) {
       if (energyCost > 0 || coinCost > 0) {
-        const updates: any = {};
         if (energyCost > 0) {
-          updates.energy = Math.max(0, profile.energy - energyCost);
-          if (profile.energy >= 25) {
-            updates.last_energy_update = new Date().toISOString();
-          }
+          // SEC-01: atomic RPC — prevents race-condition double-spend
+          consumeEnergy(energyCost).then(({ success, energyAfter }) => {
+            if (success) {
+              setProfile((p: import('../lib/supabase').UserProfile | null) => p ? { ...p, energy: energyAfter } : p);
+            }
+          });
         }
-        if (coinCost > 0) updates.coins = Math.max(0, profile.coins - coinCost);
-        updateProfile(updates);
+        if (coinCost > 0) {
+          const coinUpdates: Partial<import('../lib/supabase').UserProfile> = {
+            coins: Math.max(0, profile.coins - coinCost)
+          };
+          updateProfile(coinUpdates);
+        }
       }
       setIsEnergyDeducted(true);
     }
@@ -737,7 +742,7 @@ export default function Quiz() {
       const ansId = answers[idx];
       let isFullyCorrect = false;
       if (ansId) {
-        const opt = q.options.find((o: any) => o.id === ansId);
+        const opt = q.options.find((o: QuestionOption) => o.id === ansId);
         // Score sudah dinormalisasi ke skala 0-5 oleh fetchQuestionsFromSupabase
         const pts = Number(opt?.score ?? 0);
         finalScore += pts;
@@ -782,6 +787,21 @@ export default function Quiz() {
     if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
     setShowExplanation(true);
   };
+
+  // Keyboard shortcut: 1-5 pilih jawaban
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (isGameOver || !currentQuestion) return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      const idx = parseInt(e.key) - 1;
+      if (idx >= 0 && idx < cleanedOptions.length) {
+        const opt = cleanedOptions[idx];
+        if (opt && !eliminatedOptions.includes(opt.id)) handleSelect(opt.id);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isGameOver, currentQuestion, cleanedOptions, eliminatedOptions, handleSelect]);
   const goNextOrFinish = (scoreSnapshot: number) => {
     const nextIdx = currentQuestionIndex + 1;
     if (nextIdx < totalQuestions) {
@@ -804,7 +824,7 @@ export default function Quiz() {
       }
 
       if (sessionId) {
-        const updates: any = { currentIndex: nextIdx };
+        const updates: { currentIndex: number; startedAt?: string } = { currentIndex: nextIdx };
         if (gameMode !== 'tryout') {
           updates.startedAt = new Date().toISOString();
         }
@@ -972,7 +992,7 @@ const scoreBadge = (optionId: string) => {
         {/* === Quiz Panel === */}
         <div className="flex flex-col flex-1 h-full min-w-0 w-full max-w-5xl mx-auto">
           {/* Header */}
-          <header className="sticky top-0 p-3 md:p-4 flex items-center justify-between gap-3 md:gap-4 border-b border-slate-100 bg-white/90 backdrop-blur-md z-40 shadow-sm">
+          <header className={`sticky top-0 p-3 md:p-4 flex items-center justify-between gap-3 md:gap-4 border-b z-40 shadow-sm backdrop-blur-md ${gameMode === 'survival' ? 'border-rose-200 bg-rose-50/90' : 'border-slate-100 bg-white/90'}`}>
             <div className="flex items-center gap-3">
               <Button variant="ghost" onClick={() => setShowExitConfirm(true)} className="!p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full shrink-0">
                 <X size={20} />
@@ -982,6 +1002,7 @@ const scoreBadge = (optionId: string) => {
                 <span className="font-space font-bold text-sm text-fg whitespace-nowrap">Soal {currentQuestionIndex + 1}{gameMode !== 'survival' && `/${totalQuestions}`}</span>
                 <div className="flex items-center gap-1.5">
                   {gameMode === 'survival' && <span className="flex items-center gap-1 text-destructive bg-rose-50 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold border border-rose-100"><Skull size={10} /> Survival</span>}
+                  {gameMode === 'catatan_salah' && <span className="flex items-center gap-1 text-info bg-info/10 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold border border-info/20">📖 {totalQuestions} Soal</span>}
                   {gameMode === 'tryout'  && <span className="flex items-center gap-1 text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold border border-purple-100"><Trophy size={10} /> Try Out</span>}
                   {(gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && <span className="flex items-center gap-1 text-primary bg-blue-50 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold border border-blue-100"><Users size={10} /> PvP</span>}
                   <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${
@@ -1013,7 +1034,7 @@ const scoreBadge = (optionId: string) => {
                   )}
                 </div>
               )}
-              <div className="relative w-14 h-10 flex items-center justify-center">
+              <div className="relative w-14 h-10 flex items-center justify-center" role="timer" aria-label={`Sisa waktu ${timeLeft} detik`} aria-live="off">
                 {gameMode === 'tryout' ? (
                   <div className={`font-space font-bold text-xs bg-white px-2 py-1 rounded-md border border-slate-200 ${timerColor}`}>
                     {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
@@ -1081,7 +1102,7 @@ const scoreBadge = (optionId: string) => {
                   </div>
                 )}
                 <div className="space-y-2 md:space-y-3">
-                  {cleanedOptions.map((opt: any) => {
+                  {cleanedOptions.map((opt: QuestionOption & { cleanedText: string }) => {
                     const isSelected = selected === opt.id;
                     
                     // Sembunyikan opsi tereliminasi oleh Power up 50:50
@@ -1139,7 +1160,7 @@ const scoreBadge = (optionId: string) => {
                         <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base ${markerClass}`}>
                           {opt.id}
                         </div>
-                        <span className="flex-1 leading-snug text-sm md:text-base font-semibold text-fg" dangerouslySetInnerHTML={{ __html: opt.cleanedText }} ></span>
+                        <span className="flex-1 leading-snug text-base md:text-lg font-semibold text-fg" dangerouslySetInnerHTML={{ __html: opt.cleanedText }} ></span>
                         {/* TKP score badge revealed after answering (not in tryout) */}
                         {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Target, PenTool, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import avatarPdh from '../assets/avatar_pdh.png';
+import avatarPdh from '../assets/avatar_pdh.webp';
 import { supabase } from '../lib/supabase';
 
 const SCHOOLS = [
@@ -149,12 +149,13 @@ export default function Onboarding() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">NICKNAME (DISPLAY NAME)</label>
+              <label htmlFor="onboarding-nickname" className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">NICKNAME (DISPLAY NAME)</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                   <User size={18} />
                 </div>
                 <input
+                  id="onboarding-nickname"
                   type="text"
                   required
                   value={displayName}
@@ -166,12 +167,13 @@ export default function Onboarding() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">TARGET SEKOLAH KEDINASAN</label>
+              <label htmlFor="onboarding-school" className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">TARGET SEKOLAH KEDINASAN</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                   <Target size={18} />
                 </div>
                 <select
+                  id="onboarding-school"
                   value={targetSchool}
                   onChange={(e) => setTargetSchool(e.target.value)}
                   className="w-full bg-surface text-fg rounded-xl pl-12 pr-4 py-3.5 outline-none transition-all duration-300 border border-transparent focus:border-primary/50 focus:shadow-[0_0_15px_rgba(37,99,235,0.2)] font-mono text-sm appearance-none cursor-pointer"
@@ -189,12 +191,13 @@ export default function Onboarding() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">MOTIVASI / BIO SINGKAT</label>
+              <label htmlFor="onboarding-bio" className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">MOTIVASI / BIO SINGKAT</label>
               <div className="relative group">
                 <div className="absolute top-4 left-0 pl-4 pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                   <PenTool size={18} />
                 </div>
                 <textarea
+                  id="onboarding-bio"
                   required
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}

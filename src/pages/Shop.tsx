@@ -137,7 +137,7 @@ export default function Shop() {
       }
 
       showToast(`Berhasil membeli ${quantity > 1 ? quantity + 'x ' : ''}${itemTitle}!`, 'success');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Purchase error:', err);
       showToast('Terjadi kesalahan saat pembelian', 'error');
     } finally {
@@ -190,7 +190,7 @@ export default function Shop() {
       });
 
       showToast(`Berhasil menjual 1 ${itemTitle} (+${reward} Koin)!`, 'success');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Sell back error:', err);
       showToast('Terjadi kesalahan saat penjualan', 'error');
     } finally {

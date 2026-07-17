@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
@@ -10,34 +10,13 @@ import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvail
 import type { UserProfile, Character } from '../lib/supabase';
 import { ProfileSkeleton } from '../components/LoadingSkeleton';
 import PlayerProfileModal from '../components/PlayerProfileModal';
-import avatarPdh from '../assets/avatar_pdh.png';
+import avatarPdh from '../assets/avatar_pdh.webp';
 import RankBadge, { RankCard } from '../components/RankBadge';
 import { getUserAnalytics } from '../lib/supabase';
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  Title
-} from 'chart.js';
-import { Radar, Line } from 'react-chartjs-2';
 
-ChartJS.register(
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  Title
-);
+// ponytail: chart.js (~630KB) lazy-loaded via React.lazy + Suspense.
+// ProfileCharts wrapper owns ChartJS.register; pass typed data as props.
+const ProfileCharts = React.lazy(() => import('../components/ProfileCharts'));
 
 const ALL_BADGES_DATA = [
   { id: 1, name: 'Pawang TWK', icon: '📜', desc: 'Total >100 jawaban benar.' },
@@ -791,23 +770,14 @@ export default function Profile() {
                 📊 Analisis Kemampuan & Rekomendasi AI
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {/* Radar Chart AI */}
-                <div className="bg-surface shadow-sm border border-border rounded-2xl p-4 flex flex-col">
-                  <h4 className="text-sm font-black tracking-wider text-[#F3A04C] uppercase mb-4 text-center">SKD Balance AI</h4>
-                  <div className="w-full flex-1 min-h-[220px] flex justify-center items-center">
-                    <Radar data={radarData} options={radarOptions} />
-                  </div>
-                </div>
-
-                {/* Progress Line Chart */}
-                <div className="bg-surface shadow-sm border border-border rounded-2xl p-4 flex flex-col">
-                  <h4 className="text-sm font-black tracking-wider text-[#40B43E] uppercase mb-4 text-center">Trend Skor (7 Hari)</h4>
-                  <div className="w-full flex-1 min-h-[220px] flex justify-center items-center">
-                    <Line data={lineData} options={lineOptions} />
-                  </div>
-                </div>
-              </div>
+              <Suspense fallback={<div className="w-full min-h-[220px] flex items-center justify-center text-fg-muted text-sm">Memuat grafik...</div>}>
+                <ProfileCharts
+                  radarData={radarData}
+                  radarOptions={radarOptions}
+                  lineData={lineData}
+                  lineOptions={lineOptions}
+                />
+              </Suspense>
 
               <div className="flex flex-col items-center gap-8">
                 {/* Recommendation Texts */}

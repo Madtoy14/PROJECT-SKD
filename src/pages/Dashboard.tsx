@@ -6,7 +6,7 @@ import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvail
 import RankBadge from '../components/RankBadge';
 import { getRankForScore, getCurrentSeason } from '../data/ranks';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
-import avatarPdh from '../assets/avatar_pdh.png';
+import avatarPdh from '../assets/avatar_pdh.webp';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 const GAME_MODES = [
   { id: 'latihan', title: 'Latihan Harian', desc: 'Asah kemampuanmu setiap hari', cost: 3, costType: 'energy', icon: BrainCircuit, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success/30 hover:border-success hover:shadow-sm', badge: 'Santai' },
@@ -930,7 +930,11 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
-                    <p className="text-[12px] text-fg-muted font-medium line-clamp-2 mt-1">{mode.desc}</p>
+                    <p className="text-[12px] text-fg-muted font-medium line-clamp-2 mt-1">
+                      {mode.id === 'catatan_salah' && (profile?.catatan_salah?.length ?? 0) > 0
+                        ? `${profile?.catatan_salah?.length} soal menunggu dipelajari ulang`
+                        : mode.desc}
+                    </p>
                     <div className="flex items-center gap-1 text-[11px] font-bold text-fg mt-auto pt-2">
                       {mode.costType === 'energy' ? <Zap size={12} className="text-energy" /> : <Coins size={12} className="text-coin" />}
                       <span>{mode.cost.toLocaleString()} {mode.costType === 'energy' ? 'Energi' : 'Koin'}</span>

@@ -310,7 +310,7 @@ function AppLayout() {
         <div className={`w-full h-full ${!isFullScreen ? 'max-w-7xl mx-auto' : ''}`}>
           <Suspense fallback={
             <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3 text-primary font-bold">
-              <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+              <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" role="status" aria-label="Memuat modul" />
               <span className="text-sm text-fg-muted">Memuat Modul...</span>
             </div>
           }>

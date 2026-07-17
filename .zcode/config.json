@@ -1,0 +1,13 @@
+{
+  "mcp": {
+    "servers": {
+      "Hermes": {
+        "type": "stdio",
+        "command": "hermes",
+        "args": [
+          "mcp"
+        ]
+      }
+    }
+  }
+}
