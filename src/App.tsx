@@ -57,6 +57,17 @@ function Navigation() {
     { path: '/toko', icon: Store, label: 'Toko' },
   ];
 
+  const desktopNavOrder = [
+    { path: '/', icon: Home, label: 'Home' },
+    { path: '/belajar', icon: BookOpen, label: 'Belajar' },
+    { path: '/pembahasan', icon: BookOpenCheck, label: 'Try Out' },
+    { path: '/liga', icon: Trophy, label: 'Liga' },
+    { path: '/quest', icon: Target, label: 'Quest' },
+    { path: '/catatan-salah', icon: Bookmark, label: 'Catatan Salah' },
+    { path: '/toko', icon: Store, label: 'Toko' },
+    { path: '/profil', icon: User, label: 'Profil' },
+  ];
+
   const handleLogout = async () => {
     try {
       if (supabase) await supabase.auth.signOut();
@@ -79,56 +90,66 @@ function Navigation() {
           SKDQuest
         </Link>
         <div className="w-9" /> {/* spacer */}
-
-        {/* ── Mobile Sidebar Overlay ── */}
-        {sidebarOpen && (
-          <div className="fixed inset-0 z-[100]">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
-            <nav className="absolute top-0 left-0 bottom-0 w-72 bg-surface shadow-2xl border-r border-border flex flex-col animate-in slide-in-from-left duration-200">
-              {/* Sidebar Header */}
-              <div className="h-14 flex items-center justify-between px-5 border-b border-border">
-                <span className="font-bold text-lg bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">SKDQuest</span>
-                <button onClick={() => setSidebarOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-subtle transition-colors" aria-label="Tutup menu">
-                  <X size={18} className="text-fg-muted" />
-                </button>
-              </div>
-              {/* Sidebar Nav Items */}
-              <ul className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-                {sidebarItems.map(({ path, icon: Icon, label }) => {
-                  const isActive = location.pathname === path;
-                  return (
-                    <li key={path}>
-                      <Link
-                        to={path}
-                        onClick={() => setSidebarOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-bold ${
-                          isActive ? 'bg-primary/10 text-primary' : 'text-fg-muted hover:bg-surface-subtle hover:text-fg'
-                        }`}
-                      >
-                        <Icon size={20} />
-                        {label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-              {/* Sidebar Logout */}
-              <div className="px-3 pb-6 pt-2 border-t border-border">
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-bold text-danger hover:bg-danger/5 transition-colors"
-                >
-                  <LogOut size={20} />
-                  Logout
-                </button>
-              </div>
-            </nav>
-          </div>
-        )}
       </header>
 
+      {/* ── Mobile Sidebar Overlay (di luar header supaya fixed tidak kena stacking context backdrop-blur) ── */}
+      {sidebarOpen && (
+        <>
+          <div className="fixed inset-0 z-[200] bg-black/50" onClick={() => setSidebarOpen(false)} />
+          <nav className="fixed top-0 left-0 z-[210] h-full w-[85vw] max-w-sm bg-white border-r border-border flex flex-col shadow-2xl overflow-hidden p-6"
+            style={{ animation: 'slideInLeft 0.2s ease-out' }}
+          >
+            {/* Sidebar Header */}
+            <div className="relative shrink-0 mb-6">
+              <span className="font-bold text-lg bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">SKDQuest</span>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="absolute top-0 right-0 w-9 h-9 flex items-center justify-center rounded-lg bg-surface-subtle hover:bg-border transition-colors"
+                aria-label="Tutup menu"
+              >
+                <X size={20} className="text-fg" />
+              </button>
+            </div>
+
+            {/* Sidebar Nav Items */}
+            <ul className="flex-1 overflow-y-auto min-h-0 space-y-1">
+              {sidebarItems.map(({ path, icon: Icon, label }) => {
+                const isActive = location.pathname === path;
+                return (
+                  <li key={path}>
+                    <Link
+                      to={path}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all text-sm font-bold ${
+                        isActive ? 'bg-primary/10 text-primary' : 'text-fg-muted hover:bg-surface-subtle hover:text-fg'
+                      }`}
+                    >
+                      <Icon size={20} />
+                      {label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <hr className="my-4 border-border" />
+
+            {/* Sidebar Logout */}
+            <div className="shrink-0">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 w-full px-4 py-3.5 rounded-xl text-sm font-bold text-danger hover:bg-danger/5 transition-colors"
+              >
+                <LogOut size={20} />
+                Logout
+              </button>
+            </div>
+          </nav>
+        </>
+      )}
+
       {/* ── Mobile Bottom Navigation ── */}
-      <nav className="md:hidden fixed bottom-0 w-full bg-surface/95 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] backdrop-blur-md border-t border-border z-50 transition-colors pb-[env(safe-area-inset-bottom)]">
+      <nav className={`md:hidden fixed bottom-0 w-full bg-surface/95 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] backdrop-blur-md border-t border-border z-50 transition-all duration-200 pb-[env(safe-area-inset-bottom)] ${sidebarOpen ? 'opacity-0 pointer-events-none' : ''}`}>
         <ul className="flex justify-around items-center h-16">
           {mainNav.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path;
@@ -152,7 +173,7 @@ function Navigation() {
         </div>
 
         <ul className="flex-1 px-3 group-hover:px-4 space-y-2 mt-2 w-full">
-          {[...mainNav, ...sidebarItems].map(({ path, icon: Icon, label }) => {
+          {desktopNavOrder.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path;
             return (
               <li key={path}>
@@ -163,9 +184,8 @@ function Navigation() {
                     : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 font-medium'
                     }`}
                 >
-                  <div className="flex flex-col items-center justify-center shrink-0 w-16 group-hover:w-6 gap-1.5 group-hover:gap-0">
+                  <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
                     <Icon size={22} className={`group-hover:!w-5 group-hover:!h-5 transition-all ${isActive ? 'drop-shadow-[0_0_8px_rgba(245,166,35,0.5)]' : ''}`} />
-                    <span className="text-[10px] group-hover:hidden font-bold leading-none block">{label}</span>
                   </div>
                   <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block text-[14px] font-bold">{label}</span>
                 </Link>
@@ -174,17 +194,16 @@ function Navigation() {
           })}
         </ul>
 
-        {/* Desktop Logout */}
-        <div className="px-3 group-hover:px-4 pb-6 pt-2 border-t border-slate-700/50">
+        {/* Desktop Logout — hanya muncul pas hover */}
+        <div className="px-3 group-hover:px-4 pb-6 pt-2 border-t border-slate-700/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={handleLogout}
-            className="flex flex-col group-hover:flex-row items-center group-hover:items-center px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full text-slate-400 hover:bg-white/5 hover:text-red-400 font-medium"
+            className="flex items-center gap-3 px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full text-slate-400 hover:bg-white/5 hover:text-red-400 font-medium text-sm font-bold"
           >
-            <div className="flex flex-col items-center justify-center shrink-0 w-16 group-hover:w-6 gap-1.5 group-hover:gap-0">
-              <LogOut size={22} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
-              <span className="text-[10px] group-hover:hidden font-bold leading-none block">Logout</span>
+            <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
+              <LogOut size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
             </div>
-            <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block text-[14px] font-bold">Logout</span>
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Logout</span>
           </button>
         </div>
       </nav>
