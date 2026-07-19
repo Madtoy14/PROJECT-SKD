@@ -8,6 +8,9 @@ import { getRankForScore, getCurrentSeason } from '../data/ranks';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import avatarPdh from '../assets/avatar_pdh.webp';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+
+
+
 const GAME_MODES = [
   { id: 'latihan', title: 'Latihan Harian', desc: 'Asah kemampuanmu setiap hari', cost: 3, costType: 'energy', icon: BrainCircuit, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success/30 hover:border-success hover:shadow-sm', badge: 'Santai' },
   { id: 'survival', title: 'Survival Mode', desc: '1 Kesalahan = Game Over', cost: 2, costType: 'energy', icon: Target, color: 'text-danger', bg: 'bg-danger-subtle', border: 'border-danger/30 hover:border-danger hover:shadow-sm', badge: 'Hardcore' },
@@ -15,6 +18,7 @@ const GAME_MODES = [
   { id: 'tryout', title: 'Try Out Mode', desc: 'Simulasi SKD', cost: 1500, costType: 'coin', icon: Trophy, color: 'text-premium', bg: 'bg-premium-subtle', border: 'border-premium/30 hover:border-premium hover:shadow-sm', badge: 'Premium' },
   { id: 'catatan_salah', title: 'Buku Catatan Salah', desc: 'Latih ulang soal yang pernah salah', cost: 0, costType: 'energy', icon: BookOpen, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-card', badge: 'Evaluasi' },
 ];
+
 const MONTHLY_LEADERBOARD = [
   { rank: 1, name: 'Raden Saori', xp: 3800, isMe: true },
   { rank: 2, name: 'BudiSantoso', xp: 3210 },
@@ -221,7 +225,7 @@ export default function Dashboard() {
     { id: 'coins_100', title: '100 Koin', count: 100, isCoins: true, color: '#EC4899', weight: 20 },
     { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', count: 1, color: '#10B981', weight: 10 },
     { id: 'energy_5', title: '5 Energi', count: 5, isEnergy: true, color: '#14B8A6', weight: 12 },
-    { id: 'coins_500', title: '500 Koin (Jackpot!)', count: 500, isCoins: true, color: '#EF4444', weight: 3 },
+    { id: 'coins_500', title: '500 Koin', count: 500, isCoins: true, color: '#EF4444', weight: 3 },
   ];
   const startSpin = () => {
     if (isSpinning || !profile) return;
@@ -242,44 +246,58 @@ export default function Dashboard() {
 
     // SH-01: server-side random via RPC — cegah client manipulation
     supabase!.rpc('spin_wheel', { user_id: profile.id }).then(({ data, error }) => {
+      let prizeIdx = 0;
+      let selectedPrize = SPIN_PRIZES[0];
+      let rpcSuccess = false;
+
+      if (error || !data || data.error) {
+        // Fallback client-side
+        const r = Math.random() * 100;
+        let cumulative = 0;
+        for (let i = 0; i < SPIN_PRIZES.length; i++) {
+          cumulative += SPIN_PRIZES[i].weight;
+          if (r <= cumulative) { prizeIdx = i; break; }
+        }
+        selectedPrize = SPIN_PRIZES[prizeIdx];
+      } else {
+        rpcSuccess = true;
+        const prizeIds = SPIN_PRIZES.map(p => p.id);
+        const idx = prizeIds.indexOf(data.prize_id);
+        prizeIdx = idx < 0 ? 0 : idx;
+        selectedPrize = SPIN_PRIZES[prizeIdx];
+      }
+
+      // Hitung angle for animation
+      const sliceSize = 360 / SPIN_PRIZES.length;
+      const targetAngle = 360 - (prizeIdx * sliceSize) - (sliceSize / 2);
+      setSpinAngle(targetAngle + (5 * 360));
+
       setTimeout(() => {
         setIsSpinning(false);
-        if (error || !data || data.error) {
-          // Fallback client-side kalau RPC belum deploy
-          const r = Math.random() * 100;
-          let cumulative = 0;
-          let prizeIdx = 0;
-          for (let i = 0; i < SPIN_PRIZES.length; i++) {
-            cumulative += SPIN_PRIZES[i].weight;
-            if (r <= cumulative) { prizeIdx = i; break; }
-          }
-          const prize = SPIN_PRIZES[prizeIdx];
+        if (!rpcSuccess) {
           let updatedInv = { ...profile.inventory };
           let newCoins = globalCoins;
           let newEnergy = energy;
           if (hasSpunToday) { newCoins -= 100; } else { setLastSpinDate(todayStr); }
-          if (prize.isCoins) { newCoins += prize.count; }
-          else if (prize.isEnergy) { newEnergy = Math.min(24, (newEnergy || 0) + prize.count); }
-          else { updatedInv[prize.id] = (updatedInv[prize.id] || 0) + prize.count; }
+          if (selectedPrize.isCoins) { newCoins += selectedPrize.count; }
+          else if (selectedPrize.isEnergy) { newEnergy = Math.min(24, (newEnergy || 0) + selectedPrize.count); }
+          else { updatedInv[selectedPrize.id] = (updatedInv[selectedPrize.id] || 0) + selectedPrize.count; }
           setGlobalCoins(newCoins); setEnergy(newEnergy || 0);
           updateProfile({ coins: newCoins, energy: newEnergy || 0, inventory: updatedInv as any, last_spin_date: !hasSpunToday ? todayStr : undefined });
-          setSpinResult(prize.title);
-          setToastMessage(`🎉 Selamat! Anda memenangkan: ${prize.title}!`);
+          setSpinResult(selectedPrize.title);
+          setToastMessage(`🎉 Selamat! Anda memenangkan: ${selectedPrize.title}!`);
           setTimeout(() => setToastMessage(''), 4000);
         } else {
           // RPC berhasil — server sudah update DB
           if (!hasSpunToday) setLastSpinDate(todayStr);
           setGlobalCoins(data.coins_new);
           setEnergy(data.energy_new || 0);
-          setSpinResult(data.prize_title);
-          setToastMessage(`🎉 Selamat! Anda memenangkan: ${data.prize_title}!`);
+          
+          // Fallback title just in case
+          setSpinResult(data.prize_title || selectedPrize.title);
+          setToastMessage(`🎉 Selamat! Anda memenangkan: ${data.prize_title || selectedPrize.title}!`);
           setTimeout(() => setToastMessage(''), 4000);
         }
-        // Hitung angle for animation (index 0-6)
-        const prizeIds = SPIN_PRIZES.map(p => p.id);
-        const idx = error || !data ? 0 : prizeIds.indexOf(data.prize_id);
-        const targetAngle = 360 - ((idx < 0 ? 0 : idx) * 45) - 22.5;
-        setSpinAngle(targetAngle + (5 * 360));
       }, 4200);
     });
   };
@@ -498,6 +516,9 @@ export default function Dashboard() {
       } catch (err) {
         console.error(err);
       }
+      navigate('/catatan-salah');
+      setIsProcessing(false);
+      return;
     }
     // Verifikasi biaya (energi atau koin) sebelum bermain
     const actualModeId = modeId === 'pvp1v1' ? 'pvp' : modeId;
@@ -649,9 +670,10 @@ export default function Dashboard() {
                         return `M 128 128 L ${x1} ${y1} A 115 115 0 0 1 ${x2} ${y2} Z`;
                       };
                       return SPIN_PRIZES.map((prize, idx) => {
-                        const startAngle = idx * 45 - 90;
-                        const endAngle = (idx + 1) * 45 - 90;
-                        const midAngle = idx * 45 + 22.5 - 90;
+                        const sliceSize = 360 / SPIN_PRIZES.length;
+                        const startAngle = idx * sliceSize - 90;
+                        const endAngle = (idx + 1) * sliceSize - 90;
+                        const midAngle = idx * sliceSize + (sliceSize / 2) - 90;
                         const textRad = Math.PI / 180;
                         const tx = 128 + 80 * Math.cos(midAngle * textRad);
                         const ty = 128 + 80 * Math.sin(midAngle * textRad);

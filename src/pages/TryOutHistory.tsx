@@ -65,9 +65,9 @@ export default function TryOutHistory() {
                 <p className="text-3xl font-black text-emerald-500">{bestScore}</p>
             </div>
         </div>
-        <div className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center">
+        <div className="flex-1 bg-surface p-4 rounded-2xl border border-border shadow-sm flex items-center">
           <select 
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-bold text-fg focus:outline-none focus:border-primary transition-colors cursor-pointer"
+            className="w-full bg-surface-subtle border border-border rounded-xl p-3 font-bold text-fg focus:outline-none focus:border-primary transition-colors cursor-pointer"
             value={selectedPackage}
             onChange={e => setSelectedPackage(e.target.value)}
           >
@@ -86,16 +86,16 @@ export default function TryOutHistory() {
             <Loader2 className="animate-spin text-primary" size={32} />
         </div>
       ) : filteredHistory.length === 0 ? (
-        <div className="text-center py-12 bg-white border border-slate-100 rounded-2xl shadow-sm">
+        <div className="text-center py-12 bg-surface border border-border rounded-2xl shadow-sm">
             <p className="text-fg-muted font-bold text-lg">Belum ada riwayat Try Out.</p>
-            <p className="text-sm text-slate-400 mt-2">Mulai kerjakan Try Out untuk melihat perkembangan Anda di sini.</p>
+            <p className="text-sm text-fg-muted mt-2">Mulai kerjakan Try Out untuk melihat perkembangan Anda di sini.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {filteredHistory.map((item) => {
              const pkg = AVAILABLE_PACKAGES.find(p => p.id === item.package_id);
              return (
-               <div key={item.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-md transition-shadow">
+               <div key={item.id} className="bg-surface p-5 rounded-2xl border border-border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-md transition-shadow">
                  <div>
                    <h3 className="font-bold text-fg text-lg">{pkg?.title || 'Paket Try Out'}</h3>
                    <p className="text-xs text-fg-muted font-bold mb-3">{new Date(item.completed_at).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' })}</p>
@@ -103,18 +103,18 @@ export default function TryOutHistory() {
                      <span className={`px-2.5 py-1 text-[10px] font-black tracking-wide rounded-md uppercase ${item.passed_overall ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
                        {item.passed_overall ? 'Lulus' : 'Tidak Lulus'}
                      </span>
-                     <span className="text-[11px] font-bold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100">
+                     <span className="text-[11px] font-bold text-fg-muted bg-surface-subtle px-2.5 py-1 rounded-md border border-border">
                        TWK: <span className="text-fg">{item.twk_score}</span>
                      </span>
-                     <span className="text-[11px] font-bold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100">
+                     <span className="text-[11px] font-bold text-fg-muted bg-surface-subtle px-2.5 py-1 rounded-md border border-border">
                        TIU: <span className="text-fg">{item.tiu_score}</span>
                      </span>
-                     <span className="text-[11px] font-bold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100">
+                     <span className="text-[11px] font-bold text-fg-muted bg-surface-subtle px-2.5 py-1 rounded-md border border-border">
                        TKP: <span className="text-fg">{item.tkp_score}</span>
                      </span>
                    </div>
                  </div>
-                 <div className="flex items-center gap-5 justify-between md:justify-end border-t border-slate-100 md:border-t-0 pt-4 md:pt-0 mt-2 md:mt-0">
+                  <div className="flex items-center gap-5 justify-between md:justify-end border-t border-border md:border-t-0 pt-4 md:pt-0 mt-2 md:mt-0">
                    <div className="text-left md:text-right">
                      <p className="text-[10px] text-fg-muted font-bold uppercase tracking-wider">Skor Total</p>
                      <p className="text-2xl font-black text-primary leading-none mt-1">{item.score}</p>
@@ -123,7 +123,7 @@ export default function TryOutHistory() {
                      <Link to={`/result/${item.session_id}`} className="px-4 py-1.5 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/90 text-center transition-colors">
                        Lihat Hasil
                      </Link>
-                     <Link to={`/review/${item.session_id}`} className="px-4 py-1.5 bg-slate-100 text-slate-600 font-bold text-xs rounded-lg hover:bg-slate-200 text-center transition-colors">
+                     <Link to={`/review/${item.session_id}`} className="px-4 py-1.5 bg-surface-subtle text-fg font-bold text-xs rounded-lg hover:bg-surface border border-border text-center transition-colors">
                        Pembahasan
                      </Link>
                    </div>

@@ -52,7 +52,7 @@ export interface UserProfile {
     TKP: { correct: number; total: number };
   };
     friends?: string[];       // array user_id pertemanan
-  catatan_salah?: Array<{ id: string; type: string }>;
+  catatan_salah?: Array<{ id: string; type: string; mastery?: number } | string>;
   last_spin_date?: string;
   last_claim_date?: string;
   badges?: number[];
@@ -533,84 +533,114 @@ export const fetchAvailableCharacters = async (): Promise<Character[]> => {
 
 export async function saveWrongQuestion(userId: string, questionId: string, quizType: string) {
   if (!supabase) return;
-  
-  // 1. Simpan ke tabel wrong_books
-  const { error } = await supabase.from('wrong_books').upsert({
-    user_id: userId,
-    question_id: questionId,
-    quiz_type: quizType,
-    mastery_count: 0,
-    last_attempted_at: new Date().toISOString()
-  });
-  if (error) console.error("Error saving wrong question:", error);
 
-  // 2. Sinkronkan dengan field catatan_salah di profiles menggunakan logika normalizeProfile
   const profile = await fetchProfile(userId);
   if (profile) {
     const catatan = profile.catatan_salah || [];
-    // Hindari duplikasi
-    if (!catatan.find((item: any) => (item === questionId || item?.id === questionId))) {
-      await updateProfile({ catatan_salah: [...catatan, { id: questionId, type: quizType }] });
+    // Cek duplikasi
+    const existingIndex = catatan.findIndex((item: any) => (item === questionId || item?.id === questionId));
+    if (existingIndex === -1) {
+      await updateProfile({ catatan_salah: [...catatan, { id: questionId, type: quizType, mastery: 0 }] });
+    } else {
+      // Reset mastery if answered wrong again
+      const updatedCatatan = [...catatan];
+      if (typeof updatedCatatan[existingIndex] === 'object') {
+        updatedCatatan[existingIndex].mastery = 0;
+      } else {
+        updatedCatatan[existingIndex] = { id: questionId, type: quizType, mastery: 0 };
+      }
+      await updateProfile({ catatan_salah: updatedCatatan });
     }
   }
 }
 
 export async function getWrongQuestions(userId: string, filter?: string) {
   if (!supabase) return [];
-  let query = supabase
-    .from('wrong_books')
-    .select(`
-      id, mastery_count, quiz_type, question_id,
-      questions (*)
-    `)
-    .eq('user_id', userId)
-    .lt('mastery_count', 3);
-    
-  if (filter) {
-    query = query.eq('quiz_type', filter.toUpperCase());
-  }
   
-  const { data, error } = await query;
+  const profile = await fetchProfile(userId);
+  if (!profile || !profile.catatan_salah || profile.catatan_salah.length === 0) return [];
+  
+  // Filter questions that haven't reached mastery of 3
+  const activeWrongQs = profile.catatan_salah.map((item: any) => {
+    if (typeof item === 'string') return { id: item, type: '', mastery: 0 };
+    return { id: item.id, type: item.type, mastery: item.mastery || 0 };
+  }).filter((item: any) => item.mastery < 3);
 
+  let filteredQs = activeWrongQs;
+  if (filter) {
+    filteredQs = activeWrongQs.filter((item: any) => item.type?.toUpperCase() === filter.toUpperCase());
+  }
+
+  if (filteredQs.length === 0) return [];
+
+  const questionIds = filteredQs.map((item: any) => item.id);
   
-  if (error) {
+  // Fetch question details
+  const { data: questions, error } = await supabase
+    .from('questions')
+    .select('*')
+    .in('id', questionIds);
+
+  if (error || !questions) {
     console.error("Error fetching wrong questions:", error);
     return [];
   }
-  return data;
+
+  // Format to match what WrongBook expects
+  return questions.map(q => {
+    const meta = filteredQs.find((item: any) => item.id === q.id);
+    return {
+      id: `wb_${q.id}`,
+      mastery_count: meta?.mastery || 0,
+      quiz_type: q.category,
+      question_id: q.id,
+      questions: q
+    };
+  });
 }
 
 export async function incrementMastery(userId: string, questionId: string) {
   if (!supabase) return;
-  const { error } = await supabase.rpc('increment_mastery', {
-    p_user_id: userId,
-    p_question_id: questionId
-  });
-  if (error) console.error("Error incrementing mastery:", error);
+  const profile = await fetchProfile(userId);
+  if (profile && profile.catatan_salah) {
+    let changed = false;
+    const updatedCatatan = profile.catatan_salah.map((item: any) => {
+      const id = typeof item === 'string' ? item : item.id;
+      if (id === questionId) {
+        changed = true;
+        const currentMastery = typeof item === 'string' ? 0 : (item.mastery || 0);
+        return {
+          id: id,
+          type: typeof item === 'string' ? '' : item.type,
+          mastery: currentMastery + 1
+        };
+      }
+      return item;
+    });
+
+    if (changed) {
+      await updateProfile({ catatan_salah: updatedCatatan });
+    }
+  }
 }
 
 export async function getWrongBooksStats(userId: string) {
   if (!supabase) return { twk: 0, tiu: 0, tkp: 0, total: 0 };
-  const { data, error } = await supabase
-    .from('wrong_books')
-    .select('quiz_type, mastery_count')
-    .eq('user_id', userId)
-    .lt('mastery_count', 3);
-
-  if (error) {
-    console.error("Error fetching wrong books stats:", error);
-    return { twk: 0, tiu: 0, tkp: 0, total: 0 };
-  }
-
+  
+  const profile = await fetchProfile(userId);
   const stats = { twk: 0, tiu: 0, tkp: 0, total: 0 };
-
-  data?.forEach(item => {
-    const type = item.quiz_type?.toLowerCase() as keyof typeof stats;
-    if (stats[type] !== undefined) {
-      stats[type]++;
-    }
-    stats.total++;
-  });
-
+  
+  if (profile && profile.catatan_salah) {
+    profile.catatan_salah.forEach((item: any) => {
+      const mastery = typeof item === 'string' ? 0 : (item.mastery || 0);
+      if (mastery < 3) {
+        stats.total++;
+        const type = typeof item === 'string' ? '' : (item.type || '').toUpperCase();
+        if (type === 'TWK') stats.twk++;
+        else if (type === 'TIU') stats.tiu++;
+        else if (type === 'TKP') stats.tkp++;
+      }
+    });
+  }
   return stats;
 }

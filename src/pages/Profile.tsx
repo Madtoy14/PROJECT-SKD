@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   Swords, Medal, Target, Zap, Trophy, X,
-  UserPlus, Trash2, CheckCircle2, SquarePen, Lock
+  UserPlus, Trash2, CheckCircle2, SquarePen, Lock,
+  Bot, BarChart2
 } from 'lucide-react';
 import { useDuelMatchmaking } from '../context/DuelContext';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters } from '../lib/supabase';
@@ -768,7 +769,8 @@ export default function Profile() {
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#F5A623]/5 rounded-full blur-3xl pointer-events-none" />
 
               <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-fg">
-                📊 Analisis Kemampuan & Rekomendasi AI
+                <BarChart2 size={24} className="text-primary" />
+                Analisis Kemampuan & Rekomendasi AI
               </h3>
 
               <Suspense fallback={<div className="w-full min-h-[220px] flex items-center justify-center text-fg-muted text-sm">Memuat grafik...</div>}>
@@ -809,7 +811,7 @@ export default function Profile() {
 
                   <div className="space-y-1.5 text-xs text-fg-muted leading-relaxed font-medium">
                     <p className="flex items-start gap-2">
-                      <span className="text-[#F5A623]">🤖</span>
+                      <Bot className="text-[#F5A623] shrink-0" size={16} />
                       <span>{rekomendasiAI}</span>
                     </p>
                   </div>

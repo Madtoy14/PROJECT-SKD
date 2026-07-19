@@ -1,73 +1,70 @@
-# React + TypeScript + Vite
+# SKDQuest 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SKDQuest adalah platform simulasi dan pembelajaran interaktif untuk mempersiapkan ujian Seleksi Kompetensi Dasar (SKD) CPNS. Aplikasi ini memadukan latihan soal dengan elemen **Gamifikasi** yang kuat agar proses belajar menjadi lebih menyenangkan, adiktif, dan efektif.
 
-Currently, two official plugins are available:
+## ✨ Fitur Utama
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Mode Ujian Lengkap**: Tersedia tipe soal standar SKD (TWK, TIU, TKP) yang disimulasikan semirip mungkin dengan kondisi aslinya.
+- **Sistem Gamifikasi**: Pemain dapat mengumpulkan Koin, XP (Experience Points), naik Level, serta mempertahankan *Streak* harian.
+- **Multi-Game Modes**: 
+  - **Latihan**: Mode santai untuk fokus memahami materi.
+  - **Tryout**: Simulasi penuh dengan batasan waktu yang disesuaikan.
+  - **Survival Mode**: Jawab benar untuk bertahan, energi akan terkuras drastis jika salah menjawab.
+  - **PvP / Battle**: Bertanding skor secara *real-time* melawan pemain lain atau melawan Bot.
+- **Buku Catatan Salah**: Mengarsipkan secara otomatis soal-soal yang salah dijawab, memungkinkan pengguna melakukan *drill* ulang pada kelemahannya hingga mencapai tingkat keahlian (*Mastery*).
+- **Toko & Power-ups**: Sistem *Inventory* yang berisi bantuan strategis saat kuis (seperti *50:50*, *Waktu Beku*, *Skor Ganda*, *Perisai*, dll) yang bisa dibeli menggunakan koin.
+- **Daily Spin (Klaim Harian)**: Roda keberuntungan (*Spin Wheel*) harian untuk mendapatkan hadiah tambahan seperti energi atau koin secara gratis.
+- **Liga / Leaderboard**: Peringkat pemain secara global berdasarkan akumulasi skor mereka.
+- **Responsive & PWA Ready**: Aplikasi bisa diakses lewat Desktop maupun Mobile Browser, serta dapat di-instal layaknya aplikasi native (*Progressive Web App*).
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: [React 18](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/) + [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Backend & Database**: [Supabase](https://supabase.com/) (PostgreSQL, Realtime, Edge Functions, Authentication)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Routing**: React Router DOM
 
-## Expanding the ESLint configuration
+## 📂 Struktur Direktori Utama
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `/src/pages` - Komponen halaman utama (Dashboard, Quiz, Result, Profile, Toko, dll).
+- `/src/components` - Komponen UI yang dapat digunakan kembali (*MathCard*, *AnimatedCounter*, *LoadingSkeleton*, dll).
+- `/src/lib` - Konfigurasi dan *helper functions* utilitas (Koneksi Supabase, logika *fetch* data, dll).
+- `/supabase` - Skrip SQL dan konfigurasi database Supabase.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Setup & Instalasi (Development)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Clone repository ini**
+   ```bash
+   git clone <repo-url>
+   cd project-skd
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Konfigurasi Environment**
+   Buat file `.env` di _root directory_ dan masukkan kredensial Supabase Anda:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Jalankan Aplikasi Lokal**
+   ```bash
+   npm run dev
+   ```
+   Aplikasi akan berjalan di `http://localhost:5173`.
+
+## 📦 Build (Produksi)
+
+Untuk melakukan build (kompilasi untuk _deployment_):
+```bash
+npm run build
 ```
+Hasil build akan tersimpan di dalam folder `dist/`.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+*Dibuat untuk membantu pejuang NIP.*

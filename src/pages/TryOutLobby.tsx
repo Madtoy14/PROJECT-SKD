@@ -58,17 +58,17 @@ export default function TryOutLobby() {
       </header>
 
       {/* Tabs */}
-      <div className="flex bg-slate-100 p-1 rounded-xl w-full max-w-sm mb-8 mx-auto md:mx-0">
+      <div className="flex bg-surface-subtle border border-border p-1 rounded-xl w-full max-w-sm mb-8 mx-auto md:mx-0">
         <button 
           onClick={() => setActiveTab('lobby')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'lobby' ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'lobby' ? 'bg-surface text-primary shadow-sm' : 'text-fg-muted hover:text-fg'}`}
         >
           <List size={16} />
           Daftar Paket
         </button>
         <button 
           onClick={() => setActiveTab('history')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'history' ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'history' ? 'bg-surface text-primary shadow-sm' : 'text-fg-muted hover:text-fg'}`}
         >
           <History size={16} />
           Riwayat Nilai
@@ -82,12 +82,12 @@ export default function TryOutLobby() {
             const isUnlocked = pkg.cost === 0 || (profile?.purchased_packages?.includes(pkg.id));
             
             return (
-            <div key={pkg.id} className={`bg-white border border-slate-100 rounded-2xl p-6 shadow-sm flex flex-col transition-all ${pkg.isDevelopment ? 'opacity-80 grayscale-[20%]' : 'hover:shadow-md hover:-translate-y-1'}`}>
+            <div key={pkg.id} className={`bg-surface border border-border rounded-2xl p-6 shadow-sm flex flex-col transition-all ${pkg.isDevelopment ? 'opacity-80 grayscale-[20%]' : 'hover:shadow-md hover:-translate-y-1'}`}>
               <div className="flex justify-between items-start mb-4">
-                <div className={`p-3 rounded-xl ${isUnlocked && !pkg.isDevelopment ? 'bg-primary/10 text-primary' : 'bg-slate-50 text-slate-400'}`}>
+                <div className={`p-3 rounded-xl ${isUnlocked && !pkg.isDevelopment ? 'bg-primary/10 text-primary' : 'bg-surface-subtle text-fg-muted'}`}>
                   <BookOpenCheck size={24} />
                 </div>
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${pkg.isDevelopment ? 'bg-slate-100 text-slate-500' : isUnlocked ? 'bg-emerald-50 text-success' : 'bg-slate-50 text-slate-500'}`}>
+                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${pkg.isDevelopment ? 'bg-surface-subtle text-fg-muted' : isUnlocked ? 'bg-emerald-50 text-success' : 'bg-surface-subtle text-fg-muted'}`}>
                   {pkg.isDevelopment ? <Lock size={14} /> : isUnlocked ? <Unlock size={14} /> : <Lock size={14} />}
                   {pkg.isDevelopment ? 'Dalam Pengembangan' : isUnlocked ? 'Terbuka' : 'Terkunci'}
                 </div>
@@ -135,7 +135,7 @@ export default function TryOutLobby() {
                   onClick={() => navigate('/toko')}
                 >
                   <span>Buka Akses ({pkg.cost} Koin)</span>
-                  <Lock size={18} className="text-slate-400" />
+                  <Lock size={18} className="text-fg-muted" />
                 </Button>
               )}
             </div>

@@ -144,6 +144,11 @@ function Navigation() {
                 Logout
               </button>
             </div>
+
+            {/* Sidebar Version */}
+            <div className="shrink-0 mt-2 px-4">
+              <span className="text-[10px] text-fg-muted/50 font-medium">v1.0.0</span>
+            </div>
           </nav>
         </>
       )}
@@ -205,6 +210,11 @@ function Navigation() {
             </div>
             <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Logout</span>
           </button>
+        </div>
+
+        {/* Desktop Version */}
+        <div className="px-3 group-hover:px-4 pb-3 shrink-0">
+          <span className="text-[10px] text-blue-300/40 font-medium block text-center group-hover:text-left transition-all">v1.0.0</span>
         </div>
       </nav>
     </>

@@ -161,9 +161,9 @@ export default function ReviewDetail() {
       <div className="flex flex-col flex-1 h-full min-w-0 w-full max-w-5xl mx-auto overflow-hidden">
         
         {/* Header */}
-        <header className="sticky top-0 p-3 md:p-4 flex items-center justify-between gap-3 md:gap-4 border-b border-slate-100 bg-white/90 backdrop-blur-md z-40 shadow-sm">
+        <header className="sticky top-0 p-3 md:p-4 flex items-center justify-between gap-3 md:gap-4 border-b border-border bg-surface/90 backdrop-blur-md z-40 shadow-sm">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => navigate(-1)} className="!p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full shrink-0">
+            <Button variant="ghost" onClick={() => navigate(-1)} className="!p-2 bg-surface-subtle hover:bg-surface text-fg-muted rounded-full shrink-0 border border-border">
               <X size={20} />
             </Button>
             
@@ -190,7 +190,7 @@ export default function ReviewDetail() {
             <Button 
               variant="ghost"
               onClick={() => setShowSidebarMobile(true)} 
-              className="lg:hidden !p-2 text-slate-500 hover:bg-slate-100 rounded-full shrink-0"
+              className="lg:hidden !p-2 text-fg-muted hover:bg-surface-subtle rounded-full shrink-0"
             >
               <Menu size={20} />
             </Button>
@@ -207,7 +207,7 @@ export default function ReviewDetail() {
                 </div>
               )}
               
-              <div className="bg-white rounded-3xl p-8 md:px-12 md:py-10 border border-slate-100 shadow-sm mb-6 mt-2 md:mt-4">
+              <div className="bg-surface rounded-3xl p-8 md:px-12 md:py-10 border border-border shadow-sm mb-6 mt-2 md:mt-4">
                 <p className="text-lg font-semibold leading-loose text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.text) }} />
               </div>
 
@@ -218,8 +218,8 @@ export default function ReviewDetail() {
                   const isTKP = currentQuestion.category === 'TKP';
                   const isCorrect = isTKP ? (opt.score === 5) : (opt.id === currentQuestion.correct);
                   
-                  let cardClass = 'bg-white border-slate-200 opacity-60';
-                  let markerClass = 'bg-slate-100 text-slate-600 font-bold';
+                  let cardClass = 'bg-surface border-border opacity-60';
+                  let markerClass = 'bg-surface-subtle text-fg-muted font-bold';
 
                   if (isCorrect) {
                     cardClass = 'bg-emerald-50 border-emerald-500 shadow-sm';
@@ -266,7 +266,7 @@ export default function ReviewDetail() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center mt-6 pt-6 border-t border-slate-100">
+              <div className="flex justify-between items-center mt-6 pt-6 border-t border-border">
                 <Button
                   variant="ghost"
                   onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
@@ -328,7 +328,7 @@ export default function ReviewDetail() {
                         } else if (status === 'incorrect') {
                           btnClass = 'bg-rose-50 text-destructive border-rose-200';
                         } else if (status === 'empty') {
-                          btnClass = 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50';
+                          btnClass = 'bg-surface text-fg-muted border-border hover:bg-surface-subtle';
                         }
 
                         return (
@@ -362,7 +362,7 @@ export default function ReviewDetail() {
                   >
               <div className="p-4 border-b border-border flex items-center justify-between">
                 <h3 className="font-bold text-fg">Navigasi Soal</h3>
-                <Button variant="ghost" onClick={() => setShowSidebarMobile(false)} className="!p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full">
+                <Button variant="ghost" onClick={() => setShowSidebarMobile(false)} className="!p-2 bg-surface-subtle hover:bg-surface text-fg-muted rounded-full">
                   <X size={20} />
                 </Button>
               </div>
@@ -399,7 +399,7 @@ export default function ReviewDetail() {
                               } else if (status === 'incorrect') {
                                 btnClass = 'bg-rose-50 text-destructive border-rose-200';
                               } else if (status === 'empty') {
-                                btnClass = 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50';
+                                btnClass = 'bg-surface text-fg-muted border-border hover:bg-surface-subtle';
                               }
 
                               return (

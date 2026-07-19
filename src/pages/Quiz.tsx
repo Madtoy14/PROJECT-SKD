@@ -523,9 +523,9 @@ export default function Quiz() {
 
   // --- Timer Sync (Hardcore Anti-Cheat) ---
   useEffect(() => {
-    if (isGameOver || !activeSession?.startedAt) return;
+    if (isGameOver || !activeSession?.id) return;
     
-    // Jika waktuBeku aktif, timer berhenti secara visual (server sudah di-offset +5 detik)
+    // Jika waktuBeku aktif, timer berhenti secara visual
     if (activePowerUps.waktuBeku) {
       return;
     }
@@ -537,14 +537,10 @@ export default function Quiz() {
     }
 
     const t = setTimeout(() => {
-      const now = Date.now();
-      const start = new Date(activeSession.startedAt).getTime();
-      const elapsed = Math.floor((now - start) / 1000);
-      const newTimeLeft = Math.max(0, TOTAL_TIME - elapsed);
-      setTimeLeft(newTimeLeft);
+      setTimeLeft(prev => Math.max(0, prev - 1));
     }, 1000);
     return () => clearTimeout(t);
-  }, [timeLeft, isGameOver, gameMode, activePowerUps.waktuBeku, activeSession?.startedAt, TOTAL_TIME]);
+  }, [timeLeft, isGameOver, gameMode, activePowerUps.waktuBeku, activeSession?.id]);
   // --- Simulate Bot AI answering ---
   useEffect(() => {
     if (gameMode !== 'pvp_bot' || !currentQuestion) return;
@@ -977,7 +973,7 @@ const scoreBadge = (optionId: string) => {
             <Button
               variant="ghost"
               onClick={() => navigate('/', { replace: true })}
-              className="px-8 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black rounded-xl transition-all text-sm"
+              className="px-8 py-3 bg-surface-subtle hover:bg-surface text-fg-muted font-black rounded-xl transition-all text-sm"
             >
               Kembali ke Beranda
             </Button>
@@ -1018,9 +1014,9 @@ const scoreBadge = (optionId: string) => {
         {/* === Quiz Panel === */}
         <div className="flex flex-col flex-1 h-full min-w-0 w-full max-w-5xl mx-auto">
           {/* Header */}
-          <header className={`sticky top-0 p-3 md:p-4 flex items-center justify-between gap-3 md:gap-4 border-b z-40 shadow-sm backdrop-blur-md ${gameMode === 'survival' ? 'border-rose-200 bg-rose-50/90' : 'border-slate-100 bg-white/90'}`}>
+          <header className={`sticky top-0 p-3 md:p-4 flex items-center justify-between gap-3 md:gap-4 border-b z-40 shadow-sm backdrop-blur-md ${gameMode === 'survival' ? 'border-danger bg-danger-subtle/90' : 'border-border bg-surface/90'}`}>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" onClick={() => setShowExitConfirm(true)} className="!p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full shrink-0">
+              <Button variant="ghost" onClick={() => setShowExitConfirm(true)} className="!p-2 bg-surface-subtle hover:bg-surface text-fg-muted rounded-full shrink-0 border border-border">
                 <X size={20} />
               </Button>
               
@@ -1049,7 +1045,7 @@ const scoreBadge = (optionId: string) => {
             </div>
 
             <div className="flex-1 hidden md:block px-6">
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden w-full max-w-md mx-auto">
+              <div className="h-2 bg-surface-subtle rounded-full overflow-hidden w-full max-w-md mx-auto">
                 <div
                   className="h-full bg-primary rounded-full transition-all duration-500"
                   style={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
@@ -1070,13 +1066,13 @@ const scoreBadge = (optionId: string) => {
               )}
               <div className="relative w-14 h-10 flex items-center justify-center" role="timer" aria-label={`Sisa waktu ${timeLeft} detik`} aria-live="off">
                 {gameMode === 'tryout' ? (
-                  <div className={`font-space font-bold text-xs bg-white px-2 py-1 rounded-md border border-slate-200 ${timerColor}`}>
+                  <div className={`font-space font-bold text-xs bg-surface px-2 py-1 rounded-md border border-border ${timerColor}`}>
                     {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
                   </div>
                 ) : (
                   <>
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 40 40">
-                      <circle cx="20" cy="20" r="18" fill="none" className="stroke-slate-100" strokeWidth="3" />
+                      <circle cx="20" cy="20" r="18" fill="none" className="stroke-surface-subtle" strokeWidth="3" />
                       <circle
                         cx="20" cy="20" r="18" fill="none"
                         className={`stroke-current transition-all duration-1000 ease-linear ${timerColor}`}
@@ -1093,7 +1089,7 @@ const scoreBadge = (optionId: string) => {
                 <Button 
                   variant="ghost"
                   onClick={() => setShowSidebarMobile(true)} 
-                  className="lg:hidden !p-2 text-slate-500 hover:bg-slate-100 rounded-full shrink-0"
+                  className="lg:hidden !p-2 text-fg-muted hover:bg-surface-subtle rounded-full shrink-0"
                 >
                   <Menu size={20} />
                 </Button>
@@ -1125,7 +1121,7 @@ const scoreBadge = (optionId: string) => {
                     <span className="text-fg-muted">Setiap pilihan memiliki bobot poin berbeda (10–50).</span>
                   </div>
                 )}
-                <div className="bg-white rounded-3xl p-8 md:px-12 md:py-10 border border-slate-100 shadow-sm mb-6 mt-2 md:mt-4">
+                <div className="bg-surface rounded-3xl p-8 md:px-12 md:py-10 border border-border shadow-sm mb-6 mt-2 md:mt-4">
                   <p className="text-[20px] font-semibold leading-[1.6] text-fg" dangerouslySetInnerHTML={{ __html: cleanedQuestionText }} />
                 </div>
                 {/* Bocoran Rumus Hint Box */}
@@ -1144,8 +1140,8 @@ const scoreBadge = (optionId: string) => {
                     const isCorrect  = opt.id === currentQuestion.correct;
                     const showStatus = selected !== null;
                     const isTKP = currentQuestion.category === 'TKP';
-                    let cardClass = 'bg-white border-slate-200 hover:border-blue-300 hover:bg-blue-50/30';
-                    let markerClass = 'bg-slate-100 text-slate-600 font-bold';
+                    let cardClass = 'bg-surface border-border hover:border-primary hover:bg-primary/10';
+                    let markerClass = 'bg-surface-subtle text-fg-muted font-bold';
                     
                     if (gameMode === 'tryout') {
                       if (isSelected) {
@@ -1166,7 +1162,7 @@ const scoreBadge = (optionId: string) => {
                             cardClass = 'bg-emerald-50 border-emerald-500 shadow-sm opacity-60';
                             markerClass = 'bg-emerald-500 text-white';
                         } else {
-                            cardClass = 'bg-white border-slate-200 opacity-40';
+                            cardClass = 'bg-surface border-border opacity-40';
                         }
                       } else {
                         if (isCorrect) {
@@ -1176,7 +1172,7 @@ const scoreBadge = (optionId: string) => {
                           cardClass = 'bg-rose-50 border-destructive shadow-sm';
                           markerClass = 'bg-destructive text-white';
                         } else {
-                          cardClass = 'bg-white border-slate-200 opacity-40';
+                          cardClass = 'bg-surface border-border opacity-40';
                         }
                       }
                     }
@@ -1328,7 +1324,7 @@ const scoreBadge = (optionId: string) => {
 
           {/* Quick Slots (Power Ups) at the bottom */}
           {gameMode !== 'tryout' && profile && (
-            <div className="flex gap-4 px-4 py-3 border-t border-slate-100 bg-white/50 backdrop-blur-md overflow-x-auto shrink-0 mt-auto shadow-[0_-4px_20px_rgba(0,0,0,0.02)] relative z-30">
+            <div className="flex gap-4 px-4 py-3 border-t border-border bg-surface/50 backdrop-blur-md overflow-x-auto shrink-0 mt-auto shadow-[0_-4px_20px_rgba(0,0,0,0.02)] relative z-30">
               {profile.inventory?.item_5050 > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_5050') && (
                 <Button variant="custom" onClick={use5050} disabled={!checkPowerupLimit('item_5050')} aria-label={`50:50 - Hapus 2 jawaban salah - ${profile.inventory.item_5050} tersisa ${!checkPowerupLimit('item_5050') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary transition-colors border border-blue-100 shadow-sm min-h-[36px] ${!checkPowerupLimit('item_5050') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-blue-100'}`}><Scale size={14}/> 50:50<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-primary text-white">{profile.inventory.item_5050}</span></Button>
               )}
@@ -1336,13 +1332,13 @@ const scoreBadge = (optionId: string) => {
                 <Button variant="custom" onClick={useHint} disabled={!checkPowerupLimit('item_hint')} aria-label={`Petunjuk - Tampilkan hint rumus - ${profile.inventory.item_hint} tersisa ${!checkPowerupLimit('item_hint') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-amber-50 text-warning transition-colors border border-amber-100 shadow-sm min-h-[36px] ${!checkPowerupLimit('item_hint') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-amber-100'}`}><Lightbulb size={14}/> Petunjuk<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-warning text-white">{profile.inventory.item_hint}</span></Button>
               )}
               {profile.inventory?.item_waktu_beku > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_waktu_beku') && (
-                <Button variant="custom" onClick={useWaktuBeku} disabled={!checkPowerupLimit('item_waktu_beku')} aria-label={`Waktu Beku - Hentikan timer - ${profile.inventory.item_waktu_beku} tersisa ${activePowerUps.waktuBeku ? '(aktif)' : ''} ${!checkPowerupLimit('item_waktu_beku') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border min-h-[36px] ${!checkPowerupLimit('item_waktu_beku') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.waktuBeku ? 'bg-cyan-50 border-cyan-200 text-cyan-600 shadow-inner ring-2 ring-cyan-400' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Clock size={14}/> Waktu Beku<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-cyan-500 text-white">{profile.inventory.item_waktu_beku}</span></Button>
+                <Button variant="custom" onClick={useWaktuBeku} disabled={!checkPowerupLimit('item_waktu_beku')} aria-label={`Waktu Beku - Hentikan timer - ${profile.inventory.item_waktu_beku} tersisa ${activePowerUps.waktuBeku ? '(aktif)' : ''} ${!checkPowerupLimit('item_waktu_beku') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border min-h-[36px] ${!checkPowerupLimit('item_waktu_beku') ? 'opacity-50 grayscale cursor-not-allowed bg-surface-subtle text-fg-muted border-border' : activePowerUps.waktuBeku ? 'bg-cyan-50 border-cyan-200 text-cyan-600 shadow-inner ring-2 ring-cyan-400' : 'bg-surface border-border text-fg-muted hover:bg-surface-subtle shadow-sm'}`}><Clock size={14}/> Waktu Beku<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-cyan-500 text-white">{profile.inventory.item_waktu_beku}</span></Button>
               )}
               {profile.inventory?.item_skor_ganda > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_skor_ganda') && (
-                <Button variant="custom" onClick={useSkorGanda} disabled={!checkPowerupLimit('item_skor_ganda')} aria-label={`Skor Ganda - Poin ×2 - ${profile.inventory.item_skor_ganda} tersisa ${activePowerUps.skorGanda ? '(aktif)' : ''} ${!checkPowerupLimit('item_skor_ganda') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border min-h-[36px] ${!checkPowerupLimit('item_skor_ganda') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.skorGanda ? 'bg-amber-50 border-amber-200 text-warning shadow-inner ring-2 ring-amber-400' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Zap size={14}/> Skor Ganda<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-warning text-white">{profile.inventory.item_skor_ganda}</span></Button>
+                <Button variant="custom" onClick={useSkorGanda} disabled={!checkPowerupLimit('item_skor_ganda')} aria-label={`Skor Ganda - Poin ×2 - ${profile.inventory.item_skor_ganda} tersisa ${activePowerUps.skorGanda ? '(aktif)' : ''} ${!checkPowerupLimit('item_skor_ganda') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border min-h-[36px] ${!checkPowerupLimit('item_skor_ganda') ? 'opacity-50 grayscale cursor-not-allowed bg-surface-subtle text-fg-muted border-border' : activePowerUps.skorGanda ? 'bg-amber-50 border-amber-200 text-warning shadow-inner ring-2 ring-amber-400' : 'bg-surface border-border text-fg-muted hover:bg-surface-subtle shadow-sm'}`}><Zap size={14}/> Skor Ganda<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-warning text-white">{profile.inventory.item_skor_ganda}</span></Button>
               )}
               {profile.inventory?.item_terawangan > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_terawangan') && (
-                <Button variant="custom" onClick={useTerawangan} disabled={!checkPowerupLimit('item_terawangan')} aria-label={`Terawangan - Lihat persentase jawaban - ${profile.inventory.item_terawangan} tersisa ${activePowerUps.terawangan ? '(aktif)' : ''} ${!checkPowerupLimit('item_terawangan') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border min-h-[36px] ${!checkPowerupLimit('item_terawangan') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.terawangan ? 'bg-purple-50 border-purple-200 text-purple-600 shadow-inner ring-2 ring-purple-400' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Eye size={14}/> Terawangan<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-purple-500 text-white">{profile.inventory.item_terawangan}</span></Button>
+                <Button variant="custom" onClick={useTerawangan} disabled={!checkPowerupLimit('item_terawangan')} aria-label={`Terawangan - Lihat persentase jawaban - ${profile.inventory.item_terawangan} tersisa ${activePowerUps.terawangan ? '(aktif)' : ''} ${!checkPowerupLimit('item_terawangan') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border min-h-[36px] ${!checkPowerupLimit('item_terawangan') ? 'opacity-50 grayscale cursor-not-allowed bg-surface-subtle text-fg-muted border-border' : activePowerUps.terawangan ? 'bg-purple-50 border-purple-200 text-purple-600 shadow-inner ring-2 ring-purple-400' : 'bg-surface border-border text-fg-muted hover:bg-surface-subtle shadow-sm'}`}><Eye size={14}/> Terawangan<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-purple-500 text-white">{profile.inventory.item_terawangan}</span></Button>
               )}
               {profile.inventory?.item_tinta_hitam > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_tinta_hitam') && (
                 <Button variant="custom" onClick={useTintaHitam} disabled={!checkPowerupLimit('item_tinta_hitam')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-rose-50 text-destructive transition-colors border border-rose-100 shrink-0 shadow-sm ${!checkPowerupLimit('item_tinta_hitam') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-rose-100'}`}><Skull size={14}/> Tinta Hitam ({profile.inventory.item_tinta_hitam})</Button>
@@ -1351,7 +1347,7 @@ const scoreBadge = (optionId: string) => {
                 <Button variant="custom" onClick={useLompatanKilat} disabled={!checkPowerupLimit('item_lompatan_kilat')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary transition-colors border border-blue-100 shrink-0 shadow-sm ${!checkPowerupLimit('item_lompatan_kilat') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-blue-100'}`}><Zap size={14}/> Lompatan Kilat ({profile.inventory.item_lompatan_kilat})</Button>
               )}
               {(profile.inventory?.item_kesempatan_kedua > 0 || profile.inventory?.item_shield > 0) && ALLOWED_POWER_UPS[gameMode]?.includes('item_kesempatan_kedua') && (
-                <Button variant="custom" onClick={togglePerisai} disabled={!checkPowerupLimit('item_kesempatan_kedua') && !checkPowerupLimit('item_shield')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border shrink-0 ${(!checkPowerupLimit('item_kesempatan_kedua') && !checkPowerupLimit('item_shield')) ? 'opacity-50 grayscale bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : activePowerUps.perisaiActive ? 'bg-emerald-50 text-emerald-600 border-emerald-200 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Shield size={14}/> Perisai ({(profile.inventory.item_kesempatan_kedua || 0) + (profile.inventory.item_shield || 0)})</Button>
+                <Button variant="custom" onClick={togglePerisai} disabled={!checkPowerupLimit('item_kesempatan_kedua') && !checkPowerupLimit('item_shield')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border shrink-0 ${(!checkPowerupLimit('item_kesempatan_kedua') && !checkPowerupLimit('item_shield')) ? 'opacity-50 grayscale bg-surface-subtle text-fg-muted border-border cursor-not-allowed' : activePowerUps.perisaiActive ? 'bg-success-subtle text-success border-success shadow-inner' : 'bg-surface border-border text-fg-muted hover:bg-surface-subtle shadow-sm'}`}><Shield size={14}/> Perisai ({(profile.inventory.item_kesempatan_kedua || 0) + (profile.inventory.item_shield || 0)})</Button>
               )}
             </div>
           )}
@@ -1488,7 +1484,7 @@ const scoreBadge = (optionId: string) => {
                   <Button 
                     variant="ghost"
                     onClick={() => setShowSidebarMobile(false)}
-                    className="!p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full"
+                    className="!p-2 bg-surface-subtle hover:bg-surface text-fg-muted rounded-full"
                   >
                     <X size={20} />
                   </Button>

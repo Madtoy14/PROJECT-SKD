@@ -164,9 +164,9 @@ function QuickReviewItem({
   const [showExplanation, setShowExplanation] = useState(false);
 
   const statusConfig = {
-    correct: { icon: <CheckCircle size={15} className="text-emerald-500" />, bg: 'bg-emerald-50 border-emerald-200' },
-    wrong:   { icon: <XCircle size={15} className="text-rose-500" />,    bg: 'bg-rose-50 border-rose-200' },
-    empty:   { icon: <Circle size={15} className="text-slate-400" />,    bg: 'bg-slate-50 border-slate-200' },
+    correct: { icon: <CheckCircle size={15} className="text-success" />, bg: 'bg-success-subtle border-success' },
+    wrong:   { icon: <XCircle size={15} className="text-danger" />,    bg: 'bg-danger-subtle border-danger' },
+    empty:   { icon: <Circle size={15} className="text-fg-muted" />,    bg: 'bg-surface-subtle border-border' },
   };
 
   const { icon, bg } = statusConfig[status];
@@ -203,19 +203,19 @@ function QuickReviewItem({
           {status !== 'correct' && question.category !== 'TKP' && (
             <div className="flex flex-col gap-0.5 mt-1">
               {status === 'wrong' && selectedOpt && (
-                <div className="flex items-center gap-1 text-[10px] text-rose-600 font-bold">
+                <div className="flex items-center gap-1 text-[10px] text-danger font-bold">
                   <XCircle size={10} />
                   <span>Jawabanmu: {selectedOpt.text || selectedOpt.id}</span>
                 </div>
               )}
               {status === 'empty' && (
-                <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold">
+                <div className="flex items-center gap-1 text-[10px] text-fg-muted font-bold">
                   <Circle size={10} />
                   <span>Tidak dijawab</span>
                 </div>
               )}
               {correctOpt && (
-                <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold">
+                <div className="flex items-center gap-1 text-[10px] text-success font-bold">
                   <CheckCircle size={10} />
                   <span>Kunci: {correctOpt.text || correctOpt.id}</span>
                 </div>
@@ -507,7 +507,7 @@ export default function Result() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-5xl font-black text-fg font-space"><AnimatedCounter end={score} /></span>
-                <span className="text-xs font-bold text-slate-500 tracking-widest mt-1">TOTAL SKOR</span>
+                <span className="text-xs font-bold text-fg-muted tracking-widest mt-1">TOTAL SKOR</span>
               </div>
             </div>
           </div>
@@ -663,20 +663,20 @@ export default function Result() {
         {/* Stats Grid */}
         {!isTryout && quizQuestions && (
           <div className="grid grid-cols-3 gap-3 md:gap-4 w-full max-w-xl mb-6">
-            <div className="bg-emerald-50 border border-emerald-200 p-4 md:p-6 rounded-2xl flex flex-col items-center shadow-sm">
-              <CheckCircle className="text-emerald-600 mb-2" size={32} />
-              <div className="text-3xl md:text-4xl font-black font-space text-emerald-700">{correctCount}</div>
-              <p className="text-xs md:text-sm text-emerald-600 font-bold uppercase tracking-wider mt-1">Benar</p>
+            <div className="bg-success-subtle border border-success p-4 md:p-6 rounded-2xl flex flex-col items-center shadow-sm">
+              <CheckCircle className="text-success mb-2" size={32} />
+              <div className="text-3xl md:text-4xl font-black font-space text-success">{correctCount}</div>
+              <p className="text-xs md:text-sm text-success font-bold uppercase tracking-wider mt-1">Benar</p>
             </div>
-            <div className="bg-rose-50 border border-rose-200 p-4 md:p-6 rounded-2xl flex flex-col items-center shadow-sm">
-              <XCircle className="text-destructive mb-2" size={32} />
-              <div className="text-3xl md:text-4xl font-black font-space text-rose-700">{incorrectCount}</div>
-              <p className="text-xs md:text-sm text-destructive font-bold uppercase tracking-wider mt-1">Salah</p>
+            <div className="bg-danger-subtle border border-danger p-4 md:p-6 rounded-2xl flex flex-col items-center shadow-sm">
+              <XCircle className="text-danger mb-2" size={32} />
+              <div className="text-3xl md:text-4xl font-black font-space text-danger">{incorrectCount}</div>
+              <p className="text-xs md:text-sm text-danger font-bold uppercase tracking-wider mt-1">Salah</p>
             </div>
-            <div className="bg-slate-50 border border-slate-200 p-4 md:p-6 rounded-2xl flex flex-col items-center shadow-sm">
-              <Circle className="text-slate-500 mb-2" size={32} />
-              <div className="text-3xl md:text-4xl font-black font-space text-fg">{emptyCount}</div>
-              <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wider mt-1">Kosong</p>
+            <div className="bg-surface-subtle border border-border p-4 md:p-6 rounded-2xl flex flex-col items-center shadow-sm">
+              <Circle className="text-fg-muted mb-2" size={32} />
+              <div className="text-3xl md:text-4xl font-black font-space text-fg-muted">{emptyCount}</div>
+              <p className="text-xs md:text-sm text-fg-muted font-bold uppercase tracking-wider mt-1">Kosong</p>
             </div>
           </div>
         )}
@@ -725,7 +725,7 @@ export default function Result() {
                 const reviewPkg = resultData.package_id || 'latihan';
                 navigate(`/review/${reviewPkg}/${attemptId}`);
               }}
-              className="w-full py-4 rounded-2xl shadow-sm border-2 border-slate-200 text-fg hover:bg-slate-50 hover:border-blue-200 active:scale-[0.99] font-bold flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl shadow-sm border-2 border-border text-fg hover:bg-surface-subtle hover:border-primary active:scale-[0.99] font-bold flex items-center justify-center gap-2"
             >
               <BookOpen size={18} />
               Lihat Pembahasan Detail Lengkap
