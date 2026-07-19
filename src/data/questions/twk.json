@@ -8,7 +8,7 @@
       {
         "id": "A",
         "text": "Mengutamakan kepentingan pribadi dan golongan di atas kepentingan negara",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -18,17 +18,17 @@
       {
         "id": "C",
         "text": "Mengikuti perintah atasan tanpa mempertimbangkan dampak terhadap masyarakat",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "Bersikap acuh tak acuh terhadap isu-isu yang menyangkut kedaulatan negara",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "Hanya loyal kepada instansi tempat bekerja tanpa peduli kondisi nasional",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -45,7 +45,7 @@
       {
         "id": "A",
         "text": "Menerima uang tersebut karena nominal kecil dan tidak merugikan negara secara langsung",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -55,17 +55,17 @@
       {
         "id": "C",
         "text": "Menerima uang namun melaporkannya kepada bendahara instansi",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "Menunda proses perizinan hingga mendapat petunjuk dari atasan",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "Meminta pendapat rekan kerja terlebih dahulu sebelum mengambil keputusan",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -82,7 +82,7 @@
       {
         "id": "A",
         "text": "Pancasila dapat diubah melalui referendum jika disetujui mayoritas rakyat",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -92,17 +92,17 @@
       {
         "id": "C",
         "text": "Pancasila hanya berlaku sebagai pedoman moral, bukan norma hukum yang mengikat",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "Pengadilan dapat mengenyampingkan Pancasila jika bertentangan dengan hukum internasional",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "Pancasila berlaku setara kedudukannya dengan UUD 1945",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -119,7 +119,7 @@
       {
         "id": "A",
         "text": "Mengikuti latihan militer secara sukarela setiap akhir pekan",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -129,17 +129,17 @@
       {
         "id": "C",
         "text": "Membeli produk-produk dalam negeri untuk mendukung perekonomian nasional",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "Menghindari penggunaan media sosial agar tidak terpapar konten negatif",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "Melaporkan warga negara asing yang dicurigai kepada pihak berwenang",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -156,7 +156,7 @@
       {
         "id": "A",
         "text": "Privatisasi seluruh sumber daya alam kepada pihak swasta asing",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -166,17 +166,17 @@
       {
         "id": "C",
         "text": "Pemberian hak kepemilikan penuh sumber daya alam kepada pemerintah daerah",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "Larangan total investasi asing di sektor pertambangan dan energi",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "Kewenangan individu untuk mengelola sumber daya alam di wilayahnya",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -198,22 +198,22 @@
       {
         "id": "B",
         "text": "kegiatan ekonomi nasional",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
         "text": "pemilihan umum",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "program pemerintah",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "kegiatan sosial",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
@@ -230,7 +230,7 @@
       {
         "id": "A",
         "text": "memihak kelompok mayoritas",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -240,17 +240,17 @@
       {
         "id": "C",
         "text": "menghindari diskusi tentang perbedaan",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "mengikuti kebijakan atasan saja",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "melaporkan perbedaan ke HRD",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -267,7 +267,7 @@
       {
         "id": "A",
         "text": "bernegara satu",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -277,17 +277,17 @@
       {
         "id": "C",
         "text": "berpendidikan satu",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "berbudaya satu",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "beragama satu",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -304,12 +304,12 @@
       {
         "id": "A",
         "text": "mendukung partai politik tertentu",
-        "score": 0
+        "score": 2
       },
       {
         "id": "B",
         "text": "mengutamakan kepentingan daerah asal",
-        "score": 0
+        "score": 4
       },
       {
         "id": "C",
@@ -319,12 +319,12 @@
       {
         "id": "D",
         "text": "menolak kebijakan yang tidak disukai",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "mengikuti demonstrasi politik",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "C",
@@ -346,22 +346,22 @@
       {
         "id": "B",
         "text": "15 Agustus 1945",
-        "score": 0
+        "score": 1
       },
       {
         "id": "C",
         "text": "18 Agustus 1945",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "20 Agustus 1945",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "1 Juni 1945",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "A",
@@ -383,22 +383,22 @@
       {
         "id": "B",
         "text": "1 ayat 2",
-        "score": 0
+        "score": 4
       },
       {
         "id": "C",
         "text": "4 ayat 1",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "27 ayat 1",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "33 ayat 1",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
@@ -415,7 +415,7 @@
       {
         "id": "A",
         "text": "membeli produk luar negeri",
-        "score": 0
+        "score": 2
       },
       {
         "id": "B",
@@ -425,17 +425,17 @@
       {
         "id": "C",
         "text": "mendukung tim sepak bola nasional",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "memasang bendera setiap hari",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "menggunakan bahasa daerah saja",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -457,22 +457,22 @@
       {
         "id": "B",
         "text": "lebih dari 1.700",
-        "score": 0
+        "score": 4
       },
       {
         "id": "C",
         "text": "lebih dari 7.000",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "lebih dari 27.000",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "lebih dari 700",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
@@ -494,22 +494,22 @@
       {
         "id": "B",
         "text": "36B",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
         "text": "35",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "36",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "37",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
@@ -531,22 +531,22 @@
       {
         "id": "B",
         "text": "nilai budaya lokal",
-        "score": 0
+        "score": 4
       },
       {
         "id": "C",
         "text": "kepentingan ekonomi",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "kondisi geografis semata",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "perkembangan global",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "A",
@@ -563,7 +563,7 @@
       {
         "id": "A",
         "text": "menerima karena pengadaan sudah selesai",
-        "score": 0
+        "score": 2
       },
       {
         "id": "B",
@@ -573,17 +573,17 @@
       {
         "id": "C",
         "text": "menerima tapi tidak dilaporkan",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "menyimpan untuk keperluan kantor",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "mengembalikan setengahnya",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -605,22 +605,22 @@
       {
         "id": "B",
         "text": "kepintaran dan kecepatan kerja",
-        "score": 0
+        "score": 3
       },
       {
         "id": "C",
         "text": "kedekatan dengan atasan",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "kemampuan teknis semata",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "pengalaman kerja panjang",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "A",
@@ -637,7 +637,7 @@
       {
         "id": "A",
         "text": "bekerja lembur tanpa bayaran",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -647,17 +647,17 @@
       {
         "id": "C",
         "text": "mengikuti pelatihan mandiri",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "membantu rekan kerja",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "mengajukan cuti tahunan",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -674,7 +674,7 @@
       {
         "id": "A",
         "text": "pejabat tidak perlu melapor ke bawahan",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -684,17 +684,17 @@
       {
         "id": "C",
         "text": "hanya laporan keuangan yang penting",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "pimpinan tidak perlu diaudit",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "kerahasiaan data terjaga sepenuhnya",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -711,7 +711,7 @@
       {
         "id": "A",
         "text": "pegawai yang sering absen",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -721,17 +721,17 @@
       {
         "id": "C",
         "text": "pegawai teladan bulan ini",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "atasan yang menegur bawahan",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "auditor eksternal",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -748,12 +748,12 @@
       {
         "id": "A",
         "text": "memperlambat birokrasi",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
         "text": "mempersulit akses masyarakat",
-        "score": 0
+        "score": 3
       },
       {
         "id": "C",
@@ -763,12 +763,12 @@
       {
         "id": "D",
         "text": "mengurangi anggaran operasional",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "menambah beban kerja pegawai",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "C",
@@ -790,22 +790,22 @@
       {
         "id": "B",
         "text": "Rp 1.000.000",
-        "score": 0
+        "score": 1
       },
       {
         "id": "C",
         "text": "Rp 5.000.000",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "Rp 10.000.000",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "Rp 2.000.000",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
@@ -822,12 +822,12 @@
       {
         "id": "A",
         "text": "menerima uang terima kasih dari masyarakat",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
         "text": "menggunakan fasilitas kantor untuk kepentingan pribadi",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
@@ -837,12 +837,12 @@
       {
         "id": "D",
         "text": "memanipulasi absensi",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "mencari celah dalam peraturan",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "C",
@@ -859,7 +859,7 @@
       {
         "id": "A",
         "text": "BPK",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -869,17 +869,17 @@
       {
         "id": "C",
         "text": "BPKP",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "Kejaksaan saja",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "Kepolisian saja",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -896,7 +896,7 @@
       {
         "id": "A",
         "text": "membatasi kreativitas pegawai",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -906,17 +906,17 @@
       {
         "id": "C",
         "text": "mempersulit proses promosi jabatan",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "mengawasi kehidupan pribadi pegawai",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "meningkatkan beban kerja",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -933,7 +933,7 @@
       {
         "id": "A",
         "text": "mengikuti wajib militer",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -943,17 +943,17 @@
       {
         "id": "C",
         "text": "menghindari pajak",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "tinggal di luar negeri",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "hanya mengikuti upacara bendera",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -970,7 +970,7 @@
       {
         "id": "A",
         "text": "TNI dan Polri",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -980,17 +980,17 @@
       {
         "id": "C",
         "text": "hanya pegawai pemerintah",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "relawan militer",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "semua warga negara secara otomatis",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -1012,22 +1012,22 @@
       {
         "id": "B",
         "text": "34 Tahun 2004",
-        "score": 0
+        "score": 1
       },
       {
         "id": "C",
         "text": "2 Tahun 2002",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "7 Tahun 2012",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "17 Tahun 2011",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
@@ -1044,7 +1044,7 @@
       {
         "id": "A",
         "text": "serangan bersenjata",
-        "score": 0
+        "score": 2
       },
       {
         "id": "B",
@@ -1054,17 +1054,17 @@
       {
         "id": "C",
         "text": "perang konvensional",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "invasi militer asing",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "pembajakan kapal",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -1081,7 +1081,7 @@
       {
         "id": "A",
         "text": "membeli senjata",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1091,17 +1091,17 @@
       {
         "id": "C",
         "text": "menolak budaya asing seluruhnya",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "berlatih militer",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "bergabung dalam organisasi bersenjata",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -1118,7 +1118,7 @@
       {
         "id": "A",
         "text": "hanya TNI yang bertanggung jawab",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1128,17 +1128,17 @@
       {
         "id": "C",
         "text": "hanya wajib bagi laki-laki",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "pertahanan diserahkan ke swasta",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "pertahanan berbasis teknologi saja",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1155,7 +1155,7 @@
       {
         "id": "A",
         "text": "membeli produk impor bermerek",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1165,17 +1165,17 @@
       {
         "id": "C",
         "text": "berwisata ke luar negeri",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "menolak semua budaya asing",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "hanya berbicara dalam bahasa daerah",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -1192,7 +1192,7 @@
       {
         "id": "A",
         "text": "mengutamakan kepentingan pribadi",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1202,17 +1202,17 @@
       {
         "id": "C",
         "text": "hanya patuh pada hukum formal",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "menolak perbedaan pendapat",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "mendukung satu kelompok saja",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1229,7 +1229,7 @@
       {
         "id": "A",
         "text": "Polri",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1239,17 +1239,17 @@
       {
         "id": "C",
         "text": "BIN",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "Satpol PP",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "BNPT",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1266,7 +1266,7 @@
       {
         "id": "A",
         "text": "mengerjakan tugas minimal",
-        "score": 0
+        "score": 2
       },
       {
         "id": "B",
@@ -1276,17 +1276,17 @@
       {
         "id": "C",
         "text": "meminta kompensasi atas setiap pekerjaan tambahan",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "menolak tugas di luar jam kerja",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "mencari jabatan yang lebih tinggi",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1303,7 +1303,7 @@
       {
         "id": "A",
         "text": "Batang Tubuh UUD 1945",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -1313,17 +1313,17 @@
       {
         "id": "C",
         "text": "Penjelasan UUD 1945",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "TAP MPR",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "Ketetapan Presiden",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -1340,17 +1340,17 @@
       {
         "id": "A",
         "text": "Ketuhanan Yang Maha Esa",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
         "text": "Kemanusiaan yang adil dan beradab",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
         "text": "Persatuan Indonesia",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
@@ -1360,7 +1360,7 @@
       {
         "id": "E",
         "text": "Keadilan sosial bagi seluruh rakyat Indonesia",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "D",
@@ -1377,7 +1377,7 @@
       {
         "id": "A",
         "text": "MPR",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1387,17 +1387,17 @@
       {
         "id": "C",
         "text": "BPUPKI",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "DPR",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "Presiden Soekarno",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1414,7 +1414,7 @@
       {
         "id": "A",
         "text": "satu nusa satu bangsa",
-        "score": 0
+        "score": 2
       },
       {
         "id": "B",
@@ -1424,17 +1424,17 @@
       {
         "id": "C",
         "text": "persatuan dalam keberagaman budaya",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "bersatu kita teguh",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "keberagaman adalah kekuatan",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -1451,7 +1451,7 @@
       {
         "id": "A",
         "text": "federalisme",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1461,17 +1461,17 @@
       {
         "id": "C",
         "text": "konfederasi",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "monarki konstitusional",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "demokrasi liberal",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -1488,12 +1488,12 @@
       {
         "id": "A",
         "text": "2",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
         "text": "3",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
@@ -1503,12 +1503,12 @@
       {
         "id": "D",
         "text": "5",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "1",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "C",
@@ -1525,12 +1525,12 @@
       {
         "id": "A",
         "text": "DPR",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
         "text": "Presiden",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
@@ -1540,12 +1540,12 @@
       {
         "id": "D",
         "text": "MK",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "MA",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "C",
@@ -1562,12 +1562,12 @@
       {
         "id": "A",
         "text": "Pasal 27",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
         "text": "Pasal 28",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
@@ -1577,12 +1577,12 @@
       {
         "id": "D",
         "text": "Pasal 30",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "Pasal 33",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "C",
@@ -1599,7 +1599,7 @@
       {
         "id": "A",
         "text": "nilai-nilainya bisa diubah sesuai zaman",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1609,17 +1609,17 @@
       {
         "id": "C",
         "text": "Pancasila bisa diganti ideologi lain",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "nilai Pancasila bersifat relatif",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "Pancasila tidak memiliki nilai absolut",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1636,7 +1636,7 @@
       {
         "id": "A",
         "text": "KPU",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -1646,17 +1646,17 @@
       {
         "id": "C",
         "text": "DKPP",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "MK",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "MA",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -1673,17 +1673,17 @@
       {
         "id": "A",
         "text": "kata sifat",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
         "text": "kata kerja",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
         "text": "kata benda",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
@@ -1693,7 +1693,7 @@
       {
         "id": "E",
         "text": "kata sambung",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "D",
@@ -1710,12 +1710,12 @@
       {
         "id": "A",
         "text": "fotocopi",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
         "text": "foto copy",
-        "score": 0
+        "score": 3
       },
       {
         "id": "C",
@@ -1725,12 +1725,12 @@
       {
         "id": "D",
         "text": "foto kopi",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "foto-kopi",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "C",
@@ -1747,12 +1747,12 @@
       {
         "id": "A",
         "text": "Saya sudah makan nasi sudah kenyang",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
         "text": "Karena hujan, maka saya tidak berangkat",
-        "score": 0
+        "score": 1
       },
       {
         "id": "C",
@@ -1762,12 +1762,12 @@
       {
         "id": "D",
         "text": "Buku-buku tersebut semuanya adalah milik saya semua",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "Para hadirin semuanya dipersilakan duduk",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "C",
@@ -1784,7 +1784,7 @@
       {
         "id": "A",
         "text": "awalan yang membentuk kata sifat",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1794,17 +1794,17 @@
       {
         "id": "C",
         "text": "awalan yang membentuk kata benda",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "sisipan",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "akhiran",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -1821,7 +1821,7 @@
       {
         "id": "A",
         "text": "abstrak",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1831,17 +1831,17 @@
       {
         "id": "C",
         "text": "khayal",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "imajiner",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "virtual",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1863,22 +1863,22 @@
       {
         "id": "B",
         "text": "d.l.l",
-        "score": 0
+        "score": 4
       },
       {
         "id": "C",
         "text": "D.L.L",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "DLL",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "d/l/l",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "A",
@@ -1895,7 +1895,7 @@
       {
         "id": "A",
         "text": "deduktif",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -1905,17 +1905,17 @@
       {
         "id": "C",
         "text": "campuran",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "deskriptif",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "naratif",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -1932,12 +1932,12 @@
       {
         "id": "A",
         "text": "jernih",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
         "text": "bening",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
@@ -1947,12 +1947,12 @@
       {
         "id": "D",
         "text": "terbuka",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "jelas",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "C",
@@ -1969,7 +1969,7 @@
       {
         "id": "A",
         "text": "karena, sehingga",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1979,17 +1979,17 @@
       {
         "id": "C",
         "text": "yang, bahwa",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "jika, maka",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "agar, supaya",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -2006,7 +2006,7 @@
       {
         "id": "A",
         "text": "Dr. Ahmad S.pd",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -2016,21 +2016,1686 @@
       {
         "id": "C",
         "text": "dr. Ahmad S.Pd",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "DR. Ahmad s.pd",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "DR Ahmad SPd",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
     "explanation": "Penulisan gelar yang benar: 'Dr.' (Doktor) dan 'S.Pd.' dengan titik setelah setiap singkatan huruf.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-056",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pembukaan UUD 1945 terdiri dari empat alinea. Alinea keempat memuat hal-hal fundamental bagi negara Indonesia. Berikut ini yang TIDAK tercantum dalam alinea keempat Pembukaan UUD 1945 adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Tujuan negara Indonesia",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Bentuk negara kesatuan republik",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "Dasar negara Pancasila",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Proklamasi kemerdekaan Indonesia",
+        "score": 5
+      },
+      {
+        "id": "E",
+        "text": "Ketentuan diadakan UUD",
+        "score": 4
+      }
+    ],
+    "correct": "D",
+    "explanation": "Alinea keempat Pembukaan UUD 1945 berisi: tujuan negara, ketentuan diadakannya UUD, bentuk negara (kesatuan republik), dan dasar negara Pancasila. Proklamasi kemerdekaan termuat dalam alinea ketiga, bukan keempat.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-057",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 1 Ayat (2) UUD 1945 setelah amandemen menyatakan bahwa kedaulatan berada di tangan rakyat dan dilaksanakan menurut Undang-Undang Dasar. Perubahan ini merupakan pergeseran dari sistem kedaulatan sebelumnya, yaitu...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Kedaulatan di tangan MPR sebagai lembaga tertinggi negara",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Kedaulatan di tangan presiden sebagai mandataris MPR",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Kedaulatan di tangan DPR sebagai wakil rakyat",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Kedaulatan di tangan partai politik pemenang pemilu",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "Kedaulatan di tangan lembaga tinggi negara",
+        "score": 3
+      }
+    ],
+    "correct": "A",
+    "explanation": "Sebelum amandemen, UUD 1945 menganut sistem kedaulatan MPR — MPR adalah lembaga tertinggi negara dan presiden bertanggung jawab kepada MPR. Setelah amandemen, kedaulatan berada di tangan rakyat dan langsung dilaksanakan melalui pemilu (presiden, DPR, DPD, DPRD).",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-058",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Amandemen UUD 1945 dilakukan sebanyak empat kali dalam kurun waktu 1999-2002. Salah satu perubahan paling mendasar adalah ketentuan mengenai masa jabatan presiden. Berdasarkan Pasal 7 UUD 1945 setelah amandemen, presiden dan wakil presiden memegang jabatan selama...",
+    "options": [
+      {
+        "id": "A",
+        "text": "4 tahun dan dapat dipilih kembali untuk 2 periode berikutnya",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "5 tahun dan hanya dapat dipilih kembali untuk 1 kali masa jabatan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "6 tahun dan dapat dipilih kembali tanpa batas",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "5 tahun dan dapat dipilih kembali untuk 2 kali masa jabatan",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "4 tahun dan hanya dapat dipilih kembali untuk 1 kali masa jabatan",
+        "score": 2
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pasal 7 UUD 1945 (amandemen) menyatakan: 'Presiden dan Wakil Presiden memegang jabatan selama lima tahun, dan sesudahnya dapat dipilih kembali dalam jabatan yang sama hanya untuk satu kali masa jabatan.' Sebelum amandemen, presiden dapat dipilih kembali tanpa batas.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-059",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Setelah amandemen UUD 1945, struktur ketatanegaraan Indonesia mengalami perubahan signifikan. Salah satunya adalah pembentukan Mahkamah Konstitusi (MK) yang diatur dalam Pasal 24C. MK memiliki beberapa kewenangan, kecuali...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menguji undang-undang terhadap Undang-Undang Dasar",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Memutus sengketa kewenangan lembaga negara",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Memutus pembubaran partai politik",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Menguji peraturan pemerintah terhadap undang-undang",
+        "score": 5
+      },
+      {
+        "id": "E",
+        "text": "Memutus perselisihan hasil pemilihan umum",
+        "score": 1
+      }
+    ],
+    "correct": "D",
+    "explanation": "MK berwenang: (1) menguji UU terhadap UUD, (2) memutus sengketa kewenangan lembaga negara, (3) memutus pembubaran partai politik, (4) memutus perselisihan hasil pemilu. Menguji peraturan pemerintah terhadap UU adalah kewenangan MA, bukan MK.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-060",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 28A sampai 28J UUD 1945 mengatur tentang hak asasi manusia. Pasal 28J ayat (2) menegaskan bahwa dalam menjalankan hak dan kebebasannya, setiap orang wajib tunduk kepada pembatasan yang ditetapkan dengan undang-undang. Prinsip ini dikenal sebagai...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Hak asasi bersifat mutlak tanpa pengecualian",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Pembatasan HAM demi kepentingan umum dan keamanan negara",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "HAM hanya berlaku bagi warga negara Indonesia",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Pembatasan HAM dapat dilakukan oleh presiden kapan saja",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "HAM dapat dibatasi berdasarkan keputusan partai politik",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pasal 28J ayat (2) UUD 1945 menyatakan bahwa hak asasi manusia dapat dibatasi dengan undang-undang semata-mata untuk menjamin pengakuan dan penghormatan atas hak kebebasan orang lain serta untuk memenuhi tuntutan yang adil sesuai dengan pertimbangan moral, nilai agama, keamanan, dan ketertiban umum.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-061",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 31 UUD 1945 mengatur tentang hak warga negara di bidang pendidikan. Berdasarkan pasal tersebut, setiap warga negara berhak mendapat pendidikan. Pemerintah wajib membiayai pendidikan dasar bagi warga negara. Jenis pendidikan yang dimaksud adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pendidikan tinggi gratis untuk semua warga negara",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Pendidikan menengah atas gratis",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "Pendidikan dasar (SD dan SMP) tanpa dipungut biaya",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Pendidikan anak usia dini gratis",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Pendidikan vokasi gratis",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pasal 31 ayat (2) UUD 1945 menyatakan: 'Setiap warga negara wajib mengikuti pendidikan dasar dan pemerintah wajib membiayainya.' Pasal 31 ayat (1) menyatakan: 'Setiap warga negara berhak mendapat pendidikan.' Pendidikan dasar meliputi SD (6 tahun) dan SMP (3 tahun).",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-062",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Salah satu amandemen penting dalam UUD 1945 adalah penghapusan Dewan Pertimbangan Agung (DPA) dan pembentukan lembaga baru sebagai penggantinya. Lembaga yang dimaksud adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Majelis Permusyawaratan Rakyat",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Dewan Perwakilan Daerah",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Badan Pemeriksa Keuangan",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Dewan Perwakilan Rakyat",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Dewan Pertimbangan Presiden (Wantimpres)",
+        "score": 5
+      }
+    ],
+    "correct": "E",
+    "explanation": "DPA dihapus melalui Amandemen Keempat UUD 1945 (2002) dan digantikan dengan Dewan Pertimbangan Presiden (Wantimpres) yang dibentuk berdasarkan Pasal 16 UUD 1945. Wantimpres bertugas memberikan nasihat dan pertimbangan kepada presiden, berbeda dengan DPA yang merupakan lembaga tinggi negara setingkat menteri.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-063",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 33 UUD 1945 merupakan pasal yang mengatur tentang perekonomian nasional. Berdasarkan pasal tersebut, cabang-cabang produksi yang penting bagi negara dan menguasai hajat hidup orang banyak dikuasai oleh negara. Prinsip ekonomi yang dianut adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ekonomi pasar bebas tanpa campur tangan negara",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Ekonomi kerakyatan dengan asas kekeluargaan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Ekonomi terpusat yang dikelola swasta",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Ekonomi kapitalis dengan dominasi asing",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Ekonomi campuran 50:50 negara-swasta",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pasal 33 UUD 1945 menganut asas kekeluargaan dalam perekonomian. Ayat (1) menyatakan perekonomian disusun sebagai usaha bersama berdasar atas asas kekeluargaan. Ayat (4) menegaskan perekonomian nasional diselenggarakan berdasar atas demokrasi ekonomi dengan prinsip kebersamaan, efisiensi berkeadilan, dan berkelanjutan.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-064",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 29 UUD 1945 mengatur tentang agama. Ayat (1) menyatakan bahwa negara berdasarkan Ketuhanan Yang Maha Esa. Ayat (2) menjamin kemerdekaan tiap-tiap penduduk untuk memeluk agamanya masing-masing dan beribadat menurut agamanya. Implementasi pasal ini dalam kehidupan bernegara adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Indonesia adalah negara teokrasi dengan satu agama resmi",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Negara menjamin kebebasan beragama tanpa batas sama sekali",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Negara melindungi setiap pemeluk agama dalam menjalankan ibadah sesuai kepercayaannya",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Agama tertentu mendapat fasilitas lebih dari negara",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Semua warga negara wajib memeluk agama yang diakui negara",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pasal 29 UUD 1945 menegaskan Indonesia bukan negara teokrasi maupun negara sekuler, melainkan negara yang berdasarkan Ketuhanan Yang Maha Esa. Negara melindungi setiap warga negara untuk memeluk agama dan beribadah sesuai agamanya, tanpa diskriminasi. Pembatasan kebebasan beragama diatur dalam undang-undang untuk menjaga ketertiban umum.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-065",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 22E UUD 1945 mengatur tentang pemilihan umum. Pemilu diselenggarakan untuk memilih anggota DPR, DPD, DPRD, Presiden dan Wakil Presiden. Penyelenggara pemilu nasional yang bersifat tetap, mandiri, dan tidak memihak adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Badan Pengawas Pemilu (Bawaslu)",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Komisi Pemilihan Umum (KPU)",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Dewan Kehormatan Penyelenggara Pemilu (DKPP)",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Kementerian Dalam Negeri",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "Mahkamah Konstitusi",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pasal 22E ayat (5) UUD 1945 menyatakan: 'Pemilihan umum diselenggarakan oleh suatu komisi pemilihan umum yang bersifat nasional, tetap, dan mandiri.' KPU adalah lembaga penyelenggara pemilu. Bawaslu adalah pengawas, MK mengadili sengketa hasil pemilu, dan DKPP mengawasi etika penyelenggara pemilu.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-066",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Berdasarkan Pasal 23E UUD 1945, Badan Pemeriksa Keuangan (BPK) bertugas memeriksa pengelolaan dan tanggung jawab keuangan negara. BPK berkedudukan sebagai lembaga yang...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Bawahan presiden dan bertanggung jawab kepada presiden",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Bagian dari Kementerian Keuangan",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "Bawahan MPR dan melapor ke MPR setiap tahun",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Lembaga yang bebas dan mandiri dengan hasil pemeriksaan diserahkan ke DPR, DPD, dan DPRD",
+        "score": 5
+      },
+      {
+        "id": "E",
+        "text": "Lembaga yang bekerja di bawah MA",
+        "score": 3
+      }
+    ],
+    "correct": "D",
+    "explanation": "Pasal 23E UUD 1945 menegaskan BPK adalah lembaga yang bebas dan mandiri (independent). Hasil pemeriksaan BPK diserahkan kepada DPR (pusat), DPD (terkait keuangan daerah), dan DPRD (daerah). BPK berkedudukan setara dengan lembaga negara lainnya seperti MK, MA, dan MPR.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-067",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Sistem pemerintahan Indonesia berdasarkan UUD 1945 adalah presidensial. Ciri utama sistem presidensial yang dianut Indonesia setelah amandemen adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Presiden dipilih oleh MPR dan dapat dijatuhkan oleh MPR setiap saat",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Presiden dipilih langsung oleh rakyat dan tidak bertanggung jawab kepada DPR",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Presiden adalah kepala negara tetapi kepala pemerintahan dipegang perdana menteri",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Presiden dan DPR bersama-sama menjalankan pemerintahan secara kolektif",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Presiden bertanggung jawab kepada MPR dan DPR secara bersama",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Ciri utama sistem presidensial pasca-amandemen: (1) presiden dipilih langsung oleh rakyat (Pasal 6A), (2) presiden tidak bertanggung jawab kepada DPR (sebelumnya bertanggung jawab kepada MPR), (3) presiden tidak dapat dibubarkan oleh DPR, (4) DPR tidak dapat dijatuhkan oleh presiden.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-068",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 18 UUD 1945 mengatur tentang pemerintahan daerah. Provinsi, kabupaten, dan kota mengatur dan mengurus sendiri urusan pemerintahan menurut asas otonomi dan tugas pembantuan. Kepala daerah dipilih secara...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ditunjuk oleh presiden berdasarkan usulan DPRD",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Dipilih oleh DPRD dari kader partai",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Dipilih langsung oleh rakyat melalui pemilihan kepala daerah",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Diangkat oleh Menteri Dalam Negeri",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Dipilih oleh MPR dari calon yang diusulkan presiden",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pasal 18 ayat (4) UUD 1945 menyatakan: 'Gubernur, Bupati, dan Walikota masing-masing sebagai kepala pemerintah daerah provinsi, kabupaten, dan kota dipilih secara demokratis.' Sejak 2005, kepala daerah dipilih langsung oleh rakyat melalui Pilkada.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-069",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Sebelum amandemen, MPR merupakan lembaga tertinggi negara dengan kekuasaan tak terbatas (superpowers). Setelah amandemen, kedudukan MPR berubah menjadi...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Lembaga yang masih tertinggi namun kekuasaannya dibatasi",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Lembaga yang sejajar dengan lembaga negara lainnya",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Lembaga yang dibubarkan dan diganti DPR",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Lembaga yang hanya bersidang 5 tahun sekali",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Lembaga pengawas presiden setara BPK",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Amandemen UUD 1945 menghapus supremasi MPR. Setelah amandemen, MPR berkedudukan sejajar dengan lembaga negara lainnya (DPR, DPD, Presiden, MK, MA, BPK, KY). Tugas MPR terbatas pada mengubah dan menetapkan UUD, melantik presiden/wakil presiden, dan memberhentikan presiden dalam proses impeachment.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-070",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 1 Ayat (3) UUD 1945 menyatakan bahwa Negara Indonesia adalah negara hukum. Konsekuensi dari prinsip negara hukum (rechtsstaat) adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Presiden berhak mengeluarkan peraturan tanpa persetujuan DPR",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Segala tindakan pemerintahan harus berdasarkan hukum yang berlaku",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Hukum hanya berlaku bagi warga negara biasa, tidak bagi pejabat",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Hukum dapat diabaikan dalam keadaan darurat",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Hukum dibuat oleh pemerintah tanpa partisipasi DPR",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Negara hukum (rechtsstaat) berarti semua penyelenggaraan negara harus didasarkan pada hukum (wetmatigheid van bestuur). Konsekuensinya: (1) supremasi hukum, (2) pembagian kekuasaan, (3) perlindungan HAM, (4) peradilan bebas dan tidak memihak, (5) asas legalitas dalam tindakan pemerintah.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-071",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 6A UUD 1945 mengatur tentang tata cara pemilihan presiden dan wakil presiden. Apabila dalam pemilu tidak ada pasangan calon yang memperoleh suara lebih dari 50% dengan sebaran 20% lebih di setiap provinsi, maka...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pemilu diulang dari awal",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "DPR yang memilih presiden",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Diadakan pemilihan putaran kedua oleh MPR",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Presiden ditunjuk oleh partai pemenang pemilu",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "KPU menetapkan pasangan dengan suara terbanyak mutlak",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pasal 6A ayat (3) dan (4) UUD 1945: Pasangan calon presiden dan wakil presiden yang mendapatkan suara lebih dari 50% dengan sebaran di lebih dari setengah provinsi dilantik. Jika tidak ada, pasangan dengan suara terbanyak pertama dan kedua mengikuti pemilihan putaran kedua yang diselenggarakan MPR.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-072",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 30 UUD 1945 mengatur tentang pertahanan dan keamanan negara. Setiap warga negara berhak dan wajib ikut serta dalam usaha pertahanan dan keamanan negara. Komponen utama sistem pertahanan negara adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Polisi Republik Indonesia",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Tentara Nasional Indonesia dan Polri",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Tentara Nasional Indonesia (TNI)",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Rakyat terlatih dan satuan pengamanan swakarsa",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Kementerian Pertahanan",
+        "score": 1
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pasal 30 ayat (2) UUD 1945 menyatakan: 'Usaha pertahanan dan keamanan negara dilaksanakan melalui sistem pertahanan dan keamanan rakyat semesta dengan Tentara Nasional Indonesia sebagai komponen utama dan kepolisian sebagai komponen utama pengaman.' TNI adalah komponen utama pertahanan, Polri adalah komponen utama keamanan.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-073",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 26 UUD 1945 mengatur tentang warga negara. Yang menjadi warga negara Indonesia adalah orang-orang bangsa Indonesia asli dan orang-orang bangsa lain yang disahkan dengan undang-undang sebagai warga negara. Syarat-syarat memperoleh kewarganegaraan diatur dalam...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Peraturan presiden",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Keputusan Menteri Hukum dan HAM",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Undang-undang",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Peraturan pemerintah",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Putusan Mahkamah Konstitusi",
+        "score": 1
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pasal 26 ayat (2) UUD 1945 menyatakan: 'Penduduk ialah warga negara Indonesia dan orang asing yang bertempat tinggal di Indonesia.' Ayat (3): 'Hal-hal mengenai warga negara dan penduduk diatur dengan undang-undang.' Saat ini diatur dalam UU No. 12 Tahun 2006 tentang Kewarganegaraan RI.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-074",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 24B UUD 1945 mengatur tentang Komisi Yudisial (KY). KY adalah komisi yang bersifat mandiri yang berwenang mengusulkan pengangkatan hakim agung dan menjaga kehormatan, keluhuran martabat, serta perilaku hakim. Anggota KY diangkat dan diberhentikan oleh...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Presiden dengan persetujuan MPR",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Mahkamah Agung",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Presiden dengan persetujuan DPR",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "DPR melalui mekanisme fit and proper test",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Ketua Mahkamah Agung dengan persetujuan MPR",
+        "score": 1
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pasal 24B ayat (3) UUD 1945 menyatakan: 'Anggota Komisi Yudisial diangkat dan diberhentikan oleh Presiden dengan persetujuan Dewan Perwakilan Rakyat.' KY beranggotakan 7 orang yang merupakan mantan hakim, akademisi, dan praktisi hukum dengan masa jabatan 5 tahun.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-075",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 34 UUD 1945 mengatur tentang fakir miskin dan anak-anak terlantar. Berdasarkan pasal tersebut, siapa yang bertanggung jawab memelihara fakir miskin dan anak-anak terlantar?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keluarga dan kerabat dekat",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "Pemerintah daerah setempat",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Negara",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Organisasi sosial dan keagamaan",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Masyarakat melalui donasi sukarela",
+        "score": 1
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pasal 34 UUD 1945 menyatakan: (1) Fakir miskin dan anak-anak terlantar dipelihara oleh negara, (2) Negara mengembangkan sistem jaminan sosial bagi seluruh rakyat, (3) Negara bertanggung jawab atas penyediaan fasilitas pelayanan kesehatan dan fasilitas pelayanan umum yang layak. Ini menunjukkan komitmen negara kesejahteraan (welfare state).",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-076",
+    "category": "TWK",
+    "sub": "Bahasa Indonesia",
+    "text": "Penggunaan kata baku yang tepat dalam kalimat berikut ini adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pegawai tersebut sedang mengadakan analisa terhadap data keuangan",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Pegawai tersebut sedang mengadakan analisis terhadap data keuangan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Pegawai tersebut sedang mengadakan analisa pada data keuangan",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Pegawai tersebut melakukan analis terhadap data keuangan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Pegawai tersebut telah menganalisa data keuangan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Kata baku yang tepat adalah 'analisis' (bukan 'analisa'). Bentuk kata kerja bakunya adalah 'menganalisis' (bukan 'menganalisa'). KBBI mencatat 'analisis' sebagai bentuk baku untuk padanan kata 'analysis'.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-077",
+    "category": "TWK",
+    "sub": "Bahasa Indonesia",
+    "text": "Kalimat yang menggunakan ejaan yang benar sesuai PUEBI adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Dia bekerja di Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Dia bekerja di kementerian pendidikan, kebudayaan, riset dan teknologi",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Dia bekerja di kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Dia bekerja di Kementerian Pendidikan Kebudayaan Riset dan Teknologi",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Dia bekerja di Kementerian pendidikan kebudayaan riset dan teknologi",
+        "score": 1
+      }
+    ],
+    "correct": "A",
+    "explanation": "Nama lembaga resmi ditulis dengan huruf kapital di setiap awal kata, termasuk kata tugas 'dan' jika menjadi bagian nama resmi. PUEBI menyebutkan bahwa nama resmi lembaga negara ditulis dengan huruf kapital dan koma digunakan untuk memisahkan unsur dalam perincian.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-078",
+    "category": "TWK",
+    "sub": "Bahasa Indonesia",
+    "text": "Penulisan kata depan 'di' yang benar terdapat pada kalimat...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Surat itu ditandatangani diruang direktur utama",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Dimana saja lokasi pelatihan ASN akan diselenggarakan?",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "Berkas disimpan di dalam lemari arsip kantor",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Disini semua pegawai wajib mentaati aturan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Beliau dilahirkan disebuah desa di Jawa Tengah",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Kata depan 'di' (penanda tempat) ditulis terpisah: 'di dalam', 'di kantor', 'di sini'. 'di' yang merupakan awalan ditulis serangkai: 'ditandatangani', 'disimpan', 'dilahirkan'. Bedanya: jika 'di' bisa diganti 'ke'/'dari', berarti kata depan (pisah).",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-079",
+    "category": "TWK",
+    "sub": "Bahasa Indonesia",
+    "text": "Penulisan singkatan gelar yang sesuai dengan PUEBI adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Dr. Andi Pratama S.H., M.H.",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Andi Pratama, S.H.,M.H.",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Andi Pratama, S.H., M.H.",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "dr. Andi Pratama, SH, MH",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "Andi Pratama, S.H, M.H",
+        "score": 3
+      }
+    ],
+    "correct": "C",
+    "explanation": "Penulisan gelar: singkatan gelar diikuti titik, dipisahkan koma dari nama, antar gelar dipisah koma dan spasi. 'S.H.' (Sarjana Hukum), 'M.H.' (Magister Hukum). Kata 'dr.' (dokter) ditulis nonkapital dan diletakkan di depan nama tanpa koma.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-080",
+    "category": "TWK",
+    "sub": "Bahasa Indonesia",
+    "text": "Penggunaan tanda koma yang tepat terdapat pada kalimat...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Karena sakit kepala dia tidak masuk kantor hari ini",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Setelah menyelesaikan laporan keuangan, bulan lalu, tim audit mulai memeriksa data",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Presiden, menteri, dan pejabat tinggi negara hadir di acara tersebut",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Tugasnya meliputi: membalas surat, mengarsipkan dokumen dan, menyusun laporan",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "Dia berkata bahwa, semua pegawai harus hadir tepat waktu",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "PUEBI: tanda koma digunakan dalam perincian lebih dari dua unsur. Kalimat A kurang koma setelah 'kepala', B kelebihan koma setelah 'bulan lalu', D kelebihan koma setelah 'dan', E tanda koma setelah 'bahwa' tidak diperlukan.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-081",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Seorang ASN bertugas di perbatasan Indonesia-Malaysia. Masyarakat di sana lebih sering menggunakan mata uang ringgit dan menonton siaran televisi Malaysia. Sikap nasionalisme yang paling tepat ditunjukkan ASN tersebut adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Melarang warga menggunakan mata uang asing dengan sanksi tegas",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Membiarkan karena tidak ada aturan yang melarang secara spesifik",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "Mengedukasi masyarakat tentang pentingnya mencintai produk dalam negeri dan tetap menggunakan rupiah",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Melaporkan warga ke pihak kepolisian karena dianggap tidak nasionalis",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Meminta bantuan TNI untuk menertibkan penggunaan mata uang asing",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Nasionalisme bukan tentang pemaksaan atau pelarangan, melainkan tentang edukasi dan penguatan identitas bangsa. ASN seharusnya memberikan pemahaman tentang pentingnya cinta tanah air, penggunaan mata uang rupiah, dan produk dalam negeri secara persuasif.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-082",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Dalam era globalisasi, batas-batas negara semakin kabur akibat kemajuan teknologi informasi. Sikap nasionalisme yang tepat bagi generasi muda Indonesia adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menolak semua pengaruh budaya asing dan hanya menggunakan produk lokal",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Terbuka terhadap budaya global tetapi tetap menjunjung tinggi budaya dan identitas bangsa",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengabaikan budaya Indonesia karena dianggap ketinggalan zaman",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Mengadopsi budaya asing sepenuhnya untuk tidak ketinggalan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Mengkritik semua bentuk modernisasi karena merusak budaya bangsa",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Nasionalisme di era globalisasi adalah sikap selektif: terbuka terhadap kemajuan global namun tetap mempertahankan identitas dan jati diri bangsa (cultural filter). Sikap ini dikenal sebagai 'nasionalisme kosmopolitan' atau 'nasionalisme terbuka'.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-083",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Seorang pejabat publik mengetahui bahwa ada kebijakan asing yang dapat merugikan kepentingan nasional. Tindakan paling nasionalis yang dilakukan pejabat tersebut adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mengabaikan karena bukan kewenangan langsungnya",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menyampaikan keberatan melalui saluran diplomatik resmi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Membocorkan informasi ke media massa",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Mengundang investor asing untuk bernegosiasi ulang",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Melakukan demonstrasi di depan kedutaan asing",
+        "score": 2
+      }
+    ],
+    "correct": "B",
+    "explanation": "Nasionalisme dalam konteks kenegaraan diwujudkan melalui jalur resmi dan prosedural. Menyampaikan keberatan melalui saluran diplomatik adalah tindakan yang tepat karena menghormati hierarki dan protokol kenegaraan, serta menjaga hubungan bilateral yang profesional.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-084",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Indonesia mengimpor beras dari negara lain saat produksi dalam negeri menurun akibat cuaca ekstrem. Tindakan yang paling mencerminkan nasionalisme dalam situasi ini adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menolak impor beras dan membiarkan harga naik",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Mendukung impor sambil meningkatkan produksi beras nasional secara bertahap",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengganti konsumsi beras dengan makanan impor",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Membeli beras impor lebih banyak untuk cadangan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Mengalihkan anggaran pertanian ke sektor lain",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Nasionalisme ekonomi bukan berarti anti-impor, melakukan kebijakan yang rasional dan berorientasi pada kemandirian jangka panjang. Impor bersifat taktis untuk stabilitas, sementara peningkatan produksi dalam negeri adalah strategis.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-085",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Seorang siswa Indonesia mendapat beasiswa kuliah di luar negeri. Setelah lulus, ia ditawari pekerjaan dengan gaji tinggi di perusahaan multinasional di sana. Sikap yang paling mencerminkan nasionalisme adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menerima tawaran tersebut karena lebih menguntungkan secara finansial",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "Pulang ke Indonesia untuk mengabdikan ilmu bagi kemajuan bangsa",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Tetap di luar negeri tetapi mengirimkan sebagian gaji ke Indonesia",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Menolak tawaran perusahaan asing karena alasan ideologis",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Tetap di luar negeri untuk mengembangkan jejaring internasional",
+        "score": 1
+      }
+    ],
+    "correct": "B",
+    "explanation": "Nasionalisme diwujudkan dengan pengabdian nyata kepada bangsa dan negara. Meskipun bekerja di luar negeri bukan tindakan tidak nasionalis, opsi pulang dan mengabdikan ilmu untuk kemajuan bangsa merupakan bentuk nasionalisme yang paling tinggi.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-086",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "UU No. 3 Tahun 2002 tentang Pertahanan Negara menyebutkan bahwa setiap warga negara berhak dan wajib ikut serta dalam upaya bela negara. Bentuk partisipasi bela negara bagi seorang guru ASN yang paling tepat adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ikut latihan militer setiap akhir pekan",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "Menanamkan nilai-nilai Pancasila dan cinta tanah air kepada siswa",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mendaftar sebagai anggota cadangan TNI",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Menyumbangkan sebagian gaji untuk dana pertahanan",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Berpatroli di lingkungan sekolah setiap malam",
+        "score": 1
+      }
+    ],
+    "correct": "B",
+    "explanation": "Bela negara tidak selalu berarti militer. Bagi seorang guru, bentuk bela negara yang paling tepat adalah menanamkan nilai-nilai kebangsaan, cinta tanah air, dan kesadaran berbangsa kepada generasi muda melalui pendidikan. Ini termasuk dalam kategori bela negara secara psikis dan edukatif.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-087",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Ancaman terhadap negara tidak hanya datang dari militer asing, tetapi juga dari dalam negeri seperti narkoba, radikalisme, dan korupsi. Bentuk bela negara untuk melawan ancaman narkoba yang paling efektif adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menjadi informan polisi untuk melaporkan pengedar narkoba",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "Tidak menggunakan narkoba dan mengedukasi lingkungan sekitar tentang bahayanya",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Membentuk kelompok main hakim sendiri untuk menangkap pengedar",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Menghindari pergaulan sama sekali",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Mendukung program hukuman mati bagi pengedar narkoba",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Bela negara melawan narkoba dimulai dari diri sendiri (tidak menggunakan) dan berlanjut ke lingkungan sekitar (edukasi). Ini sejalan dengan konsep pertahanan negara nonmiliter yang menekankan pada kesadaran dan partisipasi aktif warga negara.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-088",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Indonesia menghadapi ancaman siber yang semakin meningkat. Sebagai ASN yang bekerja di bidang teknologi informasi, upaya bela negara yang paling tepat adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Melakukan serangan balik ke server peretas",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Meningkatkan keamanan sistem informasi instansi dan melaporkan potensi ancaman siber",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Membagikan data penting ke publik agar transparan",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Mengabaikan ancaman karena bukan bidang tugas utama",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Memasang antivirus gratis dari internet",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Ancaman siber termasuk dalam ancaman nonmiliter yang diakui dalam sistem pertahanan negara. ASN di bidang TI berkontribusi dengan mengamankan sistem informasi instansi pemerintah dan melaporkan potensi ancaman ke pihak berwenang seperti BSSN.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-089",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Seorang warga negara Indonesia yang tinggal di daerah perbatasan melihat adanya aktivitas penambangan ilegal oleh pihak asing di wilayah NKRI. Tindakan yang paling sesuai dengan semangat bela negara adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mendokumentasikan dan melaporkan ke aparat keamanan setempat",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Menghadapi langsung para penambang ilegal",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "Diam saja karena takut",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Membagikan informasi di media sosial",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Meminta ganti rugi kepada penambang ilegal",
+        "score": 4
+      }
+    ],
+    "correct": "A",
+    "explanation": "Bela negara dapat dilakukan dengan menjadi warga negara yang baik (good citizenship): melaporkan pelanggaran kedaulatan negara melalui prosedur resmi kepada aparat keamanan. Dokumentasi diperlukan sebagai bukti untuk tindakan hukum preventif.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-090",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Salah satu wujud bela negara secara psikis adalah memiliki kesadaran berbangsa dan bernegara. Indikator kesadaran berbangsa yang paling fundamental adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menghafal lagu kebangsaan dan lambang negara",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "Memiliki rasa memiliki terhadap bangsa dan bangga menjadi bagian dari Indonesia",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengoleksi atribut bendera dan lambang negara",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Menggunakan pakaian adat setiap hari Jumat",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "Mengikuti upacara bendera setiap Senin",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Bela negara secara psikis bukan soal ritual atau atribut, melainkan kesadaran internal tentang identitas kebangsaan. Rasa memiliki (sense of belonging) dan kebanggaan menjadi bagian dari bangsa Indonesia adalah fondasi bela negara yang paling mendasar.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-091",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Seorang ASN mendapati bahwa rekan kerjanya memalsukan tanda tangan atasan untuk menyetujui pencairan dana. Mengetahui hal ini, langkah yang paling berintegritas adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ikut menandatangani agar rekan tidak dipermalukan",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menegur rekan secara pribadi dan mendorongnya untuk melaporkan diri",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Melaporkan langsung ke Kepolisian tanpa bicara dengan rekan",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Mengabaikan karena bukan urusan pribadi",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Membicarakan dengan pegawai lain di kantin",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "Integritas berarti konsisten antara nilai dan tindakan. Pendekatan terbaik adalah menegur secara pribadi terlebih dahulu (memberi kesempatan memperbaiki), lalu mendorong pelaporan diri. Ini menyeimbangkan nilai kejujuran dengan nilai kemanusiaan.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-092",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Atasan Anda meminta untuk memproses pencairan anggaran tanpa dokumen pendukung yang lengkap karena 'sudah ada perjanjian lisan'. Tindakan ASN yang berintegritas adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Memproses karena sudah diperintahkan atasan",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Menolak dengan sopan dan menjelaskan bahwa prosedur harus dipenuhi",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Memproses setengahnya saja",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Mencari dokumen sendiri agar terlihat rajin",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Melaporkan atasan ke KPK tanpa klarifikasi",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Integritas mengharuskan ASN taat pada prosedur, bukan hanya pada atasan. Menolak dengan sopan dan menjelaskan dasar hukumnya adalah bentuk keberanian moral (moral courage). ASN wajib menerapkan prinsip akuntabilitas dalam pengelolaan keuangan negara.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-093",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Seorang ASN ditawari hadiah oleh pengusaha yang baru saja memenangkan tender proyek di instansinya. Hadiah tersebut diberikan sebagai 'ucapan terima kasih'. Sikap yang berintegritas adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menerima karena tidak ada hubungannya dengan keputusan tender",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menolak dengan tegas dan melaporkan ke unit pengawas internal",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Menerima tetapi melaporkan ke KPK",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Menolak tetapi tidak melaporkan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Menerima dan membagikan ke rekan sekantor",
+        "score": 2
+      }
+    ],
+    "correct": "B",
+    "explanation": "Penerimaan gratifikasi oleh ASN dilarang meskipun tidak terkait langsung dengan keputusan. UU No. 20/2001 tentang Pemberantasan Tipikor mengatur bahwa ASN wajib menolak gratifikasi dan melaporkannya ke KPK atau unit pengawas internal dalam waktu 30 hari.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-094",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Anda menemukan bahwa laporan kinerja bulanan yang Anda susun telah diubah oleh atasan tanpa sepengetahuan Anda, dengan menambahkan data yang tidak valid. Sikap yang mencerminkan integritas adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Diam saja karena atasan yang bertanggung jawab",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Mengklarifikasi ke atasan dan meminta koreksi data yang tidak valid",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Mengubah kembali laporan tanpa memberitahu atasan",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Membuat laporan versi sendiri dan menyebarkannya",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Mengundurkan diri karena merasa tidak dihargai",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Integritas mengharuskan ASN bertanggung jawab atas data dan informasi yang dikeluarkan. Mengklarifikasi dengan atasan secara profesional adalah langkah yang tepat sebelum mengambil tindakan lebih lanjut.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-095",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Seorang ASN mengetahui bahwa instansinya akan melakukan audit mendadak. Rekan kerjanya mengusulkan untuk 'merapikan' beberapa dokumen agar terlihat baik. Sikap yang berintegritas adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ikut merapikan karena demi nama baik instansi",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Menolak dan memastikan dokumen disajikan apa adanya sesuai fakta",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Diam saja dan membiarkan rekan mengerjakannya",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Melaporkan rekan ke atasan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Merapikan yang memang perlu, membiarkan yang tidak",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Integritas berarti menyajikan informasi apa adanya tanpa manipulasi. Audit bertujuan untuk perbaikan, bukan untuk mencari-cari kesalahan. Manipulasi dokumen justru merugikan instansi dalam jangka panjang.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-096",
+    "category": "TWK",
+    "sub": "Pilar Negara",
+    "text": "Empat pilar kehidupan berbangsa dan bernegara Indonesia terdiri dari...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pancasila, UUD 1945, NKRI, dan Bhinneka Tunggal Ika",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Pancasila, UUD 1945, Trias Politika, dan Demokrasi",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Pancasila, Proklamasi, NKRI, dan Bahasa Indonesia",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "UUD 1945, GBHN, Tap MPR, dan Perpu",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "Pancasila, UUD 1945, Tap MPR, dan Demokrasi",
+        "score": 4
+      }
+    ],
+    "correct": "A",
+    "explanation": "Empat pilar kebangsaan Indonesia adalah: (1) Pancasila sebagai dasar negara dan ideologi, (2) UUD 1945 sebagai konstitusi, (3) NKRI sebagai bentuk negara, dan (4) Bhinneka Tunggal Ika sebagai semboyan pemersatu. Keempatnya merupakan konsensus dasar berbangsa dan bernegara.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-097",
+    "category": "TWK",
+    "sub": "Pilar Negara",
+    "text": "Implementasi Pancasila sebagai pilar pertama dalam kehidupan sehari-hari ASN adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menghafal sila-sila Pancasila di luar kepala",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Menjadikan Pancasila sebagai pedoman dalam setiap pengambilan keputusan dan pelayanan publik",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Memasang lambang Pancasila di ruang kerja",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Menyebutkan Pancasila dalam setiap pidato",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Menulis makalah tentang Pancasila",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pancasila sebagai pilar negara bukan sekadar simbol atau hafalan, melainkan harus diimplementasikan dalam tindakan nyata. Bagi ASN, Pancasila harus menjadi dasar dalam pelayanan publik dan pengambilan keputusan, seperti keadilan sosial dan musyawarah mufakat.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-098",
+    "category": "TWK",
+    "sub": "Pilar Negara",
+    "text": "NKRI sebagai pilar ketiga memiliki makna bahwa bentuk negara Indonesia adalah kesatuan. Konsekuensi dari bentuk negara kesatuan adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Setiap provinsi memiliki undang-undang dasar sendiri",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Kedaulatan negara berada di tangan pemerintah pusat dan daerah secara berimbang",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "Pemerintah pusat memegang kedaulatan penuh, namun daerah diberikan otonomi seluas-luasnya",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Daerah dapat memisahkan diri dari NKRI melalui referendum",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Pemerintah daerah memiliki kedaulatan penuh atas wilayahnya",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "NKRI sebagai negara kesatuan berarti kedaulatan berada di tangan pemerintah pusat, tetapi daerah diberikan otonomi seluas-luasnya dalam kerangka NKRI (desentralisasi). Tidak ada negara bagian, dan daerah tidak dapat memisahkan diri.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-099",
+    "category": "TWK",
+    "sub": "Pilar Negara",
+    "text": "Bhinneka Tunggal Ika sebagai pilar keempat memiliki makna yang paling tepat dalam konteks ASN adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Semua suku dan budaya harus diseragamkan",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Perbedaan adalah kekayaan yang harus dihargai dan dikelola dalam bingkai persatuan",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Keberagaman hanya untuk simbol nasional",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Perbedaan dapat diabaikan demi persatuan",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Keberagaman harus dikurangi agar mudah dikelola",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Bhinneka Tunggal Ika bermakna 'berbeda-beda tetapi tetap satu'. Dalam pelayanan publik, ASN harus menghargai dan melayani semua warga tanpa diskriminasi suku, agama, ras, atau golongan, karena semua warga negara memiliki hak yang sama.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TWK-100",
+    "category": "TWK",
+    "sub": "Pilar Negara",
+    "text": "UUD 1945 sebagai pilar kedua berfungsi sebagai konstitusi negara. Kedudukan UUD 1945 dalam hierarki peraturan perundang-undangan adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Setara dengan undang-undang",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Tertinggi setelah Pancasila",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Di bawah Peraturan Pemerintah Pengganti Undang-Undang",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Setara dengan Ketetapan MPR",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Di bawah Pancasila dan di atas UU",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Dalam hierarki peraturan perundang-undangan Indonesia (Pasal 7 UU No. 12/2011), UUD 1945 menempati urutan tertinggi setelah Pancasila sebagai sumber dari segala sumber hukum. Semua peraturan di bawahnya tidak boleh bertentangan dengan UUD 1945.",
     "xp_reward": 10,
     "coin_reward": 5
   }

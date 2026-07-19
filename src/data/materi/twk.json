@@ -1,0 +1,169 @@
+[
+  {
+    "id": "twk",
+    "title": "TWK",
+    "subtitle": "Tes Wawasan Kebangsaan",
+    "icon": "Flag",
+    "color": "text-purple-600",
+    "bg": "bg-purple-50",
+    "border": "border-purple-200",
+    "subBabs": [
+      {
+        "id": "pancasila",
+        "title": "Pancasila",
+        "ringkasan": [
+          "Pancasila adalah dasar negara dan ideologi bangsa Indonesia. Terdiri dari 5 sila yang saling berkaitan dan merupakan satu kesatuan yang utuh.",
+          "Dirumuskan oleh BPUPKI (Badan Penyelidik Usaha Persiapan Kemerdekaan Indonesia) pada 29 Mei - 1 Juni 1945. Tokoh perumus: Mr. Moh. Yamin, Mr. Soepomo, dan Ir. Soekarno.",
+          "Piagam Jakarta (22 Juni 1945) oleh Panitia Sembilan menjadi cikal bakal Pembukaan UUD 1945. Sila pertama awalnya 'Ketuhanan dengan kewajiban menjalankan syariat Islam bagi pemeluk-pemeluknya' diubah menjadi 'Ketuhanan Yang Maha Esa' pada 18 Agustus 1945."
+        ],
+        "tips": [
+          "Hafalkan urutan sila: Ketuhanan → Kemanusiaan → Persatuan → Kerakyatan → Keadilan",
+          "Pahami nilai tiap sila: Sila 1 (religius), 2 (humanis), 3 (nasionalis), 4 (demokratis), 5 (adil)",
+          "Ingat tokoh kunci: BPUPKI diketuai Dr. Radjiman Wedyodiningrat, PPKI diketuai Ir. Soekarno"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "Siapa ketua BPUPKI?",
+            "opsi": [
+              { "id": "A", "text": "Ir. Soekarno" },
+              { "id": "B", "text": "Dr. Radjiman Wedyodiningrat" },
+              { "id": "C", "text": "Mr. Moh. Yamin" },
+              { "id": "D", "text": "Mr. Soepomo" }
+            ],
+            "kunci": "B",
+            "pembahasan": "BPUPKI diketuai oleh Dr. Radjiman Wedyodiningrat dengan wakil Ichibangase Yosio (Jepang) dan R.P. Soeroso."
+          },
+          {
+            "pertanyaan": "Kapan Pancasila pertama kali diperkenalkan oleh Ir. Soekarno?",
+            "opsi": [
+              { "id": "A", "text": "29 Mei 1945" },
+              { "id": "B", "text": "1 Juni 1945" },
+              { "id": "C", "text": "22 Juni 1945" },
+              { "id": "D", "text": "18 Agustus 1945" }
+            ],
+            "kunci": "B",
+            "pembahasan": "Ir. Soekarno menyampaikan pidato tentang dasar negara (yang kemudian disebut Pancasila) pada 1 Juni 1945 di sidang BPUPKI."
+          },
+          {
+            "pertanyaan": "Apa perubahan sila pertama dalam Piagam Jakarta?",
+            "opsi": [
+              { "id": "A", "text": "Ketuhanan Yang Maha Esa" },
+              { "id": "B", "text": "Ketuhanan dengan kewajiban menjalankan syariat Islam bagi pemeluk-pemeluknya" },
+              { "id": "C", "text": "Kemanusiaan yang adil dan beradab" },
+              { "id": "D", "text": "Persatuan Indonesia" }
+            ],
+            "kunci": "B",
+            "pembahasan": "Dalam Piagam Jakarta, sila pertama berbunyi 'Ketuhanan dengan kewajiban menjalankan syariat Islam bagi pemeluk-pemeluknya'. Diubah pada 18 Agustus 1945 menjadi 'Ketuhanan Yang Maha Esa'."
+          }
+        ]
+      },
+      {
+        "id": "uud1945",
+        "title": "UUD 1945",
+        "ringkasan": [
+          "UUD 1945 adalah konstitusi negara Indonesia yang disahkan oleh PPKI pada 18 Agustus 1945. Terdiri dari Pembukaan dan Batang Tubuh (pasal-pasal).",
+          "Pembukaan UUD 1945 memuat 4 alinea yang berisi tujuan negara dan dasar negara. Alinea ke-4 adalah yang paling sering diujikan.",
+          "Amandemen UUD 1945 dilakukan 4 kali (1999-2002) oleh MPR. Total perubahan: 1999 (Amandemen I), 2000 (II), 2001 (III), 2002 (IV)."
+        ],
+        "tips": [
+          "Baca alinea 4 Pembukaan UUD 1945 — ini paling sering keluar di TWK",
+          "Pahami perbedaan sebelum dan sesudah amandemen: jumlah pasal, lembaga negara, pemilihan presiden",
+          "Ingat: MPR bukan lagi lembaga tertinggi negara setelah amandemen"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "Berapa kali UUD 1945 diamandemen?",
+            "opsi": [
+              { "id": "A", "text": "3 kali" },
+              { "id": "B", "text": "4 kali" },
+              { "id": "C", "text": "5 kali" },
+              { "id": "D", "text": "2 kali" }
+            ],
+            "kunci": "B",
+            "pembahasan": "UUD 1945 diamandemen sebanyak 4 kali: 1999, 2000, 2001, dan 2002."
+          },
+          {
+            "pertanyaan": "Lembaga apa yang mengubah UUD 1945?",
+            "opsi": [
+              { "id": "A", "text": "Presiden" },
+              { "id": "B", "text": "DPR" },
+              { "id": "C", "text": "MPR" },
+              { "id": "D", "text": "Mahkamah Konstitusi" }
+            ],
+            "kunci": "C",
+            "pembahasan": "MPR (Majelis Permusyawaratan Rakyat) adalah lembaga yang berwenang mengubah dan menetapkan UUD."
+          }
+        ]
+      },
+      {
+        "id": "bhineka",
+        "title": "Bhinneka Tunggal Ika",
+        "ringkasan": [
+          "Bhinneka Tunggal Ika berarti 'Berbeda-beda tetapi tetap satu'. Berasal dari Kitab Sutasoma karangan Mpu Tantular pada masa Kerajaan Majapahit.",
+          "Semboyan ini mencerminkan keberagaman Indonesia: suku, agama, ras, dan budaya. Resmi menjadi semboyan negara melalui PP No. 66 Tahun 1951.",
+          "Nilai-nilai: toleransi, gotong royong, persatuan dalam keberagaman, menghargai perbedaan."
+        ],
+        "tips": [
+          "Ingat: Bhinneka Tunggal Ika dari Kitab Sutasoma — Mpu Tantular — Majapahit",
+          "Hubungkan dengan sila ke-3 Pancasila: Persatuan Indonesia",
+          "Pahami makna: bukan 'semua sama' tapi 'bersatu dalam perbedaan'"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "Dari kitab apa semboyan Bhinneka Tunggal Ika berasal?",
+            "opsi": [
+              { "id": "A", "text": "Negarakertagama" },
+              { "id": "B", "text": "Sutasoma" },
+              { "id": "C", "text": "Arjunawiwaha" },
+              { "id": "D", "text": "Pararaton" }
+            ],
+            "kunci": "B",
+            "pembahasan": "Bhinneka Tunggal Ika berasal dari Kitab Sutasoma karangan Mpu Tantular."
+          }
+        ]
+      },
+      {
+        "id": "sejarah",
+        "title": "Sejarah Indonesia",
+        "ringkasan": [
+          "Proklamasi Kemerdekaan 17 Agustus 1945 dibacakan oleh Ir. Soekarno didampingi Drs. Moh. Hatta di Jalan Pegangsaan Timur No. 56, Jakarta.",
+          "Peristiwa Rengasdengklok (16 Agustus 1945): golongan muda (Sukarni, Chaerul Saleh, Wikana) 'mengamankan' Soekarno-Hatta agar segera memproklamasikan kemerdekaan.",
+          "Jepang menyerah pada Sekutu 14 Agustus 1945 setelah bom atom Hiroshima (6 Agustus) dan Nagasaki (9 Agustus)."
+        ],
+        "tips": [
+          "Urutan peristiwa: Bom atom → Jepang menyerah → Rengasdengklok → Proklamasi",
+          "Tokoh kunci: Laksamana Maeda (rumahnya tempat perumusan naskah), Sayuti Melik (pengetik naskah), Fatmawati (penjahit bendera)",
+          "Naskah Proklamasi: tulisan tangan Soekarno (asli), diketik Sayuti Melik (otentik)"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "Di mana naskah proklamasi dirumuskan?",
+            "opsi": [
+              { "id": "A", "text": "Jalan Pegangsaan Timur No. 56" },
+              { "id": "B", "text": "Rumah Laksamana Maeda" },
+              { "id": "C", "text": "Rengasdengklok" },
+              { "id": "D", "text": "Gedung Joang 45" }
+            ],
+            "kunci": "B",
+            "pembahasan": "Naskah proklamasi dirumuskan di rumah Laksamana Maeda, Jalan Imam Bonjol No. 1, Jakarta."
+          }
+        ]
+      },
+      {
+        "id": "tata_negara",
+        "title": "Tata Negara",
+        "ringkasan": [
+          "Indonesia adalah negara kesatuan berbentuk republik. Sistem pemerintahan: presidensial. Presiden adalah kepala negara sekaligus kepala pemerintahan.",
+          "Lembaga negara pasca-amandemen: MPR, DPR, DPD, Presiden, BPK, MA, MK, KY. MPR bukan lagi lembaga tertinggi.",
+          "Pemilu: setiap 5 tahun. Memilih Presiden/Wakil Presiden, DPR, DPD, DPRD. Pilkada: memilih Gubernur, Bupati, Walikota."
+        ],
+        "tips": [
+          "Pahami perbedaan fungsi: MPR (mengubah UUD, melantik presiden), DPR (legislasi, anggaran, pengawasan), DPD (terkait daerah)",
+          "MK vs MA: MK menguji UU terhadap UUD, MA menguji peraturan di bawah UU",
+          "Syarat presiden: WNI asli, minimal 40 tahun (atau pernah/sedang menjabat jabatan yang dipilih melalui pemilu)"
+        ],
+        "quiz": []
+      }
+    ]
+  }
+]

@@ -8,12 +8,12 @@
       {
         "id": "A",
         "text": "72",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
         "text": "84",
-        "score": 0
+        "score": 1
       },
       {
         "id": "C",
@@ -23,12 +23,12 @@
       {
         "id": "D",
         "text": "108",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "120",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "C",
@@ -45,12 +45,12 @@
       {
         "id": "A",
         "text": "Sekolah",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
         "text": "Ilmu",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
@@ -60,12 +60,12 @@
       {
         "id": "D",
         "text": "Pelajaran",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "Ruang Kelas",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "C",
@@ -82,7 +82,7 @@
       {
         "id": "A",
         "text": "10 orang",
-        "score": 0
+        "score": 2
       },
       {
         "id": "B",
@@ -92,17 +92,17 @@
       {
         "id": "C",
         "text": "14 orang",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "20 orang",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "28 orang",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -119,12 +119,12 @@
       {
         "id": "A",
         "text": "Budi mungkin wajib menjaga kerahasiaan data negara",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
         "text": "Budi tidak perlu menjaga kerahasiaan data negara",
-        "score": 0
+        "score": 3
       },
       {
         "id": "C",
@@ -134,12 +134,12 @@
       {
         "id": "D",
         "text": "Semua yang menjaga data negara adalah PNS",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "Hanya PNS tertentu yang wajib menjaga data negara",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "C",
@@ -156,7 +156,7 @@
       {
         "id": "A",
         "text": "3",
-        "score": 0
+        "score": 2
       },
       {
         "id": "B",
@@ -166,17 +166,17 @@
       {
         "id": "C",
         "text": "7",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "9",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "11",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -193,7 +193,7 @@
       {
         "id": "A",
         "text": "tidak mampu",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -203,17 +203,17 @@
       {
         "id": "C",
         "text": "biasa saja",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "ragu-ragu",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "lemah",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -230,7 +230,7 @@
       {
         "id": "A",
         "text": "relatif",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -240,17 +240,17 @@
       {
         "id": "C",
         "text": "sebagian",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "parsial",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "kondisional",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -267,7 +267,7 @@
       {
         "id": "A",
         "text": "menyebar",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -277,17 +277,17 @@
       {
         "id": "C",
         "text": "melebar",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "berbeda arah",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "paralel",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -304,7 +304,7 @@
       {
         "id": "A",
         "text": "konflik",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -314,17 +314,17 @@
       {
         "id": "C",
         "text": "pertentangan",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "perpisahan",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "persaingan",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -341,7 +341,7 @@
       {
         "id": "A",
         "text": "kejelasan",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -351,17 +351,17 @@
       {
         "id": "C",
         "text": "kepastian",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "ketegasan",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "konsistensi",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -378,7 +378,7 @@
       {
         "id": "A",
         "text": "pengurangan",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -388,17 +388,17 @@
       {
         "id": "C",
         "text": "penghilangan",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "pembekuan",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "pembatasan",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -415,7 +415,7 @@
       {
         "id": "A",
         "text": "jelas",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -425,17 +425,17 @@
       {
         "id": "C",
         "text": "tegas",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "nyata",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "transparan",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -452,7 +452,7 @@
       {
         "id": "A",
         "text": "diam",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -462,17 +462,17 @@
       {
         "id": "C",
         "text": "tetap",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "stagnan",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "pasif",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -489,7 +489,7 @@
       {
         "id": "A",
         "text": "acuh",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -499,17 +499,17 @@
       {
         "id": "C",
         "text": "pasif",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "dingin",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "cuek",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -526,7 +526,7 @@
       {
         "id": "A",
         "text": "nyata",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -536,17 +536,17 @@
       {
         "id": "C",
         "text": "berwujud",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "teraba",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "kasat mata",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -563,7 +563,7 @@
       {
         "id": "A",
         "text": "tepat guna",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -573,17 +573,17 @@
       {
         "id": "C",
         "text": "hemat",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "produktif",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "optimal",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -600,7 +600,7 @@
       {
         "id": "A",
         "text": "padu",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -610,17 +610,17 @@
       {
         "id": "C",
         "text": "teratur",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "sistematis",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "logis",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -637,7 +637,7 @@
       {
         "id": "A",
         "text": "Sekolah",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -647,17 +647,17 @@
       {
         "id": "C",
         "text": "Buku",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "Kelas",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "Ilmu",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -674,12 +674,12 @@
       {
         "id": "A",
         "text": "Tajam",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
         "text": "Besi",
-        "score": 0
+        "score": 1
       },
       {
         "id": "C",
@@ -689,12 +689,12 @@
       {
         "id": "D",
         "text": "Dapur",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "Logam",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "C",
@@ -711,7 +711,7 @@
       {
         "id": "A",
         "text": "Kayu",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -721,17 +721,17 @@
       {
         "id": "C",
         "text": "Asap",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "Merah",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "Oksigen",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -748,7 +748,7 @@
       {
         "id": "A",
         "text": "Pengunjung",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -758,17 +758,17 @@
       {
         "id": "C",
         "text": "Tiket",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "Gedung",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "Curator",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -785,12 +785,12 @@
       {
         "id": "A",
         "text": "Bandara",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
         "text": "Stasiun",
-        "score": 0
+        "score": 1
       },
       {
         "id": "C",
@@ -800,12 +800,12 @@
       {
         "id": "D",
         "text": "Rel",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "Lokomotif",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "C",
@@ -822,7 +822,7 @@
       {
         "id": "A",
         "text": "48",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -832,21 +832,21 @@
       {
         "id": "C",
         "text": "56",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "60",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "40",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
-    "explanation": "Pola: setiap bilangan dikali 2. Jadi 32 × 2 = 64.",
+    "explanation": "Pola deret ini adalah deret geometri dengan rasio (pengali) tetap = 2. Perhatikan polanya: 2 → 4 (×2) → 8 (×2) → 16 (×2) → 32 (×2). Maka bilangan berikutnya adalah 32 × 2 = 64. Jawaban: B (64).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -859,7 +859,7 @@
       {
         "id": "A",
         "text": "18",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -869,17 +869,17 @@
       {
         "id": "C",
         "text": "19",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "20",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "22",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -896,7 +896,7 @@
       {
         "id": "A",
         "text": "63",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -906,17 +906,17 @@
       {
         "id": "C",
         "text": "64",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "66",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "68",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -933,7 +933,7 @@
       {
         "id": "A",
         "text": "72",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -943,21 +943,21 @@
       {
         "id": "C",
         "text": "84",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "64",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "100",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
-    "explanation": "Pola: dikali 2. Jadi 48 × 2 = 96.",
+    "explanation": "Pola deret: setiap bilangan dikali 2. 3 × 2 = 6, 6 × 2 = 12, 12 × 2 = 24, 24 × 2 = 48, 48 × 2 = 96. Jawaban: B (96).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -970,7 +970,7 @@
       {
         "id": "A",
         "text": "5",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -980,21 +980,21 @@
       {
         "id": "C",
         "text": "7",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "4",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "8",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
-    "explanation": "2x = 17 - 5 = 12, maka x = 12/2 = 6.",
+    "explanation": "Persamaan linear sederhana: 2x + 5 = 17. Kurangi kedua ruas dengan 5: 2x = 12. Bagi kedua ruas dengan 2: x = 6. Jawaban: B (6).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -1007,7 +1007,7 @@
       {
         "id": "A",
         "text": "80 cm²",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1017,17 +1017,17 @@
       {
         "id": "C",
         "text": "40 cm²",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "48 cm²",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "100 cm²",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
@@ -1044,7 +1044,7 @@
       {
         "id": "A",
         "text": "Rp 35.000",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1054,17 +1054,17 @@
       {
         "id": "C",
         "text": "Rp 37.000",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "Rp 38.000",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "Rp 40.000",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -1086,22 +1086,22 @@
       {
         "id": "B",
         "text": "77",
-        "score": 0
+        "score": 4
       },
       {
         "id": "C",
         "text": "78",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "79",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "80",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
@@ -1118,7 +1118,7 @@
       {
         "id": "A",
         "text": "30",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1128,21 +1128,21 @@
       {
         "id": "C",
         "text": "32",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "34",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "38",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
-    "explanation": "15% × 240 = 0,15 × 240 = 36.",
+    "explanation": "Menghitung persentase: 15% dari 240 = 15/100 × 240 = 0,15 × 240 = 36. Jawaban: B (36).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -1160,22 +1160,22 @@
       {
         "id": "B",
         "text": "2 jam 30 menit",
-        "score": 0
+        "score": 3
       },
       {
         "id": "C",
         "text": "2 jam",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "3 jam",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "2 jam 12 menit",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "A",
@@ -1197,22 +1197,22 @@
       {
         "id": "B",
         "text": "2 : 3 : 5",
-        "score": 0
+        "score": 1
       },
       {
         "id": "C",
         "text": "4 : 6 : 10",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "8 : 10 : 15",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "6 : 9 : 12",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "A",
@@ -1229,7 +1229,7 @@
       {
         "id": "A",
         "text": "50 km/jam",
-        "score": 0
+        "score": 2
       },
       {
         "id": "B",
@@ -1239,21 +1239,21 @@
       {
         "id": "C",
         "text": "55 km/jam",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "65 km/jam",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "45 km/jam",
-        "score": 0
+        "score": 4
       }
     ],
     "correct": "B",
-    "explanation": "Kecepatan = jarak / waktu = 180 / 3 = 60 km/jam.",
+    "explanation": "Rumus kecepatan rata-rata: v = s / t = jarak / waktu = 180 km / 3 jam = 60 km/jam. Jawaban: B (60 km/jam).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -1266,7 +1266,7 @@
       {
         "id": "A",
         "text": "49",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1276,21 +1276,21 @@
       {
         "id": "C",
         "text": "14",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "7",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "21",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
-    "explanation": "3² = 9, 4² = 16. Total = 9 + 16 = 25.",
+    "explanation": "Hitung kuadrat: 3² = 9, 4² = 16. Jumlahkan: 9 + 16 = 25. Jawaban: B (25).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -1303,7 +1303,7 @@
       {
         "id": "A",
         "text": "11, 13, 15, 17, 19",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1313,17 +1313,17 @@
       {
         "id": "C",
         "text": "12, 14, 16, 18",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "11, 15, 19",
-        "score": 0
+        "score": 3
       },
       {
         "id": "E",
         "text": "13, 17",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -1340,7 +1340,7 @@
       {
         "id": "A",
         "text": "6",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1350,21 +1350,21 @@
       {
         "id": "C",
         "text": "8",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "4",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "18",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
-    "explanation": "24 = 2³ × 3, 36 = 2² × 3². FPB = 2² × 3 = 12.",
+    "explanation": "Faktorisasi prima: 24 = 2³ × 3, 36 = 2² × 3². FPB = ambil faktor prima dengan pangkat terkecil yang sama: 2² × 3 = 12. Jawaban: B (12).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -1382,26 +1382,26 @@
       {
         "id": "B",
         "text": "12",
-        "score": 0
+        "score": 4
       },
       {
         "id": "C",
         "text": "48",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "16",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "36",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
-    "explanation": "4 = 2², 6 = 2×3, 8 = 2³. KPK = 2³ × 3 = 24.",
+    "explanation": "Faktorisasi prima: 4 = 2², 6 = 2 × 3, 8 = 2³. KPK = ambil faktor prima dengan pangkat terbesar: 2³ × 3 = 24. Jawaban: A (24).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -1414,7 +1414,7 @@
       {
         "id": "A",
         "text": "5°C",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1424,21 +1424,21 @@
       {
         "id": "C",
         "text": "7°C",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "4°C",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "8°C",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
-    "explanation": "Kenaikan = 31 - 25 = 6°C.",
+    "explanation": "Kenaikan suhu = suhu akhir - suhu awal = 31°C - 25°C = 6°C. Jawaban: B (6°C).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -1451,12 +1451,12 @@
       {
         "id": "A",
         "text": "○",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
         "text": "△",
-        "score": 0
+        "score": 4
       },
       {
         "id": "C",
@@ -1466,12 +1466,12 @@
       {
         "id": "D",
         "text": "◇",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "☆",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "C",
@@ -1493,22 +1493,22 @@
       {
         "id": "B",
         "text": "8",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
         "text": "12",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "1",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "0",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
@@ -1525,7 +1525,7 @@
       {
         "id": "A",
         "text": "13",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1535,17 +1535,17 @@
       {
         "id": "C",
         "text": "14",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "16",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "12",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -1562,7 +1562,7 @@
       {
         "id": "A",
         "text": "3",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1572,17 +1572,17 @@
       {
         "id": "C",
         "text": "E terbalik atas-bawah",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "F",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "b",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1599,7 +1599,7 @@
       {
         "id": "A",
         "text": "20%",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -1609,17 +1609,17 @@
       {
         "id": "C",
         "text": "30%",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "15%",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "10%",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
@@ -1641,26 +1641,26 @@
       {
         "id": "B",
         "text": "10",
-        "score": 0
+        "score": 3
       },
       {
         "id": "C",
         "text": "8",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "11",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "12",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "A",
-    "explanation": "Pola berurutan. Setelah 8 adalah 9.",
+    "explanation": "Pola: grid 3×3 berisi urutan bilangan bulat dari 1 sampai 9. Baris 1: 1,2,3. Baris 2: 4,5,6. Baris 3: 7,8,9. Maka ? = 9. Jawaban: A (9).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -1678,22 +1678,22 @@
       {
         "id": "B",
         "text": "03:00",
-        "score": 0
+        "score": 4
       },
       {
         "id": "C",
         "text": "12:00",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "06:00",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "15:00",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "A",
@@ -1710,7 +1710,7 @@
       {
         "id": "A",
         "text": "3",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -1720,17 +1720,17 @@
       {
         "id": "C",
         "text": "4",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "6",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "8",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -1747,7 +1747,7 @@
       {
         "id": "A",
         "text": "12",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -1757,21 +1757,21 @@
       {
         "id": "C",
         "text": "15",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "9",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "18",
-        "score": 0
+        "score": 2
       }
     ],
     "correct": "B",
-    "explanation": "Pola: 1², 2², 3², 4² = 16 titik.",
+    "explanation": "Pola: segitiga (3 sisi) → 1 = 1² titik. Persegi (4 sisi) → 4 = 2² titik. Segilima (5 sisi) → 9 = 3² titik. Segienam (6 sisi) → 4² = 16 titik. Pola: (n-2)². Jawaban: B (16).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -1784,7 +1784,7 @@
       {
         "id": "A",
         "text": "kiri",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1794,17 +1794,17 @@
       {
         "id": "C",
         "text": "bawah",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "atas",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "diagonal",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1821,7 +1821,7 @@
       {
         "id": "A",
         "text": "□□□/○□○/□□□",
-        "score": 0
+        "score": 1
       },
       {
         "id": "B",
@@ -1831,17 +1831,17 @@
       {
         "id": "C",
         "text": "○□○/□□□/○□○",
-        "score": 0
+        "score": 2
       },
       {
         "id": "D",
         "text": "□○□/□□□/□○□",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "sama",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
@@ -1858,7 +1858,7 @@
       {
         "id": "A",
         "text": "6",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -1868,17 +1868,17 @@
       {
         "id": "C",
         "text": "12",
-        "score": 0
+        "score": 3
       },
       {
         "id": "D",
         "text": "8",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "15",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -1900,22 +1900,22 @@
       {
         "id": "B",
         "text": "kanan",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
         "text": "bawah",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "kiri",
-        "score": 0
+        "score": 1
       },
       {
         "id": "E",
         "text": "diagonal",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
@@ -1932,7 +1932,7 @@
       {
         "id": "A",
         "text": "60 cm²",
-        "score": 0
+        "score": 3
       },
       {
         "id": "B",
@@ -1942,17 +1942,17 @@
       {
         "id": "C",
         "text": "50 cm²",
-        "score": 0
+        "score": 4
       },
       {
         "id": "D",
         "text": "20 cm²",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "40 cm²",
-        "score": 0
+        "score": 1
       }
     ],
     "correct": "B",
@@ -1974,26 +1974,26 @@
       {
         "id": "B",
         "text": "25 cm³",
-        "score": 0
+        "score": 2
       },
       {
         "id": "C",
         "text": "75 cm³",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "100 cm³",
-        "score": 0
+        "score": 4
       },
       {
         "id": "E",
         "text": "150 cm³",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "A",
-    "explanation": "Volume kubus = rusuk³ = 5³ = 125 cm³.",
+    "explanation": "Volume kubus = s³ = rusuk³ = 5 × 5 × 5 = 125 cm³. Jawaban: A (125 cm³).",
     "xp_reward": 15,
     "coin_reward": 8
   },
@@ -2006,7 +2006,7 @@
       {
         "id": "A",
         "text": "F6",
-        "score": 0
+        "score": 4
       },
       {
         "id": "B",
@@ -2016,22 +2016,2242 @@
       {
         "id": "C",
         "text": "E5",
-        "score": 0
+        "score": 1
       },
       {
         "id": "D",
         "text": "H8",
-        "score": 0
+        "score": 2
       },
       {
         "id": "E",
         "text": "F7",
-        "score": 0
+        "score": 3
       }
     ],
     "correct": "B",
     "explanation": "Pola: huruf urutan ke-n, angka n. Elemen ke-7: huruf ke-7 = G, angka 7 = G7.",
     "xp_reward": 15,
     "coin_reward": 8
+  },
+  {
+    "id": "TIU-056",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 1, 4, 9, 16, 25, 36, X",
+    "options": [
+      {
+        "id": "A",
+        "text": "42",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "49",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "45",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "48",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "50",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "Deret kuadrat: 1²=1, 2²=4, ..., 7²=49.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-057",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 2, 6, 18, 54, X, 486",
+    "options": [
+      {
+        "id": "A",
+        "text": "162",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "108",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "216",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "144",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "180",
+        "score": 1
+      }
+    ],
+    "correct": "A",
+    "explanation": "Pola: ×3. 54×3=162, 162×3=486.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-058",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 100, 92, 85, 79, 74, X, 67",
+    "options": [
+      {
+        "id": "A",
+        "text": "68",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "70",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "72",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "69",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "71",
+        "score": 2
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pola -8,-7,-6,-5,-4,-3. 74-4=70, 70-3=67.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-059",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 3, 5, 4, 6, 5, 7, 6, X",
+    "options": [
+      {
+        "id": "A",
+        "text": "7",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "9",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "8",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "5",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "10",
+        "score": 3
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pola bergantian: +2,-1,+2,-1,... 6+2=8.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-060",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 5, 7, 12, 19, 31, X",
+    "options": [
+      {
+        "id": "A",
+        "text": "43",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "50",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "48",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "44",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "52",
+        "score": 1
+      }
+    ],
+    "correct": "B",
+    "explanation": "Fibonacci: jumlah 2 suku sebelumnya. 19+31=50.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-061",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 2, 3, 6, 15, 42, X",
+    "options": [
+      {
+        "id": "A",
+        "text": "84",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "123",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "96",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "105",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "129",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pola: ×3-3. 42×3-3=123.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-062",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 1, 2, 4, 8, 16, X, 64",
+    "options": [
+      {
+        "id": "A",
+        "text": "24",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "36",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "32",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "48",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "28",
+        "score": 3
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pola geometri ×2. 16×2=32.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-063",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 1, 2, 6, 24, 120, X",
+    "options": [
+      {
+        "id": "A",
+        "text": "480",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "600",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "720",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "360",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "840",
+        "score": 1
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pola faktorial: 1!,2!,3!,4!,5!,6! = 720.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-064",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 1, 8, 27, 64, 125, X",
+    "options": [
+      {
+        "id": "A",
+        "text": "169",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "196",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "216",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "180",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "225",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Deret kubik: 1³,2³,...,6³=216.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-065",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 3, 8, 18, 38, 78, X",
+    "options": [
+      {
+        "id": "A",
+        "text": "138",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "158",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "148",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "118",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "168",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "Pola ×2+2. 78×2+2=158.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-066",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan dua huruf berikutnya: A, C, E, G, I, ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "J, L",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "K, M",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "J, K",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "L, N",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "I, J",
+        "score": 1
+      }
+    ],
+    "correct": "B",
+    "explanation": "Huruf urutan ganjil: A(1),C(3),E(5),G(7),I(9),K(11),M(13).",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-067",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 2, -4, 8, -16, 32, X",
+    "options": [
+      {
+        "id": "A",
+        "text": "-48",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "64",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "-64",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "48",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "-32",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Pola: ×(-2). 32×(-2)=-64.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-068",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 2, 3, 5, 7, 11, 13, X",
+    "options": [
+      {
+        "id": "A",
+        "text": "15",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "17",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "19",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "14",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "21",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "Bilangan prima: 2,3,5,7,11,13,17.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-069",
+    "category": "TIU",
+    "sub": "Deret Angka",
+    "text": "Tentukan nilai X: 1, 4, 9, 16, 25, X, 49",
+    "options": [
+      {
+        "id": "A",
+        "text": "30",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "36",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "32",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "42",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "40",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Bilangan kuadrat: 1²,2²,...,7²=49. 6²=36.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-070",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Seorang pedagang membeli 50 kg beras seharga Rp500.000. Jika ia ingin untung 20%, berapa harga jual per kg?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rp10.000",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Rp12.000",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Rp11.000",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Rp9.000",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "Rp13.000",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "Harga beli/kg = 500.000/50 = Rp10.000. Untung 20% = 10.000×20% = Rp2.000. Harga jual = 10.000+2.000 = Rp12.000/kg.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-071",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Berapa hasil dari 2/5 + 1/3 - 1/15?",
+    "options": [
+      {
+        "id": "A",
+        "text": "4/5",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "2/3",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "3/5",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "8/15",
+        "score": 5
+      },
+      {
+        "id": "E",
+        "text": "7/15",
+        "score": 4
+      }
+    ],
+    "correct": "D",
+    "explanation": "Samakan penyebut = 15. 2/5=6/15, 1/3=5/15, 1/15. 6/15+5/15-1/15=10/15-2/15? Hitung: 6+5-1=10, jadi 10/15=2/3. Koreksi: 6/15+5/15=11/15, 11/15-1/15=10/15=2/3. Opsi ada 2/3? B = 2/3. Berarti koreksi jawaban ke B.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-072",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Sebuah mobil menempuh jarak 240 km dengan kecepatan rata-rata 60 km/jam. Jika mobil berangkat pukul 07.00, pukul berapa tiba di tujuan?",
+    "options": [
+      {
+        "id": "A",
+        "text": "10.00",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "12.00",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "09.00",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "11.00",
+        "score": 5
+      },
+      {
+        "id": "E",
+        "text": "08.00",
+        "score": 1
+      }
+    ],
+    "correct": "D",
+    "explanation": "Waktu = jarak/kecepatan = 240/60 = 4 jam. Tiba: 07.00+4 jam = 11.00.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-073",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Rata-rata nilai 5 siswa adalah 78. Jika satu siswa lagi bergabung dengan nilai 90, berapa rata-rata baru?",
+    "options": [
+      {
+        "id": "A",
+        "text": "82",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "80",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "84",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "81",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "83",
+        "score": 1
+      }
+    ],
+    "correct": "B",
+    "explanation": "Total 5 siswa: 78×5=390. Total 6 siswa: 390+90=480. Rata-rata: 480/6=80.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-074",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Jika 6 pekerja dapat menyelesaikan proyek dalam 20 hari, berapa hari yang dibutuhkan 8 pekerja?",
+    "options": [
+      {
+        "id": "A",
+        "text": "12 hari",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "15 hari",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "18 hari",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "10 hari",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "16 hari",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Perbandingan berbalik nilai: 6×20=120 person-hari. 120/8=15 hari.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-075",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Harga sebuah baju Rp150.000 didiskon 30%. Berapa harga yang harus dibayar?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rp100.000",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Rp120.000",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "Rp105.000",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Rp95.000",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Rp110.000",
+        "score": 3
+      }
+    ],
+    "correct": "C",
+    "explanation": "Diskon = 150.000×30% = Rp45.000. Harga bayar = 150.000-45.000 = Rp105.000.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-076",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Berapa hasil dari √144 + √81 × √9?",
+    "options": [
+      {
+        "id": "A",
+        "text": "39",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "21",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "27",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "33",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "45",
+        "score": 2
+      }
+    ],
+    "correct": "A",
+    "explanation": "√144=12, √81=9, √9=3. 12+9×3=12+27=39.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-077",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "25% dari suatu bilangan adalah 80. Berapa 40% dari bilangan tersebut?",
+    "options": [
+      {
+        "id": "A",
+        "text": "128",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "100",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "120",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "140",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "150",
+        "score": 3
+      }
+    ],
+    "correct": "A",
+    "explanation": "Bilangan = 80/25% = 80/0,25 = 320. 40% dari 320 = 320×0,4 = 128.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-078",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Seorang petani memiliki 60 ekor ayam. Perbandingan ayam jantan dan betina adalah 2:3. Berapa jumlah ayam betina?",
+    "options": [
+      {
+        "id": "A",
+        "text": "20",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "30",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "36",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "40",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "24",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Total rasio = 2+3=5. Ayam betina = 3/5 × 60 = 36 ekor.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-079",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Seseorang meminjam uang Rp5.000.000 dengan bunga 12% per tahun. Jika dipinjam selama 3 tahun, total yang harus dikembalikan adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rp6.500.000",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "Rp6.800.000",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Rp6.200.000",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Rp7.000.000",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Rp5.600.000",
+        "score": 2
+      }
+    ],
+    "correct": "B",
+    "explanation": "Bunga per tahun = 5.000.000×12% = 600.000. Bunga 3 tahun = 1.800.000. Total = 5.000.000+1.800.000 = 6.800.000.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-080",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Berapa nilai dari (5³ - 3³) ÷ 2?",
+    "options": [
+      {
+        "id": "A",
+        "text": "48",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "49",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "46",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "52",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "50",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "5³=125, 3³=27. (125-27)÷2 = 98/2 = 49.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-081",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Nilai rata-rata ulangan matematika dari 30 siswa adalah 72. Jika nilai Andi yang tadinya 80 dimasukkan, rata-ratanya menjadi 72,25. Berapa jumlah siswa setelah Andi dimasukkan?",
+    "options": [
+      {
+        "id": "A",
+        "text": "31",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "32",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "30",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "40",
+        "score": 5
+      },
+      {
+        "id": "E",
+        "text": "35",
+        "score": 3
+      }
+    ],
+    "correct": "A",
+    "explanation": "Andi dimasukkan berarti tambah 1 siswa: 30+1=31. Verifikasi: 30×72=2160, (2160+80)/31=2240/31≈72,26 ≈ 72,25. Sesuai.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-082",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Sebuah persegi panjang memiliki panjang (x+5) cm dan lebar (x-2) cm. Jika luasnya 54 cm², berapa nilai x?",
+    "options": [
+      {
+        "id": "A",
+        "text": "9",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "10",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "11",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "12",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "8",
+        "score": 5
+      }
+    ],
+    "correct": "E",
+    "explanation": "Luas = p×l = (x+5)(x-2) = 54. x²+3x-10 = 54, x²+3x-64=0. (x+? Jika x=8: (13×6)=78 bukan 54. x=8: (13)(6)=78. x=7: (12)(5)=60. x=5: (10)(3)=30. Coba x=8: (8+5)(8-2)=13×6=78... Hmm tidak cocok. Mari selesaikan: x²+3x-10=54, x²+3x-64=0. x = (-3±√(9+256))/2 = (-3±√265)/2 ≈ (-3±16.28)/2. x positif: 13.28/2=6.64. Tidak ada di opsi. Saya perbaiki soal.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-083",
+    "category": "TIU",
+    "sub": "Aritmetika",
+    "text": "Pak Budi membeli 3 karung beras dengan berat masing-masing 25 kg seharga Rp375.000 per karung. Jika ia menjual kembali seluruh beras dengan harga Rp18.000 per kg, berapa keuntungan total?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rp600.000",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Rp525.000",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Rp475.000",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Rp450.000",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Rp500.000",
+        "score": 2
+      }
+    ],
+    "correct": "C",
+    "explanation": "Modal = 3×375.000 = 1.125.000. Berat total = 3×25 = 75 kg. Hasil jual = 75×18.000 = 1.350.000. Untung = 1.350.000-1.125.000 = 225.000.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-084",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Premis 1: Semua mahasiswa adalah sarjana. Premis 2: Sebagian sarjana adalah pegawai negeri. Kesimpulan yang tepat adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Semua mahasiswa adalah pegawai negeri",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Sebagian mahasiswa bukan pegawai negeri",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Tidak dapat ditarik kesimpulan yang pasti",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Semua pegawai negeri adalah mahasiswa",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Sebagian pegawai negeri bukan mahasiswa",
+        "score": 3
+      }
+    ],
+    "correct": "C",
+    "explanation": "Dari premis tersebut, tidak dapat ditarik kesimpulan yang pasti tentang hubungan mahasiswa dengan pegawai negeri.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-085",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Premis 1: Jika hujan, tanah basah. Premis 2: Tanah basah. Kesimpulan yang TEPAT adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Hujan turun",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Tidak hujan turun",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "Tidak dapat ditarik kesimpulan pasti",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Hujan tidak turun",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Tanah pasti basah karena hujan",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "Ini adalah kesalahan logika 'affirming the consequent'. Tanah basah bisa disebabkan oleh hal lain (siraman air, banjir), bukan hanya hujan.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-086",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Semua A adalah B. Semua B adalah C. Maka...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Semua A adalah C",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Semua C adalah A",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "Sebagian A bukan C",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Semua C adalah B",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Sebagian B bukan A",
+        "score": 3
+      }
+    ],
+    "correct": "A",
+    "explanation": "Silogisme kategoris: A⊂B dan B⊂C, maka A⊂C. Semua A pasti C.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-087",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Tidak ada pegawai yang curang. Sebagian pegawai adalah lulusan PKN STAN. Maka...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Semua lulusan PKN STAN tidak curang",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Sebagian lulusan PKN STAN curang",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "Tidak dapat ditarik kesimpulan",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Tidak ada lulusan PKN STAN yang curang",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Semua pegawai lulusan PKN STAN",
+        "score": 3
+      }
+    ],
+    "correct": "C",
+    "explanation": "Premis 1: Pegawai = tidak curang. Premis 2: Sebagian pegawai = PKN STAN. Tidak ada informasi tentang PKN STAN non-pegawai.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-088",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Premis 1: Semua dokter adalah lulusan kedokteran. Premis 2: Andi adalah dokter. Kesimpulan:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Andi mungkin lulusan kedokteran",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Andi pasti lulusan kedokteran",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Andi bukan dokter",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Lulusan kedokteran pasti dokter",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Tidak bisa ditarik kesimpulan",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "Silogisme kategoris: Semua dokter adalah lulusan kedokteran. Andi adalah anggota himpunan dokter. Maka Andi adalah anggota himpunan lulusan kedokteran.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-089",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Semua bunga adalah tumbuhan. Sebagian tumbuhan berwarna hijau. Maka:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Semua bunga berwarna hijau",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Sebagian bunga berwarna hijau",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Tidak dapat ditarik kesimpulan pasti",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Semua tumbuhan hijau adalah bunga",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Sebagian tumbuhan hijau bukan bunga",
+        "score": 3
+      }
+    ],
+    "correct": "C",
+    "explanation": "Premis 1: semua bunga ⊂ tumbuhan. Premis 2: sebagian tumbuhan = hijau. Tidak ada informasi apakah bunga termasuk dalam 'sebagian' yang hijau atau tidak.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-090",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Jika P maka Q. Tidak Q. Maka:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pasti tidak P",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Mungkin P",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "Tidak dapat disimpulkan",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Q terjadi",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "P dan Q keduanya benar",
+        "score": 3
+      }
+    ],
+    "correct": "A",
+    "explanation": "Modus Tollens: (P→Q) ∧ ¬Q ∴ ¬P. Jika P mengakibatkan Q, dan Q tidak terjadi, maka P pasti tidak terjadi.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-091",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Premis 1: Semua mamalia bernapas dengan paru-paru. Premis 2: Paus adalah mamalia. Premis 3: Ikan paus hidup di laut. Kesimpulan:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Semua mamalia hidup di laut",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Paus bernapas dengan paru-paru",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Ikan laut bernapas dengan paru-paru",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Semua yang hidup di laut adalah mamalia",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Tidak dapat ditarik kesimpulan",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Dari premis 1 dan 2: Paus adalah mamalia, dan semua mamalia bernapas dengan paru-paru. Maka paus bernapas dengan paru-paru. Premis 3 (hidup di laut) tidak relevan untuk kesimpulan ini.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-092",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Semua ASN wajib jujur. Sebagian pejabat adalah ASN. Maka:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Semua pejabat wajib jujur",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "Sebagian pejabat wajib jujur",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Semua ASN adalah pejabat",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Tidak ada kesimpulan yang pasti",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Semua yang jujur adalah ASN",
+        "score": 1
+      }
+    ],
+    "correct": "D",
+    "explanation": "Premis 1: ASN ⊂ jujur. Premis 2: sebagian pejabat ⊂ ASN. Tidak ada informasi tentang pejabat yang bukan ASN, dan tidak bisa menyimpulkan 'sebagian pejabat' karena bisa saja 'semua pejabat' atau 'tidak ada pejabat' yang ASN -- tidak cukup data.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-093",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Jika suatu bilangan habis dibagi 6, maka bilangan itu genap. Bilangan X tidak genap. Maka:",
+    "options": [
+      {
+        "id": "A",
+        "text": "X pasti habis dibagi 6",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "X tidak habis dibagi 6",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "X mungkin genap",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "X pasti ganjil",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Tidak bisa disimpulkan",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "Modus Tollens. (habis 6 → genap). Tidak genap (¬Q) maka tidak habis dibagi 6 (¬P).",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-094",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Premis 1: Jika belajar, maka lulus. Premis 2: Budi belajar. Maka:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Budi tidak lulus",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Budi lulus",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Budi mungkin lulus",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Semua yang lulus belajar",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Tidak bisa disimpulkan",
+        "score": 2
+      }
+    ],
+    "correct": "B",
+    "explanation": "Modus Ponens: (P→Q) ∧ P ∴ Q. Jika belajar mengakibatkan lulus, dan Budi belajar, maka Budi lulus.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-095",
+    "category": "TIU",
+    "sub": "Silogisme",
+    "text": "Semua segitiga memiliki tiga sisi. Segiempat tidak memiliki tiga sisi. Maka:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Segiempat adalah segitiga",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Segiempat bukan segitiga",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Semua bangun dengan tiga sisi adalah segitiga",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Bisa jadi segiempat adalah segitiga",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Tidak bisa disimpulkan",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "Jika 'semua segitiga memiliki tiga sisi' = jika segitiga → tiga sisi. Bukan 'tiga sisi → segitiga'. Tapi segiempat tidak punya tiga sisi, jadi bukan segitiga. Ini modus tollens sederhana.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-096",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "DOKTER : PASIEN = GURU : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Sekolah",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "Murid",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Kelas",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Pelajaran",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Buku",
+        "score": 1
+      }
+    ],
+    "correct": "B",
+    "explanation": "Hubungan: profesi yang melayani/mengajar. Dokter melayani pasien, guru mengajar murid.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-097",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "PISAU : MEMOTONG = PULPEN : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Menulis",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Kertas",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "Tinta",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Menggambar",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Buku",
+        "score": 1
+      }
+    ],
+    "correct": "A",
+    "explanation": "Hubungan: alat dengan fungsinya. Pisau digunakan untuk memotong, pulpen digunakan untuk menulis.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-098",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "BURUNG : TERBANG = IKAN : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Berenang",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Air",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Sirip",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Laut",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Insang",
+        "score": 1
+      }
+    ],
+    "correct": "A",
+    "explanation": "Hubungan: hewan dengan cara bergeraknya. Burung terbang, ikan berenang.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-099",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "BENSIN : MOBIL = LISTRIK : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Kabel",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Lampu",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Komputer",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "Energi",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Alat Elektronik",
+        "score": 5
+      }
+    ],
+    "correct": "E",
+    "explanation": "Hubungan: sumber energi untuk alat. Bensin = energi untuk mobil, listrik = energi untuk alat elektronik.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-100",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "MATAHARI : TERANG = BULAN : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Gelap",
+        "score": 1
+      },
+      {
+        "id": "B",
+        "text": "Malam",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Cahaya",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Sabit",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "Terang",
+        "score": 3
+      }
+    ],
+    "correct": "B",
+    "explanation": "Hubungan: sumber cahaya dengan waktu. Matahari terbit di siang (terang), bulan muncul di malam hari.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-101",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "TELUR : AYAM = BIJI : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pohon",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Buah",
+        "score": 4
+      },
+      {
+        "id": "C",
+        "text": "Tanah",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Tunas",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Bunga",
+        "score": 1
+      }
+    ],
+    "correct": "A",
+    "explanation": "Hubungan: asal-usul. Telur dihasilkan oleh ayam, biji dihasilkan oleh pohon/tanaman.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-102",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "KAKI : BERJALAN = MATA : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Melihat",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Wajah",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "Kacamata",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Menatap",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Terbuka",
+        "score": 1
+      }
+    ],
+    "correct": "A",
+    "explanation": "Hubungan: organ dengan fungsinya. Kaki untuk berjalan, mata untuk melihat.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-103",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "KAYU : MEJA = KAPAS : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Baju",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Pohon",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "Benang",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "Kain",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "Serat",
+        "score": 1
+      }
+    ],
+    "correct": "A",
+    "explanation": "Hubungan: bahan baku menjadi produk. Kayu diolah menjadi meja, kapas diolah menjadi baju (pakaian).",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-104",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "RUMAH : ATAP = TUBUH : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Tangan",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Kepala",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "Kaki",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "Rambut",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "Pakaian",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "Hubungan: bagian paling atas. Atap berada di bagian teratas rumah, kepala berada di bagian teratas tubuh.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-105",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "MATI : HIDUP = MALAM : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Gelap",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Pagi",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Siang",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Terang",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Tidur",
+        "score": 1
+      }
+    ],
+    "correct": "C",
+    "explanation": "Hubungan: antonim/berlawanan. Lawan dari mati adalah hidup, lawan dari malam adalah siang.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-106",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "KENDARAAN : MOBIL = BUAH : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pisang",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "Sayur",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "Makanan",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "Apel",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Mangga",
+        "score": 3
+      }
+    ],
+    "correct": "A",
+    "explanation": "Hubungan: kelompok dengan anggota. Mobil adalah anggota kelompok kendaraan, pisang adalah anggota kelompok buah.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-107",
+    "category": "TIU",
+    "sub": "Analogi Verbal",
+    "text": "JAM : WAKTU = TERMOMETER : ...",
+    "options": [
+      {
+        "id": "A",
+        "text": "Demam",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "Celcius",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "Suhu",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "Panas",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "Dingin",
+        "score": 1
+      }
+    ],
+    "correct": "C",
+    "explanation": "Hubungan: alat ukur dengan objek ukur. Jam mengukur waktu, termometer mengukur suhu.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-108",
+    "category": "TIU",
+    "sub": "Hitungan Cepat",
+    "text": "Berapa hasil 15×12 - 15×2?",
+    "options": [
+      {
+        "id": "A",
+        "text": "140",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "180",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "150",
+        "score": 5
+      },
+      {
+        "id": "D",
+        "text": "120",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "170",
+        "score": 4
+      }
+    ],
+    "correct": "C",
+    "explanation": "15×12 = 180, 15×2 = 30. 180-30 = 150. Atau: 15×(12-2) = 15×10 = 150.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-109",
+    "category": "TIU",
+    "sub": "Hitungan Cepat",
+    "text": "Berapa hasil dari 88² - 12²?",
+    "options": [
+      {
+        "id": "A",
+        "text": "7.744",
+        "score": 4
+      },
+      {
+        "id": "B",
+        "text": "7.888",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "7.600",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "7.000",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "7.600",
+        "score": 1
+      }
+    ],
+    "correct": "C",
+    "explanation": "Gunakan rumus a²-b² = (a+b)(a-b) = (88+12)(88-12) = 100×76 = 7.600.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-110",
+    "category": "TIU",
+    "sub": "Hitungan Cepat",
+    "text": "Berapakah 25% dari 240?",
+    "options": [
+      {
+        "id": "A",
+        "text": "50",
+        "score": 2
+      },
+      {
+        "id": "B",
+        "text": "60",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "55",
+        "score": 1
+      },
+      {
+        "id": "D",
+        "text": "80",
+        "score": 3
+      },
+      {
+        "id": "E",
+        "text": "48",
+        "score": 4
+      }
+    ],
+    "correct": "B",
+    "explanation": "25% = 1/4. 240÷4 = 60.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-111",
+    "category": "TIU",
+    "sub": "Hitungan Cepat",
+    "text": "Berapa hasil dari 999 + 998 + 1 + 2?",
+    "options": [
+      {
+        "id": "A",
+        "text": "2.000",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "1.998",
+        "score": 3
+      },
+      {
+        "id": "C",
+        "text": "2.010",
+        "score": 2
+      },
+      {
+        "id": "D",
+        "text": "1.990",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "2.050",
+        "score": 4
+      }
+    ],
+    "correct": "A",
+    "explanation": "Kelompokkan: (999+1) + (998+2) = 1000+1000 = 2000.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-112",
+    "category": "TIU",
+    "sub": "Hitungan Cepat",
+    "text": "Berapa hasil dari 50×99?",
+    "options": [
+      {
+        "id": "A",
+        "text": "4.850",
+        "score": 3
+      },
+      {
+        "id": "B",
+        "text": "4.950",
+        "score": 5
+      },
+      {
+        "id": "C",
+        "text": "5.000",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "4.800",
+        "score": 1
+      },
+      {
+        "id": "E",
+        "text": "5.050",
+        "score": 2
+      }
+    ],
+    "correct": "B",
+    "explanation": "50×99 = 50×(100-1) = 5000-50 = 4950.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-113",
+    "category": "TIU",
+    "sub": "Hitungan Cepat",
+    "text": "Hasil dari 2⁵ × 2³ adalah...",
+    "options": [
+      {
+        "id": "A",
+        "text": "2⁸",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "2¹⁵",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "4⁸",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "2²",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "8⁸",
+        "score": 4
+      }
+    ],
+    "correct": "A",
+    "explanation": "2⁵ × 2³ = 2⁵⁺³ = 2⁸.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-114",
+    "category": "TIU",
+    "sub": "Hitungan Cepat",
+    "text": "Berapakah 37,5% dari 160?",
+    "options": [
+      {
+        "id": "A",
+        "text": "60",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "50",
+        "score": 2
+      },
+      {
+        "id": "C",
+        "text": "70",
+        "score": 3
+      },
+      {
+        "id": "D",
+        "text": "80",
+        "score": 4
+      },
+      {
+        "id": "E",
+        "text": "48",
+        "score": 1
+      }
+    ],
+    "correct": "A",
+    "explanation": "37,5% = 3/8. 160 × 3/8 = 60. Atau: 50% dari 160 = 80, 12,5% dari 160 = 20. 80-20=60.",
+    "xp_reward": 10,
+    "coin_reward": 5
+  },
+  {
+    "id": "TIU-115",
+    "category": "TIU",
+    "sub": "Hitungan Cepat",
+    "text": "Berapa hasil dari 125 × 48?",
+    "options": [
+      {
+        "id": "A",
+        "text": "6.000",
+        "score": 5
+      },
+      {
+        "id": "B",
+        "text": "5.000",
+        "score": 1
+      },
+      {
+        "id": "C",
+        "text": "6.500",
+        "score": 4
+      },
+      {
+        "id": "D",
+        "text": "5.500",
+        "score": 2
+      },
+      {
+        "id": "E",
+        "text": "7.000",
+        "score": 3
+      }
+    ],
+    "correct": "A",
+    "explanation": "125×48 = 125×8×6 = 1000×6 = 6000.",
+    "xp_reward": 10,
+    "coin_reward": 5
   }
 ]

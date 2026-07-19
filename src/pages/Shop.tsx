@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Coins, Scale, Lightbulb, Zap, LockKeyhole, Sparkles, Check, Clock, Eye, Heart, Battery, Shield, Skull, Plus, X } from 'lucide-react';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
@@ -260,15 +261,18 @@ export default function Shop() {
                   const count = profile?.inventory?.[item.id as keyof NonNullable<typeof profile.inventory>] || 0;
 
                   return (
-                                        <button
-                      key={item.id}
-                      disabled={purchasing === item.id}
-                      onClick={() => {
-                        setBulkItem({ id: item.id, title: item.title, cost: item.cost, type: item.id === 'item_energy_refill' ? 'energy' : 'inventory' });
-                        setBulkQuantity(1);
-                      }}
-                      className="bg-surface border border-border hover:border-border p-5 md:p-6 rounded-3xl flex flex-col items-start gap-4 text-left transition-all shadow-sm hover:shadow-md hover:scale-[1.03] active:scale-[0.97] w-full relative overflow-hidden group"
-                    >
+                                        <motion.button
+                                                              key={item.id}
+                                                              disabled={purchasing === item.id}
+                                                              whileHover={{ scale: 1.03, y: -4 }}
+                                                              whileTap={{ scale: 0.97 }}
+                                                              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                                              onClick={() => {
+                                                                setBulkItem({ id: item.id, title: item.title, cost: item.cost, type: item.id === 'item_energy_refill' ? 'energy' : 'inventory' });
+                                                                setBulkQuantity(1);
+                                                              }}
+                                                              className="bg-surface border border-border hover:border-border p-5 md:p-6 rounded-3xl flex flex-col items-start gap-4 text-left transition-all shadow-sm hover:shadow-md w-full relative overflow-hidden group cursor-pointer"
+                                                            >
                       {count > 0 && (
                         <div className="absolute top-0 right-0 bg-primary-subtle text-primary border-l border-b border-primary px-3 py-1 text-xs font-bold rounded-bl-xl font-space">
                           Miliki: {count}
@@ -289,7 +293,7 @@ export default function Shop() {
                         <h3 className="font-bold text-base md:text-lg mb-2 text-fg">{item.title}</h3>
                         <p className="text-sm text-fg-muted leading-relaxed">{item.description}</p>
                       </div>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>

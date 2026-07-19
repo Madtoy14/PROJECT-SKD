@@ -1,0 +1,11 @@
+http://localhost:5173/
+http://localhost:5173/auth
+http://localhost:5173/onboarding
+http://localhost:5173/quiz
+http://localhost:5173/liga
+http://localhost:5173/quest
+http://localhost:5173/toko
+http://localhost:5173/catatan-salah
+http://localhost:5173/pembahasan
+http://localhost:5173/tryout-lobby
+http://localhost:5173/profil

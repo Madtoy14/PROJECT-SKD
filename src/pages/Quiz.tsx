@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getRandomQuestions, type Question, type QuestionOption } from '../data/questions/index';
+import { updateRating, getDifficultyColor } from '../calculations/adaptive';
 
 const cleanMathText = (text: string): string => {
   if (!text) return "";
@@ -113,6 +115,7 @@ export default function Quiz() {
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [noCatatanSalah, setNoCatatanSalah] = useState(false);
+  const [retryKey, setRetryKey] = useState(0); // bump untuk re-trigger fetch soal
   const [showSecondChanceModal, setShowSecondChanceModal] = useState(false);
   const [pendingDeathData, setPendingDeathData] = useState<{earned: number} | null>(null);
   const pendingDeathCallback = useRef<(() => void) | null>(null);
@@ -369,6 +372,10 @@ export default function Quiz() {
   // Fetch questions on mount
   useEffect(() => {
     let mounted = true;
+    // Reset state saat retry
+    setLoadingQuestions(true);
+    setError(null);
+    setNoCatatanSalah(false);
     const initQuestions = async (data: any[]) => {
       if (mounted) {
         setQuestions(data);
@@ -442,7 +449,7 @@ export default function Quiz() {
       };
       loadCatatanSalah();
     } else {
-      fetchQuestionsFromSupabase(gameMode)
+      fetchQuestionsFromSupabase(gameMode, packageId)
         .then(initQuestions)
         .catch(() => {
           // Fallback ke data lokal jika Supabase gagal
@@ -458,7 +465,7 @@ export default function Quiz() {
         });
     }
     return () => { mounted = false; };
-  }, [gameMode]);
+  }, [gameMode, retryKey]);
 
   // Keep answers ref synced for auto-save
   useEffect(() => { answersRef.current = answers; }, [answers]);
@@ -626,10 +633,14 @@ export default function Quiz() {
     setAnswers(prev => ({ ...prev, [currentQuestionIndex]: optionId }));
     const earned = calcScore(optionId);
     const isTKP = currentQuestion.category === 'TKP';
-    const isCorrect = optionId === currentQuestion.correct;
-    const isFullyCorrect = (!isTKP && isCorrect) || (isTKP && earned >= 5);
+        const isCorrect = optionId === currentQuestion.correct;
+        const isFullyCorrect = (!isTKP && isCorrect) || (isTKP && earned >= 5);
 
-    // Tracker Catatan Salah / Mastery
+        // Adaptive Difficulty: update user rating based on correctness
+        const cat = currentQuestion.category as 'TWK' | 'TIU' | 'TKP';
+        updateRating(cat, isFullyCorrect);
+
+        // Tracker Catatan Salah / Mastery
     if (profile?.id) {
       if (!isFullyCorrect) {
         saveWrongQuestion(profile.id, currentQuestion.id, currentQuestion.category);
@@ -679,18 +690,14 @@ export default function Quiz() {
           finalAnswers: { ...answers, [currentQuestionIndex]: optionId }
         }).then((resultId) => {
           navigate(`/result/${resultId}`, { 
-            state: { 
-              score: finalScore, 
-              mode: gameMode,
-              sessionId,
-              userAnswers: { ...answers, [currentQuestionIndex]: optionId },
-              quizQuestions: questions
-            } 
-          });
-          // Show toast after navigation
-          setTimeout(() => {
-             alert('Satu kesalahan fatal! Game Over.');
-          }, 100);
+                      state: { 
+                        score: finalScore, 
+                        mode: gameMode,
+                        sessionId,
+                        // ponytail: quizQuestions dihapus dari state — Result fetch dari DB (hemat memory history)
+                        userAnswers: { ...answers, [currentQuestionIndex]: optionId }
+                      } 
+                    });
         });
       }, 1000); // Wait 1 second to show red flash
     };
@@ -780,18 +787,18 @@ export default function Quiz() {
       score: finalScore, twkScore, tiuScore, tkpScore, coinsEarned: earnedCoins, xpEarned: gainedXP
     }).then((resultId) => {
       navigate(`/result/${resultId}`, { 
-        state: { 
-          score: finalScore, 
-          mode: gameMode,
-          sessionId,
-          twkScore,
-          tiuScore,
-          tkpScore,
-          userAnswers: answers,
-          quizQuestions: questions,
-          doubtfulMap: doubtful
-        } 
-      });
+              state: { 
+                score: finalScore, 
+                mode: gameMode,
+                sessionId,
+                twkScore,
+                tiuScore,
+                tkpScore,
+                // ponytail: quizQuestions dihapus — Result fetch questions_json dari DB
+                userAnswers: answers,
+                doubtfulMap: doubtful
+              } 
+            });
     });
   };
   const handleShowExplanation = () => {
@@ -850,25 +857,24 @@ export default function Quiz() {
         finalAnswers: answers
       }).then((resultId) => {
         navigate(`/result/${resultId}`, { 
-          state: { 
-            score: scoreSnapshot, 
-            mode: gameMode, 
-            sessionId,
-            liveRanks,
-            userAnswers: answers,
-            quizQuestions: questions
-          } 
-        });
-      }).catch(() => {
-        navigate(`/result/${sessionId}`, { 
-          state: { 
-            score: scoreSnapshot, 
-            mode: gameMode, 
-            sessionId,
-            liveRanks,
-            userAnswers: answers,
-            quizQuestions: questions
-          } 
+                  state: { 
+                    score: scoreSnapshot, 
+                    mode: gameMode, 
+                    sessionId,
+                    liveRanks,
+                    // ponytail: quizQuestions dihapus — Result fetch questions_json dari DB
+                    userAnswers: answers
+                  } 
+                });
+              }).catch(() => {
+                navigate(`/result/${sessionId}`, { 
+                  state: { 
+                    score: scoreSnapshot, 
+                    mode: gameMode, 
+                    sessionId,
+                    liveRanks,
+                    userAnswers: answers
+                  }
         });
       });
     }
@@ -961,12 +967,21 @@ const scoreBadge = (optionId: string) => {
               {error}
             </p>
           </div>
-          <Button
-            onClick={() => navigate('/', { replace: true })}
-            className="px-8 py-3 bg-primary hover:bg-primary-hover text-primary-fg font-black rounded-xl transition-all shadow-lg text-sm"
-          >
-            Kembali ke Beranda
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              onClick={() => setRetryKey((k) => k + 1)}
+              className="px-8 py-3 bg-primary hover:bg-primary-hover text-primary-fg font-black rounded-xl transition-all shadow-lg text-sm"
+            >
+              Coba Lagi
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/', { replace: true })}
+              className="px-8 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black rounded-xl transition-all text-sm"
+            >
+              Kembali ke Beranda
+            </Button>
+          </div>
         </div>
       )}
 
@@ -1021,6 +1036,14 @@ const scoreBadge = (optionId: string) => {
                     currentQuestion.category === 'TIU' ? 'bg-blue-50 text-primary border-blue-100' :
                     'bg-amber-50 text-warning border-amber-100'
                   }`}>Bagian: {currentQuestion.category}</span>
+                  {/* Adaptive Difficulty Badge */}
+                  {currentQuestion?.difficulty && (
+                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${getDifficultyColor(currentQuestion.difficulty)}`}>
+                      {currentQuestion.difficulty === 'mudah' && '🟢 '}
+                      {currentQuestion.difficulty === 'sulit' && '🔴 '}
+                      {currentQuestion.difficulty === 'mudah' ? 'Mudah' : currentQuestion.difficulty === 'sulit' ? 'Sulit' : 'Sedang'}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -1103,7 +1126,7 @@ const scoreBadge = (optionId: string) => {
                   </div>
                 )}
                 <div className="bg-white rounded-3xl p-8 md:px-12 md:py-10 border border-slate-100 shadow-sm mb-6 mt-2 md:mt-4">
-                  <p className="text-xl font-semibold leading-loose text-fg" dangerouslySetInnerHTML={{ __html: cleanedQuestionText }} />
+                  <p className="text-[20px] font-semibold leading-[1.6] text-fg" dangerouslySetInnerHTML={{ __html: cleanedQuestionText }} />
                 </div>
                 {/* Bocoran Rumus Hint Box */}
                 {showHint && currentQuestion.explanation && (
@@ -1159,19 +1182,21 @@ const scoreBadge = (optionId: string) => {
                     }
                                         const terawanganPercent = activePowerUps.terawangan ? (isCorrect ? ((opt.text.length * 7) % 20) + 60 : ((opt.text.length * 13) % 30)) : 0;
                     return (
-                      <button
-                        key={opt.id}
-                        onClick={() => handleSelect(opt.id)}
-                        disabled={selected !== null && gameMode !== 'tryout'}
-                        className={`w-full p-3.5 md:p-4 rounded-xl border-2 text-left flex items-center gap-3 transition-all shadow-sm relative z-0 overflow-hidden active:scale-[0.98] ${cardClass}`}
-                      >
+                      <motion.button
+                                              key={opt.id}
+                                              whileHover={{ scale: 1.02 }}
+                                              whileTap={{ scale: 0.97 }}
+                                              onClick={() => handleSelect(opt.id)}
+                                              disabled={selected !== null && gameMode !== 'tryout'}
+                                              className={`w-full min-h-[44px] p-3.5 md:p-4 rounded-xl border-2 text-left flex items-center gap-3 transition-all shadow-sm relative z-0 overflow-hidden ${cardClass}`}
+                                            >
                         {activePowerUps.terawangan && (
                           <div className="absolute left-0 bottom-0 top-0 bg-premium/10 -z-10 rounded-xl transition-all duration-1000" style={{ width: `${terawanganPercent}%` }} />
                         )}
                         <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base ${markerClass}`}>
                           {opt.id}
                         </div>
-                        <span className="flex-1 leading-snug text-base md:text-lg font-semibold text-fg" dangerouslySetInnerHTML={{ __html: opt.cleanedText }} ></span>
+                        <span className="flex-1 leading-[1.6] text-base md:text-lg font-semibold text-fg" dangerouslySetInnerHTML={{ __html: opt.cleanedText }} ></span>
                         {/* TKP score badge revealed after answering (not in tryout) */}
                         {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
@@ -1185,7 +1210,7 @@ const scoreBadge = (optionId: string) => {
                         {showStatus && !isTKP && isCorrect && gameMode !== 'tryout' && (
                           <span className="ml-auto shrink-0 text-xs font-bold bg-success/20 text-success px-2 py-1 rounded-lg">5 pts</span>
                         )}
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -1305,19 +1330,19 @@ const scoreBadge = (optionId: string) => {
           {gameMode !== 'tryout' && profile && (
             <div className="flex gap-4 px-4 py-3 border-t border-slate-100 bg-white/50 backdrop-blur-md overflow-x-auto shrink-0 mt-auto shadow-[0_-4px_20px_rgba(0,0,0,0.02)] relative z-30">
               {profile.inventory?.item_5050 > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_5050') && (
-                <Button variant="custom" onClick={use5050} disabled={!checkPowerupLimit('item_5050')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary transition-colors border border-blue-100 shadow-sm ${!checkPowerupLimit('item_5050') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-blue-100'}`}><Scale size={14}/> 50:50 ({profile.inventory.item_5050})</Button>
+                <Button variant="custom" onClick={use5050} disabled={!checkPowerupLimit('item_5050')} aria-label={`50:50 - Hapus 2 jawaban salah - ${profile.inventory.item_5050} tersisa ${!checkPowerupLimit('item_5050') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-blue-50 text-primary transition-colors border border-blue-100 shadow-sm min-h-[36px] ${!checkPowerupLimit('item_5050') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-blue-100'}`}><Scale size={14}/> 50:50<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-primary text-white">{profile.inventory.item_5050}</span></Button>
               )}
               {profile.inventory?.item_hint > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_hint') && (
-                <Button variant="custom" onClick={useHint} disabled={!checkPowerupLimit('item_hint')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-amber-50 text-warning transition-colors border border-amber-100 shadow-sm ${!checkPowerupLimit('item_hint') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-amber-100'}`}><Lightbulb size={14}/> Petunjuk ({profile.inventory.item_hint})</Button>
+                <Button variant="custom" onClick={useHint} disabled={!checkPowerupLimit('item_hint')} aria-label={`Petunjuk - Tampilkan hint rumus - ${profile.inventory.item_hint} tersisa ${!checkPowerupLimit('item_hint') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-amber-50 text-warning transition-colors border border-amber-100 shadow-sm min-h-[36px] ${!checkPowerupLimit('item_hint') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-amber-100'}`}><Lightbulb size={14}/> Petunjuk<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-warning text-white">{profile.inventory.item_hint}</span></Button>
               )}
               {profile.inventory?.item_waktu_beku > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_waktu_beku') && (
-                <Button variant="custom" onClick={useWaktuBeku} disabled={!checkPowerupLimit('item_waktu_beku')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${!checkPowerupLimit('item_waktu_beku') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.waktuBeku ? 'bg-cyan-50 border-cyan-200 text-cyan-600 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Clock size={14}/> Waktu Beku ({profile.inventory.item_waktu_beku})</Button>
+                <Button variant="custom" onClick={useWaktuBeku} disabled={!checkPowerupLimit('item_waktu_beku')} aria-label={`Waktu Beku - Hentikan timer - ${profile.inventory.item_waktu_beku} tersisa ${activePowerUps.waktuBeku ? '(aktif)' : ''} ${!checkPowerupLimit('item_waktu_beku') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border min-h-[36px] ${!checkPowerupLimit('item_waktu_beku') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.waktuBeku ? 'bg-cyan-50 border-cyan-200 text-cyan-600 shadow-inner ring-2 ring-cyan-400' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Clock size={14}/> Waktu Beku<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-cyan-500 text-white">{profile.inventory.item_waktu_beku}</span></Button>
               )}
               {profile.inventory?.item_skor_ganda > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_skor_ganda') && (
-                <Button variant="custom" onClick={useSkorGanda} disabled={!checkPowerupLimit('item_skor_ganda')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${!checkPowerupLimit('item_skor_ganda') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.skorGanda ? 'bg-amber-50 border-amber-200 text-warning shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Zap size={14}/> Skor Ganda ({profile.inventory.item_skor_ganda})</Button>
+                <Button variant="custom" onClick={useSkorGanda} disabled={!checkPowerupLimit('item_skor_ganda')} aria-label={`Skor Ganda - Poin ×2 - ${profile.inventory.item_skor_ganda} tersisa ${activePowerUps.skorGanda ? '(aktif)' : ''} ${!checkPowerupLimit('item_skor_ganda') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border min-h-[36px] ${!checkPowerupLimit('item_skor_ganda') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.skorGanda ? 'bg-amber-50 border-amber-200 text-warning shadow-inner ring-2 ring-amber-400' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Zap size={14}/> Skor Ganda<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-warning text-white">{profile.inventory.item_skor_ganda}</span></Button>
               )}
               {profile.inventory?.item_terawangan > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_terawangan') && (
-                <Button variant="custom" onClick={useTerawangan} disabled={!checkPowerupLimit('item_terawangan')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border ${!checkPowerupLimit('item_terawangan') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.terawangan ? 'bg-purple-50 border-purple-200 text-purple-600 shadow-inner' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Eye size={14}/> Terawangan ({profile.inventory.item_terawangan})</Button>
+                <Button variant="custom" onClick={useTerawangan} disabled={!checkPowerupLimit('item_terawangan')} aria-label={`Terawangan - Lihat persentase jawaban - ${profile.inventory.item_terawangan} tersisa ${activePowerUps.terawangan ? '(aktif)' : ''} ${!checkPowerupLimit('item_terawangan') ? '(habis)' : ''}`} className={`relative px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors border min-h-[36px] ${!checkPowerupLimit('item_terawangan') ? 'opacity-50 grayscale cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : activePowerUps.terawangan ? 'bg-purple-50 border-purple-200 text-purple-600 shadow-inner ring-2 ring-purple-400' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm'}`}><Eye size={14}/> Terawangan<span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full bg-purple-500 text-white">{profile.inventory.item_terawangan}</span></Button>
               )}
               {profile.inventory?.item_tinta_hitam > 0 && ALLOWED_POWER_UPS[gameMode]?.includes('item_tinta_hitam') && (
                 <Button variant="custom" onClick={useTintaHitam} disabled={!checkPowerupLimit('item_tinta_hitam')} className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 bg-rose-50 text-destructive transition-colors border border-rose-100 shrink-0 shadow-sm ${!checkPowerupLimit('item_tinta_hitam') ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-rose-100'}`}><Skull size={14}/> Tinta Hitam ({profile.inventory.item_tinta_hitam})</Button>

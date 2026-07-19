@@ -13,6 +13,7 @@ import PlayerProfileModal from '../components/PlayerProfileModal';
 import avatarPdh from '../assets/avatar_pdh.webp';
 import RankBadge, { RankCard } from '../components/RankBadge';
 import { getUserAnalytics } from '../lib/supabase';
+import { dicebearUrl } from '../lib/constants';
 
 // ponytail: chart.js (~630KB) lazy-loaded via React.lazy + Suspense.
 // ProfileCharts wrapper owns ChartJS.register; pass typed data as props.
@@ -986,7 +987,7 @@ export default function Profile() {
                   >
                     <div className="flex items-center gap-4">
                       <img
-                        src={searchFriendResult.selected_avatar ? availableCharacters.find(o => o.id === searchFriendResult.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${searchFriendResult.username}`}
+                        src={searchFriendResult.selected_avatar ? availableCharacters.find(o => o.id === searchFriendResult.selected_avatar)?.image_url || avatarPdh : dicebearUrl(searchFriendResult.username)}
                         alt={searchFriendResult.username}
                         className="w-14 h-14 rounded-full bg-surface shadow-sm object-cover border border-border"
                       />
@@ -1061,7 +1062,7 @@ export default function Profile() {
                             return (
                               <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-surface-subtle p-3 rounded-xl border border-border cursor-pointer hover:bg-surface-subtle/50 transition-colors group">
                                 <img
-                                  src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.username}`}
+                                  src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : dicebearUrl(p.username)}
                                   alt={p.username}
                                   className="w-10 h-10 rounded-full bg-surface shadow-sm object-cover"
                                 />
@@ -1090,7 +1091,7 @@ export default function Profile() {
                             return (
                               <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-surface-subtle p-3 rounded-xl border border-border cursor-pointer hover:bg-surface-subtle/50 transition-colors group">
                                 <img
-                                  src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.username}`}
+                                  src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : dicebearUrl(p.username)}
                                   alt={p.username}
                                   className="w-10 h-10 rounded-full bg-surface shadow-sm object-cover"
                                 />

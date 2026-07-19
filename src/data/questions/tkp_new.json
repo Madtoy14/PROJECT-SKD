@@ -1,0 +1,142 @@
+[
+  {
+    "id": "TKP-N001",
+    "category": "TKP",
+    "sub": "Integritas Diri",
+    "text": "Atasan Anda meminta Anda menandatangani laporan keuangan yang Anda ketahui mengandung data tidak akurat. Apa yang Anda lakukan?",
+    "options": [
+      { "id": "A", "text": "Menolak menandatangani dan melaporkan ketidakakuratan tersebut kepada atasan dengan data yang benar", "score": 5 },
+      { "id": "B", "text": "Menandatangani karena atasan yang bertanggung jawab, bukan Anda", "score": 1 },
+      { "id": "C", "text": "Menandatangani dan diam saja agar tidak menimbulkan masalah", "score": 1 },
+      { "id": "D", "text": "Meminta rekan kerja lain untuk menandatanganinya menggantikan Anda", "score": 2 },
+      { "id": "E", "text": "Meminta waktu untuk memeriksa ulang data sebelum menandatangani apapun", "score": 4 }
+    ],
+    "explanation": "Integritas mengharuskan ASN menolak segala bentuk kecurangan dan melaporkannya melalui jalur yang tepat."
+  },
+  {
+    "id": "TKP-N002",
+    "category": "TKP",
+    "sub": "Orientasi pada Pelayanan",
+    "text": "Saat jam istirahat, seorang warga lanjut usia datang ke loket Anda dalam kondisi terlihat lelah dan membutuhkan bantuan segera. Apa yang Anda lakukan?",
+    "options": [
+      { "id": "A", "text": "Meminta warga menunggu hingga jam istirahat selesai karena itu adalah hak Anda", "score": 1 },
+      { "id": "B", "text": "Mempersilakan warga duduk, mendengarkan keperluannya, dan segera membantu meskipun jam istirahat", "score": 5 },
+      { "id": "C", "text": "Mengarahkan warga ke petugas lain yang tidak sedang istirahat", "score": 3 },
+      { "id": "D", "text": "Membantu setelah istirahat selesai karena aturan jam kerja harus dihormati", "score": 2 },
+      { "id": "E", "text": "Meminta rekan yang piket untuk menangani warga tersebut", "score": 3 }
+    ],
+    "explanation": "Orientasi pelayanan prima menempatkan kebutuhan masyarakat di atas kepentingan pribadi, terutama untuk kelompok rentan."
+  },
+  {
+    "id": "TKP-N003",
+    "category": "TKP",
+    "sub": "Kemampuan Beradaptasi",
+    "text": "Instansi Anda baru saja menerapkan sistem digitalisasi pelayanan yang sama sekali berbeda dari sistem lama. Anda belum terbiasa dengan sistem baru tersebut. Sikap Anda adalah...",
+    "options": [
+      { "id": "A", "text": "Terus menggunakan sistem lama karena lebih familiar dan efisien bagi Anda", "score": 1 },
+      { "id": "B", "text": "Mengeluh kepada rekan kerja bahwa perubahan ini menyulitkan", "score": 1 },
+      { "id": "C", "text": "Aktif mempelajari sistem baru, mengikuti pelatihan, dan meminta bimbingan rekan yang lebih paham", "score": 5 },
+      { "id": "D", "text": "Menunggu pelatihan resmi dari instansi sebelum mulai menggunakan sistem baru", "score": 3 },
+      { "id": "E", "text": "Menggunakan sistem baru hanya jika ada pengawasan dari atasan", "score": 2 }
+    ],
+    "explanation": "ASN yang adaptif proaktif mempelajari perubahan dan tidak menunggu instruksi untuk berkembang."
+  },
+  {
+    "id": "TKP-N004",
+    "category": "TKP",
+    "sub": "Pengendalian Diri",
+    "text": "Seorang masyarakat berbicara dengan nada kasar dan mengkritik kinerja instansi Anda secara berlebihan di hadapan antrean. Reaksi Anda adalah...",
+    "options": [
+      { "id": "A", "text": "Membalas dengan tegas agar warga tahu batas kesopanan", "score": 1 },
+      { "id": "B", "text": "Diam dan mengabaikan karena tidak ingin terlibat konflik", "score": 2 },
+      { "id": "C", "text": "Tetap tenang, mempersilakan warga ke ruang terpisah, mendengarkan keluhan, dan memberikan solusi secara profesional", "score": 5 },
+      { "id": "D", "text": "Meminta bantuan security untuk menangani warga tersebut", "score": 2 },
+      { "id": "E", "text": "Meminta atasan untuk menghadapi warga tersebut", "score": 3 }
+    ],
+    "explanation": "Pengendalian diri dan deeskalasi adalah kunci dalam situasi konflik pelayanan publik."
+  },
+  {
+    "id": "TKP-N005",
+    "category": "TKP",
+    "sub": "Semangat Berprestasi",
+    "text": "Anda menyelesaikan tugas lebih cepat dari target yang ditetapkan. Sisa waktu kerja yang Anda miliki paling baik digunakan untuk...",
+    "options": [
+      { "id": "A", "text": "Bersantai karena tugas sudah selesai dan target sudah tercapai", "score": 1 },
+      { "id": "B", "text": "Mengecek pekerjaan kembali, mencari inovasi proses, atau membantu rekan yang membutuhkan", "score": 5 },
+      { "id": "C", "text": "Pulang lebih awal karena tugas sudah selesai", "score": 1 },
+      { "id": "D", "text": "Melaporkan pencapaian kepada atasan dan menunggu tugas berikutnya", "score": 3 },
+      { "id": "E", "text": "Menggunakan waktu untuk kegiatan pengembangan diri pribadi", "score": 4 }
+    ],
+    "explanation": "ASN berprestasi memanfaatkan waktu kerja secara optimal untuk kemajuan tim dan organisasi, bukan hanya target pribadi."
+  },
+  {
+    "id": "TKP-N006",
+    "category": "TKP",
+    "sub": "Kreativitas dan Inovasi",
+    "text": "Anda melihat ada prosedur di unit kerja Anda yang sudah ketinggalan zaman dan menyebabkan antrean panjang. Langkah terbaik Anda adalah...",
+    "options": [
+      { "id": "A", "text": "Membiarkan karena mengubah prosedur bukan wewenang Anda", "score": 1 },
+      { "id": "B", "text": "Menyusun analisis masalah dan usulan perbaikan, lalu menyampaikan kepada atasan melalui jalur resmi", "score": 5 },
+      { "id": "C", "text": "Mengubah prosedur sendiri secara langsung karena Anda yakin cara Anda lebih baik", "score": 2 },
+      { "id": "D", "text": "Mengeluhkan masalah ini kepada rekan-rekan kerja", "score": 1 },
+      { "id": "E", "text": "Menunggu rapat evaluasi rutin untuk menyampaikan pendapat", "score": 3 }
+    ],
+    "explanation": "Inovasi yang baik dilakukan melalui jalur resmi dengan data dan analisis yang terstruktur."
+  },
+  {
+    "id": "TKP-N007",
+    "category": "TKP",
+    "sub": "Kerja Sama Tim",
+    "text": "Rekan satu tim Anda terus membuat kesalahan yang sama dalam pekerjaan dan berdampak pada hasil tim. Apa yang Anda lakukan?",
+    "options": [
+      { "id": "A", "text": "Melaporkan kesalahan rekan kepada atasan agar segera ditindak", "score": 2 },
+      { "id": "B", "text": "Mengambil alih bagian pekerjaan rekan tersebut tanpa memberitahu", "score": 2 },
+      { "id": "C", "text": "Mendekati rekan secara personal, menawarkan bantuan, dan bersama mencari solusi perbaikan", "score": 5 },
+      { "id": "D", "text": "Mengingatkan di forum rapat agar semua anggota tim tahu", "score": 2 },
+      { "id": "E", "text": "Membiarkan karena setiap orang bertanggung jawab atas pekerjaannya sendiri", "score": 1 }
+    ],
+    "explanation": "Kerja sama yang baik mendorong saling membantu dan memberi umpan balik konstruktif secara personal."
+  },
+  {
+    "id": "TKP-N008",
+    "category": "TKP",
+    "sub": "Orientasi pada Pelayanan",
+    "text": "Seorang warga datang dengan permintaan yang secara teknis berada di luar kewenangan unit Anda. Respons terbaik Anda adalah...",
+    "options": [
+      { "id": "A", "text": "Menolak dan meminta warga mencari sendiri unit yang berwenang", "score": 1 },
+      { "id": "B", "text": "Menerima permintaan dan berusaha memproses meskipun di luar kewenangan", "score": 2 },
+      { "id": "C", "text": "Menjelaskan bahwa permintaan bukan wewenang unit Anda, lalu mengarahkan ke unit yang tepat beserta informasi kontak dan prosedurnya", "score": 5 },
+      { "id": "D", "text": "Menyarankan warga untuk mengajukan surat resmi terlebih dahulu", "score": 3 },
+      { "id": "E", "text": "Meminta warga datang kembali lain hari saat pimpinan hadir", "score": 1 }
+    ],
+    "explanation": "Pelayanan prima berarti memastikan warga mendapatkan solusi meskipun bukan dari unit kita sendiri."
+  },
+  {
+    "id": "TKP-N009",
+    "category": "TKP",
+    "sub": "Kemampuan Beradaptasi",
+    "text": "Anda mendapat tugas baru yang sangat berbeda dari bidang keahlian utama Anda dengan tenggat waktu yang ketat. Sikap Anda adalah...",
+    "options": [
+      { "id": "A", "text": "Menolak karena tugas tidak sesuai dengan job description Anda", "score": 1 },
+      { "id": "B", "text": "Menerima tugas, memetakan pengetahuan yang dibutuhkan, dan segera belajar sambil mengerjakan", "score": 5 },
+      { "id": "C", "text": "Meminta atasan memindahkan tugas ke orang yang lebih kompeten", "score": 2 },
+      { "id": "D", "text": "Menerima tugas tapi diam-diam berharap tenggat diperpanjang", "score": 2 },
+      { "id": "E", "text": "Mengerjakan seadanya karena bagaimanapun bukan keahlian Anda", "score": 1 }
+    ],
+    "explanation": "Adaptabilitas tinggi ditunjukkan dengan menerima tantangan baru secara positif dan aktif mengembangkan kompetensi yang dibutuhkan."
+  },
+  {
+    "id": "TKP-N010",
+    "category": "TKP",
+    "sub": "Sosial Budaya",
+    "text": "Anda bertugas di daerah dengan budaya dan adat istiadat yang berbeda dari daerah asal Anda. Sebagian warga masih memegang tradisi yang menurut Anda kurang efisien dalam proses administrasi. Sikap Anda adalah...",
+    "options": [
+      { "id": "A", "text": "Memaksakan prosedur standar tanpa mempertimbangkan kondisi budaya setempat", "score": 1 },
+      { "id": "B", "text": "Mempelajari budaya lokal, beradaptasi, dan mencari cara menjalankan prosedur yang tetap menghormati tradisi setempat", "score": 5 },
+      { "id": "C", "text": "Mengabaikan tradisi tersebut karena aturan nasional lebih tinggi dari adat", "score": 2 },
+      { "id": "D", "text": "Melaporkan kondisi ini kepada pimpinan dan meminta pedoman khusus sebelum bertindak", "score": 3 },
+      { "id": "E", "text": "Mengikuti semua tradisi sepenuhnya meskipun bertentangan dengan prosedur", "score": 2 }
+    ],
+    "explanation": "ASN yang baik menghormati keberagaman budaya dan mencari titik temu antara prosedur resmi dan kearifan lokal."
+  }
+]

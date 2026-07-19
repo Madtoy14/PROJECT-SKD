@@ -1,0 +1,8 @@
+<script>
+localStorage.clear();
+const k = 'sb-nfjzyqhcfvlhfwvoseds-auth-token';
+const v = {"access_token":"eyJhbG...sImt","token_type":"bearer","expires_in":3600,"expires_at":1784324727,"refresh_token":"onf2avncbmzq","user":{"id":"4b9df344-5a5f-4955-a8b5-7555d1187991","aud":"authenticated","role":"authenticated","email":"ramadhanakmaludien@gmail.com","email_confirmed_at":"2026-06-29T17:04:37.218869Z","phone":"","confirmed_at":"2026-06-29T17:04:37.218869Z","last_sign_in_at":"2026-07-17T18:35:53.8482Z","app_metadata":{"provider":"google","providers":["google"]},"user_metadata":{"avatar_url":"https://lh3.googleusercontent.com/a/ACg8ocIKH5TAj7e9Kl5ILG0jeExMTn3LW0u6UewNZWZU9F9xE1oiqIDV=s96-c","email":"ramadhanakmaludien@gmail.com","email_verified":true,"full_name":"Akmaludien Ramadhan","iss":"https://accounts.google.com","name":"Akmaludien Ramadhan","phone_verified":false,"picture":"https://lh3.googleusercontent.com/a/ACg8ocIKH5TAj7e9Kl5ILG0jeExMTn3LW0u6UewNZWZU9F9xE1oiqIDV=s96-c","provider_id":"114303263365701934821","sub":"114303263365701934821"},"aal":"aal1","amr":[{"method":"oauth","timestamp":1784324127}],"session_id":"394362f6-9dc4-41a0-9333-5d8485ee62de","is_anonymous":false}};
+localStorage.setItem(k, JSON.stringify(v));
+localStorage.setItem('supabase.auth.token', JSON.stringify(v));
+location.href = '/';
+</script>

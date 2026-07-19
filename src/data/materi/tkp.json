@@ -1,0 +1,124 @@
+[
+  {
+    "id": "tkp",
+    "title": "TKP",
+    "subtitle": "Tes Karakteristik Pribadi",
+    "icon": "UserCheck",
+    "color": "text-amber-600",
+    "bg": "bg-amber-50",
+    "border": "border-amber-200",
+    "subBabs": [
+      {
+        "id": "integritas",
+        "title": "Integritas Diri",
+        "ringkasan": [
+          "Integritas adalah konsistensi antara nilai, tindakan, dan perkataan. Dalam TKP, integritas diuji melalui skenario etika di tempat kerja.",
+          "Indikator: jujur (tidak korupsi, tidak manipulasi), bertanggung jawab (mengakui kesalahan), konsisten (antara ucapan dan perbuatan), transparan.",
+          "Hindari: menyalahkan orang lain, mencari alasan, menutupi kesalahan, menerima suap/gratifikasi."
+        ],
+        "tips": [
+          "Dalam TKP, pilih jawaban yang paling jujur dan bertanggung jawab — bukan yang paling 'enak'",
+          "Jika ada opsi 'melaporkan', itu biasanya skor tertinggi",
+          "Hindari opsi yang menunjukkan Anda menutupi kesalahan atau menyalahkan orang lain"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "Anda tidak sengaja merusak printer kantor. Apa yang Anda lakukan?",
+            "opsi": [
+              { "id": "A", "text": "Diam saja, berharap tidak ada yang tahu" },
+              { "id": "B", "text": "Melaporkan ke atasan dan menawarkan solusi" },
+              { "id": "C", "text": "Menyalahkan rekan kerja" },
+              { "id": "D", "text": "Memperbaiki sendiri tanpa bilang siapa-siapa" }
+            ],
+            "kunci": "B",
+            "pembahasan": "Melaporkan ke atasan dan menawarkan solusi menunjukkan integritas dan tanggung jawab (skor tertinggi)."
+          }
+        ]
+      },
+      {
+        "id": "pelayanan",
+        "title": "Orientasi Pelayanan",
+        "ringkasan": [
+          "Orientasi pelayanan adalah sikap proaktif dalam memberikan layanan terbaik kepada masyarakat. Ini adalah nilai inti ASN (Aparatur Sipil Negara).",
+          "Indikator: responsif (cepat tanggap), ramah, informatif (memberikan informasi jelas), solutif (mencari solusi), empati.",
+          "Hindari: acuh tak acuh, mengabaikan keluhan, memperlambat proses, diskriminatif."
+        ],
+        "tips": [
+          "Pilih jawaban yang menunjukkan Anda proaktif membantu, bukan menunggu diperintah",
+          "'Memberikan informasi yang jelas dan lengkap' biasanya skor lebih tinggi dari 'memberikan informasi seadanya'",
+          "Prioritaskan kepentingan masyarakat di atas kenyamanan pribadi"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "Seorang warga tampak kebingungan di kantor. Rekan Anda sedang sibuk. Apa yang Anda lakukan?",
+            "opsi": [
+              { "id": "A", "text": "Mengabaikan karena bukan tugas Anda" },
+              { "id": "B", "text": "Menyuruhnya menunggu sampai rekan Anda selesai" },
+              { "id": "C", "text": "Menghampiri dan menawarkan bantuan" },
+              { "id": "D", "text": "Memanggil satpam untuk mengarahkan" }
+            ],
+            "kunci": "C",
+            "pembahasan": "Menghampiri dan menawarkan bantuan menunjukkan orientasi pelayanan yang tinggi dan proaktif."
+          }
+        ]
+      },
+      {
+        "id": "adaptasi",
+        "title": "Kemampuan Adaptasi",
+        "ringkasan": [
+          "Kemampuan adaptasi adalah kapasitas menyesuaikan diri dengan perubahan lingkungan kerja, teknologi, atau situasi baru.",
+          "Indikator: fleksibel (tidak kaku), cepat belajar hal baru, terbuka terhadap perubahan, tidak mudah stres dalam situasi baru, mampu bekerja dalam tim yang beragam.",
+          "Hindari: menolak perubahan, mengeluh, memaksakan cara lama, tidak mau belajar sistem baru."
+        ],
+        "tips": [
+          "Pilih jawaban yang menunjukkan Anda terbuka pada perubahan dan siap belajar",
+          "'Meminta bantuan untuk memahami' lebih baik dari 'menolak karena tidak tahu'",
+          "Dalam konflik tim, pilih opsi yang menunjukkan kompromi dan kolaborasi"
+        ],
+        "quiz": []
+      },
+      {
+        "id": "profesional",
+        "title": "Profesionalisme",
+        "ringkasan": [
+          "Profesionalisme adalah sikap dan perilaku yang sesuai dengan standar etika profesi dan lingkungan kerja.",
+          "Indikator: disiplin waktu, menjaga kerahasiaan, memisahkan urusan pribadi dan pekerjaan, menghormati hierarki, tidak menyalahgunakan wewenang.",
+          "Hindari: datang terlambat, membocorkan rahasia, menggunakan fasilitas kantor untuk kepentingan pribadi, bergosip."
+        ],
+        "tips": [
+          "Pilih jawaban yang menunjukkan Anda menghargai aturan dan etika kerja",
+          "'Menjaga kerahasiaan data' adalah jawaban yang hampir selalu benar untuk TKP",
+          "Pisahkan urusan pribadi dari profesional — jangan campur aduk"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "Anda menemukan rekan kerja membocorkan data rahasia perusahaan. Apa yang Anda lakukan?",
+            "opsi": [
+              { "id": "A", "text": "Ikut membocorkan karena sudah terlanjur tahu" },
+              { "id": "B", "text": "Diam saja, itu urusan dia" },
+              { "id": "C", "text": "Menegur langsung dan melaporkan ke atasan" },
+              { "id": "D", "text": "Menyebarkan gosip tentang rekan tersebut" }
+            ],
+            "kunci": "C",
+            "pembahasan": "Menegur dan melaporkan menunjukkan profesionalisme dan integritas. Menjaga kerahasiaan adalah kewajiban profesional."
+          }
+        ]
+      },
+      {
+        "id": "semangat",
+        "title": "Semangat Berprestasi",
+        "ringkasan": [
+          "Semangat berprestasi adalah dorongan internal untuk terus belajar, berkembang, dan mencapai hasil terbaik.",
+          "Indikator: inisiatif (proaktif mencari peluang), pantang menyerah, berorientasi hasil, terus belajar (lifelong learning), mencari feedback.",
+          "Hindari: puas dengan hasil minimal, menunggu diperintah, menghindari tantangan, tidak mau belajar dari kesalahan."
+        ],
+        "tips": [
+          "Pilih jawaban yang menunjukkan Anda mengambil inisiatif, bukan menunggu",
+          "'Mengikuti pelatihan untuk meningkatkan skill' skor lebih tinggi dari 'menunggu pelatihan diadakan'",
+          "Dalam TKP, ambisi positif (ingin berkembang) ≠ ambisi negatif (menjatuhkan orang lain)"
+        ],
+        "quiz": []
+      }
+    ]
+  }
+]

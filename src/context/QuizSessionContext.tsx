@@ -224,7 +224,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     };
 
     setActiveSession(session);
-    console.log('✅ Quiz session created:', data.id);
+    if (import.meta.env.DEV) console.log('✅ Quiz session created:', data.id);
     return data.id;
   }, []);
 
@@ -380,7 +380,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     };
 
     setActiveSession(session);
-    console.log('✅ Recovered quiz session:', data.id);
+    if (import.meta.env.DEV) console.log('✅ Recovered quiz session:', data.id);
     return session;
   }, []);
 
@@ -393,7 +393,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
 
     setActiveSession(null);
-    console.log('✅ Quiz session abandoned:', sessionId);
+    if (import.meta.env.DEV) console.log('✅ Quiz session abandoned:', sessionId);
   }, []);
 
   const clearSession = useCallback(() => {

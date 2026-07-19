@@ -20,6 +20,8 @@ export interface Question {
   explanation: string;
   xp_reward: number;
   coin_reward: number;
+  /** Difficulty level from DB: 'mudah' | 'sedang' | 'sulit' */
+  difficulty?: string;
 }
 
 // ── Exports ──────────────────────────────────────────────────────────────────

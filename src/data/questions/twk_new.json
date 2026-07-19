@@ -1,0 +1,212 @@
+[
+  {
+    "id": "TWK-N001",
+    "category": "TWK",
+    "sub": "Pancasila",
+    "text": "Sila keempat Pancasila 'Kerakyatan yang Dipimpin oleh Hikmat Kebijaksanaan dalam Permusyawaratan/Perwakilan' mengandung makna bahwa pengambilan keputusan dalam pemerintahan harus dilakukan melalui...",
+    "options": [
+      { "id": "A", "text": "Keputusan sepihak oleh pemimpin tertinggi negara", "score": 0 },
+      { "id": "B", "text": "Voting mayoritas tanpa musyawarah terlebih dahulu", "score": 0 },
+      { "id": "C", "text": "Musyawarah untuk mufakat yang mengutamakan kepentingan bersama", "score": 5 },
+      { "id": "D", "text": "Keputusan yang diambil oleh partai politik terbesar", "score": 0 },
+      { "id": "E", "text": "Referendum langsung kepada seluruh rakyat Indonesia", "score": 0 }
+    ],
+    "explanation": "Sila keempat menekankan musyawarah mufakat sebagai cara pengambilan keputusan yang mengutamakan kepentingan rakyat banyak."
+  },
+  {
+    "id": "TWK-N002",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Pasal 28H ayat (1) UUD 1945 menyatakan bahwa setiap orang berhak hidup sejahtera lahir dan batin, bertempat tinggal, dan mendapatkan lingkungan hidup yang baik dan sehat. Pasal ini merupakan penjabaran dari hak...",
+    "options": [
+      { "id": "A", "text": "Hak politik warga negara", "score": 0 },
+      { "id": "B", "text": "Hak asasi manusia di bidang kesejahteraan sosial", "score": 5 },
+      { "id": "C", "text": "Hak eksklusif PNS dan ASN", "score": 0 },
+      { "id": "D", "text": "Hak warga negara asing yang berdomisili di Indonesia", "score": 0 },
+      { "id": "E", "text": "Hak prerogatif presiden dalam mensejahterakan rakyat", "score": 0 }
+    ],
+    "explanation": "Pasal 28H merupakan bagian dari Bab XA tentang Hak Asasi Manusia yang mencakup hak ekonomi, sosial, dan budaya."
+  },
+  {
+    "id": "TWK-N003",
+    "category": "TWK",
+    "sub": "Bhineka Tunggal Ika",
+    "text": "Semboyan 'Bhinneka Tunggal Ika' yang berasal dari kitab Sutasoma karya Mpu Tantular memiliki arti yang paling tepat adalah...",
+    "options": [
+      { "id": "A", "text": "Bersatu kita teguh, bercerai kita runtuh", "score": 0 },
+      { "id": "B", "text": "Berbeda-beda namun tetap satu jua", "score": 5 },
+      { "id": "C", "text": "Dari Sabang sampai Merauke adalah satu kesatuan", "score": 0 },
+      { "id": "D", "text": "Keragaman adalah kekuatan utama bangsa", "score": 0 },
+      { "id": "E", "text": "Persatuan di atas segalanya tanpa perbedaan", "score": 0 }
+    ],
+    "explanation": "Bhinneka Tunggal Ika artinya 'berbeda-beda tetapi tetap satu', mencerminkan persatuan dalam keberagaman bangsa Indonesia."
+  },
+  {
+    "id": "TWK-N004",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Sebagai ASN, Anda mengetahui bahwa rekan kerja Anda kerap menggunakan fasilitas kantor untuk keperluan pribadi di luar jam kerja. Sikap yang paling tepat adalah...",
+    "options": [
+      { "id": "A", "text": "Membiarkan karena tidak ingin menimbulkan konflik dengan rekan kerja", "score": 0 },
+      { "id": "B", "text": "Ikut menggunakan fasilitas tersebut agar tidak ada kecemburuan", "score": 0 },
+      { "id": "C", "text": "Menegur secara langsung dan mengingatkan aturan penggunaan fasilitas negara", "score": 5 },
+      { "id": "D", "text": "Melaporkan langsung ke media sosial agar mendapat perhatian publik", "score": 0 },
+      { "id": "E", "text": "Mendiamkan karena itu urusan atasan untuk mengawasi", "score": 0 }
+    ],
+    "explanation": "ASN wajib menjaga dan menggunakan fasilitas negara sesuai peruntukannya. Menegur secara langsung adalah langkah awal yang tepat sesuai nilai antikorupsi."
+  },
+  {
+    "id": "TWK-N005",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Yang dimaksud dengan 'integritas' dalam konteks nilai dasar ASN adalah...",
+    "options": [
+      { "id": "A", "text": "Kemampuan ASN menyelesaikan pekerjaan dengan cepat dan efisien", "score": 0 },
+      { "id": "B", "text": "Konsistensi antara ucapan, tindakan, dan nilai-nilai kejujuran dalam bekerja", "score": 5 },
+      { "id": "C", "text": "Kepatuhan ASN terhadap setiap perintah atasan tanpa pertanyaan", "score": 0 },
+      { "id": "D", "text": "Kemampuan ASN dalam membangun jaringan dan relasi yang luas", "score": 0 },
+      { "id": "E", "text": "Ketepatan waktu ASN dalam hadir dan pulang kerja", "score": 0 }
+    ],
+    "explanation": "Integritas ASN mencakup konsistensi antara pikiran, ucapan, dan perbuatan yang berlandaskan kejujuran dan nilai-nilai etika."
+  },
+  {
+    "id": "TWK-N006",
+    "category": "TWK",
+    "sub": "Pilar Negara",
+    "text": "Pembukaan UUD 1945 alinea keempat memuat tujuan nasional bangsa Indonesia. Salah satu tujuan yang berkaitan dengan hubungan internasional adalah...",
+    "options": [
+      { "id": "A", "text": "Memajukan kesejahteraan umum", "score": 0 },
+      { "id": "B", "text": "Mencerdaskan kehidupan bangsa", "score": 0 },
+      { "id": "C", "text": "Melindungi segenap bangsa Indonesia dan seluruh tumpah darah Indonesia", "score": 0 },
+      { "id": "D", "text": "Ikut melaksanakan ketertiban dunia yang berdasarkan kemerdekaan, perdamaian abadi, dan keadilan sosial", "score": 5 },
+      { "id": "E", "text": "Mewujudkan masyarakat adil dan makmur berdasarkan Pancasila", "score": 0 }
+    ],
+    "explanation": "Tujuan nasional ke-4 dalam Pembukaan UUD 1945 adalah ikut melaksanakan ketertiban dunia, mencerminkan politik luar negeri bebas aktif Indonesia."
+  },
+  {
+    "id": "TWK-N007",
+    "category": "TWK",
+    "sub": "Pancasila",
+    "text": "Nilai 'keadilan sosial bagi seluruh rakyat Indonesia' dalam sila kelima Pancasila paling tepat diimplementasikan oleh ASN dalam tugasnya melalui...",
+    "options": [
+      { "id": "A", "text": "Memberikan layanan prima hanya kepada masyarakat yang memiliki kedekatan personal", "score": 0 },
+      { "id": "B", "text": "Mengutamakan penyelesaian tugas yang menguntungkan instansi secara finansial", "score": 0 },
+      { "id": "C", "text": "Memberikan pelayanan yang adil, merata, dan tidak diskriminatif kepada seluruh masyarakat", "score": 5 },
+      { "id": "D", "text": "Mendahulukan pelayanan kepada pejabat dan tokoh masyarakat yang berpengaruh", "score": 0 },
+      { "id": "E", "text": "Mengikuti prosedur yang ada tanpa mempertimbangkan kondisi khusus pemohon", "score": 0 }
+    ],
+    "explanation": "Sila kelima menuntut ASN memberikan pelayanan yang adil dan merata tanpa diskriminasi kepada seluruh lapisan masyarakat."
+  },
+  {
+    "id": "TWK-N008",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Berdasarkan UUD 1945, lembaga yang berwenang melakukan pengujian undang-undang terhadap UUD 1945 adalah...",
+    "options": [
+      { "id": "A", "text": "Mahkamah Agung", "score": 0 },
+      { "id": "B", "text": "Mahkamah Konstitusi", "score": 5 },
+      { "id": "C", "text": "Dewan Perwakilan Rakyat", "score": 0 },
+      { "id": "D", "text": "Komisi Yudisial", "score": 0 },
+      { "id": "E", "text": "Dewan Pertimbangan Presiden", "score": 0 }
+    ],
+    "explanation": "Pasal 24C UUD 1945 menegaskan Mahkamah Konstitusi berwenang menguji UU terhadap UUD (judicial review)."
+  },
+  {
+    "id": "TWK-N009",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Wawasan Nusantara sebagai konsepsi geopolitik Indonesia mengandung makna bahwa...",
+    "options": [
+      { "id": "A", "text": "Indonesia hanya terdiri dari wilayah daratan yang terhubung satu sama lain", "score": 0 },
+      { "id": "B", "text": "Wilayah laut Indonesia tidak termasuk dalam kedaulatan NKRI", "score": 0 },
+      { "id": "C", "text": "Indonesia merupakan satu kesatuan wilayah darat, laut, dan udara yang tidak terpisahkan", "score": 5 },
+      { "id": "D", "text": "Pulau-pulau di Indonesia memiliki kedaulatan masing-masing yang otonom", "score": 0 },
+      { "id": "E", "text": "Kekayaan alam Indonesia hanya boleh dimanfaatkan oleh warga daerah setempat", "score": 0 }
+    ],
+    "explanation": "Wawasan Nusantara memandang Indonesia sebagai satu kesatuan geopolitik yang mencakup darat, laut, dan udara sebagai satu kesatuan yang utuh."
+  },
+  {
+    "id": "TWK-N010",
+    "category": "TWK",
+    "sub": "Bela Negara",
+    "text": "Contoh wujud bela negara yang dapat dilakukan oleh seorang ASN dalam kehidupan sehari-hari adalah...",
+    "options": [
+      { "id": "A", "text": "Mengikuti latihan militer wajib setiap akhir pekan", "score": 0 },
+      { "id": "B", "text": "Bekerja secara profesional, jujur, dan berdedikasi untuk melayani masyarakat", "score": 5 },
+      { "id": "C", "text": "Membeli produk impor untuk mendukung perdagangan internasional", "score": 0 },
+      { "id": "D", "text": "Menghindari diskusi politik agar tidak terlibat kontroversi", "score": 0 },
+      { "id": "E", "text": "Hanya fokus pada tugas administratif tanpa peduli kondisi sekitar", "score": 0 }
+    ],
+    "explanation": "Bela negara bagi ASN diwujudkan melalui pelaksanaan tugas secara profesional dan penuh dedikasi demi kepentingan bangsa dan negara."
+  },
+  {
+    "id": "TWK-N011",
+    "category": "TWK",
+    "sub": "Pilar Negara",
+    "text": "Sistem pemerintahan Indonesia berdasarkan UUD 1945 adalah sistem presidensial. Ciri khas sistem presidensial adalah...",
+    "options": [
+      { "id": "A", "text": "Presiden bertanggung jawab kepada parlemen dan dapat dijatuhkan sewaktu-waktu", "score": 0 },
+      { "id": "B", "text": "Presiden dan kabinet merupakan bagian dari lembaga legislatif", "score": 0 },
+      { "id": "C", "text": "Presiden sebagai kepala negara sekaligus kepala pemerintahan yang dipilih rakyat", "score": 5 },
+      { "id": "D", "text": "Kekuasaan eksekutif sepenuhnya berada di tangan perdana menteri", "score": 0 },
+      { "id": "E", "text": "Presiden hanya berperan seremonial sedangkan kekuasaan riil ada di DPR", "score": 0 }
+    ],
+    "explanation": "Dalam sistem presidensial, presiden merupakan kepala negara sekaligus kepala pemerintahan yang dipilih langsung oleh rakyat dan tidak bertanggung jawab kepada parlemen."
+  },
+  {
+    "id": "TWK-N012",
+    "category": "TWK",
+    "sub": "Pancasila",
+    "text": "Pancasila sebagai 'ideologi terbuka' memiliki arti bahwa...",
+    "options": [
+      { "id": "A", "text": "Nilai-nilai Pancasila dapat diubah sesuai perkembangan zaman oleh siapa saja", "score": 0 },
+      { "id": "B", "text": "Pancasila dapat digantikan oleh ideologi lain yang lebih modern", "score": 0 },
+      { "id": "C", "text": "Nilai-nilai dasar Pancasila bersifat tetap namun penjabarannya dapat berkembang sesuai dinamika masyarakat", "score": 5 },
+      { "id": "D", "text": "Pancasila terbuka untuk dikritisi dan diubah melalui referendum nasional", "score": 0 },
+      { "id": "E", "text": "Semua ideologi asing dapat masuk dan berdampingan setara dengan Pancasila", "score": 0 }
+    ],
+    "explanation": "Ideologi terbuka berarti nilai-nilai dasarnya tetap, namun penjabarannya dinamis dan dapat berkembang sesuai kebutuhan zaman tanpa mengubah esensinya."
+  },
+  {
+    "id": "TWK-N013",
+    "category": "TWK",
+    "sub": "Integritas",
+    "text": "Seorang ASN menerima tawaran hadiah dari rekanan sebagai bentuk terima kasih atas kemudahan dalam proses pengadaan. Tindakan yang sesuai dengan nilai antikorupsi adalah...",
+    "options": [
+      { "id": "A", "text": "Menerima hadiah karena nilainya kecil dan tidak ada aturan tertulis yang melarang", "score": 0 },
+      { "id": "B", "text": "Menerima hadiah dan melaporkannya kepada atasan setelahnya", "score": 0 },
+      { "id": "C", "text": "Menolak hadiah dengan tegas dan menjelaskan bahwa tugasnya memang sudah kewajiban", "score": 5 },
+      { "id": "D", "text": "Meminta rekanan mengganti hadiah dengan sumbangan ke kas instansi", "score": 0 },
+      { "id": "E", "text": "Menunda keputusan penerimaan hadiah sampai proses pengadaan selesai sepenuhnya", "score": 0 }
+    ],
+    "explanation": "Nilai antikorupsi mengharuskan ASN menolak segala bentuk gratifikasi yang berpotensi mempengaruhi objektivitas dan integritas dalam menjalankan tugas."
+  },
+  {
+    "id": "TWK-N014",
+    "category": "TWK",
+    "sub": "UUD 1945",
+    "text": "Hak warga negara untuk mendapatkan pendidikan dijamin dalam UUD 1945 pada pasal...",
+    "options": [
+      { "id": "A", "text": "Pasal 27 ayat (2)", "score": 0 },
+      { "id": "B", "text": "Pasal 28C ayat (1)", "score": 5 },
+      { "id": "C", "text": "Pasal 30 ayat (1)", "score": 0 },
+      { "id": "D", "text": "Pasal 33 ayat (1)", "score": 0 },
+      { "id": "E", "text": "Pasal 34 ayat (2)", "score": 0 }
+    ],
+    "explanation": "Pasal 28C ayat (1) UUD 1945 menjamin hak setiap orang untuk mengembangkan diri melalui pemenuhan kebutuhan dasar termasuk mendapat pendidikan."
+  },
+  {
+    "id": "TWK-N015",
+    "category": "TWK",
+    "sub": "Nasionalisme",
+    "text": "Ketahanan nasional Indonesia dibangun di atas konsep Asta Gatra yang terdiri dari Tri Gatra dan Panca Gatra. Yang termasuk dalam Tri Gatra (aspek alamiah) adalah...",
+    "options": [
+      { "id": "A", "text": "Ideologi, politik, dan ekonomi", "score": 0 },
+      { "id": "B", "text": "Sosial budaya, pertahanan keamanan, dan hukum", "score": 0 },
+      { "id": "C", "text": "Geografi, sumber kekayaan alam, dan demografi", "score": 5 },
+      { "id": "D", "text": "Pendidikan, teknologi, dan kesehatan", "score": 0 },
+      { "id": "E", "text": "Agama, budaya, dan bahasa nasional", "score": 0 }
+    ],
+    "explanation": "Tri Gatra adalah tiga aspek alamiah ketahanan nasional: geografi (posisi dan kondisi wilayah), sumber kekayaan alam, dan demografi (kependudukan)."
+  }
+]

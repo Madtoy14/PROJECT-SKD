@@ -275,12 +275,13 @@ export default function Result() {
         let retries = 3;
 
         while (retries > 0) {
-          const res = await supabase!
-            .from('quiz_results')
-            .select('*')
-            .or(`id.eq.${attemptId},session_id.eq.${attemptId}`)
-            .limit(1)
-            .maybeSingle();
+          // ponytail: select kolom spesifik — hindari transfer payload berlebih
+                    const res = await supabase!
+                      .from('quiz_results')
+                      .select('id,session_id,mode,score,twk_score,tiu_score,tkp_score,passed_twk,passed_tiu,passed_tkp,passed_overall,coins_earned,xp_earned,answers_json,questions_json,package_id,created_at')
+                      .or(`id.eq.${attemptId},session_id.eq.${attemptId}`)
+                      .limit(1)
+                      .maybeSingle();
 
           data = res.data;
           resultError = res.error;

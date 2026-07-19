@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Trophy, Swords, Shield, Star, Target, Activity, CheckCircle2 } from 'lucide-react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { dicebearUrl } from '../lib/constants';
 import type { UserProfile, Character } from '../lib/supabase';
 
 interface PlayerProfileModalProps {
@@ -111,7 +112,7 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
   const akurasiTotal = totalDijawab > 0 ? Math.round((totalBenar / totalDijawab) * 100) : 0;
   const avatarUrl =
     character?.image_url ||
-    `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile?.username || 'Guest'}`;
+    dicebearUrl(profile?.username || 'Guest');
 
   // Gunakan portal agar modal selalu berada di atas semua stacking context
   const modalContent = (

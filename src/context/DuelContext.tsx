@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useEffect, type ReactNode } from 'react';
 import { supabase, isSupabaseConfigured, fetchProfile } from '../lib/supabase';
+import { dicebearUrl } from '../lib/constants';
 import type { UserProfile } from '../lib/supabase';
 export type InviteStatus = 'idle' | 'inviting' | 'accepted' | 'rejected' | 'timeout';
 export interface DuelRequest {
@@ -71,7 +72,7 @@ export function DuelProvider({ children }: { children: ReactNode }) {
             id: senderId,
             senderId,
             senderName,
-            avatar: senderAvatar ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${senderName}` : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Siti'
+            avatar: dicebearUrl(senderAvatar ? senderName : 'Siti')
           });
         }
       })
@@ -178,7 +179,7 @@ export function DuelProvider({ children }: { children: ReactNode }) {
       id: 'mock-user-123',
       senderId: 'mock-user-123',
       senderName: 'Siti Rahma',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Siti'
+      avatar: dicebearUrl('Siti')
     });
   };
   const acceptInvite = (roomId: string) => {

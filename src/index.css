@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-syne: "Syne", sans-serif;
+  --font-poppins: "Poppins", sans-serif;
   --font-space: "Space Mono", monospace;
 
   /* SURFACES */
@@ -89,7 +89,7 @@
 }
 
 body {
-  font-family: var(--font-syne);
+  font-family: var(--font-poppins);
   margin: 0;
   min-height: 100vh;
   background-color: var(--color-bg);
@@ -126,4 +126,40 @@ html, body, #root {
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Micro-interactions ── */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+.btn-press:active {
+  transform: scale(0.95);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
 }

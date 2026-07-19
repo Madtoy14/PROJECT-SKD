@@ -1,0 +1,147 @@
+[
+  {
+    "id": "tiu",
+    "title": "TIU",
+    "subtitle": "Tes Intelegensi Umum",
+    "icon": "Brain",
+    "color": "text-blue-600",
+    "bg": "bg-blue-50",
+    "border": "border-blue-200",
+    "subBabs": [
+      {
+        "id": "sinonim",
+        "title": "Sinonim (Persamaan Kata)",
+        "ringkasan": [
+          "Sinonim adalah kata yang memiliki makna sama atau mirip dengan kata lain. Contoh: 'indah' sinonim dengan 'elok', 'cantik', 'permai'.",
+          "Strategi: cari kata yang paling mendekati makna dalam konteks kalimat. Jangan terpaku pada satu arti — satu kata bisa punya banyak sinonim tergantung konteks.",
+          "Tips: perbanyak kosakata dengan membaca berita, artikel, dan buku. Gunakan kamus tesaurus (KBBI daring atau Tesaurus Tematis)."
+        ],
+        "tips": [
+          "Eliminasi opsi yang jelas tidak berhubungan terlebih dahulu",
+          "Perhatikan kelas kata: kata benda, kata sifat, atau kata kerja",
+          "Coba substitusi: jika kata diganti dengan opsi, apakah kalimat masih bermakna sama?"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "Sinonim dari kata 'ABSTRAK' adalah...",
+            "opsi": [
+              { "id": "A", "text": "Nyata" },
+              { "id": "B", "text": "Tidak berwujud" },
+              { "id": "C", "text": "Konkret" },
+              { "id": "D", "text": "Jelas" }
+            ],
+            "kunci": "B",
+            "pembahasan": "Abstrak berarti tidak berwujud, tidak konkret, atau bersifat konseptual. Lawannya adalah konkret."
+          },
+          {
+            "pertanyaan": "Sinonim dari 'DEDIKASI' adalah...",
+            "opsi": [
+              { "id": "A", "text": "Pengabdian" },
+              { "id": "B", "text": "Pekerjaan" },
+              { "id": "C", "text": "Kewajiban" },
+              { "id": "D", "text": "Tugas" }
+            ],
+            "kunci": "A",
+            "pembahasan": "Dedikasi berarti pengorbanan tenaga, pikiran, dan waktu demi keberhasilan suatu usaha atau tujuan mulia. Sinonimnya: pengabdian."
+          }
+        ]
+      },
+      {
+        "id": "antonim",
+        "title": "Antonim (Lawan Kata)",
+        "ringkasan": [
+          "Antonim adalah kata yang memiliki makna berlawanan. Contoh: 'panas' lawan 'dingin', 'besar' lawan 'kecil'.",
+          "Perhatikan: beberapa kata memiliki lawan yang tidak simetris. 'Kaya' → 'miskin' (bukan 'tidak kaya').",
+          "Strategi: identifikasi makna inti kata, lalu cari opsi yang paling bertentangan."
+        ],
+        "tips": [
+          "Hati-hati dengan kata berimbuhan: 'memperbesar' lawannya 'memperkecil', bukan 'kecil'",
+          "Jangan terkecoh dengan kata yang mirip tapi bukan lawan kata (misalnya 'pria' vs 'wanita' — ini pasangan, bukan antonim murni)",
+          "Gunakan teknik eliminasi: coret opsi yang bermakna sama atau mirip"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "Antonim dari 'MAYOR' adalah...",
+            "opsi": [
+              { "id": "A", "text": "Kecil" },
+              { "id": "B", "text": "Minor" },
+              { "id": "C", "text": "Sedikit" },
+              { "id": "D", "text": "Rendah" }
+            ],
+            "kunci": "B",
+            "pembahasan": "Mayor berarti utama, terbesar. Antonimnya: minor (kecil, tidak penting)."
+          }
+        ]
+      },
+      {
+        "id": "analogi",
+        "title": "Analogi (Padanan Hubungan)",
+        "ringkasan": [
+          "Analogi adalah persamaan hubungan antara dua pasangan kata. Format: A : B = C : D. Contoh: 'Dokter : Pasien = Guru : Murid' (hubungan: melayani).",
+          "Jenis hubungan: sebab-akibat, fungsi, bagian-keseluruhan, profesi-alat, sinonim, antonim, derajat, tempat.",
+          "Strategi: tentukan hubungan A-B terlebih dahulu, baru cari pasangan yang memiliki hubungan sama."
+        ],
+        "tips": [
+          "Buat kalimat penghubung: 'Dokter mengobati pasien' → 'Guru mengajar murid'",
+          "Hubungan yang sering muncul: alat-fungsi (pisau:memotong), tempat-benda (perpustakaan:buku), profesi-tempat (dokter:rumah sakit)",
+          "Hati-hati dengan urutan: 'Kucing : Hewan' ≠ 'Hewan : Kucing' (kelompok vs anggota)"
+        ],
+        "quiz": []
+      },
+      {
+        "id": "aritmatika",
+        "title": "Aritmatika Dasar",
+        "ringkasan": [
+          "Aritmatika mencakup operasi hitung: penjumlahan (+), pengurangan (-), perkalian (×), pembagian (÷), persentase (%), dan pecahan.",
+          "Urutan operasi (PEMDAS): Kurung → Eksponen → Perkalian/Pembagian (kiri ke kanan) → Penjumlahan/Pengurangan (kiri ke kanan).",
+          "Rumus penting: diskon = harga × (100% - %diskon); bunga = modal × rate × waktu; rata-rata = jumlah data ÷ banyak data."
+        ],
+        "tips": [
+          "Gunakan perkiraan (estimation) untuk mempercepat — bulatkan angka ke puluhan/ratusan terdekat",
+          "Persentase: 10% dari X = X/10; 5% = setengah dari 10%; 25% = X/4",
+          "Cek satuan: pastikan semua dalam satuan yang sama sebelum menghitung"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "25% dari 400 adalah...",
+            "opsi": [
+              { "id": "A", "text": "50" },
+              { "id": "B", "text": "100" },
+              { "id": "C", "text": "150" },
+              { "id": "D", "text": "200" }
+            ],
+            "kunci": "B",
+            "pembahasan": "25% = 1/4. 400 ÷ 4 = 100."
+          }
+        ]
+      },
+      {
+        "id": "deret",
+        "title": "Deret Angka & Huruf",
+        "ringkasan": [
+          "Deret angka adalah urutan bilangan dengan pola tertentu. Pola umum: selisih tetap (+2, -3), perkalian (×2, ÷3), Fibonacci (jumlah 2 sebelumnya), dan pola loncat.",
+          "Cara menyelesaikan: 1) Cek selisih antar suku, 2) Jika selisih tidak konstan, cek selisih dari selisih (lapisan ke-2), 3) Cek pola alternatif (ganjil-genap).",
+          "Deret huruf: konversi ke angka (A=1, B=2, ..., Z=26), temukan pola, lalu konversi kembali."
+        ],
+        "tips": [
+          "Tulis selisih di bawah setiap suku — ini membantu melihat pola",
+          "Pola campuran: bisa +2, ×2, +2, ×2 bergantian",
+          "Untuk deret huruf: ingat ada 26 huruf. Setelah Z kembali ke A"
+        ],
+        "quiz": [
+          {
+            "pertanyaan": "3, 6, 12, 24, ... ?",
+            "opsi": [
+              { "id": "A", "text": "36" },
+              { "id": "B", "text": "48" },
+              { "id": "C", "text": "30" },
+              { "id": "D", "text": "42" }
+            ],
+            "kunci": "B",
+            "pembahasan": "Pola: ×2. 3×2=6, 6×2=12, 12×2=24, 24×2=48."
+          }
+        ]
+      }
+    ]
+  }
+]

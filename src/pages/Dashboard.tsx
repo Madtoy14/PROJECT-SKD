@@ -794,6 +794,19 @@ export default function Dashboard() {
                 <p className="text-sm font-semibold text-fg leading-none">{profile?.nickname || profile?.username || 'Pejuang'}</p>
                 <div className="px-1.5 py-0.5 bg-premium-subtle rounded text-[9px] text-premium font-bold">Lvl {profile?.level || 1}</div>
                 <RankBadge score={profile?.score || 0} size="sm" />
+                {/* Streak Badge "Hari ke-X" */}
+                {totalStreak > 0 && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.6 }}
+                    className="flex items-center gap-1 px-1.5 py-0.5 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-400/40 rounded text-[9px] font-black text-orange-500 shrink-0"
+                    title={`Streak ${totalStreak + (isStreakClaimed ? 1 : 0)} hari belajar berturut-turut!`}
+                  >
+                    <Flame size={9} className="text-orange-500" />
+                    {totalStreak + (isStreakClaimed ? 1 : 0)}h
+                  </motion.div>
+                )}
               </div>
               {/* Inline XP Bar */}
               <div className="flex items-center gap-2 mt-1.5">
@@ -944,8 +957,21 @@ export default function Dashboard() {
                 <h3 className="text-[18px] sm:text-[20px] font-semibold text-fg tracking-tight flex items-center gap-2">
                   <Flame className="text-streak" size={20} />
                   Streak Harian
+                  {/* Hari ke-X badge prominent */}
+                  <motion.span
+                    key={totalStreak}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 18 }}
+                    className="ml-1 px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[11px] font-black rounded-full shadow-sm"
+                  >
+                    Hari ke-{totalStreak + (isStreakClaimed ? 1 : 0)}
+                  </motion.span>
                 </h3>
-                <p className="text-[13px] text-fg-muted font-medium mt-0.5">{totalStreak + (isStreakClaimed ? 1 : 0)}/30 hari — hampir MEGA!</p>
+                <p className="text-[13px] text-fg-muted font-medium mt-0.5">
+                  {totalStreak + (isStreakClaimed ? 1 : 0)}/30 hari menuju{' '}
+                  {isTodayMegaReward ? '🏆 MEGA REWARD!' : `Mega Reward (+${30 - (totalStreak + (isStreakClaimed ? 1 : 0))} hari lagi)`}
+                </p>
               </div>
               <div className="flex items-center gap-2 text-right pb-1">
                 <button 
@@ -1022,7 +1048,7 @@ export default function Dashboard() {
                 { icon: Crosshair, color: 'text-info', bg: 'bg-info/', border: 'border-info/20', value: calculatedAkurasi, label: 'Akurasi', suffix: '%' },
                 { icon: Flame, color: 'text-primary', bg: 'bg-primary-subtle', border: 'border-primary/20', value: calculatedCombo, label: 'Combo', suffix: '', prefix: 'x' },
               ].map((stat, i) => (
-                <motion.div key={i} whileHover={{ y: -3 }} className={`bg-surface rounded-2xl p-4 border ${stat.border} shadow-sm flex flex-col items-center justify-center text-center gap-3 relative overflow-hidden group`}>
+                <motion.div key={i} whileHover={{ y: -4, scale: 1.02 }} className={`bg-surface rounded-2xl p-4 border ${stat.border} shadow-sm flex flex-col items-center justify-center text-center gap-3 relative overflow-hidden group cursor-default transition-shadow hover:shadow-md`}>
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.bg} transition-transform group-hover:scale-110`}>
                     <stat.icon className={stat.color} size={20} />
                   </div>
@@ -1370,7 +1396,7 @@ export default function Dashboard() {
                     <h4 className="text-sm font-bold text-premium mb-2 flex items-center gap-2"><Lock size={16} /> Buka Akses Try Out</h4>
                     <p className="text-xs text-fg leading-relaxed mb-4">Simulasi ini menggunakan standar format BKN dengan sistem penilaian ambang batas resmi. Dapatkan rapor lengkap di akhir sesi.</p>
                     <div className="space-y-2">
-                      <button onClick={(e) => { handlePlayGame(e, '/quiz', selectedMode.id); setSelectedMode(null); }} className="w-full bg-premium text-primary-fg hover:bg-coin text-[#0F0E17] font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-skd-premium/20 flex items-center justify-center gap-2">
+                      <button onClick={(e) => { e.preventDefault(); setSelectedMode(null); navigate('/tryout-lobby'); }} className="w-full bg-premium text-primary-fg hover:bg-coin text-[#0F0E17] font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-skd-premium/20 flex items-center justify-center gap-2">
                         <Coins size={18} /> Buka dengan 1.500 Koin
                       </button>
                       <button className="w-full bg-surface-subtle hover:bg-surface border border-border text-fg font-bold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">

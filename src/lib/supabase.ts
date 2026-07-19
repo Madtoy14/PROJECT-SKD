@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { sortByAdaptiveDifficulty } from '../calculations/adaptive';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -36,7 +37,7 @@ export interface UserProfile {
     item_kesempatan_kedua: number;
     item_energy_refill: number;
     item_streak_protector?: number;
-    item_coin_booster?: number;
+
     item_tinta_hitam?: number;
     item_lompatan_kilat?: number;
   };
@@ -310,7 +311,7 @@ export async function getUserAnalytics(userId: string) {
 }
 
 // 5. Mengambil Soal dari Supabase (Soal SKD)
-export const fetchQuestionsFromSupabase = async (gameMode: string) => {
+export const fetchQuestionsFromSupabase = async (gameMode: string, packageId?: string) => {
     if (!isSupabaseConfigured()) {
     // Fallback ke data lokal terstruktur jika Supabase belum dikonfigurasi
     const { getRandomQuestions } = await import('../data/questions/index');
@@ -371,7 +372,20 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
       }
     } else if (gameMode === 'tryout') {
       // 110 soal berdasar kategori dari tabel 'soal_tryout' untuk Try Out BKN Standar
+      // Jika packageId diberikan, filter by paket_id; fallback ke semua soal jika tidak ada paket
       const fetchCategory = async (tipe: string, limit: number) => {
+        if (packageId) {
+          // Opsi A: filter by paket_id — butuh kolom paket_id di tabel soal_tryout
+          const res = await supabase!
+            .from('soal_tryout')
+            .select('*')
+            .eq('tipe', tipe)
+            .eq('paket_id', packageId);
+          if (!res.error && res.data && res.data.length > 0) {
+            return shuffle(res.data).slice(0, limit);
+          }
+          // fallback ke soal umum jika paket belum punya soal
+        }
         const { data, error } = await supabase!.rpc('get_random_tryout_soal_by_tipe', { soal_tipe: tipe, limit_count: limit });
         if (error) {
           const res = await supabase!.from('soal_tryout').select('*').eq('tipe', tipe);
@@ -466,19 +480,28 @@ export const fetchQuestionsFromSupabase = async (gameMode: string) => {
       });
 
       return {
-        id: q.id,
-        category: q.tipe,
-        text: q.pertanyaan,
-        options: normalizedOptions,
-        correct: q.kunci,
-        explanation: q.pembahasan || 'Tidak ada pembahasan.',
-        xp_reward: q.xp_reward || 10,
-        coin_reward: q.coin_reward || 5
-      };
+              id: q.id,
+              category: q.tipe,
+              text: q.pertanyaan,
+              options: normalizedOptions,
+              correct: q.kunci,
+              explanation: q.pembahasan || 'Tidak ada pembahasan.',
+              xp_reward: q.xp_reward || 10,
+              coin_reward: q.coin_reward || 5,
+              difficulty: q.difficulty || 'sedang',
+            };
     });
 
-    } catch (err) {
-    console.error('Gagal mengambil soal dari Supabase, fallback ke questions/index.ts:', err);
+        // Apply adaptive difficulty sorting for latihan + survival (not PvP, not Tryout)
+        if (gameMode === 'latihan' || gameMode === 'survival') {
+          const firstCategory = questions[0]?.category;
+          if (firstCategory) {
+            questions = sortByAdaptiveDifficulty(questions, firstCategory);
+          }
+        }
+
+        } catch (err) {
+        console.error('Gagal mengambil soal dari Supabase, fallback ke questions/index.ts:', err);
     const { getRandomQuestions } = await import('../data/questions/index');
     if (gameMode === 'tryout') {
       return [
