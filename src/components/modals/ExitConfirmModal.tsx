@@ -12,16 +12,17 @@ export function ExitConfirmModal({ isOpen, onClose, onConfirm, isEnergyDeducted 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="exit-modal-title">
       <div
         className="absolute inset-0 bg-overlay backdrop-blur-sm"
         onClick={onClose}
+        aria-hidden="true"
       />
-      <div className="bg-bg border border-border rounded-3xl p-6 md:p-8 max-w-sm w-full relative z-10 shadow-2xl">
+      <div className="bg-bg border border-border rounded-3xl p-6 md:p-8 max-w-sm w-full relative z-10 shadow-2xl" onKeyDown={(e) => e.key === 'Escape' && onClose()}>
         <div className="w-16 h-16 bg-danger/10 text-danger rounded-2xl flex items-center justify-center mb-6 mx-auto border border-danger/20">
           <X size={32} />
         </div>
-        <h2 className="text-xl font-black text-center text-fg mb-3">Yakin Ingin Keluar?</h2>
+        <h2 id="exit-modal-title" className="text-xl font-black text-center text-fg mb-3">Yakin Ingin Keluar?</h2>
         <p className="text-sm text-center text-fg-muted mb-8 leading-relaxed">
           {!isEnergyDeducted 
             ? "Kuis belum selesai. Jika Anda keluar sekarang, biaya permainan (energi/koin) Anda tidak akan terpotong."

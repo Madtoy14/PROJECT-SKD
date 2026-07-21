@@ -250,12 +250,13 @@ export default function Auth() {
                   <form onSubmit={handleResetPassword} className="space-y-4">
                     {/* Password Baru */}
                     <div>
-                      <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">PASSWORD BARU</label>
+                      <label htmlFor="new-password" className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">PASSWORD BARU</label>
                       <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                           <Lock size={16} />
                         </div>
                         <input
+                          id="new-password"
                           type={showNewPwd ? 'text' : 'password'}
                           required
                           value={newPassword}
@@ -278,12 +279,13 @@ export default function Auth() {
 
                     {/* Konfirmasi Password */}
                     <div>
-                      <label className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">KONFIRMASI PASSWORD</label>
+                      <label htmlFor="confirm-password" className="block text-xs font-bold text-fg-muted mb-1.5 ml-1">KONFIRMASI PASSWORD</label>
                       <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-fg-muted group-focus-within:text-primary transition-colors">
                           <Lock size={16} />
                         </div>
                         <input
+                          id="confirm-password"
                           type={showConfirmPwd ? 'text' : 'password'}
                           required
                           value={confirmPassword}

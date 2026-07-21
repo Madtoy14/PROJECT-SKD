@@ -11,16 +11,17 @@ export function SubmitConfirmModal({ isOpen, onClose, onConfirm }: SubmitConfirm
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="submit-modal-title">
       <div
         className="absolute inset-0 bg-overlay backdrop-blur-sm"
         onClick={onClose}
+        aria-hidden="true"
       />
-      <div className="bg-bg border border-border rounded-3xl p-6 md:p-8 max-w-sm w-full relative z-10 shadow-2xl">
+      <div className="bg-bg border border-border rounded-3xl p-6 md:p-8 max-w-sm w-full relative z-10 shadow-2xl" onKeyDown={(e) => e.key === 'Escape' && onClose()}>
         <div className="w-16 h-16 bg-success/10 text-success rounded-2xl flex items-center justify-center mb-6 mx-auto border border-success/20">
           <Check size={32} />
         </div>
-        <h2 className="text-xl font-black text-center text-fg mb-3">Kumpulkan Ujian?</h2>
+        <h2 id="submit-modal-title" className="text-xl font-black text-center text-fg mb-3">Kumpulkan Ujian?</h2>
         <p className="text-sm text-center text-fg-muted mb-8 leading-relaxed">
           Apakah Anda yakin ingin menyelesaikan kuis ini? Pastikan Anda sudah mengecek kembali seluruh jawaban Anda.
         </p>
