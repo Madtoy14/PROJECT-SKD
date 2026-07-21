@@ -1,10 +1,11 @@
 -- SH-01: spin_wheel RPC — server-side prize random
 -- Deploy ke Supabase SQL Editor
 
-create or replace function spin_wheel(user_id uuid)
-returns jsonb language plpgsql security definer as $$
+create or replace function spin_wheel()
+returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
   p profiles%rowtype;
+  uid uuid := auth.uid();
   today_str text := to_char(now() at time zone 'Asia/Jakarta', 'YYYY-MM-DD');
   r float := random() * 100;
   cumulative float := 0;
@@ -27,7 +28,7 @@ declare
   prize jsonb;
   i int;
 begin
-  select * into p from profiles where id = user_id for update;
+  select * into p from profiles where id = uid for update;
 
   -- Cek gratis atau bayar
   if p.last_spin_date = today_str then
@@ -36,7 +37,7 @@ begin
       return jsonb_build_object('error', 'insufficient_coins');
     end if;
     paid_spin := true;
-    update profiles set coins = coins - 100 where id = user_id;
+    update profiles set coins = coins - 100 where id = uid;
   end if;
 
   -- Pick prize server-side
@@ -55,9 +56,9 @@ begin
 
   -- Apply prize
   if is_coins then
-    update profiles set coins = coins + prize_count where id = user_id;
+    update profiles set coins = coins + prize_count where id = uid;
   elsif is_energy then
-    update profiles set energy = least(24, coalesce(energy,0) + prize_count) where id = user_id;
+    update profiles set energy = least(24, coalesce(energy,0) + prize_count) where id = uid;
   else
     update profiles set
       inventory = jsonb_set(
@@ -65,16 +66,16 @@ begin
         array[prize_id],
         to_jsonb(coalesce((inventory->>prize_id)::int, 0) + prize_count)
       )
-    where id = user_id;
+    where id = uid;
   end if;
 
   -- Update last_spin_date kalau free spin
   if not paid_spin then
-    update profiles set last_spin_date = today_str where id = user_id;
+    update profiles set last_spin_date = today_str where id = uid;
   end if;
 
   -- Fetch updated profile
-  select coins, energy, inventory into p from profiles where id = user_id;
+  select coins, energy, inventory into p from profiles where id = uid;
 
   return jsonb_build_object(
     'prize_id',    prize_id,

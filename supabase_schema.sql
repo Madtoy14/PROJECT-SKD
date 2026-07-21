@@ -22,6 +22,8 @@ DROP POLICY IF EXISTS "Semua orang bisa melihat profil" ON public.profiles;
 CREATE POLICY "Semua orang bisa melihat profil" ON public.profiles
     FOR SELECT USING (true);
 
+-- Policy: UPDATE hanya untuk kolom profil publik.
+-- Mutasi ekonomi/statistik/quest hanya melalui RPC server.
 DROP POLICY IF EXISTS "Pengguna bisa mengubah profil sendiri" ON public.profiles;
 CREATE POLICY "Pengguna bisa mengubah profil sendiri" ON public.profiles
     FOR UPDATE USING (auth.uid() = id);

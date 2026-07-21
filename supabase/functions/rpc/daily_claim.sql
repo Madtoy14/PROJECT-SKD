@@ -1,17 +1,26 @@
 -- SH-02: daily_claim RPC — server-side streak + coin award
--- Deploy ke Supabase SQL Editor
+-- Parameter user_id dihapus; identitas dari auth.uid()
 
-create or replace function daily_claim(user_id uuid)
-returns jsonb language plpgsql security definer as $$
+create or replace function daily_claim()
+returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
   p profiles%rowtype;
+  uid uuid := auth.uid();
   today_str text := to_char(now() at time zone 'Asia/Jakarta', 'YYYY-MM-DD');
   streak_new int;
   bonus int;
   msg text;
   days_diff int;
 begin
-  select * into p from profiles where id = user_id for update;
+  if uid is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  select * into p from profiles where id = uid for update;
+
+  if not found then
+    raise exception 'profile_not_found';
+  end if;
 
   -- Cek sudah claim hari ini
   if p.last_claim_date = today_str then
@@ -30,12 +39,11 @@ begin
   elsif p.inventory->>'item_streak_protector' is not null
     and (p.inventory->>'item_streak_protector')::int > 0
     and days_diff <= 2 then
-    -- streak protector aktif
     streak_new := coalesce(p.streak, 0) + 1;
     update profiles set inventory = jsonb_set(
       inventory, '{item_streak_protector}',
       to_jsonb((p.inventory->>'item_streak_protector')::int - 1)
-    ) where id = user_id;
+    ) where id = uid;
   else
     streak_new := 1;
   end if;
@@ -53,7 +61,7 @@ begin
     coins = coalesce(coins, 0) + bonus,
     streak = streak_new,
     last_claim_date = today_str
-  where id = user_id;
+  where id = uid;
 
   return jsonb_build_object(
     'bonus', bonus,
