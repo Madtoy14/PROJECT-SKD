@@ -35,13 +35,12 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 
 function Navigation() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
   const hideNavPaths = ['/quiz', '/auth', '/onboarding'];
 
   if (hideNavPaths.includes(location.pathname) || location.pathname.startsWith('/result') || location.pathname.startsWith('/review')) return null;
-
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const mainNav = [
     { path: '/', icon: Home, label: 'Home' },

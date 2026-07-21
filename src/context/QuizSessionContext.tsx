@@ -51,6 +51,8 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
   const isAutoSavingRef = useRef(false);
   // Debounce timer ref untuk save-on-answer (3 detik)
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Pending update terbaru — mencegah update stale saat request aktif
+  const pendingSaveRef = useRef<{ sessionId: string; updates: Partial<QuizSession> } | null>(null);
 
   useEffect(() => {
     activeSessionRef.current = activeSession;
@@ -138,7 +140,10 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     // Update local state langsung agar UI tetap responsif
     setActiveSession(prev => prev && prev.id === sessionId ? { ...prev, ...updates } : prev);
 
-    // Debounce API call ke Supabase selama 3 detik
+    // Simpan pending update terbaru di ref
+    pendingSaveRef.current = { sessionId, updates };
+
+    // Batalkan save sebelumnya; flush yang tertunda setelah request selesai
     if (saveDebounceRef.current) clearTimeout(saveDebounceRef.current);
     saveDebounceRef.current = setTimeout(async () => {
       if (isAutoSavingRef.current) return;
@@ -146,11 +151,21 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
       if (!currentSession || currentSession.id !== sessionId) return;
       try {
         setIsAutoSaving(true);
-        await updateSession(sessionId, updates);
+        // Ambil update terbaru dari ref (bukan closure)
+        const latest = pendingSaveRef.current;
+        if (latest && latest.sessionId === sessionId) {
+          await updateSession(sessionId, latest.updates);
+          pendingSaveRef.current = null;
+        }
       } catch {
         // Silent fail — data tetap aman di local state
       } finally {
         setIsAutoSaving(false);
+        // Flush ulang bila ada update baru selama request
+        const remaining = pendingSaveRef.current;
+        if (remaining && remaining.sessionId === sessionId) {
+          debouncedSave(remaining.sessionId, remaining.updates);
+        }
       }
     }, 3000);
   }, [updateSession]);
