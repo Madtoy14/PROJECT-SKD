@@ -19,52 +19,70 @@ SKDQuest adalah platform simulasi dan pembelajaran interaktif untuk mempersiapka
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: [React 18](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/) + [Vite](https://vitejs.dev/)
+- **Frontend**: [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) + [Vite 8](https://vitejs.dev/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **Backend & Database**: [Supabase](https://supabase.com/) (PostgreSQL, Realtime, Edge Functions, Authentication)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Routing**: React Router DOM
+- **Test**: Vitest
 
 ## 📂 Struktur Direktori Utama
 
-- `/src/pages` - Komponen halaman utama (Dashboard, Quiz, Result, Profile, Toko, dll).
-- `/src/components` - Komponen UI yang dapat digunakan kembali (*MathCard*, *AnimatedCounter*, *LoadingSkeleton*, dll).
-- `/src/lib` - Konfigurasi dan *helper functions* utilitas (Koneksi Supabase, logika *fetch* data, dll).
-- `/supabase` - Skrip SQL dan konfigurasi database Supabase.
+- `/src/pages` — halaman utama
+- `/src/components` — UI reusable
+- `/src/lib` — Supabase helpers
+- `/src/__tests__` — unit tests
+- `/supabase/migrations` — migration SQL berurutan
+- `/supabase/functions` — Edge Functions + RPC SQL
+- `/docs` — dokumentasi & progress remediation
 
 ## 🚀 Setup & Instalasi (Development)
 
-1. **Clone repository ini**
+**Node:** `^20.19.0 || >=22.12.0`
+
+1. **Clone**
    ```bash
-   git clone <repo-url>
-   cd project-skd
+   git clone https://github.com/Madtoy14/PROJECT-SKD.git
+   cd PROJECT-SKD
    ```
 
-2. **Install dependencies**
+2. **Install (reproducible)**
    ```bash
-   npm install
+   npm ci
    ```
 
-3. **Konfigurasi Environment**
-   Buat file `.env` di _root directory_ dan masukkan kredensial Supabase Anda:
+3. **Environment**
+   Salin `.env.example` → `.env` lalu isi:
    ```env
    VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-4. **Jalankan Aplikasi Lokal**
+4. **Jalankan lokal**
    ```bash
    npm run dev
    ```
-   Aplikasi akan berjalan di `http://localhost:5173`.
+   Default: `http://localhost:5173`.
+
+## ✅ Quality gates
+
+```bash
+npm run lint
+npm test
+npm run build
+```
 
 ## 📦 Build (Produksi)
 
-Untuk melakukan build (kompilasi untuk _deployment_):
 ```bash
 npm run build
 ```
-Hasil build akan tersimpan di dalam folder `dist/`.
+Output di `dist/`. Deploy target: Vercel.
+
+## 🗄️ Migration Supabase
+
+Lihat urutan apply di `supabase/migrations/README.md`.  
+**Backup dulu** sebelum apply ke production.
 
 ---
 *Dibuat untuk membantu pejuang NIP.*

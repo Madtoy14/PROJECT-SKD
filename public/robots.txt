@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /auth
+Disallow: /quiz
+Disallow: /result
+Disallow: /review
+Disallow: /onboarding
+Disallow: /profil
+Disallow: /toko
+Disallow: /quest
+Disallow: /catatan-salah
+
+Sitemap: https://skdquest.vercel.app/sitemap.xml
