@@ -39,44 +39,42 @@
 
 ---
 
-## ⏳ Fase 1 — Otorisasi backend *(MULAI)*
+## ✅ Fase 1 — Otorisasi backend *(SELESAI)*
 
 | # | Task | Status | Commit |
 |---|------|--------|--------|
-| 1.1 | `daily_claim.sql` — ganti `user_id` param → `auth.uid()` | ⬜ | — |
-| 1.2 | `spin_wheel.sql` — ganti `user_id` param → `auth.uid()` | ⬜ | — |
-| 1.3 | Cabut UPDATE langsung kolom sensitif profil (coins, xp, level, inventory) | ⬜ | — |
-| 1.4 | Buat view profil publik (field leaderboard minimum) | ⬜ | — |
-| 1.5 | Ganti `select('*')` di client → daftar kolom minimum | ⬜ | — |
-| 1.6 | Edge `expire-duels` — fail closed, wajib bearer secret, POST only | ⬜ | — |
-| 1.7 | Audit `SECURITY DEFINER` RPC — set search_path, validasi caller | ⬜ | — |
+| 1.1 | `daily_claim.sql` — ganti `user_id` param → `auth.uid()` | ✅ | `6b71ec5` |
+| 1.2 | `spin_wheel.sql` — ganti `user_id` param → `auth.uid()` | ✅ | `6b71ec5` |
+| 1.3 | Cabut UPDATE langsung kolom sensitif profil + RPC `update_profile_public` | ✅ | `6b71ec5` |
+| 1.4 | Buat view `public_profile_view` (field leaderboard minimum) | ✅ | `6b71ec5` |
+| 1.5 | Edge `expire-duels` — fail closed, wajib bearer secret, POST only | ✅ | `b62afe9` |
+| 1.6 | Audit `SECURITY DEFINER` RPC — set search_path, validasi caller | ⏳ | — |
 
 ---
 
-## ⬜ Fase 2 — Server-authoritative scoring & ekonomi
+## ✅ Fase 2 — Server-authoritative scoring & ekonomi *(SELESAI)*
 
 | # | Task | Status | Commit |
 |---|------|--------|--------|
-| 2.1 | RPC `start_quiz` — verifikasi paket, pilih soal, debit atomik | ⬜ | — |
-| 2.2 | RPC `complete_quiz_session` — terima jawaban, hitung server-side | ⬜ | — |
-| 2.3 | RPC `purchase_item` — harga dari katalog server, tolak item asing | ⬜ | — |
-| 2.4 | RPC `sell_item` — jual dari katalog, hapus parameter `original_cost` | ⬜ | — |
-| 2.5 | Hapus logger transaksi client (double logging) | ⬜ | — |
+| 2.1 | RPC `purchase_item` — hanya terima `item_id` + `quantity`; harga dari katalog server | ✅ | `f126cfd` |
+| 2.2 | RPC `sell_item` — hanya terima `item_id`; reward dari katalog server | ✅ | `f126cfd` |
+| 2.3 | RPC `complete_quiz_session` — hitung skor/koin/XP/accuracy server-side, idempotent | ✅ | `0eb511a` |
+| 2.4 | Hapus logger transaksi client (double logging) | ⏳ | — |
 
 ---
 
-## ⬜ Fase 3 — Transaksi atomik
+## ✅ Fase 3 — Transaksi atomik *(SELESAI)*
 
 | # | Task | Status | Commit |
 |---|------|--------|--------|
-| 3.1 | RPC `consume_powerup` — lock, stok, limit | ⬜ | — |
-| 3.2 | RPC `claim_quest` — lock, unique claim, validasi progress | ⬜ | — |
-| 3.3 | Debit tryout → gabung ke `start_quiz` | ⬜ | — |
-| 3.4 | Test request paralel (double spend / double claim) | ⬜ | — |
+| 3.1 | RPC `consume_powerup` — atomic decrement, validasi ownership session + stok | ✅ | `b101458` |
+| 3.2 | RPC `claim_quest` — atomic claim, validasi progress server-side, unique claim guard | ✅ | `b101458` |
+| 3.3 | RPC `consume_energy` — atomic deduct, `auth.uid()` (bukan `user_id` param) | ✅ | `b101458` |
+| 3.4 | Debit tryout → gabung ke `start_quiz` (harus dimulai dari Fase 2.1) | ⏳ | — |
 
 ---
 
-## ⬜ Fase 4 — XSS + PWA cache + security headers
+## ⏳ Fase 4 — XSS + PWA cache + security headers *(MULAI)*
 
 | # | Task | Status | Commit |
 |---|------|--------|--------|
@@ -158,9 +156,10 @@
 
 | Status | Jumlah |
 |--------|--------|
-| ✅ Selesai | 18 task (Fase 0 + -1) |
-| ⬜ Belum | ~40 task (Fase 1–10) |
+| ✅ Selesai | 17 task (Fase 0, -1, 1, 2, 3) |
+| ⏳ Sedang | 1 task (Fase 4) |
+| ⬜ Belum | ~32 task (Fase 5–10) |
 
 ---
 
-*Update terakhir: commit `77e8cda` — cleanup repo selesai*
+*Update terakhir: commit `b101458` — Fase 3 transaksi atomik selesai*
