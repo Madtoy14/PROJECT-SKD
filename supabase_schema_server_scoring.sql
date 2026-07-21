@@ -22,17 +22,12 @@ CREATE POLICY "Users can update own results" ON public.quiz_results FOR UPDATE U
 -- 2. Perbarui RPC complete_quiz_session
 CREATE OR REPLACE FUNCTION complete_quiz_session(
     p_session_id UUID,
-    p_score INTEGER,
-    p_twk_score INTEGER,
-    p_tiu_score INTEGER,
-    p_tkp_score INTEGER,
-    p_accuracy NUMERIC,
-    p_coins_earned INTEGER,
-    p_xp_earned INTEGER,
-    p_passed_twk BOOLEAN,
-    p_passed_tiu BOOLEAN,
-    p_passed_tkp BOOLEAN,
-    p_passed_overall BOOLEAN
+    p_coins_earned INTEGER DEFAULT 0,
+    p_xp_earned INTEGER DEFAULT 0,
+    p_passed_twk BOOLEAN DEFAULT NULL,
+    p_passed_tiu BOOLEAN DEFAULT NULL,
+    p_passed_tkp BOOLEAN DEFAULT NULL,
+    p_passed_overall BOOLEAN DEFAULT NULL
 )
 RETURNS UUID AS $$
 DECLARE
@@ -50,9 +45,15 @@ DECLARE
     v_twk_count INTEGER := 0;
     v_tiu_count INTEGER := 0;
     v_tkp_count INTEGER := 0;
+    v_coins_earned INTEGER := 0;
+    v_xp_earned INTEGER := 0;
 BEGIN
-    SELECT * INTO v_session FROM public.quiz_sessions WHERE id = p_session_id FOR UPDATE;
-    IF NOT FOUND THEN RAISE EXCEPTION 'Session not found'; END IF;
+    -- Autentikasi dan lock session
+    SELECT * INTO v_session 
+    FROM public.quiz_sessions 
+    WHERE id = p_session_id AND user_id = auth.uid()
+    FOR UPDATE;
+    IF NOT FOUND THEN RAISE EXCEPTION 'Session not found or not yours'; END IF;
 
     IF v_session.status = 'completed' THEN
         SELECT id INTO v_result_id FROM public.quiz_results WHERE session_id = p_session_id LIMIT 1;
@@ -98,11 +99,16 @@ BEGIN
         v_passed_tkp := v_tkp_score >= CASE WHEN v_tkp_count < 45 THEN CEIL(v_tkp_count * 0.293 * 5) ELSE 166 END;
         v_passed_overall := v_passed_twk AND v_passed_tiu AND v_passed_tkp;
     ELSE
-        v_passed_twk := p_passed_twk;
-        v_passed_tiu := p_passed_tiu;
-        v_passed_tkp := p_passed_tkp;
-        v_passed_overall := p_passed_overall;
+        -- Passing flags untuk non-tryout ditentukan server
+        v_passed_twk := true;
+        v_passed_tiu := true;
+        v_passed_tkp := true;
+        v_passed_overall := true;
     END IF;
+
+    -- Hitung reward server-side (koin & XP berdasarkan skor)
+    v_coins_earned := LEAST(v_score * 2, 500);
+    v_xp_earned := LEAST(v_score, 100);
 
     UPDATE public.quiz_sessions
     SET status = 'completed', completed_at = NOW(),
@@ -117,14 +123,17 @@ BEGIN
         passed_twk, passed_tiu, passed_tkp, passed_overall, completed_at
     ) VALUES (
         v_user_id, p_session_id, v_session.mode, v_session.package_id, v_session.package_version,
-        v_score, v_twk_score, v_tiu_score, v_tkp_score, p_accuracy,
-        v_session.time_spent_seconds, p_coins_earned, p_xp_earned,
+        v_score, v_twk_score, v_tiu_score, v_tkp_score,
+        CASE WHEN (v_twk_count + v_tiu_count + v_tkp_count) > 0
+             THEN ROUND((v_score::numeric / ((v_twk_count + v_tiu_count + v_tkp_count) * 4) * 100), 1)
+             ELSE 0 END,
+        v_session.time_spent_seconds, v_coins_earned, v_xp_earned,
         v_session.questions_json, v_session.answers_json, v_session.used_powerups,
         v_passed_twk, v_passed_tiu, v_passed_tkp, v_passed_overall, NOW()
     ) RETURNING id INTO v_result_id;
 
     UPDATE public.profiles
-    SET coins = coins + p_coins_earned, score = score + p_xp_earned
+    SET coins = coins + v_coins_earned, score = score + v_xp_earned
     WHERE id = v_user_id;
 
     RETURN v_result_id;
