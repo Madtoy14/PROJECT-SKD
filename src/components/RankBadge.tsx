@@ -23,7 +23,7 @@ function RankModal({ score, onClose }: { score: number; onClose: () => void }) {
   const currentRank = getRankForScore(score);
   const { nextRank, pointsNeeded } = getRankProgress(score);
   const season = getCurrentSeason();
-  const { start, end, daysLeft, resetDate } = getSeasonDates();
+  const { daysLeft } = getSeasonDates();
 
   const progressPct = Math.min(
     (score - currentRank.minScore) / ((nextRank?.minScore ?? currentRank.minScore + 1) - currentRank.minScore) * 100,

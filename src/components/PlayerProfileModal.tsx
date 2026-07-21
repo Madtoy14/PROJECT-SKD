@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Trophy, Swords, Shield, Star, Target, Activity, CheckCircle2 } from 'lucide-react';
 import { useFocusTrap } from '../hooks/useFocusTrap';

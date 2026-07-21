@@ -29,7 +29,7 @@ export default function TryOutLobby() {
         return;
       }
       
-      const { data, error } = await supabase!
+      const { data } = await supabase!
         .from('quiz_sessions')
         .select('id')
         .eq('user_id', user.id)

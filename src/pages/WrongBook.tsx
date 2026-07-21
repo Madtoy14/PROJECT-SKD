@@ -8,7 +8,7 @@ import MathCard from '../components/MathCard';
 
 export default function WrongBook() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [_profile, setProfile] = useState<UserProfile | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [stats, setStats] = useState({ twk: 0, tiu: 0, tkp: 0, total: 0 });
   const [loading, setLoading] = useState(true);
@@ -140,7 +140,7 @@ export default function WrongBook() {
           </div>
         ) : (
           <div>
-            {questions.map((q, idx) => (
+            {questions.map((q) => (
               <div
                 key={q.id}
                 className="bg-surface border border-border p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden mb-4"

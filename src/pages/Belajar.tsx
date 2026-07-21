@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, Flag, Brain, UserCheck, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Flag, Brain, UserCheck, ChevronRight } from 'lucide-react';
 import type { Modul } from '../data/materi/index';
 import twkData from '../data/materi/twk.json';
 import tiuData from '../data/materi/tiu.json';

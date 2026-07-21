@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, Lightbulb, HelpCircle, ChevronRight, ChevronLeft, BookOpen } from 'lucide-react';
-import type { Modul, SubBab, SubBabQuiz } from '../data/materi/index';
+import type { Modul, SubBabQuiz } from '../data/materi/index';
 import twkData from '../data/materi/twk.json';
 import tiuData from '../data/materi/tiu.json';
 import tkpData from '../data/materi/tkp.json';
@@ -12,8 +12,7 @@ const MODULS: Modul[] = [twkData[0] as Modul, tiuData[0] as Modul, tkpData[0] as
 
 export default function BelajarSubBab() {
   const { modul: modulId, subbab: subBabId } = useParams<{ modul: string; subbab: string }>();
-  const navigate = useNavigate();
-
+  
   const modul = useMemo(() => MODULS.find(m => m.id === modulId), [modulId]);
   const subBab = useMemo(() => modul?.subBabs.find(s => s.id === subBabId), [modul, subBabId]);
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, useEffect, type ReactNode } from 'react';
 import { supabase, isSupabaseConfigured, fetchProfile } from '../lib/supabase';
 import { dicebearUrl } from '../lib/constants';
 import type { UserProfile } from '../lib/supabase';

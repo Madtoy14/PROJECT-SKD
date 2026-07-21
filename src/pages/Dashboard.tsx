@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
-import { Zap, Coins, Plus, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Sun, Moon, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Share2, Copy, BookOpen, LogOut } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character } from '../lib/supabase';
 import RankBadge from '../components/RankBadge';
 import { getRankForScore, getCurrentSeason } from '../data/ranks';
