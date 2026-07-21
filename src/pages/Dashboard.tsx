@@ -233,8 +233,8 @@ export default function Dashboard() {
     setIsSpinning(true);
     setSpinResult(null);
 
-    // SH-01: server-side random via RPC — cegah client manipulation
-    supabase!.rpc('spin_wheel', { user_id: profile.id }).then(({ data, error }) => {
+    // SH-01: server-side random via RPC — identitas dari auth.uid()
+    supabase!.rpc('spin_wheel').then(({ data, error }) => {
       let prizeIdx = 0;
       let selectedPrize = SPIN_PRIZES[0];
       let rpcSuccess = false;
@@ -534,22 +534,13 @@ export default function Dashboard() {
       setToastMessage('Menyelesaikan Quest...');
       setTimeout(async () => {
         try {
-          const { data, error } = await supabase!.rpc('daily_claim', { user_id: profile!.id });
+          const { data, error } = await supabase!.rpc('daily_claim');
           if (error || data?.error) {
-            // Fallback client-side kalau RPC belum deploy
-            const isMega = (totalStreak + 1) % 30 === 0;
-            const isWeekly = (totalStreak + 1) % 7 === 0;
-            let bonus = 5;
-            let msg = 'Quest Selesai! +5 Koin Harian';
-            if (isMega) { bonus = 50; msg = 'Quest Selesai! +50 Koin Mega Streak 30 Hari!'; }
-            else if (isWeekly) { bonus = 10; msg = 'Quest Selesai! +10 Koin Streak Mingguan!'; }
-            const todayStr = new Date().toDateString();
-            const newCoins = globalCoins + bonus;
-            const newStreak = totalStreak + 1;
-            setGlobalCoins(newCoins); setTotalStreak(newStreak); setIsStreakClaimed(true); setToastMessage(msg);
-            updateProfile({ coins: newCoins, streak: newStreak, last_claim_date: todayStr }).then(() => {
-              setTimeout(() => { setToastMessage(''); navigate(path, { state: { mode: modeId, energyCost: costType === 'energy' ? cost : 0, coinCost: costType === 'coin' ? cost : 0, ...extraState } }); }, 2000);
-            });
+            // Fail closed — jangan kasih reward client-side
+            setToastMessage(data?.error === 'already_claimed'
+              ? 'Klaim harian sudah diambil.'
+              : 'Gagal klaim harian. Coba lagi.');
+            setTimeout(() => setToastMessage(''), 2500);
           } else {
             // RPC berhasil — server sudah update DB
             setGlobalCoins(data.coins_new);

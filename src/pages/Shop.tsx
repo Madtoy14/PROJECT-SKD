@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Coins, Scale, Lightbulb, Zap, LockKeyhole, Sparkles, Check, Clock, Eye, Heart, Battery, Shield, Skull, Plus, X } from 'lucide-react';
 import { fetchProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
-import { logCoinPurchase, logItemSale, logEnergyPurchase, validatePurchase } from '../lib/transactions';
+import { validatePurchase } from '../lib/transactions';
 import { TopUpModal } from '../components/modals/TopUpModal';
 import { Button } from '../components/ui/Button';
 
@@ -107,36 +107,21 @@ export default function Shop() {
         return;
       }
 
+      // Harga/tipe dari katalog server — client hanya kirim item_id + quantity
       const { data: rpcResult, error: rpcError } = await supabase.rpc('purchase_item', {
         p_item_id: itemId,
-        p_cost: finalCost,
-        p_item_type: itemType,
         p_quantity: quantity
       });
 
       if (rpcError || !rpcResult?.success) {
-        // Tidak ada fallback — gagal di server berarti transaksi dibatalkan
         const reason = rpcResult?.reason ?? rpcError?.message ?? 'Pembelian gagal di server';
         showToast(reason, 'error');
         return;
       }
 
-      const coinsAfter: number = rpcResult.coins_after;
-
-      // ── Sync state lokal dari hasil server (bukan hitung sendiri) ──
+      // Sync state lokal dari hasil server (RPC sudah log transaksi)
       const freshProfile = await fetchProfile();
       if (freshProfile) setProfile(freshProfile);
-
-      // ── Log transaksi (audit trail, bukan penentu saldo) ──
-      if (itemType === 'energy') {
-        await logEnergyPurchase(finalCost, 5 * quantity, coinsAfter);
-      } else {
-        await logCoinPurchase(itemId, finalCost, coinsAfter, {
-          item_title: itemTitle,
-          item_type: itemType,
-          quantity: quantity
-        });
-      }
 
       showToast(`Berhasil membeli ${quantity > 1 ? quantity + 'x ' : ''}${itemTitle}!`, 'success');
     } catch (err: unknown) {
@@ -165,31 +150,23 @@ export default function Shop() {
 
     setPurchasing(itemId);
     try {
+      // Reward jual dihitung server dari katalog
       const { data: rpcResult, error: rpcError } = await supabase.rpc('sell_item', {
-        p_item_id: itemId,
-        p_original_cost: cost
+        p_item_id: itemId
       });
 
       if (rpcError || !rpcResult?.success) {
-        // Tidak ada fallback — gagal di server berarti transaksi dibatalkan
         const reason = rpcResult?.reason ?? rpcError?.message ?? 'Penjualan gagal di server';
         showToast(reason, 'error');
         return;
       }
 
-      const coinsAfter: number = rpcResult.coins_after;
-      const reward: number = rpcResult.reward;
+      const reward: number = rpcResult.coins_earned ?? rpcResult.reward ?? 0;
+      void cost; // harga UI; reward final dari server
 
-      // ── Sync state lokal dari hasil server ──
+      // Sync state lokal dari hasil server (RPC sudah log transaksi)
       const freshProfile = await fetchProfile();
       if (freshProfile) setProfile(freshProfile);
-
-      // ── Log transaksi (audit trail) ──
-      await logItemSale(itemId, reward, coinsAfter, {
-        item_title: itemTitle,
-        original_price: cost,
-        quantity_remaining: rpcResult.quantity_remaining
-      });
 
       showToast(`Berhasil menjual 1 ${itemTitle} (+${reward} Koin)!`, 'success');
     } catch (err: unknown) {

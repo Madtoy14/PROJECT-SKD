@@ -155,44 +155,32 @@ export const updateProfile = async (profileUpdate: Partial<UserProfile>): Promis
 };
 
 /**
- * SEC-01: Atomic energy deduction via RPC to prevent race-condition exploits.
- * Falls back to optimistic updateProfile when Supabase not configured (local dev).
- *
- * SQL RPC (run once in Supabase SQL editor):
- * ─────────────────────────────────────────────────────────────────────────────
- * create or replace function consume_energy(user_id uuid, amount int)
- * returns int language plpgsql security definer as $$
- * declare current_energy int;
- * begin
- *   select energy into current_energy from profiles
- *     where id = user_id for update;
- *   if current_energy < amount then
- *     raise exception 'insufficient_energy';
- *   end if;
- *   update profiles set energy = energy - amount,
- *     last_energy_update = now()
- *   where id = user_id;
- *   return current_energy - amount;
- * end; $$;
- * ─────────────────────────────────────────────────────────────────────────────
+ * SEC-01: Atomic energy deduction via RPC (auth.uid server-side).
+ * Signature: consume_energy(p_amount int) -> { success, energy_after }
  */
 export const consumeEnergy = async (
   amount: number
 ): Promise<{ success: boolean; energyAfter: number }> => {
   if (!isSupabaseConfigured()) {
-    // local dev fallback — no race protection
     return { success: true, energyAfter: 0 };
   }
   try {
     const { data, error } = await supabase!.rpc('consume_energy', {
-      user_id: (await supabase!.auth.getUser()).data.user?.id,
-      amount,
+      p_amount: amount,
     });
     if (error) {
       if (error.message?.includes('insufficient_energy')) {
         return { success: false, energyAfter: 0 };
       }
       throw error;
+    }
+    // Support both JSONB object and legacy int return
+    if (data && typeof data === 'object' && 'success' in data) {
+      const result = data as { success: boolean; energy_after?: number; reason?: string };
+      return {
+        success: !!result.success,
+        energyAfter: result.energy_after ?? 0,
+      };
     }
     return { success: true, energyAfter: data as number };
   } catch (err) {

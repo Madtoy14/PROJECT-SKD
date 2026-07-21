@@ -316,24 +316,23 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     //   2. INSERT quiz_results
     //   3. UPDATE profiles SET coins, score, level, total_quizzes_completed, ...
     // Semua dalam satu transaksi DB — tidak ada window of failure
+    // Skor/koin/XP dihitung server. Kirim session_id + answers saja (plus defaults kompat).
+    // Simpan jawaban final dulu agar server scoring pakai data terbaru.
+    if (finalData.finalAnswers) {
+      await updateSession(sessionId, { answers: answersToUse as Record<string, string> });
+    }
+
     const { data: resultId, error: rpcError } = await supabase!.rpc('complete_quiz_session', {
-      p_session_id:   sessionId,
-      p_score:        finalData.score,
-      p_twk_score:    finalData.twkScore    ?? 0,
-      p_tiu_score:    finalData.tiuScore    ?? 0,
-      p_tkp_score:    finalData.tkpScore    ?? 0,
-      p_accuracy:     finalData.accuracy    ?? 0,
-      p_coins_earned: finalData.coinsEarned,
-      p_xp_earned:    finalData.xpEarned,
-      p_passed_twk:   passedTwk,
-      p_passed_tiu:   passedTiu,
-      p_passed_tkp:   passedTkp,
+      p_session_id: sessionId,
+      // parameter opsional lama diabaikan server scoring baru; tetap dikirim default aman
+      p_coins_earned: 0,
+      p_xp_earned: 0,
+      p_passed_twk: passedTwk,
+      p_passed_tiu: passedTiu,
+      p_passed_tkp: passedTkp,
       p_passed_overall: passedOverall,
-      // Kirim answers_json & package_id langsung ke RPC
-      // agar server bisa simpan semuanya dalam satu transaksi
-      p_answers_json: answersToUse,
-      p_package_id:   session.packageId ?? null
     });
+    void finalData; // skor client tidak authoritative
 
     // Jika RPC gagal, jangan clear session — biarkan user retry
     if (rpcError) throw rpcError;

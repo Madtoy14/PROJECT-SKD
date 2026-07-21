@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, CheckCircle2, Flame, Clock, Brain, Coins } from 'lucide-react';
-import { fetchProfile, updateProfile } from '../lib/supabase';
+import { fetchProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
 
 const DAILY_QUESTS_METADATA = [
@@ -56,22 +56,33 @@ export default function Quest() {
 
   const handleClaim = async (questId: number, reward: number, title: string) => {
     if (!profile) return;
-    
-    // Cek apakah sudah diklaim (999)
+
+    // UI guard; security boundary di RPC claim_quest
     const currentProgress = profile.quests_progress?.[questId] || 0;
     if (currentProgress === 999) return;
+    if (!isSupabaseConfigured() || !supabase) {
+      setToastMessage('Koneksi server tidak tersedia.');
+      setTimeout(() => setToastMessage(null), 3000);
+      return;
+    }
 
-    const updatedCoins = profile.coins + reward;
-    const updatedProgress = { ...(profile.quests_progress || {}), [questId]: 999 };
-
-    const updated = await updateProfile({
-      coins: updatedCoins,
-      quests_progress: updatedProgress
-    });
-
-    setProfile(updated);
-    setToastMessage(`Sukses klaim hadiah +${reward} Koin dari misi "${title}"!`);
-    setTimeout(() => setToastMessage(null), 3000);
+    try {
+      const { data, error } = await supabase.rpc('claim_quest', { p_quest_id: questId });
+      if (error || !data?.success) {
+        setToastMessage(data?.reason ?? error?.message ?? 'Gagal klaim quest');
+        setTimeout(() => setToastMessage(null), 3000);
+        return;
+      }
+      const fresh = await fetchProfile();
+      if (fresh) setProfile(fresh);
+      const earned = data.coins_earned ?? reward;
+      setToastMessage(`Sukses klaim hadiah +${earned} Koin dari misi "${title}"!`);
+      setTimeout(() => setToastMessage(null), 3000);
+    } catch (err) {
+      console.error(err);
+      setToastMessage('Terjadi kesalahan saat klaim quest');
+      setTimeout(() => setToastMessage(null), 3000);
+    }
   };
 
   const renderQuestCard = (quest: any) => {
