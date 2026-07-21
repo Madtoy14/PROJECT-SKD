@@ -10,21 +10,31 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+function unauthorized(message = 'Unauthorized'): Response {
+  return new Response(
+    JSON.stringify({ error: message }),
+    { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
+
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+  // Hanya accept POST
+  if (req.method !== 'POST') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
   }
 
   try {
-    // Verify cron secret
+    // Verify cron secret — fail-closed: jika secret kosong, tolak request
     const authHeader = req.headers.get('Authorization');
     const cronSecret = Deno.env.get('CRON_SECRET');
     
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (!cronSecret) {
+      console.error('CRON_SECRET not configured');
+      return unauthorized('Server misconfiguration: CRON_SECRET not set');
+    }
+    
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return unauthorized();
     }
 
     // Create service role client for admin operations
