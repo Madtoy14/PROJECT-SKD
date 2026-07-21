@@ -406,16 +406,16 @@ function AppLayout() {
               <Route path="/auth" element={<Auth />} />
               <Route path="/"                  element={<ProtectedRoute authState={authState}><Dashboard /></ProtectedRoute>} />
               <Route path="/onboarding"        element={<ProtectedRoute authState={authState}><Onboarding /></ProtectedRoute>} />
-              <Route path="/quiz"              element={<ProtectedRoute authState={authState}><Quiz /></ProtectedRoute>} />
-              <Route path="/result/:attemptId" element={<ProtectedRoute authState={authState}><Result /></ProtectedRoute>} />
+              <Route path="/quiz"              element={<ProtectedRoute authState={authState}><QuizSessionProvider><Quiz /></QuizSessionProvider></ProtectedRoute>} />
+              <Route path="/result/:attemptId" element={<ProtectedRoute authState={authState}><QuizSessionProvider><Result /></QuizSessionProvider></ProtectedRoute>} />
               <Route path="/liga"              element={<ProtectedRoute authState={authState}><Leaderboard /></ProtectedRoute>} />
               <Route path="/quest"             element={<ProtectedRoute authState={authState}><Quest /></ProtectedRoute>} />
               <Route path="/toko"              element={<ProtectedRoute authState={authState}><Shop /></ProtectedRoute>} />
               <Route path="/catatan-salah"     element={<ProtectedRoute authState={authState}><WrongBook /></ProtectedRoute>} />
               <Route path="/pembahasan"        element={<ProtectedRoute authState={authState}><TryOutLobby /></ProtectedRoute>} />
               <Route path="/tryout-lobby"     element={<ProtectedRoute authState={authState}><TryOutLobby /></ProtectedRoute>} />
-              <Route path="/review/:attemptId" element={<ProtectedRoute authState={authState}><ReviewDetail /></ProtectedRoute>} />
-              <Route path="/review/:packageId/:attemptId" element={<ProtectedRoute authState={authState}><ReviewDetail /></ProtectedRoute>} />
+              <Route path="/review/:attemptId" element={<ProtectedRoute authState={authState}><QuizSessionProvider><ReviewDetail /></QuizSessionProvider></ProtectedRoute>} />
+              <Route path="/review/:packageId/:attemptId" element={<ProtectedRoute authState={authState}><QuizSessionProvider><ReviewDetail /></QuizSessionProvider></ProtectedRoute>} />
               <Route path="/profil"            element={<ProtectedRoute authState={authState}><Profile /></ProtectedRoute>} />
               <Route path="/belajar"           element={<ProtectedRoute authState={authState}><Belajar /></ProtectedRoute>} />
                             <Route path="/belajar/:modul"     element={<ProtectedRoute authState={authState}><BelajarModul /></ProtectedRoute>} />
