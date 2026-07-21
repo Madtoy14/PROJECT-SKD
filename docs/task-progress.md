@@ -74,14 +74,14 @@
 
 ---
 
-## ⏳ Fase 4 — XSS + PWA cache + security headers *(MULAI)*
+## ✅ Fase 4 — XSS + PWA cache + security headers *(SELESAI)*
 
 | # | Task | Status | Commit |
 |---|------|--------|--------|
-| 4.1 | Hapus `dangerouslySetInnerHTML` mentah | ⬜ | — |
-| 4.2 | Jangan cache API Supabase di SW | ⬜ | — |
-| 4.3 | Bersihkan Cache Storage saat logout | ⬜ | — |
-| 4.4 | Tambah security headers Vercel (CSP, frame-ancestors, nosniff, dll) | ⬜ | — |
+| 4.1 | Ganti `dangerouslySetInnerHTML` → text node di Quiz.tsx (2 lokasi) & ReviewDetail.tsx (2 lokasi) | ✅ | `3ad7761` |
+| 4.2 | Hapus runtime caching Supabase API (NetworkOnly) | ✅ | `3ad7761` |
+| 4.3 | Bersihkan Cache Storage saat logout | ✅ | `3ad7761` |
+| 4.4 | Tambah security headers Vercel (nosniff, DENY, Referrer-Policy, Permissions-Policy) | ✅ | `3ad7761` |
 
 ---
 
