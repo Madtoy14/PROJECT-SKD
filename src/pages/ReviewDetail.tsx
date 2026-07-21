@@ -208,7 +208,7 @@ export default function ReviewDetail() {
               )}
               
               <div className="bg-surface rounded-3xl p-8 md:px-12 md:py-10 border border-border shadow-sm mb-6 mt-2 md:mt-4">
-                <p className="text-lg font-semibold leading-loose text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(currentQuestion.text) }} />
+                <p className="text-lg font-semibold leading-loose text-fg">{cleanMathText(currentQuestion.text)}</p>
               </div>
 
               <div className="space-y-2 md:space-y-3">
@@ -237,7 +237,7 @@ export default function ReviewDetail() {
                       <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base ${markerClass}`}>
                         {isCorrect ? '✓' : (isSelected ? '✗' : opt.id)}
                       </div>
-                      <span className="flex-1 leading-snug text-sm md:text-base font-semibold text-fg" dangerouslySetInnerHTML={{ __html: cleanMathText(opt.text) }} ></span>
+                      <span className="flex-1 leading-snug text-sm md:text-base font-semibold text-fg">{cleanMathText(opt.text)}</span>
                       
                       {isTKP && (
                         <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg

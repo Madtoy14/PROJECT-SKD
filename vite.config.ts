@@ -40,18 +40,9 @@ export default defineConfig({
             },
           },
           {
-            // Supabase API — network-first for real-time data
+            // Hanya cache font static — jangan cache API Supabase (auth, data users)
             urlPattern: ({ url }) => url.hostname.includes('supabase'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'supabase-api-cache',
-              networkTimeoutSeconds: 5,
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 5, // 5 minutes
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
+            handler: 'NetworkOnly',
           },
         ],
       },

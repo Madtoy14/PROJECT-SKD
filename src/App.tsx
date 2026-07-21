@@ -70,6 +70,11 @@ function Navigation() {
 
   const handleLogout = async () => {
     try {
+      // Bersihkan PWA cache sebelum logout
+      if ('caches' in window) {
+        const cacheKeys = await caches.keys();
+        await Promise.all(cacheKeys.map(key => caches.delete(key)));
+      }
       if (supabase) await supabase.auth.signOut();
       window.location.href = '/auth';
     } catch { window.location.href = '/auth'; }

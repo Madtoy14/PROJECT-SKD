@@ -1122,13 +1122,13 @@ const scoreBadge = (optionId: string) => {
                   </div>
                 )}
                 <div className="bg-surface rounded-3xl p-8 md:px-12 md:py-10 border border-border shadow-sm mb-6 mt-2 md:mt-4">
-                  <p className="text-[20px] font-semibold leading-[1.6] text-fg" dangerouslySetInnerHTML={{ __html: cleanedQuestionText }} />
+                  <p className="text-[20px] font-semibold leading-[1.6] text-fg">{cleanedQuestionText}</p>
                 </div>
                 {/* Bocoran Rumus Hint Box */}
                 {showHint && currentQuestion.explanation && (
                   <div className="bg-coin-subtle border border-yellow-500/30 p-4 rounded-2xl text-coin text-xs sm:text-sm font-medium leading-relaxed shadow-sm">
                     <span className="font-bold flex items-center gap-1.5 mb-1 text-primary"><Lightbulb size={14}/> Petunjuk Rumus / Soal:</span>
-                    <span dangerouslySetInnerHTML={{ __html: cleanedExplanation.slice(0, 180) + (cleanedExplanation.length > 180 ? '...' : '') }} />
+                    <span>{cleanedExplanation.slice(0, 180) + (cleanedExplanation.length > 180 ? '...' : '')}</span>
                   </div>
                 )}
                 <div className="space-y-2 md:space-y-3">
@@ -1192,7 +1192,7 @@ const scoreBadge = (optionId: string) => {
                         <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base ${markerClass}`}>
                           {opt.id}
                         </div>
-                        <span className="flex-1 leading-[1.6] text-base md:text-lg font-semibold text-fg" dangerouslySetInnerHTML={{ __html: opt.cleanedText }} ></span>
+                        <span className="flex-1 leading-[1.6] text-base md:text-lg font-semibold text-fg">{opt.cleanedText}</span>
                         {/* TKP score badge revealed after answering (not in tryout) */}
                         {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
