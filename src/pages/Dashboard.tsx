@@ -4,7 +4,6 @@ import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activit
 import { useNavigate } from 'react-router-dom';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character } from '../lib/supabase';
 import RankBadge from '../components/RankBadge';
-import { getRankForScore, getCurrentSeason } from '../data/ranks';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import avatarPdh from '../assets/avatar_pdh.webp';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -19,15 +18,6 @@ const GAME_MODES = [
   { id: 'catatan_salah', title: 'Buku Catatan Salah', desc: 'Latih ulang soal yang pernah salah', cost: 0, costType: 'energy', icon: BookOpen, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-card', badge: 'Evaluasi' },
 ];
 
-const MONTHLY_LEADERBOARD = [
-  { rank: 1, name: 'Raden Saori', xp: 3800, isMe: true },
-  { rank: 2, name: 'BudiSantoso', xp: 3210 },
-  { rank: 3, name: 'SitiRahma', xp: 2950 },
-  { rank: 4, name: 'AndiWijaya', xp: 2640 },
-  { rank: 5, name: 'DewiBulan', xp: 2100 },
-  { rank: 6, name: 'FajarPagi', xp: 1870 },
-  { rank: 7, name: 'NurHidayah', xp: 1450 },
-];
 const DAY_NAMES = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 function AnimatedCounter({ end, suffix = '', duration = 2 }: { end: number, suffix?: string, duration?: number }) {
   const [count, setCount] = useState(0);
@@ -197,7 +187,6 @@ export default function Dashboard() {
     setActiveRoom('');
   });
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
   // PvP State
   const [roomCode, setRoomCode] = useState('');
   const [pvpState, setPvpState] = useState<'idle' | 'loading' | 'waiting' | 'matching' | 'waiting_friend'>('idle');
@@ -216,7 +205,7 @@ export default function Dashboard() {
     if (!isSpinning) setShowSpinWheel(false);
   });
   const [spinAngle, setSpinAngle] = useState(0);
-  const [spinResult, setSpinResult] = useState<string | null>(null);
+  const [, setSpinResult] = useState<string | null>(null);
   const [lastSpinDate, setLastSpinDate] = useState<string | null>(null);
   const SPIN_PRIZES = [
     { id: 'item_waktu_beku', title: 'Waktu Beku', count: 1, color: '#6366F1', weight: 15 },
@@ -539,7 +528,6 @@ export default function Dashboard() {
       return;
     }
     // Energi akan dipotong di Quiz.tsx saat menjawab soal pertama (Deferred Deduction)
-    let newEnergy = energy;
     
     if (!isStreakClaimed) {
       e.preventDefault();

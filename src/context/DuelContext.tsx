@@ -111,7 +111,7 @@ export function DuelProvider({ children }: { children: ReactNode }) {
     };
   }, [myProfile]);
   // Send an invite
-  const sendInvite = (id: string, name: string) => {
+  const sendInvite = (id: string, _name: string) => {
     clearTimers();
     setInviteStatus('inviting');
     setTargetId(id);

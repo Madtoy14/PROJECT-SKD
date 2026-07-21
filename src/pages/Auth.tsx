@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle2, Loader2, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+
 import authBg from '../assets/auth_bg.webp';
 import { supabase } from '../lib/supabase';
 
@@ -16,8 +16,6 @@ export default function Auth() {
   const [showConfirmPwd, setShowConfirmPwd]     = useState(false);
   const [errorMsg, setErrorMsg]                 = useState('');
   const [successMsg, setSuccessMsg]             = useState('');
-
-  const navigate = useNavigate();
 
   // Deteksi token recovery dari URL hash (dikirim Supabase lewat email reset)
   // Format: /auth#access_token=...&type=recovery

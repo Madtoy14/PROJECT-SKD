@@ -23,7 +23,7 @@ function RankModal({ score, onClose }: { score: number; onClose: () => void }) {
   const currentRank = getRankForScore(score);
   const { nextRank, pointsNeeded } = getRankProgress(score);
   const season = getCurrentSeason();
-  const { daysLeft } = getSeasonDates();
+  const { start, end, daysLeft, resetDate } = getSeasonDates();
 
   const progressPct = Math.min(
     (score - currentRank.minScore) / ((nextRank?.minScore ?? currentRank.minScore + 1) - currentRank.minScore) * 100,
@@ -241,7 +241,7 @@ export function RankCard({ score = 3800 }: { score?: number }) {
   const currentRank = getRankForScore(score);
   const { progress, nextRank, pointsNeeded } = getRankProgress(score);
   const season = getCurrentSeason();
-  const { start, end, daysLeft, resetDate } = getSeasonDates();
+  const { daysLeft, resetDate } = getSeasonDates();
   const [modalOpen, setModalOpen] = useState(false);
 
   return (

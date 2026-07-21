@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
@@ -331,7 +331,7 @@ export default function Profile() {
     setSearchFriendResult(null);
     setSearchFriendError(false);
     try {
-      const { data, error } = await supabase!
+      const { data } = await supabase!
         .from('profiles')
         .select('id, username, score, selected_avatar')
         .ilike('username', searchVal)
@@ -377,34 +377,6 @@ export default function Profile() {
       fetchFollowData();
     }
   }, [isFollowModalOpen, followModalTab, profile]);
-
-  const handleFollowUser = async () => {
-    if (!searchFriendResult || !profile) return;
-    try {
-      const { error } = await supabase!.from('friends').insert({
-        user_id: profile.id,
-        friend_id: searchFriendResult.id,
-        status: 'accepted' // Otomatis mengikuti
-      });
-
-      if (error) {
-        if (error.code === '23505') {
-          showToast('Kamu sudah mengikuti pemain ini!', 'info');
-        } else {
-          throw error;
-        }
-      } else {
-        showToast(`Berhasil mengikuti @${searchFriendResult.username}!`, 'success');
-        setFollowingCount(prev => prev + 1);
-        setSearchFriendModal(false);
-        setSearchFriendResult(null);
-        setNewFriendName('');
-      }
-    } catch (err) {
-      console.error(err);
-      showToast('Gagal mengikuti pemain.', 'error');
-    }
-  };
 
   const togglePinBadge = (id: number) => {
     setPinnedBadges(prev => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpenCheck, Lock, Unlock, ChevronRight, Play, History, List } from 'lucide-react';
 import { Button } from '../components/ui/Button';

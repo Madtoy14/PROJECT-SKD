@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Coins, Scale, Lightbulb, Zap, LockKeyhole, Sparkles, Check, Clock, Eye, Heart, Battery, Shield, Skull, Plus, X } from 'lucide-react';
-import { fetchProfile, updateProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
+import { fetchProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
 import { logCoinPurchase, logItemSale, logEnergyPurchase, validatePurchase } from '../lib/transactions';
 import { TopUpModal } from '../components/modals/TopUpModal';

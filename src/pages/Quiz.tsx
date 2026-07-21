@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { getRandomQuestions, type Question, type QuestionOption } from '../data/questions/index';
 import { updateRating, getDifficultyColor } from '../calculations/adaptive';
 
@@ -56,7 +56,7 @@ const cleanMathText = (text: string): string => {
   return cleaned.trim();
 }
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Check, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, HeartCrack, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
+import { X, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, HeartCrack, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, consumeEnergy, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery } from '../lib/supabase';
 import { useQuizSession } from '../context/QuizSessionContext';
@@ -519,8 +519,7 @@ export default function Quiz() {
     }
     return pts;
   };
-  const questionStartTimeRef = useRef<number>(Date.now());
-
+  
   // --- Timer Sync (Hardcore Anti-Cheat) ---
   useEffect(() => {
     if (isGameOver || !activeSession?.id) return;

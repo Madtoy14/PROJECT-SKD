@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Target, Brain, Activity, Clock, Flame, Shield, ArrowRight, Play, Loader2, Sparkles } from 'lucide-react';
+import { BookOpen, Target, Brain, Activity, Flame, Shield, Play, Loader2, Sparkles } from 'lucide-react';
 import { fetchProfile, getWrongQuestions, getWrongBooksStats, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
