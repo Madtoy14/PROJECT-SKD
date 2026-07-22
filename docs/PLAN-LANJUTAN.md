@@ -26,15 +26,17 @@ Handler power-up di `Quiz.tsx` masih banyak `updateProfile(inventory)` client-si
 Semua konsumsi item lewat `consume_powerup(session_id, item_id)`.
 
 ### Task
-- [ ] Helper `consumePowerup(sessionId, itemId)` di `src/lib/supabase.ts`
-- [ ] Update semua handler power-up di `src/pages/Quiz.tsx`
-- [ ] Efek aktif hanya setelah RPC sukses
-- [ ] Hapus path mutasi inventory sensitif via `updateProfile` untuk consume
-- [ ] Toast error + disable tombol saat request
+- [x] Helper `consumePowerup(sessionId, itemId)` di `src/lib/supabase.ts`
+- [x] Update semua handler power-up di `src/pages/Quiz.tsx`
+- [x] Efek aktif hanya setelah RPC sukses
+- [x] Hapus path mutasi inventory sensitif via `updateProfile` untuk consume
+- [x] Toast error + disable tombol saat request
 
 ### Done when
 - Double-click / 2 tab tidak double-consume
 - Stok 0 tidak bisa dipakai
+
+**Status:** ✅ commit `68dcc9b`
 
 ---
 
@@ -49,14 +51,16 @@ Finish quiz antar mode belum seragam; error jaringan bisa bikin UX macet/palsu.
 Satu `finishQuiz()` untuk semua mode.
 
 ### Task
-- [ ] Satukan survival/tryout/normal
-- [ ] State `isFinishing`, `finishError`, retry
-- [ ] Navigate result hanya jika ada `result_id`
-- [ ] Session tetap aktif saat gagal
+- [x] Satukan survival/tryout/normal
+- [x] State `isFinishing`, `finishError`, retry
+- [x] Navigate result hanya jika ada `result_id`
+- [x] Session tetap aktif saat gagal
 
 ### Done when
 - Offline saat submit → tombol coba lagi
 - Tidak ada result palsu
+
+**Status:** ✅ commit `0d921c5`
 
 ---
 
@@ -65,10 +69,10 @@ Satu `finishQuiz()` untuk semua mode.
 **Estimasi:** 1–2 jam
 
 ### Task
-- [ ] Aktifkan backup/PITR Supabase bila memungkinkan
-- [ ] Atau jadwal export manual tabel kritis
-- [ ] Update `docs/deploy-checklist.md`
-- [ ] Runbook restore singkat
+- [x] Runbook restore: `docs/backup-restore.md`
+- [x] Update `docs/deploy-checklist.md` (backup wajib + jadwal)
+- [ ] Aktifkan backup/PITR Supabase di dashboard (manual owner)
+- [ ] Set reminder export mingguan jika free tier
 
 ### Done when
 - Ada jalur restore yang jelas
