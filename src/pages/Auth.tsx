@@ -109,12 +109,12 @@ export default function Auth() {
     <div className="min-h-screen bg-bg text-fg flex flex-col lg:flex-row font-syne overflow-hidden">
 
       {/* ── Sisi Kiri: Visual/Branding ── */}
-      <div className="relative w-full lg:w-1/2 min-h-[28vh] lg:min-h-screen flex flex-col justify-end p-8 lg:p-16 overflow-hidden">
+      <div className="relative w-full lg:w-1/2 min-h-[38vh] sm:min-h-[46vh] lg:min-h-screen flex flex-col justify-end p-6 pb-12 sm:p-10 lg:p-16 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-[center_top] lg:bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${authBg})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-bg via-surface-bg/60 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-surface-bg/40 lg:to-surface-bg" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-bg/40 lg:to-bg" />
         <div
           className="absolute inset-0 opacity-20 pointer-events-none"
           style={{
@@ -124,11 +124,11 @@ export default function Auth() {
         />
         <div className="relative z-10 max-w-lg">
           <div className="animate-[fadeInUp_0.8s_ease-out_0.2s_both]">
-            <h1 className="text-4xl lg:text-6xl font-black mb-4 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-skd-accent to-yellow-500">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-black mb-1.5 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-skd-accent to-yellow-500 drop-shadow-sm">
               SKDQuest
             </h1>
-            <p className="text-xl lg:text-2xl font-medium text-fg-muted font-mono">
-              Taklukan Rintangannya<br />Raih Mimpimu.
+            <p className="text-sm sm:text-lg lg:text-2xl font-medium text-fg-muted font-mono leading-tight">
+              Taklukan Rintangannya<br className="hidden sm:inline" /> Raih Mimpimu.
             </p>
           </div>
         </div>
