@@ -224,6 +224,40 @@ export const consumePowerup = async (
   }
 };
 
+/**
+ * Reset misi harian (quest 1-3) sekali per hari Asia/Jakarta.
+ * Signature: reset_daily_quests() -> { success, reset, quests_progress }
+ */
+export const resetDailyQuests = async (): Promise<{
+  success: boolean;
+  reset: boolean;
+  questsProgress?: Record<string, number>;
+  reason?: string;
+}> => {
+  if (!isSupabaseConfigured()) {
+    return { success: true, reset: false };
+  }
+  try {
+    const { data, error } = await supabase!.rpc('reset_daily_quests');
+    if (error) throw error;
+    const result = (data ?? {}) as {
+      success?: boolean;
+      reset?: boolean;
+      quests_progress?: Record<string, number>;
+      reason?: string;
+    };
+    return {
+      success: !!result.success,
+      reset: !!result.reset,
+      questsProgress: result.quests_progress,
+      reason: result.reason,
+    };
+  } catch (err) {
+    console.error('resetDailyQuests failed:', err);
+    return { success: false, reset: false, reason: 'error' };
+  }
+};
+
 // 3. Gabung Papan Peringkat Bulanan (Leaderboard/Liga)
 export const fetchMonthlyLeaderboard = async () => {
   if (!isSupabaseConfigured()) {

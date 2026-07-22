@@ -1,6 +1,6 @@
--- RPC: consume_powerup — atomic power-up consumption
+-- RPC: consume_powerup — atomic power-up consumption + log used_powerups
 -- Parameter: p_session_id (validasi ownership + status), p_item_id
--- Return: { success, item_remaining }
+-- Return: { success, item_remaining, item_id?, reason? }
 CREATE OR REPLACE FUNCTION public.consume_powerup(
     p_session_id UUID,
     p_item_id TEXT
@@ -16,13 +16,18 @@ DECLARE
     v_session RECORD;
     v_inv_val INTEGER;
     v_new_qty INTEGER;
+    v_used JSONB;
 BEGIN
     IF v_user_id IS NULL THEN
         RETURN jsonb_build_object('success', false, 'reason', 'not_authenticated');
     END IF;
 
-    -- Validasi session milik user dan masih active
-    SELECT id, user_id, status INTO v_session
+    IF p_item_id IS NULL OR length(trim(p_item_id)) = 0 THEN
+        RETURN jsonb_build_object('success', false, 'reason', 'invalid_item');
+    END IF;
+
+    -- Validasi session milik user dan masih active/paused
+    SELECT id, user_id, status, used_powerups, current_index INTO v_session
     FROM public.quiz_sessions
     WHERE id = p_session_id
     FOR UPDATE;
@@ -57,6 +62,24 @@ BEGIN
         to_jsonb(v_new_qty)
     )
     WHERE id = v_user_id;
+
+    -- Catat pemakaian di session (audit / anti-cheat skor ganda)
+    v_used := COALESCE(v_session.used_powerups, '[]'::jsonb);
+    IF jsonb_typeof(v_used) IS DISTINCT FROM 'array' THEN
+        v_used := '[]'::jsonb;
+    END IF;
+    v_used := v_used || jsonb_build_array(
+        jsonb_build_object(
+            'powerup', p_item_id,
+            'questionIndex', COALESCE(v_session.current_index, 0),
+            'at', to_char(now() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+        )
+    );
+
+    UPDATE public.quiz_sessions
+    SET used_powerups = v_used,
+        last_activity_at = NOW()
+    WHERE id = p_session_id;
 
     RETURN jsonb_build_object(
         'success', true,

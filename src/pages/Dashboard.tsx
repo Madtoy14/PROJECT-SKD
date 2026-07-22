@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
 import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character, type UserProfile } from '../lib/supabase';
+import { fetchProfile, resetDailyQuests, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character, type UserProfile } from '../lib/supabase';
 import RankBadge from '../components/RankBadge';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import avatarPdh from '../assets/avatar_pdh.webp';
@@ -83,23 +83,18 @@ export default function Dashboard() {
         }
 
         const now = new Date();
-        const todayStr = now.toDateString();
-        const updates: Partial<any> = {};
 
-        // 1. Reset Misi Harian (Quest)
-        let currentQuests = p.quests_progress || {};
-        if (p.last_login !== todayStr) {
-          updates.last_login = todayStr;
-          const newQuests = { ...currentQuests };
-          delete newQuests[1];
-          delete newQuests[2];
-          delete newQuests[3];
-          currentQuests = newQuests;
-          updates.quests_progress = currentQuests;
-          p.quests_progress = currentQuests;
-        }
+        // 1. Reset misi harian server-side (quest 1-3) — jangan updateProfile quests_progress
+        void resetDailyQuests().then((r) => {
+          if (r.success && r.questsProgress) {
+            setProfile((prev: UserProfile | null) =>
+              prev ? { ...prev, quests_progress: r.questsProgress as any } : prev
+            );
+          }
+        });
 
-        // 2. Recovery Energi Offline
+        // 2. Recovery Energi Offline (display only; energy mutasi lewat consume_energy)
+        // ponytail: regen energy server-side belum; UI timer lokal, write energy dihapus
         let currentEnergy = p.energy ?? 25;
         let nextTimer = 150;
         if (currentEnergy < 25 && p.last_energy_update) {
@@ -110,16 +105,11 @@ export default function Dashboard() {
             const remainder = diffSecs % 150;
             if (recovered > 0) {
               currentEnergy = Math.min(25, currentEnergy + recovered);
-              updates.energy = currentEnergy;
-              updates.last_energy_update = new Date(now.getTime() - (remainder * 1000)).toISOString();
             }
             if (currentEnergy < 25) {
               nextTimer = 150 - remainder;
             }
           }
-        }
-        if (!p.last_energy_update && currentEnergy < 25) {
-          updates.last_energy_update = now.toISOString();
         }
 
         setEnergy(currentEnergy || 0);
@@ -138,11 +128,6 @@ export default function Dashboard() {
           setIsStreakClaimed(true);
         } else {
           setIsStreakClaimed(false);
-        }
-
-        // Energy/avatar updates only (jangan auto-mutasi streak di client)
-        if (Object.keys(updates).length > 0) {
-          updateProfile(updates);
         }
       })
       .finally(() => setLoading(false));
@@ -239,17 +224,9 @@ export default function Dashboard() {
       setTimeout(() => {
         setIsSpinning(false);
         if (!rpcSuccess) {
-          let updatedInv = { ...profile.inventory };
-          let newCoins = globalCoins;
-          let newEnergy = energy;
-          if (hasSpunToday) { newCoins -= 100; } else { setLastSpinDate(todayStr); }
-          if (selectedPrize.isCoins) { newCoins += selectedPrize.count; }
-          else if (selectedPrize.isEnergy) { newEnergy = Math.min(24, (newEnergy || 0) + selectedPrize.count); }
-          else { updatedInv[selectedPrize.id] = (updatedInv[selectedPrize.id] || 0) + selectedPrize.count; }
-          setGlobalCoins(newCoins); setEnergy(newEnergy || 0);
-          updateProfile({ coins: newCoins, energy: newEnergy || 0, inventory: updatedInv as any, last_spin_date: !hasSpunToday ? todayStr : undefined });
-          setSpinResult(selectedPrize.title);
-          setToastMessage(`🎉 Selamat! Anda memenangkan: ${selectedPrize.title}!`);
+          // Fail-closed: tanpa RPC sukses, jangan mutasi ekonomi client
+          setSpinResult(null);
+          setToastMessage('Gagal spin. Coba lagi.');
           setTimeout(() => setToastMessage(''), 4000);
         } else {
           // RPC berhasil — server sudah update DB
@@ -311,17 +288,13 @@ export default function Dashboard() {
       };
     });
   })();
-  // Timer Logic
+  // Timer Logic — UI-only regen (server authority energy lewat consume_energy)
   useEffect(() => {
     if ((energy || 0) >= 25) return;
     const interval = setInterval(() => {
       setEnergyTimer((prev) => {
         if (prev <= 1) {
-          setEnergy((e) => {
-            const newE = Math.min((e || 0) + 1, 25);
-            updateProfile({ energy: newE, last_energy_update: new Date().toISOString() });
-            return newE;
-          });
+          setEnergy((e) => Math.min((e || 0) + 1, 25));
           return 150;
         }
         return prev - 1;

@@ -1,6 +1,6 @@
 -- RPC: claim_quest — atomic quest claim with progress validation
--- Parameter: p_quest_id (quest metadata can be hardcoded or from config table)
--- Return: { success, coins_earned, coins_after }
+-- Parameter: p_quest_id (quest metadata hardcoded selaras Quest.tsx)
+-- Return: { success, coins_earned, coins_after, reason? }
 CREATE OR REPLACE FUNCTION public.claim_quest(
     p_quest_id INTEGER
 )
@@ -14,12 +14,15 @@ DECLARE
     v_profile RECORD;
     v_reward INTEGER;
     v_required_total INTEGER;
+    v_progress_val INTEGER;
+    v_new_coins INTEGER;
+    v_progress JSONB;
 BEGIN
     IF v_user_id IS NULL THEN
         RETURN jsonb_build_object('success', false, 'reason', 'not_authenticated');
     END IF;
 
-    -- Ambil reward dan target dari quest metadata (hardcoded sesuai DAILY_QUESTS_METADATA & WEEKLY_QUESTS_METADATA di Quest.tsx)
+    -- Reward + target (selaras DAILY/WEEKLY di Quest.tsx)
     SELECT reward, total INTO v_reward, v_required_total
     FROM (VALUES
         (1, 100, 10),   -- Jawab 10 Soal TWK
@@ -34,7 +37,6 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'reason', 'unknown_quest');
     END IF;
 
-    -- Lock profil
     SELECT id, coins, quests_progress, quests_claimed
     INTO v_profile
     FROM public.profiles
@@ -45,25 +47,34 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'reason', 'profile_not_found');
     END IF;
 
-    -- Cek sudah claimed
-    IF v_profile.quests_claimed @> ARRAY[p_quest_id] THEN
+    -- Sudah claimed (array ATAU sentinel 999 di progress)
+    IF v_profile.quests_claimed IS NOT NULL AND v_profile.quests_claimed @> ARRAY[p_quest_id] THEN
         RETURN jsonb_build_object('success', false, 'reason', 'already_claimed');
     END IF;
 
-    -- Validasi progress cukup
-    IF COALESCE((v_profile.quests_progress ->> p_quest_id::TEXT)::INTEGER, 0) < v_required_total THEN
+    v_progress_val := COALESCE((v_profile.quests_progress ->> p_quest_id::TEXT)::INTEGER, 0);
+    IF v_progress_val = 999 THEN
+        RETURN jsonb_build_object('success', false, 'reason', 'already_claimed');
+    END IF;
+
+    IF v_progress_val < v_required_total THEN
         RETURN jsonb_build_object('success', false, 'reason', 'progress_insufficient');
     END IF;
 
-    -- Mark claimed & tambah koin atomik
+    v_new_coins := COALESCE(v_profile.coins, 0) + v_reward;
+    v_progress := COALESCE(v_profile.quests_progress, '{}'::jsonb);
+    v_progress := jsonb_set(v_progress, ARRAY[p_quest_id::TEXT], to_jsonb(999));
+
     UPDATE public.profiles
-    SET coins = COALESCE(coins, 0) + v_reward,
-        quests_claimed = array_append(COALESCE(quests_claimed, '{}'), p_quest_id)
+    SET coins = v_new_coins,
+        quests_claimed = array_append(COALESCE(quests_claimed, '{}'), p_quest_id),
+        quests_progress = v_progress
     WHERE id = v_user_id;
 
     RETURN jsonb_build_object(
         'success', true,
-        'coins_earned', v_reward
+        'coins_earned', v_reward,
+        'coins_after', v_new_coins
     );
 END; $$;
 

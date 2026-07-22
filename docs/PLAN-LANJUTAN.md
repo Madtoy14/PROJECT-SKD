@@ -98,9 +98,15 @@ Satu `finishQuiz()` untuk semua mode.
 **Estimasi:** 0.5 hari
 
 ### Task
-- [ ] Progress quest lebih server-side
-- [ ] Catat used powerups di session via RPC bila perlu
-- [ ] Reason code error RPC konsisten
+- [x] Progress quest di `complete_quiz_session` (server)
+- [x] `consume_powerup` catat `used_powerups` session
+- [x] `claim_quest` sentinel 999 + coins_after
+- [x] `reset_daily_quests` RPC + Dashboard wire
+- [x] Hapus fallback spin/energy mutasi client
+- [ ] Apply `supabase/fase-e-hardening.sql` di production (**backup dulu**)
+- [ ] RPC potong koin tryout (masih UI-optimistic)
+
+**Status:** code ready; apply DB manual
 
 ---
 

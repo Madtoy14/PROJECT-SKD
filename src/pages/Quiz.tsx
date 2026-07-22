@@ -58,7 +58,7 @@ const cleanMathText = (text: string): string => {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, HeartCrack, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchQuestionsFromSupabase, fetchProfile, updateProfile, consumeEnergy, consumePowerup, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery } from '../lib/supabase';
+import { fetchQuestionsFromSupabase, fetchProfile, consumeEnergy, consumePowerup, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery } from '../lib/supabase';
 import { useQuizSession } from '../context/QuizSessionContext';
 import MathCard from '../components/MathCard';
 import { Button } from '../components/ui/Button';
@@ -653,10 +653,11 @@ export default function Quiz() {
           });
         }
         if (coinCost > 0) {
-          const coinUpdates: Partial<import('../lib/supabase').UserProfile> = {
-            coins: Math.max(0, profile.coins - coinCost)
-          };
-          updateProfile(coinUpdates);
+          // ponytail: entry tryout belum punya RPC potong koin atomik;
+          // UI optimistic saja — ganti ke purchase_tryout / consume_coins saat siap
+          setProfile((p: import('../lib/supabase').UserProfile | null) =>
+            p ? { ...p, coins: Math.max(0, (p.coins || 0) - coinCost) } : p
+          );
         }
       }
       setIsEnergyDeducted(true);
