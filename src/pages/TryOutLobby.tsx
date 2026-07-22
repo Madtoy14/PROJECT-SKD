@@ -1,34 +1,90 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpenCheck, Lock, Unlock, ChevronRight, Play, History, List } from 'lucide-react';
+import { BookOpenCheck, Lock, Unlock, ChevronRight, Play, History, List, Coins } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { fetchProfile, supabase, type UserProfile } from '../lib/supabase';
+import { fetchProfile, supabase, isSupabaseConfigured, type UserProfile } from '../lib/supabase';
 import { AVAILABLE_PACKAGES } from '../data/tryout_packages';
+import { coinsToIdr } from '../lib/coins';
 import TryOutHistory from './TryOutHistory';
 
 export default function TryOutLobby() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<'lobby' | 'history'>('lobby');
+  const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const reloadProfile = () => fetchProfile().then(p => setProfile(p));
 
   useEffect(() => {
-    fetchProfile().then(p => setProfile(p));
+    reloadProfile();
   }, []);
 
-  const handleStart = (pkgId: string) => {
-    // Navigate to quiz with the package ID, or custom mode
-    // Assuming quiz handles "packageId" via state.
-    navigate('/quiz', { state: { mode: 'tryout', packageId: pkgId } });
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const isPackageUnlocked = (pkgId: string, unlockCost: number) => {
+    if (unlockCost === 0) return true;
+    return !!profile?.purchased_packages?.includes(pkgId);
+  };
+
+  const handleStart = (pkgId: string, attemptCost: number) => {
+    // Attempt cost dipotong di alur quiz/start (bukan di sini)
+    navigate('/quiz', {
+      state: {
+        mode: 'tryout',
+        packageId: pkgId,
+        coinCost: attemptCost,
+      },
+    });
+  };
+
+  const handleUnlock = async (pkgId: string, unlockCost: number, title: string) => {
+    if (!profile) return;
+    if (profile.purchased_packages?.includes(pkgId)) {
+      showToast('Paket sudah terbuka.');
+      return;
+    }
+    if ((profile.coins ?? 0) < unlockCost) {
+      showToast(`Koin tidak cukup. Butuh ${unlockCost.toLocaleString('id-ID')} koin.`);
+      return;
+    }
+    if (!isSupabaseConfigured() || !supabase) {
+      showToast('Koneksi server tidak tersedia.');
+      return;
+    }
+
+    setBuyingId(pkgId);
+    try {
+      // Server catalog menentukan harga; client hanya kirim item_id
+      const { data, error } = await supabase.rpc('purchase_item', {
+        p_item_id: pkgId,
+        p_quantity: 1,
+      });
+      if (error || !data?.success) {
+        showToast(data?.reason ?? error?.message ?? 'Gagal membuka paket');
+        return;
+      }
+      await reloadProfile();
+      showToast(`Berhasil unlock: ${title}`);
+    } catch (err) {
+      console.error(err);
+      showToast('Terjadi kesalahan saat unlock paket');
+    } finally {
+      setBuyingId(null);
+    }
   };
 
   const handleReview = async (pkgId: string) => {
     try {
       const { data: { user } } = await supabase!.auth.getUser();
       if (!user) {
-        alert("Sesi tidak valid. Silakan login kembali.");
+        showToast('Sesi tidak valid. Silakan login kembali.');
         return;
       }
-      
+
       const { data } = await supabase!
         .from('quiz_sessions')
         .select('id')
@@ -38,35 +94,49 @@ export default function TryOutLobby() {
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
-        
-      if (data && data.id) {
+
+      if (data?.id) {
         navigate(`/review/${data.id}`);
       } else {
-        alert("Anda belum pernah menyelesaikan Try Out ini. Silakan mulai terlebih dahulu.");
+        showToast('Anda belum pernah menyelesaikan Try Out ini.');
       }
-    } catch(err) {
-      console.error("Gagal memuat riwayat pembahasan:", err);
-      alert("Terjadi kesalahan saat memuat riwayat. Coba lagi.");
+    } catch (err) {
+      console.error(err);
+      showToast('Gagal memuat riwayat pembahasan.');
     }
   };
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto min-h-screen">
+      {toast && (
+        <div className="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 bg-fg text-bg px-5 py-3 rounded-full text-sm font-bold shadow-lg">
+          {toast}
+        </div>
+      )}
+
       <header className="mb-8 text-center md:text-left">
         <h1 className="text-3xl font-black text-fg mb-2">Try Out</h1>
-        <p className="text-fg-muted">Pilih paket Try Out untuk menguji kemampuan Anda dan lihat pembahasannya.</p>
+        <p className="text-fg-muted">
+          Try Out standar: <strong>1.000 koin / attempt</strong> (≈ Rp{coinsToIdr(1000).toLocaleString('id-ID')}).
+          Paket premium = unlock permanen di sini atau lewat Toko.
+        </p>
+        {profile && (
+          <p className="text-sm text-fg-muted mt-2 flex items-center gap-1.5 justify-center md:justify-start">
+            <Coins size={14} className="text-coin" />
+            Saldo: <strong className="text-fg">{(profile.coins ?? 0).toLocaleString('id-ID')} koin</strong>
+          </p>
+        )}
       </header>
 
-      {/* Tabs */}
       <div className="flex bg-surface-subtle border border-border p-1 rounded-xl w-full max-w-sm mb-8 mx-auto md:mx-0">
-        <button 
+        <button
           onClick={() => setActiveTab('lobby')}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'lobby' ? 'bg-surface text-primary shadow-sm' : 'text-fg-muted hover:text-fg'}`}
         >
           <List size={16} />
           Daftar Paket
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('history')}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'history' ? 'bg-surface text-primary shadow-sm' : 'text-fg-muted hover:text-fg'}`}
         >
@@ -78,68 +148,103 @@ export default function TryOutLobby() {
       {activeTab === 'lobby' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {AVAILABLE_PACKAGES.map((pkg) => {
-            // Check if unlocked (free or purchased)
-            const isUnlocked = pkg.cost === 0 || (profile?.purchased_packages?.includes(pkg.id));
-            
-            return (
-            <div key={pkg.id} className={`bg-surface border border-border rounded-2xl p-6 shadow-sm flex flex-col transition-all ${pkg.isDevelopment ? 'opacity-80 grayscale-[20%]' : 'hover:shadow-md hover:-translate-y-1'}`}>
-              <div className="flex justify-between items-start mb-4">
-                <div className={`p-3 rounded-xl ${isUnlocked && !pkg.isDevelopment ? 'bg-primary/10 text-primary' : 'bg-surface-subtle text-fg-muted'}`}>
-                  <BookOpenCheck size={24} />
-                </div>
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${pkg.isDevelopment ? 'bg-surface-subtle text-fg-muted' : isUnlocked ? 'bg-emerald-50 text-success' : 'bg-surface-subtle text-fg-muted'}`}>
-                  {pkg.isDevelopment ? <Lock size={14} /> : isUnlocked ? <Unlock size={14} /> : <Lock size={14} />}
-                  {pkg.isDevelopment ? 'Dalam Pengembangan' : isUnlocked ? 'Terbuka' : 'Terkunci'}
-                </div>
-              </div>
-              
-              <h3 className="text-lg font-bold text-fg mb-2 leading-tight">{pkg.title}</h3>
-              <p className="text-sm text-fg-muted leading-relaxed mb-4 flex-1">{pkg.description}</p>
-              
-              <div className="flex items-center justify-between text-xs text-fg-muted font-bold mb-6">
-                <span>{pkg.totalQuestions} Soal</span>
-                <span>Skor Maks: {pkg.totalQuestions * 5}</span>
-              </div>
+            const unlocked = isPackageUnlocked(pkg.id, pkg.unlockCost);
 
-              {pkg.isDevelopment ? (
-                <Button 
-                  variant="secondary" 
-                  className="w-full justify-center group opacity-70"
-                  disabled
-                >
-                  <span>Segera Hadir</span>
-                </Button>
-              ) : isUnlocked ? (
-                <div className="flex flex-col gap-2">
-                  <Button 
-                    variant="primary" 
-                    className="w-full justify-center group"
-                    onClick={() => handleStart(pkg.id)}
-                  >
-                    <Play size={16} className="mr-2" />
-                    <span>Mulai Sekarang</span>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-between group"
-                    onClick={() => handleReview(pkg.id)}
-                  >
-                    <span>Lihat Pembahasan</span>
-                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </Button>
+            return (
+              <div
+                key={pkg.id}
+                className={`bg-surface border border-border rounded-2xl p-6 shadow-sm flex flex-col transition-all ${
+                  pkg.isDevelopment ? 'opacity-80 grayscale-[20%]' : 'hover:shadow-md hover:-translate-y-1'
+                }`}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className={`p-3 rounded-xl ${unlocked && !pkg.isDevelopment ? 'bg-primary/10 text-primary' : 'bg-surface-subtle text-fg-muted'}`}>
+                    <BookOpenCheck size={24} />
+                  </div>
+                  <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${
+                    pkg.isDevelopment
+                      ? 'bg-surface-subtle text-fg-muted'
+                      : unlocked
+                        ? 'bg-emerald-50 text-success'
+                        : 'bg-surface-subtle text-fg-muted'
+                  }`}>
+                    {pkg.isDevelopment ? <Lock size={14} /> : unlocked ? <Unlock size={14} /> : <Lock size={14} />}
+                    {pkg.isDevelopment ? 'Dalam Pengembangan' : unlocked ? 'Terbuka' : 'Terkunci'}
+                  </div>
                 </div>
-              ) : (
-                <Button 
-                  variant="secondary" 
-                  className="w-full justify-between group"
-                  onClick={() => navigate('/toko')}
-                >
-                  <span>Buka Akses ({pkg.cost} Koin)</span>
-                  <Lock size={18} className="text-fg-muted" />
-                </Button>
-              )}
-            </div>
-          )})}
+
+                <h3 className="text-lg font-bold text-fg mb-2 leading-tight">{pkg.title}</h3>
+                <p className="text-sm text-fg-muted leading-relaxed mb-4 flex-1">{pkg.description}</p>
+
+                <div className="text-xs text-fg-muted font-bold mb-2 space-y-1">
+                  <div className="flex justify-between">
+                    <span>{pkg.totalQuestions} Soal</span>
+                    <span>Skor Maks: {pkg.totalQuestions * 5}</span>
+                  </div>
+                  {pkg.unlockCost > 0 && (
+                    <div className="flex justify-between">
+                      <span>Unlock permanen</span>
+                      <span className="text-fg">{pkg.unlockCost.toLocaleString('id-ID')} koin</span>
+                    </div>
+                  )}
+                  {pkg.attemptCost > 0 && (
+                    <div className="flex justify-between">
+                      <span>Biaya / attempt</span>
+                      <span className="text-fg">{pkg.attemptCost.toLocaleString('id-ID')} koin</span>
+                    </div>
+                  )}
+                </div>
+
+                {pkg.isDevelopment ? (
+                  <Button variant="secondary" className="w-full justify-center opacity-70" disabled>
+                    Segera Hadir
+                  </Button>
+                ) : unlocked ? (
+                  <div className="flex flex-col gap-2 mt-2">
+                    <Button
+                      variant="primary"
+                      className="w-full justify-center"
+                      onClick={() => handleStart(pkg.id, pkg.attemptCost)}
+                    >
+                      <Play size={16} className="mr-2" />
+                      {pkg.attemptCost > 0
+                        ? `Mulai · ${pkg.attemptCost.toLocaleString('id-ID')} koin`
+                        : 'Mulai Sekarang'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                      onClick={() => handleReview(pkg.id)}
+                    >
+                      <span>Lihat Pembahasan</span>
+                      <ChevronRight size={18} />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2 mt-2">
+                    <Button
+                      variant="primary"
+                      className="w-full justify-center"
+                      disabled={buyingId === pkg.id}
+                      onClick={() => handleUnlock(pkg.id, pkg.unlockCost, pkg.title)}
+                    >
+                      {buyingId === pkg.id
+                        ? 'Memproses...'
+                        : `Unlock · ${pkg.unlockCost.toLocaleString('id-ID')} koin (≈ Rp${coinsToIdr(pkg.unlockCost).toLocaleString('id-ID')})`}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                      onClick={() => navigate('/toko')}
+                    >
+                      <span>Atau beli di Toko</span>
+                      <Lock size={16} className="text-fg-muted" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 

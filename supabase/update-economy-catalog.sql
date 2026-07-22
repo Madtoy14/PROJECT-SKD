@@ -58,6 +58,7 @@ BEGIN
         ('paket_premium_twk_1',    700, 'premium_package'),
         ('paket_premium_tiu_2',    900, 'premium_package'),
         ('paket_premium_twk_2',    900, 'premium_package'),
+        ('paket_tryout_standar',  1000, 'premium_package'),
         ('paket_tryout_akbar_1',  1000, 'premium_package'),
         ('paket_tryout_akbar_2',  1000, 'premium_package'),
         ('paket_spesialis_bumn',  1500, 'premium_package'),

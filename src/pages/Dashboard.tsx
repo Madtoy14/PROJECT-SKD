@@ -1395,13 +1395,22 @@ export default function Dashboard() {
                 {selectedMode.id === 'tryout' && (
                   <div className="bg-premium-subtle p-4 rounded-xl border border-premium mb-6">
                     <h4 className="text-sm font-bold text-premium mb-2 flex items-center gap-2"><Lock size={16} /> Buka Akses Try Out</h4>
-                    <p className="text-xs text-fg leading-relaxed mb-4">Simulasi ini menggunakan standar format BKN dengan sistem penilaian ambang batas resmi. Dapatkan rapor lengkap di akhir sesi.</p>
+                    <p className="text-xs text-fg leading-relaxed mb-4">
+                      Simulasi standar format BKN (110 soal, ambang batas resmi, rapor lengkap).
+                      Entry attempt: <strong>1.000 koin (≈ Rp10.000)</strong>. Beli paket di Toko untuk unlock permanen + pembahasan.
+                    </p>
                     <div className="space-y-2">
-                      <button onClick={(e) => { e.preventDefault(); setSelectedMode(null); navigate('/tryout-lobby'); }} className="w-full bg-premium text-primary-fg hover:bg-coin text-[#0F0E17] font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-skd-premium/20 flex items-center justify-center gap-2">
-                        <Coins size={18} /> Buka dengan 1.500 Koin
+                      <button
+                        onClick={(e) => { e.preventDefault(); setSelectedMode(null); navigate('/tryout-lobby'); }}
+                        className="w-full bg-premium text-primary-fg hover:bg-coin text-[#0F0E17] font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-skd-premium/20 flex items-center justify-center gap-2"
+                      >
+                        <Coins size={18} /> Ke Lobby Try Out · 1.000 Koin / attempt
                       </button>
-                      <button className="w-full bg-surface-subtle hover:bg-surface border border-border text-fg font-bold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                        <CreditCard size={18} /> Beli seharga Rp 15.000
+                      <button
+                        onClick={(e) => { e.preventDefault(); setSelectedMode(null); navigate('/toko'); }}
+                        className="w-full bg-surface-subtle hover:bg-surface border border-border text-fg font-bold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
+                      >
+                        <CreditCard size={18} /> Beli paket unlock di Toko
                       </button>
                     </div>
                   </div>
