@@ -451,7 +451,7 @@ BEGIN
     END;
 
     RETURN jsonb_build_object('success', true, 'coins_after', v_new_coins, 'coins_spent', v_cost);
-END; $;
+END; $$;
 
 -- Grant access
 REVOKE EXECUTE ON FUNCTION public.purchase_item(TEXT, INTEGER) FROM PUBLIC;
@@ -552,7 +552,7 @@ BEGIN
         'coins_earned', v_reward,
         'new_qty', v_new_qty
     );
-END; $;
+END; $$;
 
 REVOKE EXECUTE ON FUNCTION public.sell_item(TEXT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.sell_item(TEXT) TO authenticated;
@@ -882,7 +882,7 @@ BEGIN
 
     RETURN v_result_id;
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- ############################################################
