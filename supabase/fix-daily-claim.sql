@@ -1,4 +1,6 @@
--- daily_claim — auth.uid(), tanggal Asia/Jakarta konsisten
+-- Fix daily_claim: tombol klaim harian + format tanggal YYYY-MM-DD (Asia/Jakarta)
+-- Paste di Supabase SQL Editor → Run
+
 create or replace function public.daily_claim()
 returns jsonb
 language plpgsql
@@ -24,7 +26,6 @@ begin
     return jsonb_build_object('error', 'profile_not_found');
   end if;
 
-  -- Normalisasi last_claim_date ke YYYY-MM-DD (dukung legacy Date.toDateString)
   if p.last_claim_date is null or btrim(p.last_claim_date) = '' then
     last_str := null;
   elsif p.last_claim_date ~ '^\d{4}-\d{2}-\d{2}' then
@@ -38,7 +39,11 @@ begin
   end if;
 
   if last_str is not null and last_str = today_str then
-    return jsonb_build_object('error', 'already_claimed', 'streak', coalesce(p.streak, 0), 'coins_new', coalesce(p.coins, 0));
+    return jsonb_build_object(
+      'error', 'already_claimed',
+      'streak', coalesce(p.streak, 0),
+      'coins_new', coalesce(p.coins, 0)
+    );
   end if;
 
   if last_str is null then
@@ -62,7 +67,6 @@ begin
     streak_new := 1;
   end if;
 
-  -- Reward: selaras ekonomi baru (1 koin = Rp10)
   if streak_new % 30 = 0 then
     bonus := 300; msg := 'Mega Streak 30 Hari! +300 Koin';
   elsif streak_new % 7 = 0 then
@@ -89,3 +93,5 @@ $$;
 
 revoke all on function public.daily_claim() from public;
 grant execute on function public.daily_claim() to authenticated;
+
+select 'daily_claim fixed' as status;

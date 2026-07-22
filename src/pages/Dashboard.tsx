@@ -129,42 +129,18 @@ export default function Dashboard() {
         setEquippedAvatarId(p.selected_avatar || 'stmkg');
         setLastSpinDate(p.last_spin_date || null);
 
-        // 3. Cek & Amankan Streak Harian (Streak Protector)!
-        const lastClaimStr = p.last_claim_date || null;
-        if (lastClaimStr) {
-          const lastClaimDate = new Date(lastClaimStr);
-          // Set to start of day to calculate purely by calendar day diff
-          const calNow = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-          const calLast = new Date(lastClaimDate.getFullYear(), lastClaimDate.getMonth(), lastClaimDate.getDate());
-          const timeDiff = calNow.getTime() - calLast.getTime();
-          const daysDiff = Math.floor(timeDiff / (24 * 60 * 60 * 1000));
-          
-          if (daysDiff > 1) {
-            // Melewatkan lebih dari 1 hari! Streak terancam pecah!
-            if (p.inventory && typeof p.inventory.item_streak_protector === 'number' && p.inventory.item_streak_protector > 0) {
-              const updatedInv = { ...p.inventory, item_streak_protector: p.inventory.item_streak_protector - 1 };
-              updates.inventory = updatedInv;
-              setTotalStreak(p.streak);
-              setToastMessage(`[Streak Protector Aktif] Rantai streak ${p.streak} hari Anda berhasil diselamatkan!`);
-              setTimeout(() => setToastMessage(''), 5000);
-            } else {
-              // Streak pecah/patah ke 0
-              updates.streak = 0;
-              setTotalStreak(0);
-              setToastMessage(`[Peringatan] Streak Anda terputus karena absen belajar. Mulai lagi dari 0!`);
-              setTimeout(() => setToastMessage(''), 5000);
-            }
-          } else {
-            setTotalStreak(p.streak ?? 29);
-            if (daysDiff === 0) {
-              setIsStreakClaimed(true);
-            }
-          }
+        // Streak display dari server; klaim hanya lewat tombol + RPC daily_claim
+        // last_claim_date format kanonis: YYYY-MM-DD (Asia/Jakarta di server)
+        const lastClaimStr = (p.last_claim_date || '').slice(0, 10);
+        const todayYmd = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); // YYYY-MM-DD
+        setTotalStreak(p.streak ?? 0);
+        if (lastClaimStr && lastClaimStr === todayYmd) {
+          setIsStreakClaimed(true);
         } else {
-          setTotalStreak(p.streak ?? 29);
-          updates.last_claim_date = todayStr;
+          setIsStreakClaimed(false);
         }
 
+        // Energy/avatar updates only (jangan auto-mutasi streak di client)
         if (Object.keys(updates).length > 0) {
           updateProfile(updates);
         }
@@ -529,33 +505,44 @@ export default function Dashboard() {
     }
     // Energi akan dipotong di Quiz.tsx saat menjawab soal pertama (Deferred Deduction)
     
-    if (!isStreakClaimed) {
-      e.preventDefault();
-      setToastMessage('Menyelesaikan Quest...');
-      setTimeout(async () => {
-        try {
-          const { data, error } = await supabase!.rpc('daily_claim');
-          if (error || data?.error) {
-            // Fail closed — jangan kasih reward client-side
-            setToastMessage(data?.error === 'already_claimed'
-              ? 'Klaim harian sudah diambil.'
-              : 'Gagal klaim harian. Coba lagi.');
-            setTimeout(() => setToastMessage(''), 2500);
-          } else {
-            // RPC berhasil — server sudah update DB
-            setGlobalCoins(data.coins_new);
-            setTotalStreak(data.streak);
-            setIsStreakClaimed(true);
-            setToastMessage(`Quest Selesai! ${data.msg}`);
-            setTimeout(() => { setToastMessage(''); navigate(path, { state: { mode: modeId, energyCost: costType === 'energy' ? cost : 0, coinCost: costType === 'coin' ? cost : 0, ...extraState } }); }, 2000);
-          }
-        } catch {
-          setToastMessage('Gagal claim. Coba lagi.');
-          setIsProcessing(false);
+    // Daily claim tidak digabung ke start game — pakai tombol "Klaim Harian"
+    navigate(path, { state: { mode: modeId, energyCost: costType === 'energy' ? cost : 0, coinCost: costType === 'coin' ? cost : 0, ...extraState } });
+    setIsProcessing(false);
+  };
+
+  const handleDailyClaim = async () => {
+    if (isStreakClaimed || isProcessing) return;
+    if (!isSupabaseConfigured() || !supabase) {
+      setToastMessage('Koneksi server tidak tersedia.');
+      setTimeout(() => setToastMessage(''), 2500);
+      return;
+    }
+    setIsProcessing(true);
+    try {
+      const { data, error } = await supabase.rpc('daily_claim');
+      if (error || data?.error) {
+        if (data?.error === 'already_claimed') {
+          setIsStreakClaimed(true);
+          if (typeof data.streak === 'number') setTotalStreak(data.streak);
+          setToastMessage('Klaim harian sudah diambil hari ini.');
+        } else {
+          setToastMessage(data?.error ?? error?.message ?? 'Gagal klaim harian.');
         }
-      }, 1000);
-    } else {
-      navigate(path, { state: { mode: modeId, energyCost: costType === 'energy' ? cost : 0, coinCost: costType === 'coin' ? cost : 0, ...extraState } });
+        setTimeout(() => setToastMessage(''), 3000);
+        return;
+      }
+      setGlobalCoins(data.coins_new);
+      setTotalStreak(data.streak);
+      setIsStreakClaimed(true);
+      setProfile(prev => prev ? { ...prev, coins: data.coins_new, streak: data.streak, last_claim_date: data.last_claim_date } : prev);
+      setToastMessage(data.msg || `Klaim berhasil! +${data.bonus} Koin`);
+      setTimeout(() => setToastMessage(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setToastMessage('Gagal klaim harian. Coba lagi.');
+      setTimeout(() => setToastMessage(''), 3000);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -974,14 +961,27 @@ export default function Dashboard() {
                   {isTodayMegaReward ? '🏆 MEGA REWARD!' : `Mega Reward (+${30 - (totalStreak + (isStreakClaimed ? 1 : 0))} hari lagi)`}
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-right pb-1">
-                <button 
-                  onClick={() => setShowSpinWheel(true)}
-                  className="text-[10px] font-bold text-premium uppercase tracking-wider bg-premium-subtle px-3 py-1.5 rounded hover:bg-premium-subtle transition-all flex items-center gap-1.5 shadow-sm active:scale-95 animate-pulse shrink-0"
+              <div className="flex items-center gap-2 text-right pb-1 flex-wrap justify-end">
+                <button
+                  type="button"
+                  onClick={handleDailyClaim}
+                  disabled={isStreakClaimed || isProcessing}
+                  className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded shadow-sm active:scale-95 shrink-0 flex items-center gap-1.5 transition-all ${
+                    isStreakClaimed
+                      ? 'bg-success/15 text-success cursor-default'
+                      : 'bg-primary text-primary-fg hover:opacity-90 animate-pulse'
+                  }`}
                 >
-                  <Gift size={12} /> Klaim Spin Harian 🎡
+                  <Flame size={12} />
+                  {isStreakClaimed ? 'Sudah klaim hari ini' : (isProcessing ? 'Memproses...' : 'Klaim Harian')}
                 </button>
-                <span className="text-[10px] font-bold text-premium uppercase tracking-wider bg-premium-subtle px-2 py-1.5 rounded">Mega Reward</span>
+                <button 
+                  type="button"
+                  onClick={() => setShowSpinWheel(true)}
+                  className="text-[10px] font-bold text-premium uppercase tracking-wider bg-premium-subtle px-3 py-1.5 rounded hover:bg-premium-subtle transition-all flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0"
+                >
+                  <Gift size={12} /> Spin Harian 🎡
+                </button>
               </div>
             </div>
             {/* Motivational Progress Bar */}
