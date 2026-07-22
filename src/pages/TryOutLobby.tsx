@@ -62,12 +62,19 @@ export default function TryOutLobby() {
     try {
       const result = await startTryoutAttempt(pkgId, tier);
       if (!result.success) {
-        const msg =
-          result.reason === 'insufficient_coins'
-            ? `Koin tidak cukup (butuh ${result.cost || attemptCost}).`
-            : result.reason === 'not_authenticated'
-              ? 'Login dulu.'
-              : 'Gagal memotong biaya attempt. Coba lagi.';
+        const r = (result.reason || '').toLowerCase();
+        let msg = 'Gagal memotong biaya attempt. Coba lagi.';
+        if (r === 'insufficient_coins') {
+          msg = `Koin tidak cukup (butuh ${result.cost || attemptCost}).`;
+        } else if (r === 'not_authenticated') {
+          msg = 'Login dulu.';
+        } else if (r.includes('could not find') || r.includes('does not exist') || r.includes('pgrst202')) {
+          msg = 'RPC start_tryout_attempt belum ada di server. Apply SQL dulu.';
+        } else if (r.includes('permission') || r.includes('42501')) {
+          msg = 'Tidak punya izin RPC tryout. Cek GRANT authenticated.';
+        } else if (result.reason && result.reason !== 'error' && result.reason !== 'failed') {
+          msg = `Gagal attempt: ${result.reason}`;
+        }
         showToast(msg);
         return;
       }

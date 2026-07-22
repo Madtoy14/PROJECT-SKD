@@ -279,22 +279,43 @@ export const startTryoutAttempt = async (
       p_package_id: packageId ?? null,
       p_tier: tier,
     });
-    if (error) throw error;
+    if (error) {
+      // Surface PostgREST/Postgres message (function missing, permission, dll.)
+      console.error('start_tryout_attempt RPC error:', error);
+      return {
+        success: false,
+        coinsAfter: 0,
+        cost: tier === 'akbar' ? 1500 : 1000,
+        reason: error.message || error.code || 'rpc_error',
+      };
+    }
     const result = (data ?? {}) as {
       success?: boolean;
       coins_after?: number;
       cost?: number;
       reason?: string;
     };
+    if (!result.success) {
+      return {
+        success: false,
+        coinsAfter: result.coins_after ?? 0,
+        cost: result.cost ?? (tier === 'akbar' ? 1500 : 1000),
+        reason: result.reason || 'failed',
+      };
+    }
     return {
-      success: !!result.success,
+      success: true,
       coinsAfter: result.coins_after ?? 0,
       cost: result.cost ?? (tier === 'akbar' ? 1500 : 1000),
-      reason: result.reason,
     };
   } catch (err) {
     console.error('startTryoutAttempt failed:', err);
-    return { success: false, coinsAfter: 0, cost: 0, reason: 'error' };
+    return {
+      success: false,
+      coinsAfter: 0,
+      cost: 0,
+      reason: (err as Error)?.message || 'error',
+    };
   }
 };
 
