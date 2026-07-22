@@ -8,31 +8,29 @@ import { TopUpModal } from '../components/modals/TopUpModal';
 import { Button } from '../components/ui/Button';
 
 const POWER_UPS = [
-  { id: 'item_5050', title: 'Eliminasi 50:50', description: 'Hapus 2 opsi jawaban yang salah.', cost: 300, icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-  { id: 'item_hint', title: 'Bocoran Rumus', description: 'Tampilkan rumus/petunjuk untuk soal hitungan.', cost: 250, icon: Lightbulb, color: 'text-info', bg: 'bg-info-subtle' },
-  { id: 'item_waktu_beku', title: 'Waktu Beku', description: 'Bekukan timer selama 30 detik.', cost: 300, icon: Clock, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-  { id: 'item_skor_ganda', title: 'Skor Ganda', description: 'Gandakan perolehan poin untuk 1 soal berikutnya.', cost: 350, icon: Zap, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-  { id: 'item_terawangan', title: 'Prediksi AI', description: 'Tampilkan estimasi probabilitas jawaban (prediksi AI, bukan data real pengguna).', cost: 400, icon: Eye, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-  { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', description: 'Batalkan 1x kesalahan di mode Survival.', cost: 500, icon: Heart, color: 'text-red-400', bg: 'bg-danger/10' },
-  { id: 'item_shield', title: 'Perisai Survival', description: 'Membatalkan 1x kesalahan (Lama).', cost: 500, icon: Shield, color: 'text-success', bg: 'bg-success/10' },
-  { id: 'item_energy_refill', title: 'Isi Ulang Energi', description: 'Pulihkan 5 energi.', cost: 150, icon: Battery, color: 'text-green-400', bg: 'bg-success/10' },
-  { id: 'item_streak_protector', title: 'Streak Protector', description: 'Melindungi streak harian belajar Anda jika lupa login 1 hari.', cost: 500, icon: Shield, color: 'text-orange-400', bg: 'bg-orange-500/10' },
-  // ponytail: item_coin_booster disabled — no handler in Quiz.tsx yet
-  // { id: 'item_coin_booster', title: 'Koin Booster 2x', description: 'Gandakan koin yang didapat untuk 3 kuis berikutnya.', cost: 300, icon: Sparkles, color: 'text-coin', bg: 'bg-coin-subtle' },
-  { id: 'item_tinta_hitam', title: 'Tinta Hitam (PvP)', description: 'Mengaburkan layar soal lawan selama 5 detik.', cost: 350, icon: Skull, color: 'text-danger', bg: 'bg-danger/10' },
-  { id: 'item_lompatan_kilat', title: 'Lompatan Kilat (PvP)', description: 'Otomatis temukan jawaban benar tanpa menghabiskan waktu.', cost: 450, icon: Zap, color: 'text-info', bg: 'bg-info-subtle' },
+  { id: 'item_hint', title: 'Bocoran Rumus', description: 'Tampilkan rumus/petunjuk untuk soal hitungan.', cost: 40, icon: Lightbulb, color: 'text-info', bg: 'bg-info-subtle' },
+  { id: 'item_5050', title: 'Eliminasi 50:50', description: 'Hapus 2 opsi jawaban yang salah.', cost: 60, icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+  { id: 'item_waktu_beku', title: 'Waktu Beku', description: 'Bekukan timer selama 30 detik.', cost: 70, icon: Clock, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+  { id: 'item_energy_refill', title: 'Isi Ulang Energi', description: 'Pulihkan 5 energi.', cost: 80, icon: Battery, color: 'text-green-400', bg: 'bg-success/10' },
+  { id: 'item_skor_ganda', title: 'Skor Ganda', description: 'Gandakan perolehan poin untuk 1 soal berikutnya.', cost: 90, icon: Zap, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  { id: 'item_terawangan', title: 'Prediksi AI', description: 'Tampilkan estimasi probabilitas jawaban (prediksi AI, bukan data real pengguna).', cost: 100, icon: Eye, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+  { id: 'item_tinta_hitam', title: 'Tinta Hitam (PvP)', description: 'Mengaburkan layar soal lawan selama 5 detik.', cost: 100, icon: Skull, color: 'text-danger', bg: 'bg-danger/10' },
+  { id: 'item_shield', title: 'Perisai Survival', description: 'Pasang manual saat mengerjakan. Jika salah, nyawa tetap aman.', cost: 120, icon: Shield, color: 'text-success', bg: 'bg-success/10' },
+  { id: 'item_streak_protector', title: 'Streak Protector', description: 'Melindungi streak harian jika lupa login 1 hari.', cost: 120, icon: Shield, color: 'text-orange-400', bg: 'bg-orange-500/10' },
+  { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', description: 'Setelah salah, muncul popup: pakai kesempatan kedua?', cost: 160, icon: Heart, color: 'text-red-400', bg: 'bg-danger/10' },
+  { id: 'item_lompatan_kilat', title: 'Lompatan Kilat (PvP)', description: 'Otomatis temukan jawaban benar tanpa menghabiskan waktu.', cost: 180, icon: Zap, color: 'text-info', bg: 'bg-info-subtle' },
 ];
 
 const PREMIUM_PACKAGES = [
-  { id: 'paket_premium_tkp_1', title: 'Paket Soal Rahasia TKP 1', description: 'Pembahasan 100 soal TKP HOTS pilar pelayanan publik & profesionalisme.', cost: 1000 },
-  { id: 'paket_premium_tkp_2', title: 'Paket Soal Rahasia TKP 2', description: 'Pembahasan soal TKP bertema jejaring kerja & anti radikalisme.', cost: 1000 },
-  { id: 'paket_premium_tiu_1', title: 'Trik TIU Numerik 1', description: 'Pembahasan trik matematika numerik, deret aritmatika cepat, & penalaran logis.', cost: 1000 },
-  { id: 'paket_premium_tiu_2', title: 'Trik TIU Analitis 2', description: 'Pembahasan taktis silogisme, diagram venn, & penalaran analitis spasial.', cost: 1000 },
-  { id: 'paket_premium_twk_1', title: 'Hafalan UUD TWK 1', description: 'Pembahasan materi pilar negara, UUD 1945, & nasionalisme secara mendalam.', cost: 1000 },
-  { id: 'paket_premium_twk_2', title: 'Pilar Negara TWK 2', description: 'Pembahasan soal TWK bela negara, patriotisme, & sejarah perjuangan bangsa.', cost: 1000 },
-  { id: 'paket_tryout_akbar_1', title: 'Try Out Akbar CPNS 1', description: 'Pembahasan lengkap Try Out Akbar CAT serentak peringkat nasional 1.', cost: 1500 },
-  { id: 'paket_tryout_akbar_2', title: 'Try Out Akbar CPNS 2', description: 'Pembahasan lengkap Try Out Akbar CAT serentak peringkat nasional 2.', cost: 1500 },
-  { id: 'paket_spesialis_bumn', title: 'Simulasi Khusus BUMN', description: 'Materi soal pembahasan TKD & Core Values Akhlak persiapan BUMN.', cost: 2000 },
+  { id: 'paket_premium_tkp_1', title: 'Paket Soal Rahasia TKP 1', description: 'Pembahasan 100 soal TKP HOTS pilar pelayanan publik & profesionalisme. Unlock permanen.', cost: 700 },
+  { id: 'paket_premium_tkp_2', title: 'Paket Soal Rahasia TKP 2', description: 'Pembahasan soal TKP bertema jejaring kerja & anti radikalisme. Unlock permanen.', cost: 700 },
+  { id: 'paket_premium_tiu_1', title: 'Trik TIU Numerik 1', description: 'Pembahasan trik matematika numerik, deret aritmatika cepat, & penalaran logis. Unlock permanen.', cost: 700 },
+  { id: 'paket_premium_tiu_2', title: 'Trik TIU Analitis 2', description: 'Pembahasan taktis silogisme, diagram venn, & penalaran analitis spasial. Unlock permanen.', cost: 900 },
+  { id: 'paket_premium_twk_1', title: 'Hafalan UUD TWK 1', description: 'Pembahasan materi pilar negara, UUD 1945, & nasionalisme secara mendalam. Unlock permanen.', cost: 700 },
+  { id: 'paket_premium_twk_2', title: 'Pilar Negara TWK 2', description: 'Pembahasan soal TWK bela negara, patriotisme, & sejarah perjuangan bangsa. Unlock permanen.', cost: 900 },
+  { id: 'paket_tryout_akbar_1', title: 'Try Out Akbar CPNS 1', description: 'Pembahasan lengkap Try Out Akbar CAT serentak peringkat nasional 1. Unlock permanen.', cost: 1000 },
+  { id: 'paket_tryout_akbar_2', title: 'Try Out Akbar CPNS 2', description: 'Pembahasan lengkap Try Out Akbar CAT serentak peringkat nasional 2. Unlock permanen.', cost: 1000 },
+  { id: 'paket_spesialis_bumn', title: 'Simulasi Khusus BUMN', description: 'Materi soal pembahasan TKD & Core Values Akhlak persiapan BUMN. Unlock permanen.', cost: 1500 },
 ];
 
 export default function Shop() {

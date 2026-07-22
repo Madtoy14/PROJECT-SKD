@@ -24,19 +24,20 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'reason', 'Tidak terautentikasi');
     END IF;
 
-    -- Ambil harga jual dari katalog (50% dari harga beli)
-    SELECT FLOOR(cost * 0.5)::INTEGER INTO v_reward
+    -- Ambil harga jual dari katalog (45% dari harga beli)
+    SELECT GREATEST(1, FLOOR(cost * 0.45)::INTEGER) INTO v_reward
     FROM (VALUES
-        ('item_5050',             300),
-        ('item_hint',             250),
-        ('item_waktu_beku',       300),
-        ('item_skor_ganda',       400),
-        ('item_terawangan',       350),
-        ('item_kesempatan_kedua', 500),
-        ('item_energy_refill',    200),
-        ('item_streak_protector', 150),
-        ('item_tinta_hitam',      250),
-        ('item_lompatan_kilat',   300)
+        ('item_hint',               40),
+        ('item_5050',               60),
+        ('item_waktu_beku',         70),
+        ('item_energy_refill',      80),
+        ('item_skor_ganda',         90),
+        ('item_terawangan',        100),
+        ('item_tinta_hitam',       100),
+        ('item_shield',            120),
+        ('item_streak_protector',  120),
+        ('item_kesempatan_kedua',  160),
+        ('item_lompatan_kilat',    180)
     ) AS katalog(id, cost)
     WHERE id = p_item_id;
 
