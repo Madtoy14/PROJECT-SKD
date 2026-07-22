@@ -1,6 +1,8 @@
--- RPC: claim_quest — atomic quest claim with progress validation
--- Parameter: p_quest_id (quest metadata hardcoded selaras Quest.tsx)
--- Return: { success, coins_earned, coins_after, reason? }
+-- ============================================================
+-- Apply di Supabase SQL Editor (opsional, jika claim quest error)
+-- claim_quest pakai sentinel 999 di quests_progress (tanpa wajib quests_claimed)
+-- ============================================================
+
 CREATE OR REPLACE FUNCTION public.claim_quest(
     p_quest_id INTEGER
 )
@@ -22,14 +24,13 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'reason', 'not_authenticated');
     END IF;
 
-    -- Reward + target (selaras DAILY/WEEKLY di Quest.tsx)
     SELECT reward, total INTO v_reward, v_required_total
     FROM (VALUES
-        (1, 100, 10),   -- Jawab 10 Soal TWK
-        (2, 50, 5),     -- Combo 5x
-        (3, 150, 1),    -- Selesaikan Latihan TIU
-        (4, 500, 10),   -- 10 Kuis
-        (5, 300, 30)    -- Survival 30 Soal
+        (1, 100, 10),
+        (2, 50, 5),
+        (3, 150, 1),
+        (4, 500, 10),
+        (5, 300, 30)
     ) AS quests(id, reward, total)
     WHERE id = p_quest_id;
 
@@ -74,3 +75,9 @@ END; $$;
 
 REVOKE EXECUTE ON FUNCTION public.claim_quest(INTEGER) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.claim_quest(INTEGER) TO authenticated;
+NOTIFY pgrst, 'reload schema';
+
+SELECT p.proname, pg_get_function_identity_arguments(p.oid) AS args
+FROM pg_proc p
+JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'public' AND p.proname = 'claim_quest';

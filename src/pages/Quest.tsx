@@ -67,12 +67,22 @@ export default function Quest() {
     }
 
     try {
+      // Fail-closed: hanya RPC claim_quest (server). Jangan mutasi coins dari client.
       const { data, error } = await supabase.rpc('claim_quest', { p_quest_id: questId });
       if (error || !data?.success) {
-        setToastMessage(data?.reason ?? error?.message ?? 'Gagal klaim quest');
+        const reason = (data?.reason || error?.message || 'Gagal klaim quest').toString();
+        const msgMap: Record<string, string> = {
+          already_claimed: 'Quest sudah diklaim.',
+          progress_insufficient: 'Progress belum cukup.',
+          not_authenticated: 'Login dulu.',
+          unknown_quest: 'Quest tidak dikenal.',
+          profile_not_found: 'Profil tidak ditemukan.',
+        };
+        setToastMessage(msgMap[reason] || `Gagal klaim: ${reason}`);
         setTimeout(() => setToastMessage(null), 3000);
         return;
       }
+
       const fresh = await fetchProfile();
       if (fresh) setProfile(fresh);
       const earned = data.coins_earned ?? reward;

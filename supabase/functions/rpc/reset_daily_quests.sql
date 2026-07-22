@@ -58,8 +58,7 @@ BEGIN
     -- last_login disimpan YYYY-MM-DD Asia/Jakarta (text-compatible)
     UPDATE public.profiles
     SET quests_progress = v_progress,
-        last_login = v_today,
-        quests_claimed = array_remove(array_remove(array_remove(COALESCE(quests_claimed, '{}'), 1), 2), 3)
+        last_login = v_today
     WHERE id = v_user_id;
 
     RETURN jsonb_build_object(
