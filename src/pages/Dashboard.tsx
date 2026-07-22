@@ -466,7 +466,7 @@ export default function Dashboard() {
     setMatchCountdown(3);
     setPvpSubMode('selection');
   };
-  const handlePlayGame = (e: React.MouseEvent, path: string, modeId?: string, extraState: any = {}) => {
+  const handlePlayGame = (_e: React.MouseEvent, path: string, modeId?: string, extraState: any = {}) => {
     if (isProcessing) return;
     setIsProcessing(true);
     if (modeId === 'catatan_salah') {
@@ -534,7 +534,7 @@ export default function Dashboard() {
       setGlobalCoins(data.coins_new);
       setTotalStreak(data.streak);
       setIsStreakClaimed(true);
-      setProfile(prev => prev ? { ...prev, coins: data.coins_new, streak: data.streak, last_claim_date: data.last_claim_date } : prev);
+      setProfile((prev: UserProfile | null) => prev ? { ...prev, coins: data.coins_new, streak: data.streak, last_claim_date: data.last_claim_date } : prev);
       setToastMessage(data.msg || `Klaim berhasil! +${data.bonus} Koin`);
       setTimeout(() => setToastMessage(''), 3000);
     } catch (err) {
