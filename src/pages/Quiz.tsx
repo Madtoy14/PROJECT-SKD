@@ -93,6 +93,13 @@ export default function Quiz() {
   const gameMode = location.state?.mode || 'latihan';
   const opponentName = location.state?.opponent || 'Lawan';
   const energyCost = location.state?.energyCost || 0;
+  // Anti-copy kasual: tryout/kompetitif saja (latihan/review tetap bebas)
+  const lockQuestionCopy = ['tryout', 'survival', 'pvp', 'pvp1v1', 'pvp_bot'].includes(gameMode);
+  const onQuestionCopyGuard = (e: { preventDefault: () => void }) => {
+    if (!lockQuestionCopy) return;
+    e.preventDefault();
+  };
+
   const coinCost = location.state?.coinCost || 0;
   const botDifficulty = location.state?.botDifficulty || 'medium';
   const packageId = location.state?.packageId || undefined;
@@ -1226,7 +1233,14 @@ const scoreBadge = (optionId: string) => {
           )}
           {/* Question Body */}
           <main className={`flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 pb-24 relative ${tintaHitamActive ? 'blur-md pointer-events-none transition-all duration-300' : 'transition-all duration-300'}`}>
-            <div key={currentQuestion.id} className="space-y-4">
+            <div
+              key={currentQuestion.id}
+              className={`space-y-4 ${lockQuestionCopy ? 'select-none' : ''}`}
+              onCopy={onQuestionCopyGuard}
+              onCut={onQuestionCopyGuard}
+              onContextMenu={onQuestionCopyGuard}
+              style={lockQuestionCopy ? { WebkitUserSelect: 'none', WebkitTouchCallout: 'none' } : undefined}
+            >
                 {/* TKP indicator */}
                 {currentQuestion.category === 'TKP' && (
                   <div className="flex items-center gap-2 text-xs text-orange-400 bg-orange-500/10 border border-orange-500/20 px-3 py-2 rounded-xl">
