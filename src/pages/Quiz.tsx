@@ -58,7 +58,7 @@ const cleanMathText = (text: string): string => {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, HeartCrack, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchQuestionsFromSupabase, fetchProfile, consumeEnergy, consumePowerup, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery, resolveWrongQuestionsForQuiz } from '../lib/supabase';
+import { fetchQuestionsFromSupabase, fetchProfile, consumeEnergy, consumePowerup, startTryoutAttempt, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery, resolveWrongQuestionsForQuiz } from '../lib/supabase';
 import { useQuizSession } from '../context/QuizSessionContext';
 import MathCard from '../components/MathCard';
 import { Button } from '../components/ui/Button';
@@ -634,26 +634,38 @@ export default function Quiz() {
     if (isGameOver) return;
     if (!currentQuestion) return;
 
-    // Deferred Cost Deduction: Potong energi/koin saat pemain PERTAMA KALI menjawab
+    // Deferred Cost Deduction: potong energy/koin saat jawaban PERTAMA
     if (!isEnergyDeducted && profile) {
-      if (energyCost > 0 || coinCost > 0) {
-        if (energyCost > 0) {
-          // SEC-01: atomic RPC — prevents race-condition double-spend
-          consumeEnergy(energyCost).then(({ success, energyAfter }) => {
-            if (success) {
-              setProfile((p: import('../lib/supabase').UserProfile | null) => p ? { ...p, energy: energyAfter } : p);
-            }
-          });
-        }
-        if (coinCost > 0) {
-          // ponytail: entry tryout belum punya RPC potong koin atomik;
-          // UI optimistic saja — ganti ke purchase_tryout / consume_coins saat siap
-          setProfile((p: import('../lib/supabase').UserProfile | null) =>
-            p ? { ...p, coins: Math.max(0, (p.coins || 0) - coinCost) } : p
-          );
-        }
+      setIsEnergyDeducted(true); // guard double-click segera
+      if (energyCost > 0) {
+        void consumeEnergy(energyCost).then(({ success, energyAfter }) => {
+          if (success) {
+            setProfile((p: import('../lib/supabase').UserProfile | null) =>
+              p ? { ...p, energy: energyAfter } : p
+            );
+          }
+        });
       }
-      setIsEnergyDeducted(true);
+      if (coinCost > 0 && gameMode === 'tryout') {
+        // Server catalog: standar 1000 / akbar 1500 (abaikan coinCost client palsu)
+        const tier = coinCost >= 1500 ? 'akbar' : 'standar';
+        void startTryoutAttempt(packageId, tier).then(({ success, coinsAfter, reason, cost }) => {
+          if (success) {
+            setProfile((p: import('../lib/supabase').UserProfile | null) =>
+              p ? { ...p, coins: coinsAfter } : p
+            );
+          } else {
+            // Fail-closed: kembalikan guard + toast lewat powerupToast channel
+            setIsEnergyDeducted(false);
+            const msg =
+              reason === 'insufficient_coins'
+                ? `Koin tidak cukup (butuh ${cost || coinCost}).`
+                : 'Gagal memotong biaya tryout. Coba lagi.';
+            setPowerupToast(msg);
+            setTimeout(() => setPowerupToast(''), 4000);
+          }
+        });
+      }
     }
 
         if (gameMode === 'tryout') {

@@ -225,6 +225,42 @@ export const consumePowerup = async (
 };
 
 /**
+ * Potong entry fee tryout (server catalog: standar 1000 / akbar 1500).
+ * Signature: start_tryout_attempt(p_package_id text, p_tier text)
+ */
+export const startTryoutAttempt = async (
+  packageId?: string,
+  tier: 'standar' | 'akbar' = 'standar'
+): Promise<{ success: boolean; coinsAfter: number; cost: number; reason?: string }> => {
+  if (!isSupabaseConfigured()) {
+    // ponytail: local/dev tanpa Supabase
+    return { success: true, coinsAfter: 0, cost: tier === 'akbar' ? 1500 : 1000 };
+  }
+  try {
+    const { data, error } = await supabase!.rpc('start_tryout_attempt', {
+      p_package_id: packageId ?? null,
+      p_tier: tier,
+    });
+    if (error) throw error;
+    const result = (data ?? {}) as {
+      success?: boolean;
+      coins_after?: number;
+      cost?: number;
+      reason?: string;
+    };
+    return {
+      success: !!result.success,
+      coinsAfter: result.coins_after ?? 0,
+      cost: result.cost ?? (tier === 'akbar' ? 1500 : 1000),
+      reason: result.reason,
+    };
+  } catch (err) {
+    console.error('startTryoutAttempt failed:', err);
+    return { success: false, coinsAfter: 0, cost: 0, reason: 'error' };
+  }
+};
+
+/**
  * Reset misi harian (quest 1-3) sekali per hari Asia/Jakarta.
  * Signature: reset_daily_quests() -> { success, reset, quests_progress }
  */
