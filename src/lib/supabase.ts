@@ -157,10 +157,11 @@ export const updateProfile = async (profileUpdate: Partial<UserProfile>): Promis
 /**
  * SEC-01: Atomic energy deduction via RPC (auth.uid server-side).
  * Signature: consume_energy(p_amount int) -> { success, energy_after }
+ * Server regen dulu (1/150s, cap 25) lalu potong.
  */
 export const consumeEnergy = async (
   amount: number
-): Promise<{ success: boolean; energyAfter: number }> => {
+): Promise<{ success: boolean; energyAfter: number; reason?: string }> => {
   if (!isSupabaseConfigured()) {
     return { success: true, energyAfter: 0 };
   }
@@ -170,22 +171,59 @@ export const consumeEnergy = async (
     });
     if (error) {
       if (error.message?.includes('insufficient_energy')) {
-        return { success: false, energyAfter: 0 };
+        return { success: false, energyAfter: 0, reason: 'insufficient_energy' };
       }
       throw error;
     }
-    // Support both JSONB object and legacy int return
     if (data && typeof data === 'object' && 'success' in data) {
       const result = data as { success: boolean; energy_after?: number; reason?: string };
       return {
         success: !!result.success,
         energyAfter: result.energy_after ?? 0,
+        reason: result.reason,
       };
     }
     return { success: true, energyAfter: data as number };
   } catch (err) {
     console.error('consumeEnergy failed:', err);
-    return { success: false, energyAfter: 0 };
+    return { success: false, energyAfter: 0, reason: 'error' };
+  }
+};
+
+/**
+ * Sync energy regen server-side.
+ * Signature: sync_energy() -> { success, energy, seconds_to_next, recovered }
+ */
+export const syncEnergy = async (): Promise<{
+  success: boolean;
+  energy: number;
+  secondsToNext: number;
+  recovered: number;
+  reason?: string;
+}> => {
+  if (!isSupabaseConfigured()) {
+    return { success: true, energy: 25, secondsToNext: 0, recovered: 0 };
+  }
+  try {
+    const { data, error } = await supabase!.rpc('sync_energy');
+    if (error) throw error;
+    const result = (data ?? {}) as {
+      success?: boolean;
+      energy?: number;
+      seconds_to_next?: number;
+      recovered?: number;
+      reason?: string;
+    };
+    return {
+      success: !!result.success,
+      energy: result.energy ?? 0,
+      secondsToNext: result.seconds_to_next ?? 0,
+      recovered: result.recovered ?? 0,
+      reason: result.reason,
+    };
+  } catch (err) {
+    console.error('syncEnergy failed:', err);
+    return { success: false, energy: 0, secondsToNext: 0, recovered: 0, reason: 'error' };
   }
 };
 
@@ -624,26 +662,19 @@ export const fetchAvailableCharacters = async (): Promise<Character[]> => {
   }
 };
 
-export async function saveWrongQuestion(userId: string, questionId: string, quizType: string) {
-  if (!supabase) return;
-
-  const profile = await fetchProfile(userId);
-  if (profile) {
-    const catatan = profile.catatan_salah || [];
-    // Cek duplikasi
-    const existingIndex = catatan.findIndex((item: any) => (item === questionId || item?.id === questionId));
-    if (existingIndex === -1) {
-      await updateProfile({ catatan_salah: [...catatan, { id: questionId, type: quizType, mastery: 0 }] });
-    } else {
-      // Reset mastery if answered wrong again
-      const updatedCatatan = [...catatan];
-      if (typeof updatedCatatan[existingIndex] === 'object') {
-        updatedCatatan[existingIndex].mastery = 0;
-      } else {
-        updatedCatatan[existingIndex] = { id: questionId, type: quizType, mastery: 0 };
-      }
-      await updateProfile({ catatan_salah: updatedCatatan });
+export async function saveWrongQuestion(_userId: string, questionId: string, quizType: string) {
+  if (!supabase || !isSupabaseConfigured()) return;
+  try {
+    const { data, error } = await supabase.rpc('record_wrong_answer', {
+      p_question_id: questionId,
+      p_quiz_type: quizType || '',
+    });
+    if (error) throw error;
+    if (data && typeof data === 'object' && 'success' in data && !(data as { success?: boolean }).success) {
+      console.warn('record_wrong_answer:', (data as { reason?: string }).reason);
     }
+  } catch (err) {
+    console.error('saveWrongQuestion failed:', err);
   }
 }
 
@@ -835,28 +866,18 @@ export async function resolveWrongQuestionsForQuiz(
     .filter(Boolean) as any[];
 }
 
-export async function incrementMastery(userId: string, questionId: string) {
-  if (!supabase) return;
-  const profile = await fetchProfile(userId);
-  if (profile && profile.catatan_salah) {
-    let changed = false;
-    const updatedCatatan = profile.catatan_salah.map((item: any) => {
-      const id = typeof item === 'string' ? item : item.id;
-      if (id === questionId) {
-        changed = true;
-        const currentMastery = typeof item === 'string' ? 0 : (item.mastery || 0);
-        return {
-          id: id,
-          type: typeof item === 'string' ? '' : item.type,
-          mastery: currentMastery + 1
-        };
-      }
-      return item;
+export async function incrementMastery(_userId: string, questionId: string) {
+  if (!supabase || !isSupabaseConfigured()) return;
+  try {
+    const { data, error } = await supabase.rpc('increment_wrong_mastery', {
+      p_question_id: questionId,
     });
-
-    if (changed) {
-      await updateProfile({ catatan_salah: updatedCatatan });
+    if (error) throw error;
+    if (data && typeof data === 'object' && 'success' in data && !(data as { success?: boolean }).success) {
+      console.warn('increment_wrong_mastery:', (data as { reason?: string }).reason);
     }
+  } catch (err) {
+    console.error('incrementMastery failed:', err);
   }
 }
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
 import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut, Clock, Eye, RefreshCw, Sparkles, PartyPopper } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { fetchProfile, resetDailyQuests, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character, type UserProfile } from '../lib/supabase';
+import { fetchProfile, resetDailyQuests, syncEnergy, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character, type UserProfile } from '../lib/supabase';
 import RankBadge from '../components/RankBadge';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import avatarPdh from '../assets/avatar_pdh.webp';
@@ -82,8 +82,6 @@ export default function Dashboard() {
           return;
         }
 
-        const now = new Date();
-
         // 1. Reset misi harian server-side (quest 1-3) — jangan updateProfile quests_progress
         void resetDailyQuests().then((r) => {
           if (r.success && r.questsProgress) {
@@ -93,31 +91,22 @@ export default function Dashboard() {
           }
         });
 
-        // 2. Recovery Energi Offline (display only; energy mutasi lewat consume_energy)
-        // ponytail: regen energy server-side belum; UI timer lokal, write energy dihapus
-        let currentEnergy = p.energy ?? 25;
-        let nextTimer = 150;
-        if (currentEnergy < 25 && p.last_energy_update) {
-          const lastUpdate = new Date(p.last_energy_update);
-          const diffSecs = Math.floor((now.getTime() - lastUpdate.getTime()) / 1000);
-          if (diffSecs > 0) {
-            const recovered = Math.floor(diffSecs / 150);
-            const remainder = diffSecs % 150;
-            if (recovered > 0) {
-              currentEnergy = Math.min(25, currentEnergy + recovered);
-            }
-            if (currentEnergy < 25) {
-              nextTimer = 150 - remainder;
-            }
-          }
-        }
-
-        setEnergy(currentEnergy || 0);
-        setEnergyTimer(nextTimer);
+        // 2. Energy: tampilkan nilai DB dulu; sync_energy server-side (regen authoritative)
+        setEnergy(p.energy ?? 25);
+        setEnergyTimer(150);
         setProfile(p);
         setGlobalCoins(p.coins);
         setEquippedAvatarId(p.selected_avatar || 'stmkg');
         setLastSpinDate(normalizeSpinDate(p.last_spin_date) || p.last_spin_date || null);
+
+        void syncEnergy().then((r) => {
+          if (!r.success) return;
+          setEnergy(r.energy);
+          setEnergyTimer(r.secondsToNext > 0 ? r.secondsToNext : 150);
+          setProfile((prev: UserProfile | null) =>
+            prev ? { ...prev, energy: r.energy } : prev
+          );
+        });
 
         // Streak display dari server; klaim hanya lewat tombol + RPC daily_claim
         // last_claim_date format kanonis: YYYY-MM-DD (Asia/Jakarta di server)
@@ -349,13 +338,18 @@ export default function Dashboard() {
       };
     });
   })();
-  // Timer Logic — UI-only regen (server authority energy lewat consume_energy)
+  // Timer countdown UI; saat habis → re-sync server (jangan write energy client)
   useEffect(() => {
     if ((energy || 0) >= 25) return;
     const interval = setInterval(() => {
       setEnergyTimer((prev) => {
         if (prev <= 1) {
-          setEnergy((e) => Math.min((e || 0) + 1, 25));
+          void syncEnergy().then((r) => {
+            if (!r.success) return;
+            setEnergy(r.energy);
+            setEnergyTimer(r.secondsToNext > 0 ? r.secondsToNext : 150);
+            setProfile((p: UserProfile | null) => (p ? { ...p, energy: r.energy } : p));
+          });
           return 150;
         }
         return prev - 1;
