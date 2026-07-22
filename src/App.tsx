@@ -45,7 +45,7 @@ function Navigation() {
   const mainNav = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/belajar', icon: BookOpen, label: 'Belajar' },
-    { path: '/pembahasan', icon: BookOpenCheck, label: 'Try Out' },
+    { path: '/tryout-lobby', icon: BookOpenCheck, label: 'Try Out' },
     { path: '/quest', icon: Target, label: 'Quest' },
     { path: '/profil', icon: User, label: 'Profil' },
   ];
@@ -59,7 +59,7 @@ function Navigation() {
   const desktopNavOrder = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/belajar', icon: BookOpen, label: 'Belajar' },
-    { path: '/pembahasan', icon: BookOpenCheck, label: 'Try Out' },
+    { path: '/tryout-lobby', icon: BookOpenCheck, label: 'Try Out' },
     { path: '/liga', icon: Trophy, label: 'Liga' },
     { path: '/quest', icon: Target, label: 'Quest' },
     { path: '/catatan-salah', icon: Bookmark, label: 'Catatan Salah' },
@@ -412,8 +412,9 @@ function AppLayout() {
               <Route path="/quest"             element={<ProtectedRoute authState={authState}><Quest /></ProtectedRoute>} />
               <Route path="/toko"              element={<ProtectedRoute authState={authState}><Shop /></ProtectedRoute>} />
               <Route path="/catatan-salah"     element={<ProtectedRoute authState={authState}><WrongBook /></ProtectedRoute>} />
-              <Route path="/pembahasan"        element={<ProtectedRoute authState={authState}><TryOutLobby /></ProtectedRoute>} />
-              <Route path="/tryout-lobby"     element={<ProtectedRoute authState={authState}><TryOutLobby /></ProtectedRoute>} />
+              {/* kanonis: /tryout-lobby; /pembahasan = alias legacy */}
+              <Route path="/tryout-lobby"      element={<ProtectedRoute authState={authState}><TryOutLobby /></ProtectedRoute>} />
+              <Route path="/pembahasan"         element={<Navigate to="/tryout-lobby" replace />} />
               <Route path="/review/:attemptId" element={<ProtectedRoute authState={authState}><QuizSessionProvider><ReviewDetail /></QuizSessionProvider></ProtectedRoute>} />
               <Route path="/review/:packageId/:attemptId" element={<ProtectedRoute authState={authState}><QuizSessionProvider><ReviewDetail /></QuizSessionProvider></ProtectedRoute>} />
               <Route path="/profil"            element={<ProtectedRoute authState={authState}><Profile /></ProtectedRoute>} />
