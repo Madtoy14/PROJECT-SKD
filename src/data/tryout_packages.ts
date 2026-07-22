@@ -26,7 +26,7 @@ export const AVAILABLE_PACKAGES: TryOutPackage[] = [
   {
     id: 'paket_tryout_standar',
     title: 'Try Out Standar BKN',
-    description: 'Simulasi 110 soal format CAT BKN. Entry 1.000 koin per attempt. Tidak perlu beli unlock terpisah.',
+    description: 'Simulasi 110 soal format CAT BKN. Selalu terbuka. Tiap mulai = 1.000 koin (attempt), bukan unlock sekali seumur hidup.',
     totalQuestions: 110,
     unlockCost: 0, // selalu bisa dimainkan (bayar attempt)
     attemptCost: MODE_COSTS.tryout_coins, // 1000
@@ -36,7 +36,7 @@ export const AVAILABLE_PACKAGES: TryOutPackage[] = [
   {
     id: 'paket_tryout_akbar_1',
     title: 'Try Out Akbar CPNS #1',
-    description: 'Paket Try Out Akbar + pembahasan lengkap. Unlock permanen di Toko, lalu main dengan entry attempt.',
+    description: 'Unlock permanen 1× (pembahasan). Tiap mulai tetap bayar 1.500 koin / attempt.',
     totalQuestions: 110,
     unlockCost: PREMIUM_PACKAGE_COSTS.paket_tryout_akbar, // 1000
     attemptCost: MODE_COSTS.tryout_akbar_coins, // 1500

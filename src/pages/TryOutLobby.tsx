@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpenCheck, Lock, Unlock, ChevronRight, Play, History, List, Coins } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { fetchProfile, supabase, isSupabaseConfigured, type UserProfile } from '../lib/supabase';
+import { fetchProfile, startTryoutAttempt, supabase, isSupabaseConfigured, type UserProfile } from '../lib/supabase';
 import { AVAILABLE_PACKAGES } from '../data/tryout_packages';
-import { coinsToIdr } from '../lib/coins';
 import TryOutHistory from './TryOutHistory';
 
 export default function TryOutLobby() {
@@ -12,6 +11,7 @@ export default function TryOutLobby() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<'lobby' | 'history'>('lobby');
   const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [startingId, setStartingId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   const reloadProfile = () => fetchProfile().then(p => setProfile(p));
@@ -30,15 +30,64 @@ export default function TryOutLobby() {
     return !!profile?.purchased_packages?.includes(pkgId);
   };
 
-  const handleStart = (pkgId: string, attemptCost: number) => {
-    // Attempt cost dipotong di alur quiz/start (bukan di sini)
-    navigate('/quiz', {
-      state: {
-        mode: 'tryout',
-        packageId: pkgId,
-        coinCost: attemptCost,
-      },
-    });
+  /** Model A: unlock permanen ≠ free attempt. Charge entry fee di lobby sebelum masuk quiz. */
+  const handleStart = async (pkgId: string, attemptCost: number) => {
+    if (!profile) return;
+    if (startingId) return;
+
+    // Free attempt (attemptCost 0) — langsung masuk
+    if (attemptCost <= 0) {
+      navigate('/quiz', {
+        state: {
+          mode: 'tryout',
+          packageId: pkgId,
+          coinCost: 0,
+          tryoutPaid: true,
+        },
+      });
+      return;
+    }
+
+    if ((profile.coins ?? 0) < attemptCost) {
+      showToast(`Koin tidak cukup. Butuh ${attemptCost.toLocaleString('id-ID')} koin / attempt.`);
+      return;
+    }
+    if (!isSupabaseConfigured()) {
+      showToast('Koneksi server tidak tersedia.');
+      return;
+    }
+
+    const tier = attemptCost >= 1500 ? 'akbar' : 'standar';
+    setStartingId(pkgId);
+    try {
+      const result = await startTryoutAttempt(pkgId, tier);
+      if (!result.success) {
+        const msg =
+          result.reason === 'insufficient_coins'
+            ? `Koin tidak cukup (butuh ${result.cost || attemptCost}).`
+            : result.reason === 'not_authenticated'
+              ? 'Login dulu.'
+              : 'Gagal memotong biaya attempt. Coba lagi.';
+        showToast(msg);
+        return;
+      }
+      // Sync saldo lokal
+      setProfile((p) => (p ? { ...p, coins: result.coinsAfter } : p));
+      navigate('/quiz', {
+        state: {
+          mode: 'tryout',
+          packageId: pkgId,
+          coinCost: 0, // sudah dibayar di lobby — Quiz jangan charge lagi
+          tryoutPaid: true,
+          tryoutCostPaid: result.cost,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      showToast('Gagal memulai tryout.');
+    } finally {
+      setStartingId(null);
+    }
   };
 
   const handleUnlock = async (pkgId: string, unlockCost: number, title: string) => {
@@ -117,8 +166,10 @@ export default function TryOutLobby() {
       <header className="mb-8 text-center md:text-left">
         <h1 className="text-3xl font-black text-fg mb-2">Try Out</h1>
         <p className="text-fg-muted">
-          Try Out standar: <strong>1.000 koin / attempt</strong> (≈ Rp{coinsToIdr(1000).toLocaleString('id-ID')}).
-          Paket premium = unlock permanen di sini atau lewat Toko.
+          <strong>Unlock</strong> = buka paket permanen (1×).{' '}
+          <strong>Attempt</strong> = tiket tiap mulai (
+          <strong>1.000 koin</strong> standar / <strong>1.500</strong> akbar).
+          Unlock tidak membuat attempt gratis.
         </p>
         {profile && (
           <p className="text-sm text-fg-muted mt-2 flex items-center gap-1.5 justify-center md:justify-start">
@@ -183,15 +234,20 @@ export default function TryOutLobby() {
                   </div>
                   {pkg.unlockCost > 0 && (
                     <div className="flex justify-between">
-                      <span>Unlock permanen</span>
+                      <span>Unlock permanen (1×)</span>
                       <span className="text-fg">{pkg.unlockCost.toLocaleString('id-ID')} koin</span>
                     </div>
                   )}
                   {pkg.attemptCost > 0 && (
                     <div className="flex justify-between">
-                      <span>Biaya / attempt</span>
+                      <span>Entry / attempt</span>
                       <span className="text-fg">{pkg.attemptCost.toLocaleString('id-ID')} koin</span>
                     </div>
+                  )}
+                  {unlocked && pkg.attemptCost > 0 && (
+                    <p className="text-[10px] font-medium text-fg-muted pt-1">
+                      Unlock ✓ · tiap mulai tetap bayar attempt
+                    </p>
                   )}
                 </div>
 
@@ -204,12 +260,15 @@ export default function TryOutLobby() {
                     <Button
                       variant="primary"
                       className="w-full justify-center"
+                      disabled={startingId === pkg.id}
                       onClick={() => handleStart(pkg.id, pkg.attemptCost)}
                     >
                       <Play size={16} className="mr-2" />
-                      {pkg.attemptCost > 0
-                        ? `Mulai · ${pkg.attemptCost.toLocaleString('id-ID')} koin`
-                        : 'Mulai Sekarang'}
+                      {startingId === pkg.id
+                        ? 'Memproses...'
+                        : pkg.attemptCost > 0
+                          ? `Mulai attempt · ${pkg.attemptCost.toLocaleString('id-ID')} koin`
+                          : 'Mulai Sekarang'}
                     </Button>
                     <Button
                       variant="outline"
@@ -230,7 +289,7 @@ export default function TryOutLobby() {
                     >
                       {buyingId === pkg.id
                         ? 'Memproses...'
-                        : `Unlock · ${pkg.unlockCost.toLocaleString('id-ID')} koin (≈ Rp${coinsToIdr(pkg.unlockCost).toLocaleString('id-ID')})`}
+                        : `Unlock permanen · ${pkg.unlockCost.toLocaleString('id-ID')} koin`}
                     </Button>
                     <Button
                       variant="outline"

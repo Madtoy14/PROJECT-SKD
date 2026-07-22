@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
-import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut } from 'lucide-react';
+import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Lock, CreditCard, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut, Clock, Eye, RefreshCw, Sparkles, PartyPopper } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProfile, resetDailyQuests, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character, type UserProfile } from '../lib/supabase';
 import RankBadge from '../components/RankBadge';
@@ -14,7 +14,7 @@ const GAME_MODES = [
   { id: 'latihan', title: 'Latihan Harian', desc: 'Asah kemampuanmu setiap hari', cost: 2, costType: 'energy', icon: BrainCircuit, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success/30 hover:border-success hover:shadow-sm', badge: 'Santai' },
   { id: 'survival', title: 'Survival Mode', desc: '1 Kesalahan = Game Over', cost: 3, costType: 'energy', icon: Target, color: 'text-danger', bg: 'bg-danger-subtle', border: 'border-danger/30 hover:border-danger hover:shadow-sm', badge: 'Hardcore' },
   { id: 'pvp', title: 'PvP Battle', desc: 'Main bareng maks 50 player', cost: 3, costType: 'energy', icon: Swords, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-sm', badge: 'Multiplayer' },
-  { id: 'tryout', title: 'Try Out Mode', desc: 'Simulasi SKD · 1000 koin (Rp10.000)', cost: 1000, costType: 'coin', icon: Trophy, color: 'text-premium', bg: 'bg-premium-subtle', border: 'border-premium/30 hover:border-premium hover:shadow-sm', badge: 'Premium' },
+  { id: 'tryout', title: 'Try Out Mode', desc: 'Simulasi SKD · 1.000 koin / attempt', cost: 1000, costType: 'coin', icon: Trophy, color: 'text-premium', bg: 'bg-premium-subtle', border: 'border-premium/30 hover:border-premium hover:shadow-sm', badge: 'Premium' },
   { id: 'catatan_salah', title: 'Buku Catatan Salah', desc: 'Latih ulang soal yang pernah salah', cost: 0, costType: 'energy', icon: BookOpen, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-card', badge: 'Evaluasi' },
 ];
 
@@ -166,7 +166,9 @@ export default function Dashboard() {
   });
   const [spinAngle, setSpinAngle] = useState(0);
   const [, setSpinResult] = useState<string | null>(null);
+  const [wonPrize, setWonPrize] = useState<{ title: string; count: number; icon: any; color: string; isCoins?: boolean; isEnergy?: boolean } | null>(null);
   const [lastSpinDate, setLastSpinDate] = useState<string | null>(null);
+
   // Tanggal kanonis spin: Asia/Jakarta YYYY-MM-DD (selaras RPC)
   const jakartaYmd = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
   const normalizeSpinDate = (v?: string | null) => {
@@ -179,16 +181,40 @@ export default function Dashboard() {
     }
     return null;
   };
-  const SPIN_PRIZES = [
-    { id: 'item_waktu_beku', title: 'Waktu Beku', short: 'Beku', count: 1, color: '#6366F1', weight: 15 },
-    { id: 'item_skor_ganda', title: 'Skor Ganda', short: 'x2', count: 1, color: '#F59E0B', weight: 15 },
-    { id: 'item_terawangan', title: 'Teropong Sakti', short: 'Mata', count: 1, color: '#8B5CF6', weight: 15 },
-    { id: 'coins_100', title: '100 Koin', short: '100', count: 100, isCoins: true, color: '#EC4899', weight: 20 },
-    { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', short: '2nd', count: 1, color: '#10B981', weight: 10 },
-    { id: 'energy_5', title: '5 Energi', short: '+5⚡', count: 5, isEnergy: true, color: '#14B8A6', weight: 12 },
-    { id: 'coins_500', title: '500 Koin', short: '500', count: 500, isCoins: true, color: '#EF4444', weight: 3 },
-  ];
+
+  const SPIN_PRIZES = useMemo(() => [
+    { id: 'item_waktu_beku', title: 'Waktu Beku', short: 'Beku', count: 1, color: '#6366F1', icon: Clock, weight: 15, desc: 'Membekukan timer kuis selama 30 detik.' },
+    { id: 'item_skor_ganda', title: 'Skor Ganda', short: 'x2 Skor', count: 1, color: '#F59E0B', icon: Zap, weight: 15, desc: 'Menggandakan poin jawaban benarmu.' },
+    { id: 'item_terawangan', title: 'Teropong Sakti', short: 'Teropong', count: 1, color: '#8B5CF6', icon: Eye, weight: 15, desc: 'Melihat jawaban paling populer di soal.' },
+    { id: 'coins_100', title: '100 Koin', short: '100 Koin', count: 100, isCoins: true, color: '#EC4899', icon: Coins, weight: 20, desc: 'Tambahan 100 koin untuk belanja item.' },
+    { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', short: '2nd Life', count: 1, color: '#10B981', icon: RefreshCw, weight: 10, desc: 'Lanjut bermain meski 1x salah jawab.' },
+    { id: 'energy_5', title: '5 Energi', short: '+5⚡', count: 5, isEnergy: true, color: '#14B8A6', icon: Flame, weight: 12, desc: 'Tambahan 5 energi untuk masuk mode kuis.' },
+    { id: 'coins_500', title: '500 Koin (Jackpot!)', short: 'JACKPOT!', count: 500, isCoins: true, color: '#EF4444', icon: Trophy, weight: 3, desc: 'Bonus Jackpot 500 koin melimpah!' },
+  ], []);
+
+  // Precompute SVG geometry so spinning animation does ZERO layout math per frame
+  const precomputedSlices = useMemo(() => {
+    const sliceSize = 360 / SPIN_PRIZES.length;
+    const rad = Math.PI / 180;
+    return SPIN_PRIZES.map((prize, idx) => {
+      const startAngle = idx * sliceSize - 90;
+      const endAngle = (idx + 1) * sliceSize - 90;
+      const midAngle = idx * sliceSize + (sliceSize / 2) - 90;
+      const x1 = 128 + 118 * Math.cos(startAngle * rad);
+      const y1 = 128 + 118 * Math.sin(startAngle * rad);
+      const x2 = 128 + 118 * Math.cos(endAngle * rad);
+      const y2 = 128 + 118 * Math.sin(endAngle * rad);
+      const d = `M 128 128 L ${x1.toFixed(2)} ${y1.toFixed(2)} A 118 118 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
+      const tx = 128 + 82 * Math.cos(midAngle * rad);
+      const ty = 128 + 82 * Math.sin(midAngle * rad);
+      const ix = 128 + 54 * Math.cos(midAngle * rad);
+      const iy = 128 + 54 * Math.sin(midAngle * rad);
+      return { prize, d, tx, ty, ix, iy, midAngle };
+    });
+  }, [SPIN_PRIZES]);
+
   const hasSpunToday = normalizeSpinDate(lastSpinDate) === jakartaYmd();
+
   const startSpin = () => {
     if (isSpinning || !profile) return;
     if (!isSupabaseConfigured() || !supabase) {
@@ -217,12 +243,20 @@ export default function Dashboard() {
         const reason = String((data as { error?: string })?.error || failReason || 'error');
         const msgMap: Record<string, string> = {
           insufficient_coins: 'Koin tidak cukup (butuh 100 koin).',
-          not_authenticated: 'Login dulu untuk spin.',
-          profile_not_found: 'Profil tidak ditemukan.',
+          not_authenticated: 'Login terlebih dahulu untuk memutar roda.',
+          profile_not_found: 'Profil akun tidak ditemukan.',
         };
         setIsSpinning(false);
         setSpinResult(null);
-        setToastMessage(msgMap[reason] || `Gagal spin: ${reason}`);
+        let userMsg = msgMap[reason];
+        if (!userMsg) {
+          if (reason.toLowerCase().includes('uuid') || reason.toLowerCase().includes('syntax')) {
+            userMsg = 'Gagal memutar roda (Server DB perlu update). Silakan coba lagi.';
+          } else {
+            userMsg = `Gagal memutar roda: ${reason}`;
+          }
+        }
+        setToastMessage(userMsg);
         setTimeout(() => setToastMessage(''), 4000);
         return;
       }
@@ -232,13 +266,12 @@ export default function Dashboard() {
       const prizeIdx = idx < 0 ? 0 : idx;
       const selectedPrize = SPIN_PRIZES[prizeIdx];
 
-      // Animasi ringan: 2 putaran, ~2.5s (bukan 5 putaran / 4s)
+      // Animasi ultra mulus 60FPS: 3 putaran (1080 deg) dengan cubic-bezier deceleration
       const sliceSize = 360 / SPIN_PRIZES.length;
       const targetAngle = 360 - (prizeIdx * sliceSize) - (sliceSize / 2);
       setSpinAngle(prev => {
-        // lanjut dari sudut saat ini agar tidak loncat mundur
         const base = Math.ceil(prev / 360) * 360;
-        return base + targetAngle + (2 * 360);
+        return base + targetAngle + (3 * 360);
       });
 
       setTimeout(() => {
@@ -253,8 +286,16 @@ export default function Dashboard() {
         if (typeof d.coins_new === 'number') setGlobalCoins(d.coins_new);
         if (typeof d.energy_new === 'number') setEnergy(d.energy_new);
         setSpinResult(d.prize_title || selectedPrize.title);
-        setToastMessage(`Selamat! Menang: ${d.prize_title || selectedPrize.title}`);
-        setTimeout(() => setToastMessage(''), 4000);
+
+        // Tampilkan Modal Selebrasi Hadiah (Rich Visual Prize Modal)
+        setWonPrize({
+          title: d.prize_title || selectedPrize.title,
+          count: selectedPrize.count,
+          icon: selectedPrize.icon,
+          color: selectedPrize.color,
+          isCoins: selectedPrize.isCoins,
+          isEnergy: selectedPrize.isEnergy,
+        });
       }, 2600);
     }).catch(() => {
       setIsSpinning(false);
@@ -597,10 +638,10 @@ export default function Dashboard() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.6 }}
+              animate={{ opacity: 0.7 }}
               exit={{ opacity: 0 }}
               onClick={() => !isSpinning && setShowSpinWheel(false)}
-              className="fixed inset-0 bg-black"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm"
               data-backdrop="true"
             />
             
@@ -609,109 +650,198 @@ export default function Dashboard() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="spin-wheel-title"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-surface border border-border w-full max-w-sm rounded-[32px] p-6 shadow-2xl relative z-10 overflow-hidden text-center flex flex-col items-center gap-4"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-surface border border-border/80 w-full max-w-sm sm:max-w-md md:max-w-xl rounded-[32px] p-5 sm:p-6 shadow-2xl relative z-10 overflow-y-auto max-h-[90vh] custom-scrollbar flex flex-col md:flex-row items-center gap-5 justify-between"
             >
               <button 
                 type="button"
                 disabled={isSpinning}
                 onClick={() => setShowSpinWheel(false)}
                 aria-label="Tutup Roda Keberuntungan"
-                className="absolute top-4 right-4 p-1 hover:bg-locked-subtle rounded-full transition-colors text-fg disabled:opacity-30"
+                className="absolute top-4 right-4 p-1.5 hover:bg-surface-subtle rounded-full transition-colors text-fg disabled:opacity-30 z-30 border border-border/40"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
               
-              <h3 id="spin-wheel-title" className="font-black text-lg text-fg flex items-center gap-1.5 uppercase font-space tracking-wider">
-                🎡 Roda Keberuntungan
-              </h3>
-              <p className="text-xs text-fg-muted leading-relaxed">
-                {hasSpunToday
-                  ? "Spin gratis hari ini sudah dipakai. Putaran ekstra 100 koin."
-                  : "Putar roda untuk power-up harian gratis!"}
-              </p>
-              
-              <div className="relative w-72 h-72 md:w-80 md:h-80 mt-2 flex items-center justify-center bg-overlay rounded-full border-[6px] border-border shadow-inner">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-20 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[16px] border-t-red-500 drop-shadow-md" />
-                
-                <div className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-surface shadow-sm border-4 border-border z-10 flex items-center justify-center shadow-lg">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500 fill-yellow-500 animate-pulse" />
-                </div>
-                <motion.div
-                  className="w-full h-full will-change-transform"
-                  animate={{ rotate: spinAngle }}
-                  transition={isSpinning ? { duration: 2.5, ease: [0.2, 0.8, 0.2, 1] } : { duration: 0 }}
-                >
-                  <svg className="w-full h-full" viewBox="0 0 256 256">
-                    {(() => {
-                      const dVal = (startAngle: number, endAngle: number) => {
-                        const rad = Math.PI / 180;
-                        const x1 = 128 + 115 * Math.cos(startAngle * rad);
-                        const y1 = 128 + 115 * Math.sin(startAngle * rad);
-                        const x2 = 128 + 115 * Math.cos(endAngle * rad);
-                        const y2 = 128 + 115 * Math.sin(endAngle * rad);
-                        return `M 128 128 L ${x1} ${y1} A 115 115 0 0 1 ${x2} ${y2} Z`;
-                      };
-                      return SPIN_PRIZES.map((prize, idx) => {
-                        const sliceSize = 360 / SPIN_PRIZES.length;
-                        const startAngle = idx * sliceSize - 90;
-                        const endAngle = (idx + 1) * sliceSize - 90;
-                        const midAngle = idx * sliceSize + (sliceSize / 2) - 90;
-                        const textRad = Math.PI / 180;
-                        const tx = 128 + 78 * Math.cos(midAngle * textRad);
-                        const ty = 128 + 78 * Math.sin(midAngle * textRad);
-                        return (
-                          <g key={prize.id}>
-                            <path d={dVal(startAngle, endAngle)} fill={prize.color} stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
-                            <text
-                              x={tx}
-                              y={ty}
-                              transform={`rotate(${midAngle + 90}, ${tx}, ${ty})`}
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                              className="fill-white font-black font-space text-[11px]"
-                            >
-                              {prize.short}
-                            </text>
-                          </g>
-                        );
-                      });
-                    })()}
-                  </svg>
-                </motion.div>
-              </div>
-              
-              <button
-                disabled={isSpinning}
-                onClick={startSpin}
-                className="w-full mt-2 py-3 bg-xp text-primary-fg text-[#0F0E17] font-black rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
-              >
-                <Coins size={16} />
-                <span>
-                  {isSpinning
-                    ? "Memutar..."
-                    : hasSpunToday
-                    ? "Beli Putaran (100 Koin)"
-                    : "Putar Sekarang (Gratis)"}
-                </span>
-              </button>
-              {/* Legenda Peluang Gacha Transparan */}
-              <div className="mt-4 bg-surface-subtle border border-border rounded-2xl p-3 text-center max-w-sm w-full backdrop-blur-md">
-                <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-2 font-space">Peluang Hadiah Roda CAT</h4>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[9px] font-bold text-fg-muted">
-                  {SPIN_PRIZES.map(prize => (
-                    <div key={prize.id} className="flex justify-between border-b border-border pb-0.5">
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: prize.color }} />
-                        {prize.title.split(' (')[0]}
-                      </span>
-                      <span className="font-space text-fg">{prize.weight}%</span>
+              {/* Kolom Kiri: Roda Spin dengan LED Ring */}
+              <div className="flex flex-col items-center shrink-0">
+                <div className="relative w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center p-2.5 rounded-full bg-gradient-to-b from-amber-500/20 via-primary/10 to-purple-500/20 border-4 border-amber-400/40 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
+                  
+                  {/* 12 LED Lights */}
+                  {Array.from({ length: 12 }).map((_, i) => {
+                    const angle = (i * 30) * (Math.PI / 180);
+                    const radius = 110;
+                    const lx = radius * Math.cos(angle);
+                    const ly = radius * Math.sin(angle);
+                    return (
+                      <div
+                        key={i}
+                        className={`absolute w-2 h-2 rounded-full border border-white/40 z-20 transition-all duration-300 ${
+                          isSpinning
+                            ? (i % 2 === 0 ? 'bg-amber-300 shadow-[0_0_6px_#fde047]' : 'bg-rose-400 shadow-[0_0_6px_#fb7185]')
+                            : 'bg-amber-400/80 shadow-[0_0_4px_#f59e0b]'
+                        }`}
+                        style={{
+                          transform: `translate(${lx}px, ${ly}px)`,
+                        }}
+                      />
+                    );
+                  })}
+
+                  {/* Pointer Jarum Penunjuk Atas */}
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
+                    <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[18px] border-t-rose-500 drop-shadow-[0_3px_6px_rgba(225,29,72,0.6)]" />
+                    <div className="w-2 h-2 rounded-full bg-amber-300 shadow-[0_0_6px_rgba(252,211,77,1)] -mt-3.5 border border-rose-700" />
+                  </div>
+                  
+                  {/* Centre Hub Button */}
+                  <div className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-surface shadow-lg border-4 border-amber-400/80 z-20 flex items-center justify-center pointer-events-none">
+                    <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center shadow-inner">
+                      <Trophy size={9} className="text-stone-900" />
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Wheel SVG Canvas */}
+                  <motion.div
+                    className="w-full h-full rounded-full overflow-hidden will-change-transform shadow-xl"
+                    animate={{ rotate: spinAngle }}
+                    transition={isSpinning ? { duration: 2.6, ease: [0.15, 0.85, 0.35, 1.0] } : { duration: 0 }}
+                  >
+                    <svg className="w-full h-full" viewBox="0 0 256 256">
+                      {precomputedSlices.map(({ prize, d, tx, ty, midAngle }) => (
+                        <g key={prize.id}>
+                          <path
+                            d={d}
+                            fill={prize.color}
+                            stroke="rgba(255,255,255,0.2)"
+                            strokeWidth="1.5"
+                          />
+                          <text
+                            x={tx}
+                            y={ty}
+                            transform={`rotate(${midAngle + 90}, ${tx}, ${ty})`}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            className="fill-white font-black font-space text-[10.5px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
+                          >
+                            {prize.short}
+                          </text>
+                        </g>
+                      ))}
+                    </svg>
+                  </motion.div>
                 </div>
               </div>
+
+              {/* Kolom Kanan: Detail, Tombol & Peluang (Desktop 2-column layout) */}
+              <div className="flex flex-col flex-1 w-full items-center md:items-start text-center md:text-left gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 bg-amber-500/10 text-amber-500 rounded-xl border border-amber-500/20">
+                    <Sparkles size={18} className="animate-pulse" />
+                  </span>
+                  <h3 id="spin-wheel-title" className="font-black text-lg text-fg uppercase font-space tracking-wider">
+                    Roda Keberuntungan
+                  </h3>
+                </div>
+                <p className="text-xs text-fg-muted leading-relaxed max-w-[280px]">
+                  {hasSpunToday
+                    ? "Spin gratis hari ini sudah dipakai. Putaran ekstra 100 koin."
+                    : "Putar roda keberuntungan harian dan dapatkan item gratis!"}
+                </p>
+
+                <button
+                  disabled={isSpinning}
+                  onClick={startSpin}
+                  className="w-full py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 text-stone-950 font-black rounded-2xl shadow-[0_4px_20px_rgba(245,158,11,0.35)] hover:brightness-110 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-sm uppercase tracking-wider font-space transition-all"
+                >
+                  <Coins size={18} className="fill-stone-950/20" />
+                  <span>
+                    {isSpinning
+                      ? "Memutar Roda..."
+                      : hasSpunToday
+                      ? "Beli Putaran (100 Koin)"
+                      : "Putar Sekarang (Gratis)"}
+                  </span>
+                </button>
+
+                {/* Legenda Peluang Gacha Transparan */}
+                <div className="w-full bg-surface-subtle/80 border border-border/60 rounded-2xl p-2.5 backdrop-blur-md">
+                  <h4 className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1.5 font-space flex items-center justify-center md:justify-start gap-1">
+                    <span>Peluang Hadiah Roda CAT</span>
+                  </h4>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[9.5px] font-bold text-fg-muted">
+                    {SPIN_PRIZES.map(prize => (
+                      <div key={prize.id} className="flex justify-between border-b border-border/40 pb-0.5">
+                        <span className="flex items-center gap-1.5 truncate">
+                          <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: prize.color }} />
+                          <span className="truncate">{prize.title.split(' (')[0]}</span>
+                        </span>
+                        <span className="font-space text-fg shrink-0 ml-1">{prize.weight}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* === MODAL SELEBRASI KEMENANGAN SPIN (WON PRIZE MODAL) === */}
+      <AnimatePresence>
+        {wonPrize && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.8 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setWonPrize(null)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.7, opacity: 0, y: 30 }}
+              className="bg-surface border-2 border-amber-400/60 w-full max-w-sm rounded-[32px] p-6 shadow-[0_0_50px_rgba(245,158,11,0.3)] relative z-10 text-center flex flex-col items-center gap-4 overflow-hidden"
+            >
+              <div className="absolute -top-12 -left-12 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="p-3 bg-amber-500/10 rounded-full border border-amber-400/30 text-amber-400 animate-bounce">
+                <PartyPopper size={36} />
+              </div>
+
+              <div>
+                <span className="text-[11px] font-black text-amber-500 uppercase tracking-widest font-space">
+                  Selamat! Kamu Menang
+                </span>
+                <h3 className="text-2xl font-black text-fg font-space mt-1">
+                  {wonPrize.title}
+                </h3>
+              </div>
+
+              {/* Visual Card Prize */}
+              <div className="w-full bg-gradient-to-b from-surface-subtle to-surface border border-border/80 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 shadow-inner">
+                <div
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg border border-white/20 text-white"
+                  style={{ backgroundColor: wonPrize.color }}
+                >
+                  <wonPrize.icon size={32} />
+                </div>
+                <span className="font-space font-black text-xl text-fg mt-1">
+                  +{wonPrize.count} {wonPrize.isCoins ? 'Koin' : wonPrize.isEnergy ? 'Energi' : 'Item'}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setWonPrize(null)}
+                className="w-full py-3.5 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 text-stone-950 font-black rounded-2xl shadow-lg hover:brightness-110 active:scale-[0.98] font-space uppercase tracking-wider text-sm"
+              >
+                Klaim Hadiah
+              </button>
             </motion.div>
           </div>
         )}
@@ -1052,13 +1182,13 @@ export default function Dashboard() {
         {selectedMode && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={handleCloseModal} className="absolute inset-0 bg-overlay backdrop-blur-sm backdrop-blur-sm" data-backdrop="true" />
+              onClick={handleCloseModal} className="absolute inset-0 bg-overlay backdrop-blur-sm" data-backdrop="true" />
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}
               ref={gameModeModalRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="game-mode-title"
-              className="bg-surface w-full max-w-md rounded-3xl border border-border shadow-2xl relative z-10 overflow-hidden"
+              className="bg-surface w-full max-w-md rounded-3xl border border-border shadow-2xl relative z-10 max-h-[90vh] overflow-y-auto custom-scrollbar"
             >
               <div className={`h-24 ${selectedMode.bg} relative`}>
                 <button type="button" onClick={handleCloseModal} aria-label="Tutup Mode Game" className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-overlay backdrop-blur-sm rounded-full text-white transition-colors">

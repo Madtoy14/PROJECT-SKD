@@ -58,7 +58,7 @@ const cleanMathText = (text: string): string => {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, HeartCrack, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchQuestionsFromSupabase, fetchProfile, consumeEnergy, consumePowerup, startTryoutAttempt, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery, resolveWrongQuestionsForQuiz } from '../lib/supabase';
+import { fetchQuestionsFromSupabase, fetchProfile, consumeEnergy, consumePowerup, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery, resolveWrongQuestionsForQuiz } from '../lib/supabase';
 import { useQuizSession } from '../context/QuizSessionContext';
 import MathCard from '../components/MathCard';
 import { Button } from '../components/ui/Button';
@@ -634,9 +634,10 @@ export default function Quiz() {
     if (isGameOver) return;
     if (!currentQuestion) return;
 
-    // Deferred Cost Deduction: potong energy/koin saat jawaban PERTAMA
+    // Deferred energy deduction (latihan/survival/pvp) saat jawaban PERTAMA.
+    // Tryout attempt fee sudah dibayar di lobby (start_tryout_attempt) — jangan charge lagi.
     if (!isEnergyDeducted && profile) {
-      setIsEnergyDeducted(true); // guard double-click segera
+      setIsEnergyDeducted(true);
       if (energyCost > 0) {
         void consumeEnergy(energyCost).then(({ success, energyAfter }) => {
           if (success) {
@@ -646,26 +647,8 @@ export default function Quiz() {
           }
         });
       }
-      if (coinCost > 0 && gameMode === 'tryout') {
-        // Server catalog: standar 1000 / akbar 1500 (abaikan coinCost client palsu)
-        const tier = coinCost >= 1500 ? 'akbar' : 'standar';
-        void startTryoutAttempt(packageId, tier).then(({ success, coinsAfter, reason, cost }) => {
-          if (success) {
-            setProfile((p: import('../lib/supabase').UserProfile | null) =>
-              p ? { ...p, coins: coinsAfter } : p
-            );
-          } else {
-            // Fail-closed: kembalikan guard + toast lewat powerupToast channel
-            setIsEnergyDeducted(false);
-            const msg =
-              reason === 'insufficient_coins'
-                ? `Koin tidak cukup (butuh ${cost || coinCost}).`
-                : 'Gagal memotong biaya tryout. Coba lagi.';
-            setPowerupToast(msg);
-            setTimeout(() => setPowerupToast(''), 4000);
-          }
-        });
-      }
+      // coinCost tryout: diabaikan di sini (lobby already paid, coinCost state = 0)
+      void coinCost;
     }
 
         if (gameMode === 'tryout') {
