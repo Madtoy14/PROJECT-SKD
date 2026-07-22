@@ -1,12 +1,11 @@
 -- ============================================================
 -- Apply di Supabase SQL Editor (setelah backup ringan)
--- 1) sync_energy
--- 2) consume_energy (regen dulu)
--- 3) record_wrong_answer
--- 4) increment_wrong_mastery
+-- Energy polish: clamp + clock skew + seconds_to_next
+-- + wrong-answer RPCs
 -- ============================================================
 
--- sync_energy
+-- RPC: sync_energy — regen energy server-side (1 per 150s, cap 25, floor 0)
+-- Return: { success, energy, seconds_to_next, recovered }
 CREATE OR REPLACE FUNCTION public.sync_energy()
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -29,22 +28,44 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'reason', 'not_authenticated');
     END IF;
 
-    SELECT energy, last_energy_update INTO v_energy, v_last
-    FROM public.profiles WHERE id = v_user_id FOR UPDATE;
+    SELECT energy, last_energy_update
+      INTO v_energy, v_last
+    FROM public.profiles
+    WHERE id = v_user_id
+    FOR UPDATE;
+
     IF NOT FOUND THEN
         RETURN jsonb_build_object('success', false, 'reason', 'profile_not_found');
     END IF;
 
-    v_energy := COALESCE(v_energy, v_max);
+    -- Clamp corrupt values
+    v_energy := LEAST(v_max, GREATEST(0, COALESCE(v_energy, v_max)));
     v_recovered := 0;
     v_seconds_to_next := 0;
 
     IF v_energy >= v_max THEN
-        UPDATE public.profiles SET energy = v_max, last_energy_update = v_now WHERE id = v_user_id;
-        RETURN jsonb_build_object('success', true, 'energy', v_max, 'seconds_to_next', 0, 'recovered', 0);
+        v_energy := v_max;
+        UPDATE public.profiles
+        SET energy = v_energy,
+            last_energy_update = v_now
+        WHERE id = v_user_id;
+        RETURN jsonb_build_object(
+            'success', true,
+            'energy', v_energy,
+            'seconds_to_next', 0,
+            'recovered', 0
+        );
     END IF;
 
-    IF v_last IS NULL THEN v_last := v_now; END IF;
+    IF v_last IS NULL THEN
+        v_last := v_now;
+    END IF;
+
+    -- Guard clock skew: last di masa depan → reset ke now
+    IF v_last > v_now THEN
+        v_last := v_now;
+    END IF;
+
     v_elapsed := GREATEST(0, FLOOR(EXTRACT(EPOCH FROM (v_now - v_last)))::INTEGER);
     v_recovered := FLOOR(v_elapsed / v_interval)::INTEGER;
     v_remainder := v_elapsed % v_interval;
@@ -52,7 +73,8 @@ BEGIN
     IF v_recovered > 0 THEN
         v_energy := LEAST(v_max, v_energy + v_recovered);
         IF v_energy >= v_max THEN
-            v_last := v_now; v_seconds_to_next := 0;
+            v_last := v_now;
+            v_seconds_to_next := 0;
         ELSE
             v_last := v_now - (v_remainder || ' seconds')::INTERVAL;
             v_seconds_to_next := v_interval - v_remainder;
@@ -61,15 +83,29 @@ BEGIN
         v_seconds_to_next := GREATEST(0, v_interval - v_elapsed);
     END IF;
 
-    UPDATE public.profiles SET energy = v_energy, last_energy_update = v_last WHERE id = v_user_id;
-    RETURN jsonb_build_object('success', true, 'energy', v_energy, 'seconds_to_next', v_seconds_to_next, 'recovered', v_recovered);
+    UPDATE public.profiles
+    SET energy = v_energy,
+        last_energy_update = v_last
+    WHERE id = v_user_id;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'energy', v_energy,
+        'seconds_to_next', v_seconds_to_next,
+        'recovered', v_recovered
+    );
 END; $$;
 
 REVOKE ALL ON FUNCTION public.sync_energy() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.sync_energy() TO authenticated;
 
--- consume_energy (regen + potong)
-CREATE OR REPLACE FUNCTION public.consume_energy(p_amount INTEGER)
+
+-- RPC: consume_energy — clamp + regen dulu, lalu potong atomik
+-- Parameter: p_amount
+-- Return: { success, energy_after, seconds_to_next?, reason? }
+CREATE OR REPLACE FUNCTION public.consume_energy(
+    p_amount INTEGER
+)
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -86,30 +122,42 @@ DECLARE
     v_max INTEGER := 25;
     v_interval INTEGER := 150;
     v_energy_after INTEGER;
+    v_seconds_to_next INTEGER := 0;
 BEGIN
     IF v_user_id IS NULL THEN
         RETURN jsonb_build_object('success', false, 'reason', 'not_authenticated');
     END IF;
+
     IF p_amount <= 0 OR p_amount > 100 THEN
         RETURN jsonb_build_object('success', false, 'reason', 'invalid_amount');
     END IF;
 
-    SELECT energy, last_energy_update INTO v_energy, v_last
-    FROM public.profiles WHERE id = v_user_id FOR UPDATE;
+    SELECT energy, last_energy_update
+      INTO v_energy, v_last
+    FROM public.profiles
+    WHERE id = v_user_id
+    FOR UPDATE;
+
     IF NOT FOUND THEN
         RETURN jsonb_build_object('success', false, 'reason', 'profile_not_found');
     END IF;
 
-    v_energy := COALESCE(v_energy, v_max);
+    v_energy := LEAST(v_max, GREATEST(0, COALESCE(v_energy, v_max)));
+
+    -- Regen sebelum potong
     IF v_energy < v_max THEN
-        IF v_last IS NULL THEN v_last := v_now; END IF;
+        IF v_last IS NULL OR v_last > v_now THEN
+            v_last := v_now;
+        END IF;
         v_elapsed := GREATEST(0, FLOOR(EXTRACT(EPOCH FROM (v_now - v_last)))::INTEGER);
         v_recovered := FLOOR(v_elapsed / v_interval)::INTEGER;
         v_remainder := v_elapsed % v_interval;
         IF v_recovered > 0 THEN
             v_energy := LEAST(v_max, v_energy + v_recovered);
-            IF v_energy >= v_max THEN v_last := v_now;
-            ELSE v_last := v_now - (v_remainder || ' seconds')::INTERVAL;
+            IF v_energy >= v_max THEN
+                v_last := v_now;
+            ELSE
+                v_last := v_now - (v_remainder || ' seconds')::INTERVAL;
             END IF;
         END IF;
     ELSE
@@ -117,17 +165,39 @@ BEGIN
     END IF;
 
     IF v_energy < p_amount THEN
-        UPDATE public.profiles SET energy = v_energy, last_energy_update = v_last WHERE id = v_user_id;
-        RETURN jsonb_build_object('success', false, 'reason', 'insufficient_energy', 'energy_after', v_energy);
+        IF v_energy < v_max THEN
+            v_elapsed := GREATEST(0, FLOOR(EXTRACT(EPOCH FROM (v_now - COALESCE(v_last, v_now))))::INTEGER);
+            v_seconds_to_next := GREATEST(0, v_interval - (v_elapsed % v_interval));
+        END IF;
+        UPDATE public.profiles
+        SET energy = v_energy,
+            last_energy_update = COALESCE(v_last, v_now)
+        WHERE id = v_user_id;
+        RETURN jsonb_build_object(
+            'success', false,
+            'reason', 'insufficient_energy',
+            'energy_after', v_energy,
+            'seconds_to_next', v_seconds_to_next
+        );
     END IF;
 
     v_energy_after := v_energy - p_amount;
-    UPDATE public.profiles SET energy = v_energy_after, last_energy_update = v_now WHERE id = v_user_id;
-    RETURN jsonb_build_object('success', true, 'energy_after', v_energy_after);
+    -- Setelah consume, timer mulai dari now (fair)
+    UPDATE public.profiles
+    SET energy = v_energy_after,
+        last_energy_update = v_now
+    WHERE id = v_user_id;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'energy_after', v_energy_after,
+        'seconds_to_next', CASE WHEN v_energy_after >= v_max THEN 0 ELSE v_interval END
+    );
 END; $$;
 
 REVOKE EXECUTE ON FUNCTION public.consume_energy(INTEGER) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.consume_energy(INTEGER) TO authenticated;
+
 
 -- record_wrong_answer
 CREATE OR REPLACE FUNCTION public.record_wrong_answer(p_question_id TEXT, p_quiz_type TEXT DEFAULT '')
@@ -251,6 +321,8 @@ END; $$;
 
 REVOKE ALL ON FUNCTION public.increment_wrong_mastery(TEXT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.increment_wrong_mastery(TEXT) TO authenticated;
+
+
 
 SELECT p.proname, pg_get_function_identity_arguments(p.oid) AS args
 FROM pg_proc p

@@ -634,20 +634,39 @@ export default function Quiz() {
     if (isGameOver) return;
     if (!currentQuestion) return;
 
-    // Deferred energy deduction (latihan/survival/pvp) saat jawaban PERTAMA.
-    // Tryout attempt fee sudah dibayar di lobby (start_tryout_attempt) — jangan charge lagi.
+    // Deferred energy: potong saat jawaban PERTAMA (fail-closed).
+    // Tryout attempt fee sudah di lobby — jangan charge koin di sini.
     if (!isEnergyDeducted && profile) {
-      setIsEnergyDeducted(true);
       if (energyCost > 0) {
-        void consumeEnergy(energyCost).then(({ success, energyAfter }) => {
+        // Guard dulu agar double-click tidak double-RPC; rollback jika gagal
+        setIsEnergyDeducted(true);
+        void consumeEnergy(energyCost).then(({ success, energyAfter, reason }) => {
           if (success) {
             setProfile((p: import('../lib/supabase').UserProfile | null) =>
               p ? { ...p, energy: energyAfter } : p
             );
+            return;
+          }
+          // Fail-closed: batalkan guard; mode kompetitif tolak lanjut jika energy habis
+          setIsEnergyDeducted(false);
+          const msg =
+            reason === 'insufficient_energy'
+              ? `Energi tidak cukup (butuh ${energyCost}).`
+              : 'Gagal memotong energi. Coba jawab lagi.';
+          setPowerupToast(msg);
+          setTimeout(() => setPowerupToast(''), 3500);
+          if (
+            reason === 'insufficient_energy' &&
+            (gameMode === 'survival' || gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot')
+          ) {
+            setProfile((p: import('../lib/supabase').UserProfile | null) =>
+              p ? { ...p, energy: energyAfter ?? 0 } : p
+            );
           }
         });
+      } else {
+        setIsEnergyDeducted(true);
       }
-      // coinCost tryout: diabaikan di sini (lobby already paid, coinCost state = 0)
       void coinCost;
     }
 
@@ -957,7 +976,7 @@ const scoreBadge = (optionId: string) => {
         </div>
         <h2 className="text-xl font-black text-fg mb-2">Energi Anda Habis!</h2>
         <p className="text-xs text-fg-muted max-w-sm mb-6 leading-relaxed">
-          Untuk menjaga kestabilan belajar, Anda memerlukan energi untuk bermain di mode kompetitif. Pulihkan energi Anda secara instan di Toko menggunakan koin, atau tunggu pemulihan otomatis (+1 energi setiap 15 menit).
+          Untuk menjaga kestabilan belajar, Anda memerlukan energi untuk bermain di mode kompetitif. Pulihkan di Toko dengan koin, atau tunggu regen otomatis (+1 energi setiap 2,5 menit / 150 detik).
         </p>
         <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs justify-center">
           <Link

@@ -91,9 +91,9 @@ export default function Dashboard() {
           }
         });
 
-        // 2. Energy: tampilkan nilai DB dulu; sync_energy server-side (regen authoritative)
+        // 2. Energy: nilai DB dulu; sync_energy authoritative (regen 1/150s, cap 25)
         setEnergy(p.energy ?? 25);
-        setEnergyTimer(150);
+        setEnergyTimer((p.energy ?? 25) >= 25 ? 0 : 150);
         setProfile(p);
         setGlobalCoins(p.coins);
         setEquippedAvatarId(p.selected_avatar || 'stmkg');
@@ -102,7 +102,7 @@ export default function Dashboard() {
         void syncEnergy().then((r) => {
           if (!r.success) return;
           setEnergy(r.energy);
-          setEnergyTimer(r.secondsToNext > 0 ? r.secondsToNext : 150);
+          setEnergyTimer(r.energy >= 25 ? 0 : Math.max(0, r.secondsToNext || 0));
           setProfile((prev: UserProfile | null) =>
             prev ? { ...prev, energy: r.energy } : prev
           );
@@ -338,7 +338,7 @@ export default function Dashboard() {
       };
     });
   })();
-  // Timer countdown UI; saat habis → re-sync server (jangan write energy client)
+  // Timer countdown UI; habis / tab fokus → re-sync server (jangan write energy client)
   useEffect(() => {
     if ((energy || 0) >= 25) return;
     const interval = setInterval(() => {
@@ -347,16 +347,36 @@ export default function Dashboard() {
           void syncEnergy().then((r) => {
             if (!r.success) return;
             setEnergy(r.energy);
-            setEnergyTimer(r.secondsToNext > 0 ? r.secondsToNext : 150);
+            setEnergyTimer(r.energy >= 25 ? 0 : Math.max(1, r.secondsToNext || 150));
             setProfile((p: UserProfile | null) => (p ? { ...p, energy: r.energy } : p));
           });
-          return 150;
+          // Tahan 1s sampai server jawab (hindari spam RPC)
+          return 1;
         }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(interval);
   }, [energy]);
+
+  // Re-sync saat tab kembali aktif (anti drift timer background)
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+      void syncEnergy().then((r) => {
+        if (!r.success) return;
+        setEnergy(r.energy);
+        setEnergyTimer(r.energy >= 25 ? 0 : Math.max(0, r.secondsToNext || 0));
+        setProfile((p: UserProfile | null) => (p ? { ...p, energy: r.energy } : p));
+      });
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, []);
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
@@ -520,48 +540,64 @@ export default function Dashboard() {
     setMatchCountdown(3);
     setPvpSubMode('selection');
   };
-  const handlePlayGame = (_e: React.MouseEvent, path: string, modeId?: string, extraState: any = {}) => {
+  const handlePlayGame = async (_e: React.MouseEvent, path: string, modeId?: string, extraState: any = {}) => {
     if (isProcessing) return;
     setIsProcessing(true);
-    if (modeId === 'catatan_salah') {
-      try {
-        const parsed = profile?.catatan_salah || [];
-        if (parsed.length === 0) {
-          setToastMessage('Buku Catatan Salah Anda masih kosong! Belum ada soal yang tercatat.');
+    try {
+      if (modeId === 'catatan_salah') {
+        try {
+          const parsed = profile?.catatan_salah || [];
+          if (parsed.length === 0) {
+            setToastMessage('Buku Catatan Salah Anda masih kosong! Belum ada soal yang tercatat.');
+            setTimeout(() => setToastMessage(''), 3000);
+            return;
+          }
+        } catch (err) {
+          console.error(err);
+        }
+        navigate('/catatan-salah');
+        return;
+      }
+
+      const actualModeId = modeId === 'pvp1v1' ? 'pvp' : modeId;
+      const modeConfig = GAME_MODES.find(m => m.id === actualModeId) || selectedMode;
+      const cost = modeConfig?.cost || 0;
+      const costType = modeConfig?.costType || 'energy';
+
+      // Sync energy server sebelum cek biaya (hindari stale UI)
+      let liveEnergy = energy || 0;
+      if (costType === 'energy' && cost > 0) {
+        const synced = await syncEnergy();
+        if (synced.success) {
+          liveEnergy = synced.energy;
+          setEnergy(synced.energy);
+          setEnergyTimer(synced.energy >= 25 ? 0 : Math.max(0, synced.secondsToNext || 0));
+          setProfile((p: UserProfile | null) => (p ? { ...p, energy: synced.energy } : p));
+        }
+        if (liveEnergy < cost) {
+          setToastMessage(`Energi tidak cukup! Butuh ${cost} (punya ${liveEnergy}).`);
           setTimeout(() => setToastMessage(''), 3000);
-          setIsProcessing(false);
           return;
         }
-      } catch (err) {
-        console.error(err);
       }
-      navigate('/catatan-salah');
+      if (costType === 'coin' && globalCoins < cost) {
+        setToastMessage(`Koin Anda tidak cukup! Dibutuhkan ${cost.toLocaleString()} koin.`);
+        setTimeout(() => setToastMessage(''), 3000);
+        return;
+      }
+
+      // Energy dipotong di Quiz saat jawaban pertama (RPC consume_energy)
+      navigate(path, {
+        state: {
+          mode: modeId,
+          energyCost: costType === 'energy' ? cost : 0,
+          coinCost: costType === 'coin' ? cost : 0,
+          ...extraState,
+        },
+      });
+    } finally {
       setIsProcessing(false);
-      return;
     }
-    // Verifikasi biaya (energi atau koin) sebelum bermain
-    const actualModeId = modeId === 'pvp1v1' ? 'pvp' : modeId;
-    const modeConfig = GAME_MODES.find(m => m.id === actualModeId) || selectedMode;
-    const cost = modeConfig?.cost || 0;
-    const costType = modeConfig?.costType || 'energy';
-    
-    if (costType === 'energy' && (energy || 0) < cost) {
-      setToastMessage(`Energi Anda tidak cukup! Dibutuhkan ${cost} energi.`);
-      setTimeout(() => setToastMessage(''), 3000);
-      setIsProcessing(false);
-      return;
-    }
-    if (costType === 'coin' && globalCoins < cost) {
-      setToastMessage(`Koin Anda tidak cukup! Dibutuhkan ${cost.toLocaleString()} koin.`);
-      setTimeout(() => setToastMessage(''), 3000);
-      setIsProcessing(false);
-      return;
-    }
-    // Energi akan dipotong di Quiz.tsx saat menjawab soal pertama (Deferred Deduction)
-    
-    // Daily claim tidak digabung ke start game — pakai tombol "Klaim Harian"
-    navigate(path, { state: { mode: modeId, energyCost: costType === 'energy' ? cost : 0, coinCost: costType === 'coin' ? cost : 0, ...extraState } });
-    setIsProcessing(false);
   };
 
   const handleDailyClaim = async () => {

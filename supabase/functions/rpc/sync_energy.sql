@@ -1,4 +1,4 @@
--- RPC: sync_energy — regen energy server-side (1 per 150s, cap 25)
+-- RPC: sync_energy — regen energy server-side (1 per 150s, cap 25, floor 0)
 -- Return: { success, energy, seconds_to_next, recovered }
 CREATE OR REPLACE FUNCTION public.sync_energy()
 RETURNS JSONB
@@ -32,7 +32,8 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'reason', 'profile_not_found');
     END IF;
 
-    v_energy := COALESCE(v_energy, v_max);
+    -- Clamp corrupt values
+    v_energy := LEAST(v_max, GREATEST(0, COALESCE(v_energy, v_max)));
     v_recovered := 0;
     v_seconds_to_next := 0;
 
@@ -54,13 +55,17 @@ BEGIN
         v_last := v_now;
     END IF;
 
+    -- Guard clock skew: last di masa depan → reset ke now
+    IF v_last > v_now THEN
+        v_last := v_now;
+    END IF;
+
     v_elapsed := GREATEST(0, FLOOR(EXTRACT(EPOCH FROM (v_now - v_last)))::INTEGER);
     v_recovered := FLOOR(v_elapsed / v_interval)::INTEGER;
     v_remainder := v_elapsed % v_interval;
 
     IF v_recovered > 0 THEN
         v_energy := LEAST(v_max, v_energy + v_recovered);
-        -- Geser last_energy_update ke sisa interval (atau now jika full)
         IF v_energy >= v_max THEN
             v_last := v_now;
             v_seconds_to_next := 0;
@@ -69,8 +74,7 @@ BEGIN
             v_seconds_to_next := v_interval - v_remainder;
         END IF;
     ELSE
-        v_seconds_to_next := v_interval - v_elapsed;
-        IF v_seconds_to_next < 0 THEN v_seconds_to_next := 0; END IF;
+        v_seconds_to_next := GREATEST(0, v_interval - v_elapsed);
     END IF;
 
     UPDATE public.profiles
