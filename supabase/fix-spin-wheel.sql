@@ -1,5 +1,9 @@
--- Apply di Supabase SQL Editor (SETELAH backup ringan).
--- Fix: spin_wheel search_path + last_spin_date YYYY-MM-DD Asia/Jakarta + paid spin.
+-- ============================================================
+-- FIX spin_wheel (apply di SQL Editor production)
+-- Bug: SELECT coins,energy,inventory INTO profiles%rowtype
+--      mengisi BY POSITION → coins masuk ke kolom id (uuid)
+--      → "invalid input syntax for type uuid: \"831450\""
+-- ============================================================
 
 create or replace function public.spin_wheel()
 returns jsonb
@@ -8,8 +12,11 @@ security definer
 set search_path = public
 as $$
 declare
-  p public.profiles%rowtype;
-  uid uuid := auth.uid();
+  v_user_id uuid := auth.uid();
+  v_coins int;
+  v_energy int;
+  v_inventory jsonb;
+  v_last_spin text;
   today_str text := to_char((now() at time zone 'Asia/Jakarta'), 'YYYY-MM-DD');
   last_str text;
   r float := random() * 100;
@@ -31,34 +38,39 @@ declare
   ]'::jsonb;
   prize jsonb;
   i int;
+  v_coins_new int;
+  v_energy_new int;
+  v_inventory_new jsonb;
 begin
-  if uid is null then
+  if v_user_id is null then
     return jsonb_build_object('error', 'not_authenticated');
   end if;
 
-  select * into p from public.profiles where id = uid for update;
+  -- PENTING: select ke variabel skalar, BUKAN profiles%rowtype
+  select coins, energy, inventory, last_spin_date
+    into v_coins, v_energy, v_inventory, v_last_spin
+  from public.profiles
+  where id = v_user_id
+  for update;
+
   if not found then
     return jsonb_build_object('error', 'profile_not_found');
   end if;
 
-  if p.last_spin_date is null or btrim(p.last_spin_date) = '' then
+  if v_last_spin is null or btrim(v_last_spin) = '' then
     last_str := null;
-  elsif p.last_spin_date ~ '^\d{4}-\d{2}-\d{2}' then
-    last_str := left(p.last_spin_date, 10);
+  elsif v_last_spin ~ '^\d{4}-\d{2}-\d{2}' then
+    last_str := left(v_last_spin, 10);
   else
-    begin
-      last_str := to_char(p.last_spin_date::timestamptz at time zone 'Asia/Jakarta', 'YYYY-MM-DD');
-    exception when others then
-      last_str := null;
-    end;
+    last_str := null;
   end if;
 
   if last_str is not null and last_str = today_str then
-    if coalesce(p.coins, 0) < 100 then
-      return jsonb_build_object('error', 'insufficient_coins', 'coins', coalesce(p.coins, 0));
+    if coalesce(v_coins, 0) < 100 then
+      return jsonb_build_object('error', 'insufficient_coins', 'coins', coalesce(v_coins, 0));
     end if;
     paid_spin := true;
-    update public.profiles set coins = coins - 100 where id = uid;
+    v_coins := v_coins - 100;
   end if;
 
   for i in 0..jsonb_array_length(prizes)-1 loop
@@ -83,34 +95,39 @@ begin
     is_energy   := (prize->>'isEnergy')::bool;
   end if;
 
+  v_coins_new := coalesce(v_coins, 0);
+  v_energy_new := coalesce(v_energy, 0);
+  v_inventory_new := coalesce(v_inventory, '{}'::jsonb);
+
   if is_coins then
-    update public.profiles set coins = coins + prize_count where id = uid;
+    v_coins_new := v_coins_new + prize_count;
   elsif is_energy then
-    update public.profiles set energy = least(24, coalesce(energy, 0) + prize_count) where id = uid;
+    v_energy_new := least(24, v_energy_new + prize_count);
   else
-    update public.profiles set
-      inventory = jsonb_set(
-        coalesce(inventory, '{}'::jsonb),
-        array[prize_id],
-        to_jsonb(coalesce((inventory->>prize_id)::int, 0) + prize_count)
-      )
-    where id = uid;
+    v_inventory_new := jsonb_set(
+      v_inventory_new,
+      array[prize_id],
+      to_jsonb(coalesce((v_inventory_new->>prize_id)::int, 0) + prize_count)
+    );
   end if;
 
-  update public.profiles set last_spin_date = today_str where id = uid;
-
-  select coins, energy, inventory into p from public.profiles where id = uid;
+  update public.profiles
+  set coins = v_coins_new,
+      energy = v_energy_new,
+      inventory = v_inventory_new,
+      last_spin_date = today_str
+  where id = v_user_id;
 
   return jsonb_build_object(
-    'prize_id',    prize_id,
+    'prize_id', prize_id,
     'prize_title', prize_title,
     'prize_count', prize_count,
-    'is_coins',    is_coins,
-    'is_energy',   is_energy,
-    'paid',        paid_spin,
-    'coins_new',   p.coins,
-    'energy_new',  p.energy,
-    'inventory',   p.inventory,
+    'is_coins', is_coins,
+    'is_energy', is_energy,
+    'paid', paid_spin,
+    'coins_new', v_coins_new,
+    'energy_new', v_energy_new,
+    'inventory', v_inventory_new,
     'last_spin_date', today_str
   );
 end; $$;
@@ -118,6 +135,7 @@ end; $$;
 revoke all on function public.spin_wheel() from public;
 grant execute on function public.spin_wheel() to authenticated;
 
+-- verifikasi
 select p.proname, pg_get_function_identity_arguments(p.oid) as args
 from pg_proc p
 join pg_namespace n on n.oid = p.pronamespace

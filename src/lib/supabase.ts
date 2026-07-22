@@ -668,10 +668,17 @@ function mapSoalRowToQuestion(q: any): {
   };
 }
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 /** Resolve id catatan_salah dari soal_skd dulu, sisa coba soal_tryout. */
 async function fetchSoalByIds(ids: string[]): Promise<Map<string, ReturnType<typeof mapSoalRowToQuestion>>> {
   const out = new Map<string, ReturnType<typeof mapSoalRowToQuestion>>();
   if (!supabase || ids.length === 0) return out;
+
+  // Hanya UUID valid — id numerik legacy (mis. "831450") bikin error cast uuid di PostgREST
+  const uuidIds = ids.filter((id) => UUID_RE.test(String(id)));
+  if (uuidIds.length === 0) return out;
 
   // Supabase .in() aman per batch
   const chunk = <T,>(arr: T[], size: number) => {
@@ -680,7 +687,7 @@ async function fetchSoalByIds(ids: string[]): Promise<Map<string, ReturnType<typ
     return res;
   };
 
-  for (const part of chunk(ids, 100)) {
+  for (const part of chunk(uuidIds, 100)) {
     const { data, error } = await supabase
       .from('soal_skd')
       .select('id, tipe, pertanyaan, opsi, kunci, pembahasan')
@@ -694,7 +701,7 @@ async function fetchSoalByIds(ids: string[]): Promise<Map<string, ReturnType<typ
     }
   }
 
-  const missing = ids.filter((id) => !out.has(id));
+  const missing = uuidIds.filter((id) => !out.has(id));
   for (const part of chunk(missing, 100)) {
     if (part.length === 0) break;
     const { data, error } = await supabase
