@@ -336,6 +336,7 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
 
     // Jika RPC gagal, jangan clear session — biarkan user retry
     if (rpcError) throw rpcError;
+    if (!resultId) throw new Error('result_id kosong dari server');
 
     // ── Update akurasi profil (fire-and-forget, bukan blocking) ──
     // Ini bukan data kritis — boleh gagal tanpa memblokir navigasi
@@ -358,8 +359,8 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
       .catch(() => { /* non-critical, abaikan */ });
 
     setActiveSession(null);
-    return resultId;
-  }, [activeSession]);
+    return String(resultId);
+  }, [activeSession, updateSession]);
 
   const recoverSession = useCallback(async (): Promise<QuizSession | null> => {
     const { data: { user } } = await supabase!.auth.getUser();

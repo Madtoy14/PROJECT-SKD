@@ -130,7 +130,8 @@ export default function Quiz() {
   const selected = answers[currentQuestionIndex] || null;
   const [isGameOver, setIsGameOver] = useState(false);
   const [heartBroken, setHeartBroken] = useState(false); // Sudden death visual
-  const [totalScore, setTotalScore] = useState(0);
+  // score authoritative via totalScoreRef; state only for re-render HUD if needed later
+  const [, setTotalScore] = useState(0);
   const [doubtful, setDoubtful] = useState<Record<number, boolean>>({});
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   const [activePowerUps, setActivePowerUps] = useState<{
@@ -154,6 +155,19 @@ export default function Quiz() {
   const [consumingPowerup, setConsumingPowerup] = useState<string | null>(null);
   const [powerupToast, setPowerupToast] = useState('');
   const [isFinishing, setIsFinishing] = useState(false);
+  const [finishError, setFinishError] = useState<string | null>(null);
+  const lastFinishRef = useRef<{
+    payload: {
+      score: number;
+      twkScore?: number;
+      tiuScore?: number;
+      tkpScore?: number;
+      coinsEarned: number;
+      xpEarned: number;
+      finalAnswers?: Record<number, string>;
+    };
+    navState: Record<string, unknown>;
+  } | null>(null);
 
   const checkPowerupLimit = (itemKey: string): boolean => {
     const limits = MAX_POWERUP_USAGE[gameMode] || {};
@@ -733,25 +747,18 @@ export default function Quiz() {
       setHeartBroken(true);
       setTimeout(() => {
         setIsGameOver(true);
-        const finalScore = totalScore + earned;
-        const earnedCoins = Math.floor(finalScore * 0.2 * 10);
-        const gainedXP = finalScore * 10;
-
-        completeSession(sessionId!, {
+        const finalScore = totalScoreRef.current + earned;
+        const finalAnswers = { ...answersRef.current, [currentQuestionIndex]: optionId };
+        void finishQuiz({
           score: finalScore,
-          coinsEarned: earnedCoins,
-          xpEarned: gainedXP,
-          finalAnswers: { ...answers, [currentQuestionIndex]: optionId }
-        }).then((resultId) => {
-          navigate(`/result/${resultId}`, {
-                      state: {
-                        score: finalScore,
-                        mode: gameMode,
-                        sessionId,
-                        // ponytail: quizQuestions dihapus dari state — Result fetch dari DB (hemat memory history)
-                        userAnswers: { ...answers, [currentQuestionIndex]: optionId }
-                      }
-                    });
+          coinsEarned: Math.floor(finalScore * 0.2 * 10),
+          xpEarned: finalScore * 10,
+          finalAnswers,
+        }, {
+          score: finalScore,
+          mode: gameMode,
+          sessionId,
+          userAnswers: finalAnswers,
         });
       }, 1000); // Wait 1 second to show red flash
     };
@@ -784,11 +791,55 @@ export default function Quiz() {
 
     applyAnswerProgress(earned);
   };
-    const finishTryout = () => {
+  /** Satu alur finish untuk semua mode. Navigate result HANYA jika ada result_id. */
+  const finishQuiz = async (
+    payload: {
+      score: number;
+      twkScore?: number;
+      tiuScore?: number;
+      tkpScore?: number;
+      coinsEarned: number;
+      xpEarned: number;
+      finalAnswers?: Record<number, string>;
+    },
+    navState: Record<string, unknown>
+  ) => {
+    if (!sessionId) {
+      setFinishError('Sesi tidak ditemukan. Kembali ke dashboard dan mulai lagi.');
+      return;
+    }
+    if (isFinishing) return;
+
+    lastFinishRef.current = { payload, navState };
+    setIsFinishing(true);
+    setFinishError(null);
+    try {
+      const resultId = await completeSession(sessionId, payload);
+      if (!resultId) {
+        throw new Error('result_id kosong');
+      }
+      navigate(`/result/${resultId}`, {
+        state: { ...navState, sessionId },
+      });
+    } catch (err: unknown) {
+      // Session tetap aktif di context — user bisa retry
+      setIsFinishing(false);
+      setFinishError((err as Error)?.message || 'Gagal mengirim hasil. Coba lagi.');
+    }
+  };
+
+  const retryFinish = () => {
+    const last = lastFinishRef.current;
+    if (!last) return;
+    void finishQuiz(last.payload, last.navState);
+  };
+
+  const finishTryout = () => {
     let finalScore = 0, twkScore = 0, tiuScore = 0, tkpScore = 0;
+    const finalAnswers = answersRef.current;
 
     questions.forEach((q, idx) => {
-      const ansId = answers[idx];
+      const ansId = finalAnswers[idx];
       let isFullyCorrect = false;
       if (ansId) {
         const opt = q.options.find((o: QuestionOption) => o.id === ansId);
@@ -813,24 +864,19 @@ export default function Quiz() {
     const earnedCoins = gameMode === 'tryout' ? 300 : 50;
     const gainedXP = gameMode === 'tryout' ? 500 : 150;
 
-    setIsFinishing(true);
-    completeSession(sessionId!, {
-      score: finalScore, twkScore, tiuScore, tkpScore, coinsEarned: earnedCoins, xpEarned: gainedXP
-    }).then((resultId) => {
-      navigate(`/result/${resultId}`, { 
-              state: { 
-                score: finalScore, 
-                mode: gameMode,
-                sessionId,
-                twkScore,
-                tiuScore,
-                tkpScore,
-                // ponytail: quizQuestions dihapus — Result fetch questions_json dari DB
-                userAnswers: answers,
-                doubtfulMap: doubtful
-              } 
-            });
-    });
+    void finishQuiz(
+      { score: finalScore, twkScore, tiuScore, tkpScore, coinsEarned: earnedCoins, xpEarned: gainedXP, finalAnswers },
+      {
+        score: finalScore,
+        mode: gameMode,
+        sessionId,
+        twkScore,
+        tiuScore,
+        tkpScore,
+        userAnswers: finalAnswers,
+        doubtfulMap: doubtful,
+      }
+    );
   };
   const handleShowExplanation = () => {
     if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
@@ -880,34 +926,23 @@ export default function Quiz() {
         updateSession(sessionId, updates);
       }
     } else {
-      setIsFinishing(true);
-      completeSession(sessionId!, {
-        score: totalScoreRef.current,
-        coinsEarned: Math.floor(totalScore * 0.2 * 10),
-        xpEarned: totalScore * 10,
-        finalAnswers: answers
-      }).then((resultId) => {
-        navigate(`/result/${resultId}`, { 
-                  state: { 
-                    score: scoreSnapshot, 
-                    mode: gameMode, 
-                    sessionId,
-                    liveRanks,
-                    // ponytail: quizQuestions dihapus — Result fetch questions_json dari DB
-                    userAnswers: answers
-                  } 
-                });
-              }).catch(() => {
-                navigate(`/result/${sessionId}`, { 
-                  state: { 
-                    score: scoreSnapshot, 
-                    mode: gameMode, 
-                    sessionId,
-                    liveRanks,
-                    userAnswers: answers
-                  }
-        });
-      });
+      const finalScore = totalScoreRef.current;
+      const finalAnswers = answersRef.current;
+      void finishQuiz(
+        {
+          score: finalScore,
+          coinsEarned: Math.floor(finalScore * 0.2 * 10),
+          xpEarned: finalScore * 10,
+          finalAnswers,
+        },
+        {
+          score: scoreSnapshot,
+          mode: gameMode,
+          sessionId,
+          liveRanks,
+          userAnswers: finalAnswers,
+        }
+      );
     }
   };
   // --- Score label helper ---
@@ -977,6 +1012,36 @@ const scoreBadge = (optionId: string) => {
       {powerupToast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-danger/95 border border-danger text-white font-bold py-2 px-6 rounded-2xl shadow-lg backdrop-blur-md text-xs flex items-center gap-2">
           <span>{powerupToast}</span>
+        </div>
+      )}
+      {finishError && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-[min(92vw,28rem)] bg-surface border border-danger/40 text-fg shadow-2xl rounded-2xl p-4 flex flex-col gap-3">
+          <p className="text-sm font-bold text-danger">Gagal mengirim hasil</p>
+          <p className="text-xs text-fg-muted leading-relaxed">{finishError}</p>
+          <div className="flex gap-2">
+            <Button
+              variant="primary"
+              disabled={isFinishing}
+              onClick={retryFinish}
+              className="flex-1 py-2.5 rounded-xl text-sm font-bold"
+            >
+              {isFinishing ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" /> Mengirim...
+                </span>
+              ) : (
+                'Coba kirim lagi'
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              disabled={isFinishing}
+              onClick={() => setFinishError(null)}
+              className="px-4 py-2.5 rounded-xl text-sm"
+            >
+              Tutup
+            </Button>
+          </div>
         </div>
       )}
       {activePowerUps.waktuBeku && (
