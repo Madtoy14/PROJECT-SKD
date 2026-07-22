@@ -22,7 +22,14 @@ Backup dulu. Lalu apply SQL dari repo:
 Lihat `supabase/migrations/README.md`.
 
 ### RPC security baru (wajib untuk client sync)
-Jalankan di SQL Editor (staging):
+
+**Cara cepat (disarankan):**
+
+1. Buka file `supabase/apply-all-security-rpcs.sql`
+2. Supabase SQL Editor → paste **seluruh file** → Run
+3. Pastikan query verifikasi di akhir menampilkan semua function
+
+**Cara manual (file terpisah):**
 
 1. `supabase/functions/rpc/daily_claim.sql`
 2. `supabase/functions/rpc/spin_wheel.sql`
