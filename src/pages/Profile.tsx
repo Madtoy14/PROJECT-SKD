@@ -440,7 +440,7 @@ export default function Profile() {
         {isEditProfileOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-overlay backdrop-blur-sm backdrop-blur-md z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-overlay backdrop-blur-md z-[100] flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
@@ -908,11 +908,11 @@ export default function Profile() {
         {searchFriendModal && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-overlay backdrop-blur-sm backdrop-blur-md z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-overlay backdrop-blur-md z-[100] flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-surface shadow-sm border border-border rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col"
+              className="bg-surface shadow-sm border border-border rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-4 border-b border-border">
                 <h3 className="font-bold text-lg">Cari Teman</h3>
@@ -987,7 +987,7 @@ export default function Profile() {
         {isFollowModalOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-overlay backdrop-blur-sm backdrop-blur-md z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-overlay backdrop-blur-md z-[100] flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}

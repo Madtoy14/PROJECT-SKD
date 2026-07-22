@@ -131,7 +131,7 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
             role="dialog"
             aria-modal="true"
             aria-labelledby="player-profile-title"
-            className="bg-surface shadow-sm border border-border w-full max-w-xs rounded-[1.75rem] shadow-2xl relative z-10 overflow-hidden animate-[fadeInUp_0.25s_ease-out_both]"
+            className="bg-surface shadow-sm border border-border w-full max-w-xs rounded-[1.75rem] shadow-2xl relative z-10 max-h-[90vh] overflow-y-auto custom-scrollbar animate-[fadeInUp_0.25s_ease-out_both]"
           >
             {loading ? (
               <div className="flex flex-col items-center justify-center p-10 text-fg-muted">
@@ -160,7 +160,7 @@ export default function PlayerProfileModal({ playerId, onClose, onAddRival, exis
                     type="button"
                     onClick={onClose}
                     aria-label="Tutup Profil Pemain"
-                    className="absolute top-3 right-3 w-7 h-7 bg-black/30 hover:bg-overlay backdrop-blur-sm text-white rounded-full flex items-center justify-center backdrop-blur-md transition-colors z-10"
+                    className="absolute top-3 right-3 w-7 h-7 bg-black/30 hover:bg-overlay backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-colors z-10"
                   >
                     <X size={14} />
                   </button>
