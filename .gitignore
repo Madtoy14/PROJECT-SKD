@@ -76,3 +76,10 @@ Soal/
 # public/inject.html  # tracked as safe 404 placeholder (no secrets)
 audit_check_token*.py
 
+
+# Legacy SQL root (kanonis: supabase/migrations + functions/rpc)
+supabase_schema*.sql
+
+# One-off generators
+scripts/append_*.cjs
+scripts/fix_question_scores.cjs
