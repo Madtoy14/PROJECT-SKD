@@ -189,6 +189,41 @@ export const consumeEnergy = async (
   }
 };
 
+/**
+ * SEC: Atomic power-up consume via RPC (auth.uid + session ownership).
+ * Signature: consume_powerup(p_session_id uuid, p_item_id text)
+ * -> { success, item_remaining, item_id?, reason? }
+ */
+export const consumePowerup = async (
+  sessionId: string,
+  itemId: string
+): Promise<{ success: boolean; itemRemaining: number; reason?: string }> => {
+  if (!isSupabaseConfigured()) {
+    // ponytail: local/dev without Supabase — skip server stock authority
+    return { success: true, itemRemaining: 0 };
+  }
+  try {
+    const { data, error } = await supabase!.rpc('consume_powerup', {
+      p_session_id: sessionId,
+      p_item_id: itemId,
+    });
+    if (error) throw error;
+    const result = (data ?? {}) as {
+      success?: boolean;
+      item_remaining?: number;
+      reason?: string;
+    };
+    return {
+      success: !!result.success,
+      itemRemaining: result.item_remaining ?? 0,
+      reason: result.reason,
+    };
+  } catch (err) {
+    console.error('consumePowerup failed:', err);
+    return { success: false, itemRemaining: 0, reason: 'error' };
+  }
+};
+
 // 3. Gabung Papan Peringkat Bulanan (Leaderboard/Liga)
 export const fetchMonthlyLeaderboard = async () => {
   if (!isSupabaseConfigured()) {
