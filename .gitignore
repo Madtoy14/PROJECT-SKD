@@ -73,6 +73,6 @@ temp/
 Soal/
 
 # Sensitive debug artifacts
-public/inject.html
+# public/inject.html  # tracked as safe 404 placeholder (no secrets)
 audit_check_token*.py
 
