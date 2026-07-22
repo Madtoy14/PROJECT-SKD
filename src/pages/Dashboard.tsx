@@ -147,9 +147,8 @@ export default function Dashboard() {
       })
       .finally(() => setLoading(false));
   }, []);
-  // Streak State
-  const [totalStreak, setTotalStreak] = useState(29); // Simulate: 29 days completed. Today is day 30!
-  const [startDayIndex] = useState(2); // Simulate: Streak started on Wednesday ('Rab')
+  // Streak State (real calendar, not simulated)
+  const [totalStreak, setTotalStreak] = useState(0);
   const [isStreakClaimed, setIsStreakClaimed] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   // Modal State for Game Modes
@@ -266,25 +265,52 @@ export default function Dashboard() {
       }, 4200);
     });
   };
-  // Calculate dynamic 7-day cycle
-  const cycleDayIndex = totalStreak % 7;
-  const isTodayMegaReward = (totalStreak + 1) % 30 === 0;
-  const weeklyStreakData = Array.from({ length: 7 }).map((_, idx) => {
-    const dayName = DAY_NAMES[(startDayIndex + idx) % 7];
-    let status = 'future';
-    if (isStreakClaimed) {
-      if (idx <= cycleDayIndex) status = 'done';
-    } else {
-      if (idx < cycleDayIndex) status = 'done';
-      else if (idx === cycleDayIndex) status = 'current';
-    }
-    return {
-      day: dayName,
-      status,
-      isDay7: idx === 6,
-      isMega: idx === cycleDayIndex && isTodayMegaReward
-    };
-  });
+  // Minggu kalender real (Sen–Min), timezone Asia/Jakarta
+  // DAY_NAMES index: 0=Sen ... 6=Min
+  // JS getDay(): 0=Min, 1=Sen, ..., 6=Sab
+  const isTodayMegaReward = totalStreak > 0 && totalStreak % 30 === 0;
+  const weeklyStreakData = (() => {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Jakarta',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'short',
+    }).formatToParts(new Date());
+    const y = Number(parts.find(p => p.type === 'year')?.value);
+    const m = Number(parts.find(p => p.type === 'month')?.value);
+    const d = Number(parts.find(p => p.type === 'day')?.value);
+    // weekday short en: Mon,Tue,... — map ke index Sen=0
+    const wd = parts.find(p => p.type === 'weekday')?.value ?? 'Mon';
+    const wdMap: Record<string, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+    const todayIdx = wdMap[wd] ?? 0; // 0=Sen ... 6=Min
+
+    // UTC date at Jakarta Y-M-D for day math
+    const todayUtc = Date.UTC(y, m - 1, d);
+
+    return Array.from({ length: 7 }).map((_, idx) => {
+      const dayName = DAY_NAMES[idx];
+      const cellUtc = todayUtc + (idx - todayIdx) * 86400000;
+      const daysFromToday = Math.round((cellUtc - todayUtc) / 86400000);
+
+      let status: 'done' | 'current' | 'future' = 'future';
+      if (daysFromToday < 0) {
+        // hari sebelum hari ini: done jika termasuk rantai streak mundur
+        status = -daysFromToday <= totalStreak ? 'done' : 'future';
+      } else if (daysFromToday === 0) {
+        status = isStreakClaimed ? 'done' : 'current';
+      } else {
+        status = 'future';
+      }
+
+      return {
+        day: dayName,
+        status,
+        isDay7: idx === 6,
+        isMega: daysFromToday === 0 && isTodayMegaReward,
+      };
+    });
+  })();
   // Timer Logic
   useEffect(() => {
     if ((energy || 0) >= 25) return;
@@ -957,8 +983,12 @@ export default function Dashboard() {
                   </motion.span>
                 </h3>
                 <p className="text-[13px] text-fg-muted font-medium mt-0.5">
-                  {totalStreak + (isStreakClaimed ? 1 : 0)}/30 hari menuju{' '}
-                  {isTodayMegaReward ? '🏆 MEGA REWARD!' : `Mega Reward (+${30 - (totalStreak + (isStreakClaimed ? 1 : 0))} hari lagi)`}
+                  {(() => {
+                    const displayStreak = totalStreak; // totalStreak sudah include hari ini jika claimed
+                    const toMega = displayStreak === 0 ? 30 : (30 - (displayStreak % 30 || 30));
+                    if (isTodayMegaReward) return `${displayStreak} hari · 🏆 MEGA REWARD tercapai!`;
+                    return `${displayStreak} hari beruntun · Mega tiap 30 hari (+${toMega} hari lagi)`;
+                  })()}
                 </p>
               </div>
               <div className="flex items-center gap-2 text-right pb-1 flex-wrap justify-end">
