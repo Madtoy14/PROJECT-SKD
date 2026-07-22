@@ -10,22 +10,23 @@ export default function WrongBook() {
   const navigate = useNavigate();
   const [_profile, setProfile] = useState<UserProfile | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
-  const [stats, setStats] = useState({ twk: 0, tiu: 0, tkp: 0, total: 0 });
+  const [stats, setStats] = useState({ twk: 0, tiu: 0, tkp: 0, total: 0, unresolved: 0 });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'twk' | 'tiu' | 'tkp'>('all');
 
   useEffect(() => {
     async function loadData() {
+      setLoading(true);
       try {
         const p = await fetchProfile();
         setProfile(p);
-        
+
         if (p?.id && isSupabaseConfigured()) {
-          const fetchedStats = await getWrongBooksStats(p.id);
+          const [fetchedStats, fetchedQuestions] = await Promise.all([
+            getWrongBooksStats(p.id),
+            getWrongQuestions(p.id, activeTab === 'all' ? undefined : activeTab),
+          ]);
           setStats(fetchedStats);
-          
-          const filter = activeTab === 'all' ? undefined : activeTab;
-          const fetchedQuestions = await getWrongQuestions(p.id, filter);
           setQuestions(fetchedQuestions);
         }
       } catch (err) {
@@ -130,12 +131,18 @@ export default function WrongBook() {
           </div>
         ) : questions.length === 0 ? (
           <div className="bg-surface border-2 border-dashed border-border rounded-3xl p-12 flex flex-col items-center justify-center text-center">
-            <div className="w-20 h-20 bg-success/10 text-success rounded-full flex items-center justify-center mb-4">
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${stats.unresolved > 0 ? 'bg-amber-500/10 text-amber-600' : 'bg-success/10 text-success'}`}>
               <Sparkles size={40} />
             </div>
-            <h3 className="text-2xl font-bold text-fg mb-2">Luar Biasa!</h3>
+            <h3 className="text-2xl font-bold text-fg mb-2">
+              {stats.unresolved > 0 ? 'Soal belum bisa dimuat' : 'Luar Biasa!'}
+            </h3>
             <p className="text-fg-muted max-w-md">
-              Kamu tidak memiliki soal yang salah atau belum dikuasai di kategori ini. Teruskan performa hebatmu!
+              {stats.unresolved > 0
+                ? `${stats.unresolved} catatan di profil tidak ketemu di bank soal (soal_skd/tryout). Mungkin id lama/orphan.`
+                : stats.total > 0 && activeTab !== 'all'
+                  ? 'Tidak ada soal di kategori ini. Coba tab Semua Kategori.'
+                  : 'Kamu tidak memiliki soal yang salah atau belum dikuasai di kategori ini. Teruskan performa hebatmu!'}
             </p>
           </div>
         ) : (

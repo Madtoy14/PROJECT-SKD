@@ -1,5 +1,6 @@
--- SH-01: spin_wheel RPC — server-side prize random
--- Free 1x/hari (Asia/Jakarta YYYY-MM-DD); putaran berikutnya 100 koin
+-- Apply di Supabase SQL Editor (SETELAH backup ringan).
+-- Fix: spin_wheel search_path + last_spin_date YYYY-MM-DD Asia/Jakarta + paid spin.
+
 create or replace function public.spin_wheel()
 returns jsonb
 language plpgsql
@@ -40,7 +41,6 @@ begin
     return jsonb_build_object('error', 'profile_not_found');
   end if;
 
-  -- Normalisasi last_spin_date → YYYY-MM-DD (dukung legacy Date.toDateString)
   if p.last_spin_date is null or btrim(p.last_spin_date) = '' then
     last_str := null;
   elsif p.last_spin_date ~ '^\d{4}-\d{2}-\d{2}' then
@@ -97,7 +97,6 @@ begin
     where id = uid;
   end if;
 
-  -- Free spin: set tanggal; paid: pastikan format kanonis tetap YYYY-MM-DD
   update public.profiles set last_spin_date = today_str where id = uid;
 
   select coins, energy, inventory into p from public.profiles where id = uid;
@@ -118,3 +117,8 @@ end; $$;
 
 revoke all on function public.spin_wheel() from public;
 grant execute on function public.spin_wheel() to authenticated;
+
+select p.proname, pg_get_function_identity_arguments(p.oid) as args
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public' and p.proname = 'spin_wheel';

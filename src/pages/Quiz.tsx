@@ -58,7 +58,7 @@ const cleanMathText = (text: string): string => {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Trophy, Skull, Users, ChevronUp, ChevronDown, Loader2, Menu, Zap, Eye, Heart, HeartCrack, Clock, Battery, Scale, Lightbulb, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchQuestionsFromSupabase, fetchProfile, consumeEnergy, consumePowerup, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery } from '../lib/supabase';
+import { fetchQuestionsFromSupabase, fetchProfile, consumeEnergy, consumePowerup, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery, resolveWrongQuestionsForQuiz } from '../lib/supabase';
 import { useQuizSession } from '../context/QuizSessionContext';
 import MathCard from '../components/MathCard';
 import { Button } from '../components/ui/Button';
@@ -442,7 +442,7 @@ export default function Quiz() {
     };
 
     if (gameMode === 'catatan_salah') {
-      // Fetch catatan_salah langsung dari Supabase agar selalu up-to-date
+      // Resolve id dari profiles.catatan_salah → soal_skd / soal_tryout (bukan bank lokal)
       const loadCatatanSalah = async () => {
         try {
           let catatanData: Question[] = [];
@@ -455,26 +455,19 @@ export default function Quiz() {
                 .eq('id', user.id)
                 .maybeSingle();
               if (data?.catatan_salah) {
-                const raw: Array<{id: string; type: string}> = typeof data.catatan_salah === 'string'
+                const raw = typeof data.catatan_salah === 'string'
                   ? JSON.parse(data.catatan_salah)
                   : data.catatan_salah;
                 if (Array.isArray(raw)) {
-                  const { ALL_QUESTIONS } = await import('../data/questions/index');
-                  catatanData = raw
-                    .map((ref: {id: string; type: string}) => ALL_QUESTIONS.find(q => q.id === ref.id))
-                    .filter((q): q is Question => !!q);
+                  catatanData = (await resolveWrongQuestionsForQuiz(raw)) as Question[];
                 }
               }
             }
           } else {
-            // Fallback ke profil lokal jika Supabase tidak terkonfigurasi
             const p = await fetchProfile();
-            const refs = p?.catatan_salah as Array<{id: string; type: string}> || [];
+            const refs = p?.catatan_salah || [];
             if (refs.length > 0) {
-              const { ALL_QUESTIONS } = await import('../data/questions/index');
-              catatanData = refs
-                .map((ref) => ALL_QUESTIONS.find(q => q.id === ref.id))
-                .filter((q): q is Question => !!q);
+              catatanData = (await resolveWrongQuestionsForQuiz(refs as any)) as Question[];
             }
           }
 

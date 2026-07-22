@@ -611,49 +611,185 @@ export async function saveWrongQuestion(userId: string, questionId: string, quiz
   }
 }
 
+/** Map baris soal_skd / soal_tryout → shape runtime Question (selaras fetchQuestionsFromSupabase). */
+function mapSoalRowToQuestion(q: any): {
+  id: string;
+  category: string;
+  text: string;
+  options: Array<{ id: string; text: string; score: number }>;
+  correct: string;
+  explanation: string;
+} {
+  let parsedOptions: any[] = [];
+  try {
+    const rawOpsi = typeof q.opsi === 'string' ? JSON.parse(q.opsi) : q.opsi;
+    if (Array.isArray(rawOpsi)) {
+      if (typeof rawOpsi[0] === 'string') {
+        const labels = ['A', 'B', 'C', 'D', 'E'];
+        parsedOptions = rawOpsi.map((text: string, i: number) => ({
+          id: labels[i] || String(i),
+          text,
+          score: 0,
+        }));
+      } else {
+        parsedOptions = rawOpsi;
+      }
+    } else if (rawOpsi && typeof rawOpsi === 'object') {
+      parsedOptions = Object.keys(rawOpsi).map((key) => {
+        const val = rawOpsi[key];
+        if (typeof val === 'object' && val !== null) return { id: key, ...val };
+        return { id: key, text: String(val), score: 0 };
+      }).sort((a, b) => String(a.id).localeCompare(String(b.id)));
+    }
+  } catch {
+    parsedOptions = [];
+  }
+
+  const tipe = (q.tipe || q.category || '').toUpperCase();
+  const kunci = q.kunci || q.correct || '';
+  const options = parsedOptions.map((o: any) => {
+    let score = typeof o.score === 'number' ? o.score : (parseInt(o.score, 10) || 0);
+    if (tipe === 'TKP') {
+      if (score > 5) score = Math.round(score / 10);
+      score = Math.max(1, Math.min(5, score || 1));
+    } else {
+      score = o.id === kunci ? 5 : 0;
+    }
+    return { id: String(o.id), text: String(o.text ?? ''), score };
+  });
+
+  return {
+    id: String(q.id),
+    category: tipe || 'TWK',
+    text: q.pertanyaan || q.text || '',
+    options,
+    correct: String(kunci),
+    explanation: q.pembahasan || q.explanation || 'Tidak ada pembahasan.',
+  };
+}
+
+/** Resolve id catatan_salah dari soal_skd dulu, sisa coba soal_tryout. */
+async function fetchSoalByIds(ids: string[]): Promise<Map<string, ReturnType<typeof mapSoalRowToQuestion>>> {
+  const out = new Map<string, ReturnType<typeof mapSoalRowToQuestion>>();
+  if (!supabase || ids.length === 0) return out;
+
+  // Supabase .in() aman per batch
+  const chunk = <T,>(arr: T[], size: number) => {
+    const res: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) res.push(arr.slice(i, i + size));
+    return res;
+  };
+
+  for (const part of chunk(ids, 100)) {
+    const { data, error } = await supabase
+      .from('soal_skd')
+      .select('id, tipe, pertanyaan, opsi, kunci, pembahasan')
+      .in('id', part);
+    if (error) {
+      console.error('fetchSoalByIds soal_skd:', error);
+    } else {
+      for (const row of data || []) {
+        out.set(String(row.id), mapSoalRowToQuestion(row));
+      }
+    }
+  }
+
+  const missing = ids.filter((id) => !out.has(id));
+  for (const part of chunk(missing, 100)) {
+    if (part.length === 0) break;
+    const { data, error } = await supabase
+      .from('soal_tryout')
+      .select('id, tipe, pertanyaan, opsi, kunci, pembahasan')
+      .in('id', part);
+    if (error) {
+      console.error('fetchSoalByIds soal_tryout:', error);
+      continue;
+    }
+    for (const row of data || []) {
+      out.set(String(row.id), mapSoalRowToQuestion(row));
+    }
+  }
+
+  return out;
+}
+
 export async function getWrongQuestions(userId: string, filter?: string) {
   if (!supabase) return [];
-  
+
   const profile = await fetchProfile(userId);
   if (!profile || !profile.catatan_salah || profile.catatan_salah.length === 0) return [];
-  
-  // Filter questions that haven't reached mastery of 3
+
   const activeWrongQs = profile.catatan_salah.map((item: any) => {
     if (typeof item === 'string') return { id: item, type: '', mastery: 0 };
-    return { id: item.id, type: item.type, mastery: item.mastery || 0 };
-  }).filter((item: any) => item.mastery < 3);
+    return { id: String(item.id), type: item.type || '', mastery: item.mastery || 0 };
+  }).filter((item: any) => item.id && item.mastery < 3);
 
   let filteredQs = activeWrongQs;
   if (filter) {
-    filteredQs = activeWrongQs.filter((item: any) => item.type?.toUpperCase() === filter.toUpperCase());
+    filteredQs = activeWrongQs.filter(
+      (item: any) => item.type?.toUpperCase() === filter.toUpperCase()
+    );
   }
-
   if (filteredQs.length === 0) return [];
 
   const questionIds = filteredQs.map((item: any) => item.id);
-  
-  // Fetch question details
-  const { data: questions, error } = await supabase
-    .from('questions')
-    .select('*')
-    .in('id', questionIds);
+  const byId = await fetchSoalByIds(questionIds);
 
-  if (error || !questions) {
-    console.error("Error fetching wrong questions:", error);
-    return [];
-  }
+  // Hanya yang ketemu di DB; orphan id di-skip (bukan empty state palsu di caller)
+  return filteredQs
+    .map((meta: any) => {
+      const q = byId.get(meta.id);
+      if (!q) return null;
+      const category = (meta.type || q.category || '').toUpperCase() || q.category;
+      return {
+        id: `wb_${q.id}`,
+        mastery_count: meta.mastery || 0,
+        quiz_type: category,
+        question_id: q.id,
+        category,
+        question: q.text,
+        options: q.options,
+        correct: q.correct,
+        explanation: q.explanation,
+        // legacy nested shape (jika ada consumer lama)
+        questions: q,
+      };
+    })
+    .filter(Boolean) as any[];
+}
 
-  // Format to match what WrongBook expects
-  return questions.map(q => {
-    const meta = filteredQs.find((item: any) => item.id === q.id);
-    return {
-      id: `wb_${q.id}`,
-      mastery_count: meta?.mastery || 0,
-      quiz_type: q.category,
-      question_id: q.id,
-      questions: q
-    };
-  });
+/** Resolve daftar Question runtime untuk mode quiz catatan_salah. */
+export async function resolveWrongQuestionsForQuiz(
+  refs: Array<{ id: string; type?: string; mastery?: number } | string>
+): Promise<Array<{
+  id: string;
+  category: string;
+  text: string;
+  options: Array<{ id: string; text: string; score: number }>;
+  correct: string;
+  explanation: string;
+  xp_reward: number;
+  coin_reward: number;
+}>> {
+  const active = refs
+    .map((item) => {
+      if (typeof item === 'string') return { id: item, mastery: 0 };
+      return { id: String(item.id), mastery: item.mastery || 0 };
+    })
+    .filter((x) => x.id && x.mastery < 3);
+  if (active.length === 0) return [];
+  const byId = await fetchSoalByIds(active.map((x) => x.id));
+  return active
+    .map((m) => {
+      const q = byId.get(m.id);
+      if (!q) return null;
+      return {
+        ...q,
+        xp_reward: 10,
+        coin_reward: 5,
+      };
+    })
+    .filter(Boolean) as any[];
 }
 
 export async function incrementMastery(userId: string, questionId: string) {
@@ -682,22 +818,28 @@ export async function incrementMastery(userId: string, questionId: string) {
 }
 
 export async function getWrongBooksStats(userId: string) {
-  if (!supabase) return { twk: 0, tiu: 0, tkp: 0, total: 0 };
-  
+  if (!supabase) return { twk: 0, tiu: 0, tkp: 0, total: 0, unresolved: 0 };
+
+  // Stats selaras list: hanya id yang resolve di soal_skd/tryout + mastery < 3
+  const list = await getWrongQuestions(userId);
+  const stats = { twk: 0, tiu: 0, tkp: 0, total: 0, unresolved: 0 };
+  list.forEach((q: any) => {
+    stats.total++;
+    const type = (q.category || q.quiz_type || '').toUpperCase();
+    if (type === 'TWK') stats.twk++;
+    else if (type === 'TIU') stats.tiu++;
+    else if (type === 'TKP') stats.tkp++;
+  });
+
+  // Hitung orphan (ada di profil, tidak di bank soal) untuk debug UI
   const profile = await fetchProfile(userId);
-  const stats = { twk: 0, tiu: 0, tkp: 0, total: 0 };
-  
-  if (profile && profile.catatan_salah) {
-    profile.catatan_salah.forEach((item: any) => {
+  if (profile?.catatan_salah) {
+    const active = profile.catatan_salah.filter((item: any) => {
       const mastery = typeof item === 'string' ? 0 : (item.mastery || 0);
-      if (mastery < 3) {
-        stats.total++;
-        const type = typeof item === 'string' ? '' : (item.type || '').toUpperCase();
-        if (type === 'TWK') stats.twk++;
-        else if (type === 'TIU') stats.tiu++;
-        else if (type === 'TKP') stats.tkp++;
-      }
-    });
+      return mastery < 3;
+    }).length;
+    stats.unresolved = Math.max(0, active - stats.total);
   }
+
   return stats;
 }

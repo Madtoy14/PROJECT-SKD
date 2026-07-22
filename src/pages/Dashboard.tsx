@@ -117,7 +117,7 @@ export default function Dashboard() {
         setProfile(p);
         setGlobalCoins(p.coins);
         setEquippedAvatarId(p.selected_avatar || 'stmkg');
-        setLastSpinDate(p.last_spin_date || null);
+        setLastSpinDate(normalizeSpinDate(p.last_spin_date) || p.last_spin_date || null);
 
         // Streak display dari server; klaim hanya lewat tombol + RPC daily_claim
         // last_claim_date format kanonis: YYYY-MM-DD (Asia/Jakarta di server)
@@ -167,79 +167,99 @@ export default function Dashboard() {
   const [spinAngle, setSpinAngle] = useState(0);
   const [, setSpinResult] = useState<string | null>(null);
   const [lastSpinDate, setLastSpinDate] = useState<string | null>(null);
+  // Tanggal kanonis spin: Asia/Jakarta YYYY-MM-DD (selaras RPC)
+  const jakartaYmd = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+  const normalizeSpinDate = (v?: string | null) => {
+    if (!v) return null;
+    if (/^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0, 10);
+    // legacy Date.toDateString() → coba parse
+    const d = new Date(v);
+    if (!Number.isNaN(d.getTime())) {
+      return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+    }
+    return null;
+  };
   const SPIN_PRIZES = [
-    { id: 'item_waktu_beku', title: 'Waktu Beku', count: 1, color: '#6366F1', weight: 15 },
-    { id: 'item_skor_ganda', title: 'Skor Ganda', count: 1, color: '#F59E0B', weight: 15 },
-    { id: 'item_terawangan', title: 'Teropong Sakti', count: 1, color: '#8B5CF6', weight: 15 },
-    { id: 'coins_100', title: '100 Koin', count: 100, isCoins: true, color: '#EC4899', weight: 20 },
-    { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', count: 1, color: '#10B981', weight: 10 },
-    { id: 'energy_5', title: '5 Energi', count: 5, isEnergy: true, color: '#14B8A6', weight: 12 },
-    { id: 'coins_500', title: '500 Koin', count: 500, isCoins: true, color: '#EF4444', weight: 3 },
+    { id: 'item_waktu_beku', title: 'Waktu Beku', short: 'Beku', count: 1, color: '#6366F1', weight: 15 },
+    { id: 'item_skor_ganda', title: 'Skor Ganda', short: 'x2', count: 1, color: '#F59E0B', weight: 15 },
+    { id: 'item_terawangan', title: 'Teropong Sakti', short: 'Mata', count: 1, color: '#8B5CF6', weight: 15 },
+    { id: 'coins_100', title: '100 Koin', short: '100', count: 100, isCoins: true, color: '#EC4899', weight: 20 },
+    { id: 'item_kesempatan_kedua', title: 'Kesempatan Kedua', short: '2nd', count: 1, color: '#10B981', weight: 10 },
+    { id: 'energy_5', title: '5 Energi', short: '+5⚡', count: 5, isEnergy: true, color: '#14B8A6', weight: 12 },
+    { id: 'coins_500', title: '500 Koin', short: '500', count: 500, isCoins: true, color: '#EF4444', weight: 3 },
   ];
+  const hasSpunToday = normalizeSpinDate(lastSpinDate) === jakartaYmd();
   const startSpin = () => {
     if (isSpinning || !profile) return;
-    
-    const todayStr = new Date().toDateString();
-    const hasSpunToday = lastSpinDate === todayStr;
-    
-    if (hasSpunToday) {
-      if (globalCoins < 100) {
-        setToastMessage("Koin Anda tidak cukup untuk membeli spin tambahan (100 Koin)!");
-        setTimeout(() => setToastMessage(''), 3000);
-        return;
-      }
+    if (!isSupabaseConfigured() || !supabase) {
+      setToastMessage('Koneksi server tidak tersedia.');
+      setTimeout(() => setToastMessage(''), 3000);
+      return;
     }
-    
+
+    if (hasSpunToday && globalCoins < 100) {
+      setToastMessage('Koin tidak cukup (butuh 100 koin).');
+      setTimeout(() => setToastMessage(''), 3000);
+      return;
+    }
+
     setIsSpinning(true);
     setSpinResult(null);
 
     // SH-01: server-side random via RPC — identitas dari auth.uid()
-    supabase!.rpc('spin_wheel').then(({ data, error }) => {
-      let prizeIdx = 0;
-      let selectedPrize = SPIN_PRIZES[0];
-      let rpcSuccess = false;
+    void Promise.resolve(supabase.rpc('spin_wheel')).then(({ data, error }) => {
+      const failReason =
+        (data && typeof data === 'object' && (data as { error?: string }).error) ||
+        error?.message ||
+        null;
 
-      if (error || !data || data.error) {
-        // Fallback client-side
-        const r = Math.random() * 100;
-        let cumulative = 0;
-        for (let i = 0; i < SPIN_PRIZES.length; i++) {
-          cumulative += SPIN_PRIZES[i].weight;
-          if (r <= cumulative) { prizeIdx = i; break; }
-        }
-        selectedPrize = SPIN_PRIZES[prizeIdx];
-      } else {
-        rpcSuccess = true;
-        const prizeIds = SPIN_PRIZES.map(p => p.id);
-        const idx = prizeIds.indexOf(data.prize_id);
-        prizeIdx = idx < 0 ? 0 : idx;
-        selectedPrize = SPIN_PRIZES[prizeIdx];
+      if (failReason || !data || (data as { error?: string }).error) {
+        const reason = String((data as { error?: string })?.error || failReason || 'error');
+        const msgMap: Record<string, string> = {
+          insufficient_coins: 'Koin tidak cukup (butuh 100 koin).',
+          not_authenticated: 'Login dulu untuk spin.',
+          profile_not_found: 'Profil tidak ditemukan.',
+        };
+        setIsSpinning(false);
+        setSpinResult(null);
+        setToastMessage(msgMap[reason] || `Gagal spin: ${reason}`);
+        setTimeout(() => setToastMessage(''), 4000);
+        return;
       }
 
-      // Hitung angle for animation
+      const prizeIds = SPIN_PRIZES.map(p => p.id);
+      const idx = prizeIds.indexOf((data as { prize_id?: string }).prize_id || '');
+      const prizeIdx = idx < 0 ? 0 : idx;
+      const selectedPrize = SPIN_PRIZES[prizeIdx];
+
+      // Animasi ringan: 2 putaran, ~2.5s (bukan 5 putaran / 4s)
       const sliceSize = 360 / SPIN_PRIZES.length;
       const targetAngle = 360 - (prizeIdx * sliceSize) - (sliceSize / 2);
-      setSpinAngle(targetAngle + (5 * 360));
+      setSpinAngle(prev => {
+        // lanjut dari sudut saat ini agar tidak loncat mundur
+        const base = Math.ceil(prev / 360) * 360;
+        return base + targetAngle + (2 * 360);
+      });
 
       setTimeout(() => {
         setIsSpinning(false);
-        if (!rpcSuccess) {
-          // Fail-closed: tanpa RPC sukses, jangan mutasi ekonomi client
-          setSpinResult(null);
-          setToastMessage('Gagal spin. Coba lagi.');
-          setTimeout(() => setToastMessage(''), 4000);
-        } else {
-          // RPC berhasil — server sudah update DB
-          if (!hasSpunToday) setLastSpinDate(todayStr);
-          setGlobalCoins(data.coins_new);
-          setEnergy(data.energy_new || 0);
-          
-          // Fallback title just in case
-          setSpinResult(data.prize_title || selectedPrize.title);
-          setToastMessage(`🎉 Selamat! Anda memenangkan: ${data.prize_title || selectedPrize.title}!`);
-          setTimeout(() => setToastMessage(''), 4000);
-        }
-      }, 4200);
+        const d = data as {
+          coins_new?: number;
+          energy_new?: number;
+          prize_title?: string;
+          last_spin_date?: string;
+        };
+        setLastSpinDate(d.last_spin_date || jakartaYmd());
+        if (typeof d.coins_new === 'number') setGlobalCoins(d.coins_new);
+        if (typeof d.energy_new === 'number') setEnergy(d.energy_new);
+        setSpinResult(d.prize_title || selectedPrize.title);
+        setToastMessage(`Selamat! Menang: ${d.prize_title || selectedPrize.title}`);
+        setTimeout(() => setToastMessage(''), 4000);
+      }, 2600);
+    }).catch(() => {
+      setIsSpinning(false);
+      setToastMessage('Gagal spin (jaringan). Coba lagi.');
+      setTimeout(() => setToastMessage(''), 4000);
     });
   };
   // Minggu kalender real (Sen–Min), timezone Asia/Jakarta
@@ -608,21 +628,21 @@ export default function Dashboard() {
                 🎡 Roda Keberuntungan
               </h3>
               <p className="text-xs text-fg-muted leading-relaxed">
-                {lastSpinDate === new Date().toDateString() 
-                  ? "Anda sudah menggunakan spin gratis hari ini. Beli putaran ekstra seharga 100 Koin!" 
-                  : "Putar roda untuk mendapatkan Power-up harian gratis Anda!"}
+                {hasSpunToday
+                  ? "Spin gratis hari ini sudah dipakai. Putaran ekstra 100 koin."
+                  : "Putar roda untuk power-up harian gratis!"}
               </p>
               
-              <div className="relative w-72 h-72 md:w-80 md:h-80 mt-2 flex items-center justify-center bg-overlay backdrop-blur-sm rounded-full border-[6px] border-border shadow-inner">
+              <div className="relative w-72 h-72 md:w-80 md:h-80 mt-2 flex items-center justify-center bg-overlay rounded-full border-[6px] border-border shadow-inner">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-20 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[16px] border-t-red-500 drop-shadow-md" />
                 
                 <div className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-surface shadow-sm border-4 border-border z-10 flex items-center justify-center shadow-lg">
                   <div className="w-3 h-3 rounded-full bg-yellow-500 fill-yellow-500 animate-pulse" />
                 </div>
                 <motion.div
-                  className="w-full h-full"
+                  className="w-full h-full will-change-transform"
                   animate={{ rotate: spinAngle }}
-                  transition={isSpinning ? { duration: 4, ease: [0.1, 1, 0.1, 1] } : { duration: 0 }}
+                  transition={isSpinning ? { duration: 2.5, ease: [0.2, 0.8, 0.2, 1] } : { duration: 0 }}
                 >
                   <svg className="w-full h-full" viewBox="0 0 256 256">
                     {(() => {
@@ -640,62 +660,20 @@ export default function Dashboard() {
                         const endAngle = (idx + 1) * sliceSize - 90;
                         const midAngle = idx * sliceSize + (sliceSize / 2) - 90;
                         const textRad = Math.PI / 180;
-                        const tx = 128 + 80 * Math.cos(midAngle * textRad);
-                        const ty = 128 + 80 * Math.sin(midAngle * textRad);
-                        
-                        let displayFirst = "";
-                        let displaySecond = "";
-                        switch (prize.id) {
-                          case 'item_waktu_beku':
-                            displayFirst = "❄️ Waktu";
-                            displaySecond = "Beku";
-                            break;
-                          case 'item_skor_ganda':
-                            displayFirst = "🔥 Skor";
-                            displaySecond = "x2";
-                            break;
-                          case 'item_terawangan':
-                            displayFirst = "👁️ Teropong";
-                            displaySecond = "Sakti";
-                            break;
-                          case 'coins_100':
-                            displayFirst = "🪙 100";
-                            displaySecond = "Koin";
-                            break;
-                          case 'item_kesempatan_kedua':
-                            displayFirst = "🔄 Ksmptn";
-                            displaySecond = "Kedua";
-                            break;
-                          case 'energy_5':
-                            displayFirst = "⚡ 5";
-                            displaySecond = "Energi";
-                            break;
-                          case 'coins_500':
-                            displayFirst = "👑 Jackpot";
-                            displaySecond = "500 Koin";
-                            break;
-                          default:
-                            const cleanTitle = prize.title.split(' (')[0];
-                            displayFirst = cleanTitle.split(' ')[0];
-                            displaySecond = cleanTitle.split(' ').slice(1).join(' ');
-                        }
-                        
+                        const tx = 128 + 78 * Math.cos(midAngle * textRad);
+                        const ty = 128 + 78 * Math.sin(midAngle * textRad);
                         return (
                           <g key={prize.id}>
                             <path d={dVal(startAngle, endAngle)} fill={prize.color} stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
-                            <text 
-                              x={tx} 
-                              y={ty} 
+                            <text
+                              x={tx}
+                              y={ty}
                               transform={`rotate(${midAngle + 90}, ${tx}, ${ty})`}
-                              textAnchor="middle" 
-                              className="fill-white font-black font-space text-[12px] tracking-tighter"
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                              className="fill-white font-black font-space text-[11px]"
                             >
-                              <tspan x={tx} dy="-3">{displayFirst}</tspan>
-                              {displaySecond && (
-                                <tspan x={tx} dy="11" className="fill-yellow-300 font-bold text-[9.5px] tracking-tighter">
-                                  {displaySecond}
-                                </tspan>
-                              )}
+                              {prize.short}
                             </text>
                           </g>
                         );
@@ -712,10 +690,10 @@ export default function Dashboard() {
               >
                 <Coins size={16} />
                 <span>
-                  {isSpinning 
-                    ? "Memutar..." 
-                    : lastSpinDate === new Date().toDateString() 
-                    ? "Beli Putaran (100 Koin)" 
+                  {isSpinning
+                    ? "Memutar..."
+                    : hasSpunToday
+                    ? "Beli Putaran (100 Koin)"
                     : "Putar Sekarang (Gratis)"}
                 </span>
               </button>
