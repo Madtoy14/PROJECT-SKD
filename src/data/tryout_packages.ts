@@ -21,7 +21,7 @@ export interface TryOutPackage {
  * Paket tryout statis (soal_tryout.paket_id).
  * Format: 30 TWK + 35 TIU + 45 TKP = 110, by created_at.
  *
- * Live: hanya paket 1 (QA). Paket 2–6 disembunyikan start (AI/batch jelek).
+ * Live: paket 1–2. Paket 3–6 Segera Hadir (review kualitas).
  * Model A: unlock 0, attempt 1000 koin / run.
  */
 export const AVAILABLE_PACKAGES: TryOutPackage[] = [
@@ -39,12 +39,13 @@ export const AVAILABLE_PACKAGES: TryOutPackage[] = [
   {
     id: 'paket_tryout_2',
     title: 'Paket Soal Tryout 2',
-    description: '110 soal tetap. Sedang direview kualitas soal sebelum dibuka.',
+    description:
+      'Simulasi 110 soal format BKN (30 TWK + 35 TIU + 45 TKP). Soal tetap tiap attempt. Entry 1.000 koin / attempt.',
     totalQuestions: 110,
     unlockCost: 0,
     attemptCost: MODE_COSTS.tryout_coins,
     cost: 0,
-    isDevelopment: true,
+    isDevelopment: false,
   },
   {
     id: 'paket_tryout_3',

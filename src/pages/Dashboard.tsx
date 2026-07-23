@@ -1538,7 +1538,7 @@ export default function Dashboard() {
                     <h4 className="text-sm font-bold text-premium mb-2 flex items-center gap-2"><Trophy size={16} /> Try Out SKD</h4>
                     <p className="text-xs text-fg leading-relaxed mb-4">
                       Simulasi <strong>110 soal</strong> format BKN (30 TWK + 35 TIU + 45 TKP), soal tetap per paket.
-                      Saat ini <strong>Paket 1</strong> dibuka. Biaya: <strong>1.000 koin / attempt</strong> (≈ Rp10.000).
+                      Saat ini <strong>Paket 1 & 2</strong> dibuka. Biaya: <strong>1.000 koin / attempt</strong> (≈ Rp10.000).
                     </p>
                     <button
                       onClick={(e) => { e.preventDefault(); setSelectedMode(null); navigate('/tryout-lobby'); }}

@@ -174,7 +174,7 @@ export default function TryOutLobby() {
         <h1 className="text-3xl font-black text-fg mb-2">Try Out</h1>
         <p className="text-fg-muted">
           Simulasi <strong>110 soal</strong> format BKN (30 TWK + 35 TIU + 45 TKP), soal tetap per paket.
-          Biaya: <strong>1.000 koin / attempt</strong>. Saat ini hanya <strong>Paket 1</strong> yang dibuka; paket lain menunggu review kualitas.
+          Biaya: <strong>1.000 koin / attempt</strong>. Saat ini <strong>Paket 1 & 2</strong> dibuka; paket 3–6 menunggu review kualitas.
         </p>
         {profile && (
           <p className="text-sm text-fg-muted mt-2 flex items-center gap-1.5 justify-center md:justify-start">
@@ -225,7 +225,13 @@ export default function TryOutLobby() {
                         : 'bg-surface-subtle text-fg-muted'
                   }`}>
                     {pkg.isDevelopment ? <Lock size={14} /> : unlocked ? <Unlock size={14} /> : <Lock size={14} />}
-                    {pkg.isDevelopment ? 'Segera Hadir' : !pkg.isDevelopment && pkg.id === 'paket_tryout_1' ? 'Direkomendasikan' : unlocked ? 'Terbuka' : 'Terkunci'}
+                    {pkg.isDevelopment
+                      ? 'Segera Hadir'
+                      : pkg.id === 'paket_tryout_1'
+                        ? 'Direkomendasikan'
+                        : unlocked
+                          ? 'Terbuka'
+                          : 'Terkunci'}
                   </div>
                 </div>
 

@@ -61,6 +61,7 @@ import { Link } from 'react-router-dom';
 import { fetchQuestionsFromSupabase, fetchProfile, consumeEnergy, consumePowerup, supabase, isSupabaseConfigured, saveWrongQuestion, incrementMastery, resolveWrongQuestionsForQuiz } from '../lib/supabase';
 import { useQuizSession } from '../context/QuizSessionContext';
 import MathCard from '../components/MathCard';
+import SafeRichText from '../components/SafeRichText';
 import { Button } from '../components/ui/Button';
 import { ExitConfirmModal } from '../components/modals/ExitConfirmModal';
 import { SubmitConfirmModal } from '../components/modals/SubmitConfirmModal';
@@ -1249,7 +1250,7 @@ const scoreBadge = (optionId: string) => {
                   </div>
                 )}
                 <div className="bg-surface rounded-3xl p-8 md:px-12 md:py-10 border border-border shadow-sm mb-6 mt-2 md:mt-4">
-                  <p className="text-[20px] font-semibold leading-[1.6] text-fg">{cleanedQuestionText}</p>
+                  <div className="text-[20px] font-semibold leading-[1.6] text-fg"><SafeRichText text={cleanedQuestionText} /></div>
                 </div>
                 {/* Bocoran Rumus Hint Box */}
                 {showHint && currentQuestion.explanation && (
@@ -1319,7 +1320,7 @@ const scoreBadge = (optionId: string) => {
                         <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-space font-bold shrink-0 text-base ${markerClass}`}>
                           {opt.id}
                         </div>
-                        <span className="flex-1 leading-[1.6] text-base md:text-lg font-semibold text-fg">{opt.cleanedText}</span>
+                        <span className="flex-1 leading-[1.6] text-base md:text-lg font-semibold text-fg"><SafeRichText text={opt.cleanedText} /></span>
                         {/* TKP score badge revealed after answering (not in tryout) */}
                         {showStatus && isTKP && gameMode !== 'tryout' && (
                           <span className={`ml-auto shrink-0 text-xs font-bold px-2 py-1 rounded-lg
