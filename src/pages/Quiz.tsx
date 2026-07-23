@@ -107,7 +107,7 @@ export default function Quiz() {
   const packageVersion = location.state?.packageVersion || 1;
   
     // --- Quiz Session ---
-  const { activeSession, createSession, updateSession, abandonSession, completeSession, debouncedSave } = useQuizSession();
+  const { activeSession, createSession, updateSession, abandonSession, completeSession, debouncedSave, recoverSession } = useQuizSession();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const answersRef = useRef<Record<number, string>>({});
   
@@ -438,6 +438,40 @@ export default function Quiz() {
         setQuestions(data);
         setLoadingQuestions(false);
         try {
+          // Coba recover session aktif dulu (misal: user refresh mid-quiz)
+          const recovered = await recoverSession();
+          if (recovered && recovered.mode === gameMode) {
+            // Session aktif ditemukan — restore state
+            if (mounted) {
+              setSessionId(recovered.id);
+              setQuestions(recovered.questions);
+              setCurrentQuestionIndex(recovered.currentIndex);
+              setAnswers(recovered.answers as Record<number, string>);
+              answersRef.current = recovered.answers as Record<number, string>;
+              totalScoreRef.current = recovered.score;
+              setTotalScore(recovered.score);
+              setIsEnergyDeducted(true); // sudah bayar di session sebelumnya
+
+              // Restore timer dari started_at
+              if (gameMode === 'tryout') {
+                // Continuous: sisa = total - elapsed
+                const elapsed = Math.floor((Date.now() - new Date(recovered.startedAt).getTime()) / 1000);
+                setTimeLeft(Math.max(0, 100 * 60 - elapsed));
+              } else if (gameMode === 'survival') {
+                // Per-soal: sisa = soal_time - elapsed
+                const soalTime = getSurvivalTime(recovered.currentIndex);
+                const elapsed = Math.floor((Date.now() - new Date(recovered.startedAt).getTime()) / 1000);
+                setTimeLeft(Math.max(0, soalTime - elapsed));
+              } else {
+                // Latihan/PvP: per-soal 45s - elapsed
+                const elapsed = Math.floor((Date.now() - new Date(recovered.startedAt).getTime()) / 1000);
+                setTimeLeft(Math.max(0, 45 - elapsed));
+              }
+            }
+            return;
+          }
+
+          // Tidak ada session aktif — buat baru
           const id = await createSession(gameMode, data, packageId, packageVersion);
           if (mounted) setSessionId(id);
         } catch (err: unknown) {
@@ -641,6 +675,8 @@ export default function Quiz() {
   const handleSelect = (optionId: string) => {
     if (isGameOver) return;
     if (!currentQuestion) return;
+    // Jangan proses jawaban jika session belum dibuat — cegah finish tanpa sessionId
+    if (!sessionId) return;
 
     // Deferred energy: potong saat jawaban PERTAMA (fail-closed).
     // Tryout attempt fee sudah di lobby — jangan charge koin di sini.
@@ -971,7 +1007,9 @@ const scoreBadge = (optionId: string) => {
     return pts;
   };
 */
-  if (profile && (gameMode === 'survival' || gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && profile.energy <= 0) {
+  // Energy gate: hanya SEBELUM sesi dimulai (pre-session).
+  // Setelah session dibuat / energi sudah dipotong, gate ini MATI — jangan unmount quiz mid-session.
+  if (profile && (gameMode === 'survival' || gameMode === 'pvp' || gameMode === 'pvp1v1' || gameMode === 'pvp_bot') && profile.energy <= 0 && !activeSession?.id && !isEnergyDeducted) {
     return (
     <div className="min-h-screen bg-background font-syne pb-24 md:pb-8 flex justify-center text-center">
       {/* Sudden Death Flash Overlay */}

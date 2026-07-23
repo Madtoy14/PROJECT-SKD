@@ -370,12 +370,20 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
       .from('quiz_sessions')
       .select('*')
       .eq('user_id', user.id)
-      .eq('status', 'active')
+      .in('status', ['active', 'interrupted'])
       .order('started_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
     if (error || !data) return null;
+
+    // Jika session interrupted (refresh/tab ditutup), set kembali ke active
+    if (data.status === 'interrupted') {
+      await supabase!
+        .from('quiz_sessions')
+        .update({ status: 'active', last_activity_at: new Date().toISOString() })
+        .eq('id', data.id);
+    }
 
     const session: QuizSession = {
       id: data.id,
