@@ -1,3 +1,6 @@
+-- Apply di Supabase SQL Editor: katalog purchase_item + paket_tryout_1..6 (1000 koin, unlock 1x)
+-- Model B: beli sekali = akses permanen (bukan per attempt)
+
 -- ============================================================
 -- RPC: purchase_item — atomic, harga server-authoritative
 -- Parameter dari client: p_item_id, p_quantity (default 1)

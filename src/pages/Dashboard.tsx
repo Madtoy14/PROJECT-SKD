@@ -14,7 +14,7 @@ const GAME_MODES = [
   { id: 'latihan', title: 'Latihan Harian', desc: 'Asah kemampuanmu setiap hari', cost: 2, costType: 'energy', icon: BrainCircuit, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success/30 hover:border-success hover:shadow-sm', badge: 'Santai' },
   { id: 'survival', title: 'Survival Mode', desc: '1 Kesalahan = Game Over', cost: 3, costType: 'energy', icon: Target, color: 'text-danger', bg: 'bg-danger-subtle', border: 'border-danger/30 hover:border-danger hover:shadow-sm', badge: 'Hardcore' },
   { id: 'pvp', title: 'PvP Battle', desc: 'Main bareng maks 50 player', cost: 3, costType: 'energy', icon: Swords, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-sm', badge: 'Multiplayer' },
-  { id: 'tryout', title: 'Try Out Mode', desc: '110 soal BKN · 1.000 koin / attempt', cost: 1000, costType: 'coin', icon: Trophy, color: 'text-premium', bg: 'bg-premium-subtle', border: 'border-premium/30 hover:border-premium hover:shadow-sm', badge: 'Premium' },
+  { id: 'tryout', title: 'Try Out Mode', desc: '110 soal BKN · beli 1× 1.000 koin', cost: 1000, costType: 'coin', icon: Trophy, color: 'text-premium', bg: 'bg-premium-subtle', border: 'border-premium/30 hover:border-premium hover:shadow-sm', badge: 'Premium' },
   { id: 'catatan_salah', title: 'Buku Catatan Salah', desc: 'Latih ulang soal yang pernah salah', cost: 0, costType: 'energy', icon: BookOpen, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-card', badge: 'Evaluasi' },
 ];
 
@@ -1538,13 +1538,13 @@ export default function Dashboard() {
                     <h4 className="text-sm font-bold text-premium mb-2 flex items-center gap-2"><Trophy size={16} /> Try Out SKD</h4>
                     <p className="text-xs text-fg leading-relaxed mb-4">
                       Simulasi <strong>110 soal</strong> format BKN (30 TWK + 35 TIU + 45 TKP), soal tetap per paket.
-                      Saat ini <strong>Paket 1 & 2</strong> dibuka. Biaya: <strong>1.000 koin / attempt</strong> (≈ Rp10.000).
+                      <strong>Beli 1× (1.000 koin)</strong> → main kapan saja tanpa biaya attempt. Paket 1 & 2 dibuka.
                     </p>
                     <button
                       onClick={(e) => { e.preventDefault(); setSelectedMode(null); navigate('/tryout-lobby'); }}
                       className="w-full bg-premium text-primary-fg hover:bg-coin text-[#0F0E17] font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-skd-premium/20 flex items-center justify-center gap-2"
                     >
-                      <Coins size={18} /> Pilih paket di Lobby · 1.000 koin / attempt
+                      <Coins size={18} /> Pilih paket di Lobby · beli 1×
                     </button>
                   </div>
                 )}

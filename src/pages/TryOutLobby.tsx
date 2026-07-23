@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpenCheck, Lock, Unlock, ChevronRight, Play, History, List, Coins } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { fetchProfile, startTryoutAttempt, supabase, isSupabaseConfigured, type UserProfile } from '../lib/supabase';
+import { fetchProfile, supabase, isSupabaseConfigured, type UserProfile } from '../lib/supabase';
 import { AVAILABLE_PACKAGES } from '../data/tryout_packages';
 import TryOutHistory from './TryOutHistory';
 
@@ -11,10 +11,9 @@ export default function TryOutLobby() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<'lobby' | 'history'>('lobby');
   const [buyingId, setBuyingId] = useState<string | null>(null);
-  const [startingId, setStartingId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  const reloadProfile = () => fetchProfile().then(p => setProfile(p));
+  const reloadProfile = () => fetchProfile().then((p) => setProfile(p));
 
   useEffect(() => {
     reloadProfile();
@@ -30,71 +29,17 @@ export default function TryOutLobby() {
     return !!profile?.purchased_packages?.includes(pkgId);
   };
 
-  /** Model A: unlock permanen ≠ free attempt. Charge entry fee di lobby sebelum masuk quiz. */
-  const handleStart = async (pkgId: string, attemptCost: number) => {
+  /** Model B: sudah beli → main gratis kapan saja (tanpa charge attempt). */
+  const handleStart = (pkgId: string) => {
     if (!profile) return;
-    if (startingId) return;
-
-    // Free attempt (attemptCost 0) — langsung masuk
-    if (attemptCost <= 0) {
-      navigate('/quiz', {
-        state: {
-          mode: 'tryout',
-          packageId: pkgId,
-          coinCost: 0,
-          tryoutPaid: true,
-        },
-      });
-      return;
-    }
-
-    if ((profile.coins ?? 0) < attemptCost) {
-      showToast(`Koin tidak cukup. Butuh ${attemptCost.toLocaleString('id-ID')} koin / attempt.`);
-      return;
-    }
-    if (!isSupabaseConfigured()) {
-      showToast('Koneksi server tidak tersedia.');
-      return;
-    }
-
-    const tier = attemptCost >= 1500 ? 'akbar' : 'standar';
-    setStartingId(pkgId);
-    try {
-      const result = await startTryoutAttempt(pkgId, tier);
-      if (!result.success) {
-        const r = (result.reason || '').toLowerCase();
-        let msg = 'Gagal memotong biaya attempt. Coba lagi.';
-        if (r === 'insufficient_coins') {
-          msg = `Koin tidak cukup (butuh ${result.cost || attemptCost}).`;
-        } else if (r === 'not_authenticated') {
-          msg = 'Login dulu.';
-        } else if (r.includes('could not find') || r.includes('does not exist') || r.includes('pgrst202')) {
-          msg = 'RPC start_tryout_attempt belum ada di server. Apply SQL dulu.';
-        } else if (r.includes('permission') || r.includes('42501')) {
-          msg = 'Tidak punya izin RPC tryout. Cek GRANT authenticated.';
-        } else if (result.reason && result.reason !== 'error' && result.reason !== 'failed') {
-          msg = `Gagal attempt: ${result.reason}`;
-        }
-        showToast(msg);
-        return;
-      }
-      // Sync saldo lokal
-      setProfile((p) => (p ? { ...p, coins: result.coinsAfter } : p));
-      navigate('/quiz', {
-        state: {
-          mode: 'tryout',
-          packageId: pkgId,
-          coinCost: 0, // sudah dibayar di lobby — Quiz jangan charge lagi
-          tryoutPaid: true,
-          tryoutCostPaid: result.cost,
-        },
-      });
-    } catch (err) {
-      console.error(err);
-      showToast('Gagal memulai tryout.');
-    } finally {
-      setStartingId(null);
-    }
+    navigate('/quiz', {
+      state: {
+        mode: 'tryout',
+        packageId: pkgId,
+        coinCost: 0,
+        tryoutPaid: true,
+      },
+    });
   };
 
   const handleUnlock = async (pkgId: string, unlockCost: number, title: string) => {
@@ -114,7 +59,6 @@ export default function TryOutLobby() {
 
     setBuyingId(pkgId);
     try {
-      // Server catalog menentukan harga; client hanya kirim item_id
       const { data, error } = await supabase.rpc('purchase_item', {
         p_item_id: pkgId,
         p_quantity: 1,
@@ -124,10 +68,10 @@ export default function TryOutLobby() {
         return;
       }
       await reloadProfile();
-      showToast(`Berhasil unlock: ${title}`);
+      showToast(`Berhasil beli: ${title}. Silakan mulai kapan saja.`);
     } catch (err) {
       console.error(err);
-      showToast('Terjadi kesalahan saat unlock paket');
+      showToast('Terjadi kesalahan saat membeli paket');
     } finally {
       setBuyingId(null);
     }
@@ -135,7 +79,9 @@ export default function TryOutLobby() {
 
   const handleReview = async (pkgId: string) => {
     try {
-      const { data: { user } } = await supabase!.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase!.auth.getUser();
       if (!user) {
         showToast('Sesi tidak valid. Silakan login kembali.');
         return;
@@ -154,7 +100,7 @@ export default function TryOutLobby() {
       if (data?.id) {
         navigate(`/review/${data.id}`);
       } else {
-        showToast('Anda belum pernah menyelesaikan Try Out ini.');
+        showToast('Anda belum pernah menyelesaikan Try Out paket ini.');
       }
     } catch (err) {
       console.error(err);
@@ -174,12 +120,14 @@ export default function TryOutLobby() {
         <h1 className="text-3xl font-black text-fg mb-2">Try Out</h1>
         <p className="text-fg-muted">
           Simulasi <strong>110 soal</strong> format BKN (30 TWK + 35 TIU + 45 TKP), soal tetap per paket.
-          Biaya: <strong>1.000 koin / attempt</strong>. Saat ini <strong>Paket 1 & 2</strong> dibuka; paket 3–6 menunggu review kualitas.
+          <strong> Beli 1×</strong> → akses permanen, <strong>tanpa biaya attempt</strong> lagi.
+          Saat ini <strong>Paket 1 & 2</strong> dibuka; 3–6 menunggu review.
         </p>
         {profile && (
           <p className="text-sm text-fg-muted mt-2 flex items-center gap-1.5 justify-center md:justify-start">
             <Coins size={14} className="text-coin" />
-            Saldo: <strong className="text-fg">{(profile.coins ?? 0).toLocaleString('id-ID')} koin</strong>
+            Saldo:{' '}
+            <strong className="text-fg">{(profile.coins ?? 0).toLocaleString('id-ID')} koin</strong>
           </p>
         )}
       </header>
@@ -210,27 +158,41 @@ export default function TryOutLobby() {
               <div
                 key={pkg.id}
                 className={`bg-surface border border-border rounded-2xl p-6 shadow-sm flex flex-col transition-all ${
-                  pkg.isDevelopment ? 'opacity-80 grayscale-[20%]' : 'hover:shadow-md hover:-translate-y-1'
+                  pkg.isDevelopment
+                    ? 'opacity-80 grayscale-[20%]'
+                    : 'hover:shadow-md hover:-translate-y-1'
                 }`}
               >
                 <div className="flex justify-between items-start mb-4">
-                  <div className={`p-3 rounded-xl ${unlocked && !pkg.isDevelopment ? 'bg-primary/10 text-primary' : 'bg-surface-subtle text-fg-muted'}`}>
+                  <div
+                    className={`p-3 rounded-xl ${unlocked && !pkg.isDevelopment ? 'bg-primary/10 text-primary' : 'bg-surface-subtle text-fg-muted'}`}
+                  >
                     <BookOpenCheck size={24} />
                   </div>
-                  <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${
-                    pkg.isDevelopment
-                      ? 'bg-surface-subtle text-fg-muted'
-                      : unlocked
-                        ? 'bg-emerald-50 text-success'
-                        : 'bg-surface-subtle text-fg-muted'
-                  }`}>
-                    {pkg.isDevelopment ? <Lock size={14} /> : unlocked ? <Unlock size={14} /> : <Lock size={14} />}
+                  <div
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${
+                      pkg.isDevelopment
+                        ? 'bg-surface-subtle text-fg-muted'
+                        : unlocked
+                          ? 'bg-emerald-50 text-success'
+                          : 'bg-surface-subtle text-fg-muted'
+                    }`}
+                  >
+                    {pkg.isDevelopment ? (
+                      <Lock size={14} />
+                    ) : unlocked ? (
+                      <Unlock size={14} />
+                    ) : (
+                      <Lock size={14} />
+                    )}
                     {pkg.isDevelopment
                       ? 'Segera Hadir'
                       : pkg.id === 'paket_tryout_1'
-                        ? 'Direkomendasikan'
+                        ? unlocked
+                          ? 'Dimiliki'
+                          : 'Direkomendasikan'
                         : unlocked
-                          ? 'Terbuka'
+                          ? 'Dimiliki'
                           : 'Terkunci'}
                   </div>
                 </div>
@@ -243,15 +205,15 @@ export default function TryOutLobby() {
                     <span>{pkg.totalQuestions} Soal</span>
                     <span>30 TWK · 35 TIU · 45 TKP</span>
                   </div>
-                  {pkg.attemptCost > 0 && !pkg.isDevelopment && (
+                  {pkg.unlockCost > 0 && !pkg.isDevelopment && (
                     <div className="flex justify-between">
-                      <span>Entry / attempt</span>
-                      <span className="text-fg">{pkg.attemptCost.toLocaleString('id-ID')} koin</span>
+                      <span>Harga beli (1×)</span>
+                      <span className="text-fg">{pkg.unlockCost.toLocaleString('id-ID')} koin</span>
                     </div>
                   )}
-                  {!pkg.isDevelopment && (
+                  {unlocked && !pkg.isDevelopment && (
                     <p className="text-[10px] font-medium text-success pt-1">
-                      Soal tetap · tiap mulai bayar attempt
+                      ✓ Sudah dibeli · attempt gratis
                     </p>
                   )}
                 </div>
@@ -265,15 +227,10 @@ export default function TryOutLobby() {
                     <Button
                       variant="primary"
                       className="w-full justify-center"
-                      disabled={startingId === pkg.id}
-                      onClick={() => handleStart(pkg.id, pkg.attemptCost)}
+                      onClick={() => handleStart(pkg.id)}
                     >
                       <Play size={16} className="mr-2" />
-                      {startingId === pkg.id
-                        ? 'Memproses...'
-                        : pkg.attemptCost > 0
-                          ? `Mulai attempt · ${pkg.attemptCost.toLocaleString('id-ID')} koin`
-                          : 'Mulai Sekarang'}
+                      Mulai Try Out
                     </Button>
                     <Button
                       variant="outline"
@@ -294,15 +251,7 @@ export default function TryOutLobby() {
                     >
                       {buyingId === pkg.id
                         ? 'Memproses...'
-                        : `Unlock permanen · ${pkg.unlockCost.toLocaleString('id-ID')} koin`}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-between"
-                      onClick={() => navigate('/toko')}
-                    >
-                      <span>Atau beli di Toko</span>
-                      <Lock size={16} className="text-fg-muted" />
+                        : `Beli · ${pkg.unlockCost.toLocaleString('id-ID')} koin`}
                     </Button>
                   </div>
                 )}
