@@ -74,6 +74,14 @@ function Navigation() {
         const cacheKeys = await caches.keys();
         await Promise.all(cacheKeys.map(key => caches.delete(key)));
       }
+      try {
+        const keys: string[] = [];
+        for (let i = 0; i < sessionStorage.length; i++) {
+          const k = sessionStorage.key(i);
+          if (k?.startsWith('onboarding_')) keys.push(k);
+        }
+        keys.forEach((k) => sessionStorage.removeItem(k));
+      } catch { /* ignore */ }
       if (supabase) await supabase.auth.signOut();
       window.location.href = '/auth';
     } catch { window.location.href = '/auth'; }
@@ -235,6 +243,23 @@ interface AuthState {
   needsOnboarding: boolean;
 }
 
+function clearOnboardingCache(userId?: string) {
+  try {
+    if (userId) {
+      sessionStorage.removeItem(`onboarding_${userId}`);
+      return;
+    }
+    const keys: string[] = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const k = sessionStorage.key(i);
+      if (k?.startsWith('onboarding_')) keys.push(k);
+    }
+    keys.forEach((k) => sessionStorage.removeItem(k));
+  } catch {
+    /* private mode / blocked storage */
+  }
+}
+
 function ProtectedRoute({
   children,
   authState
@@ -262,6 +287,11 @@ function ProtectedRoute({
     return <Navigate to="/onboarding" replace />;
   }
 
+  // Sudah onboarding tapi masih di /onboarding → ke home (cegah loop bolak-balik)
+  if (!needsOnboarding && location.pathname === '/onboarding') {
+    return <Navigate to="/" replace />;
+  }
+
   return <>{children}</>;
 }
 
@@ -279,9 +309,11 @@ function AppLayout() {
   });
   const checkingRef    = useRef(false);
   const checkedUserRef = useRef<string | null>(null);
+  // Cegah timeout 5s false-logout setelah getSession sudah selesai
+  const sessionResolvedRef = useRef(false);
 
-  const checkOnboarding = async (userId: string) => {
-    if (checkingRef.current && checkedUserRef.current === userId) return;
+  const checkOnboarding = async (userId: string, opts?: { force?: boolean }) => {
+    if (!opts?.force && checkingRef.current && checkedUserRef.current === userId) return;
     checkingRef.current    = true;
     checkedUserRef.current = userId;
 
@@ -295,7 +327,7 @@ function AppLayout() {
         .maybeSingle();
 
       if (!profile) {
-        // User baru Google — buat profil awal tanpa nickname/target
+        // User baru — buat profil awal tanpa nickname/target
         const { data: { user } } = await supabase!.auth.getUser();
         if (user) {
           const rawName = user.user_metadata?.full_name ||
@@ -309,19 +341,36 @@ function AppLayout() {
           await supabase!.from('profiles').upsert({ id: user.id, username: safeUsername });
         }
         sessionStorage.setItem(cacheKey, 'true');
-        setAuthState(s => ({ ...s, needsOnboarding: true, loading: false }));
+        setAuthState(s => ({ ...s, session: s.session, needsOnboarding: true, loading: false }));
       } else {
         const isComplete = !!(profile.nickname && profile.target_kedinasan);
-        // Cache hasil — false = sudah onboarding, true = perlu onboarding
+        // Cache: 'false' = sudah onboarding, 'true' = perlu onboarding
         sessionStorage.setItem(cacheKey, String(!isComplete));
         setAuthState(s => ({ ...s, needsOnboarding: !isComplete, loading: false }));
       }
     } catch {
-      setAuthState(s => ({ ...s, needsOnboarding: true, loading: false }));
+      // Jangan paksa onboarding saat network error — biarkan coba lagi, stay loading false
+      // needsOnboarding: pertahankan nilai lama agar tidak loop /auth ↔ /onboarding
+      setAuthState(s => ({ ...s, loading: false }));
     } finally {
       checkingRef.current = false;
     }
   };
+
+  // Onboarding.tsx fire event ini setelah profil lengkap — update gate tanpa full reload
+  useEffect(() => {
+    const onDone = (e: Event) => {
+      const userId = (e as CustomEvent<{ userId?: string }>).detail?.userId;
+      if (userId) {
+        try {
+          sessionStorage.setItem(`onboarding_${userId}`, 'false');
+        } catch { /* ignore */ }
+      }
+      setAuthState((s) => ({ ...s, needsOnboarding: false, loading: false }));
+    };
+    window.addEventListener('skd:onboarding-done', onDone);
+    return () => window.removeEventListener('skd:onboarding-done', onDone);
+  }, []);
 
   useEffect(() => {
     if (!supabase) {
@@ -329,65 +378,80 @@ function AppLayout() {
       return;
     }
 
-    // Timeout protection: jangan stuck loading forever
+    sessionResolvedRef.current = false;
+
+    // Timeout: hentikan spinner saja — JANGAN wipe session (penyebab loop #14)
     const timeout = setTimeout(() => {
-      console.warn('[Auth] Session check timeout, redirecting to /auth');
-      setAuthState({ loading: false, session: null, needsOnboarding: false });
-    }, 5000); // 5 detik timeout
+      if (sessionResolvedRef.current) return;
+      console.warn('[Auth] Session check timeout — stop loading, keep session if any');
+      setAuthState((s) => ({ ...s, loading: false }));
+    }, 8000);
 
     // Cek session awal sekali saat AppLayout mount
     supabase.auth.getSession().then(({ data: { session } }) => {
-      clearTimeout(timeout); // Cancel timeout jika berhasil
+      sessionResolvedRef.current = true;
+      clearTimeout(timeout);
 
       if (!session?.user) {
         setAuthState({ loading: false, session: null, needsOnboarding: false });
         return;
       }
 
-      // Cek cache di sessionStorage dulu — hindari query Supabase setiap refresh
       const cacheKey = `onboarding_${session.user.id}`;
       const cached   = sessionStorage.getItem(cacheKey);
 
-      if (cached !== null) {
-        // Sudah pernah dicek di sesi ini — langsung pakai hasil cache
-        setAuthState({ loading: false, session, needsOnboarding: cached === 'true' });
+      // Hanya trust cache 'false' (sudah onboarding). Cache 'true' bisa stale setelah submit.
+      if (cached === 'false') {
+        setAuthState({ loading: false, session, needsOnboarding: false });
       } else {
-        // Belum ada cache — query Supabase
-        setAuthState(s => ({ ...s, session }));
-        checkOnboarding(session.user.id);
+        setAuthState((s) => ({ ...s, session, loading: true }));
+        void checkOnboarding(session.user.id);
       }
     }).catch((err) => {
+      sessionResolvedRef.current = true;
       clearTimeout(timeout);
       console.error('[Auth] Session check failed:', err);
-      setAuthState({ loading: false, session: null, needsOnboarding: false });
+      setAuthState((s) => ({ ...s, loading: false }));
     });
 
-    // Dengarkan perubahan auth (Google OAuth callback, logout, dll)
+    // Dengarkan perubahan auth (Google OAuth callback, logout, email login, dll)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_OUT') {
           checkingRef.current    = false;
           checkedUserRef.current = null;
+          clearOnboardingCache();
           setAuthState({ loading: false, session: null, needsOnboarding: false });
           return;
         }
         if (!session?.user) return;
 
-        setAuthState(s => ({ ...s, session }));
+        sessionResolvedRef.current = true;
+        setAuthState((s) => ({ ...s, session }));
 
-        // Cek cache — skip query jika sudah ada
         const cacheKey = `onboarding_${session.user.id}`;
         const cached   = sessionStorage.getItem(cacheKey);
-        if (cached !== null && event !== 'USER_UPDATED') {
-          setAuthState(s => ({ ...s, loading: false, needsOnboarding: cached === 'true' }));
+
+        // TOKEN_REFRESHED: jangan re-fetch onboarding jika sudah complete
+        if (event === 'TOKEN_REFRESHED' && cached === 'false') {
+          setAuthState((s) => ({ ...s, loading: false, needsOnboarding: false }));
           return;
         }
 
-        await checkOnboarding(session.user.id);
+        // Trust cache complete; selain itu revalidate (cegah loop cache stale 'true')
+        if (cached === 'false' && event !== 'USER_UPDATED') {
+          setAuthState((s) => ({ ...s, loading: false, needsOnboarding: false }));
+          return;
+        }
+
+        await checkOnboarding(session.user.id, { force: event === 'USER_UPDATED' });
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -403,7 +467,22 @@ function AppLayout() {
             </div>
           }>
             <Routes>
-              <Route path="/auth" element={<Auth />} />
+              {/* Sudah login → jangan stuck di /auth (email/Google sukses) */}
+              <Route
+                path="/auth"
+                element={
+                  authState.loading ? (
+                    <div className="min-h-screen bg-bg flex flex-col items-center justify-center gap-3 text-primary font-bold">
+                      <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                      <span className="text-sm">Memuat Arena...</span>
+                    </div>
+                  ) : authState.session ? (
+                    <Navigate to={authState.needsOnboarding ? '/onboarding' : '/'} replace />
+                  ) : (
+                    <Auth />
+                  )
+                }
+              />
               <Route path="/"                  element={<ProtectedRoute authState={authState}><Dashboard /></ProtectedRoute>} />
               <Route path="/onboarding"        element={<ProtectedRoute authState={authState}><Onboarding /></ProtectedRoute>} />
               <Route path="/quiz"              element={<ProtectedRoute authState={authState}><QuizSessionProvider><Quiz /></QuizSessionProvider></ProtectedRoute>} />

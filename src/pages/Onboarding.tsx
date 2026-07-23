@@ -64,10 +64,17 @@ export default function Onboarding() {
 
       if (error) throw error;
 
-      // Tidak pakai localStorage — ProtectedRoute cek langsung ke Supabase
+      // Wajib: cache + event agar App.tsx needsOnboarding=false (cegah loop / ↔ /onboarding)
+      try {
+        sessionStorage.setItem(`onboarding_${user.id}`, 'false');
+      } catch { /* ignore */ }
+      window.dispatchEvent(
+        new CustomEvent('skd:onboarding-done', { detail: { userId: user.id } })
+      );
+
       setShowToast(true);
       setTimeout(() => {
-        navigate('/');
+        navigate('/', { replace: true });
       }, 1500);
     } catch (err: any) {
       console.error(err);
