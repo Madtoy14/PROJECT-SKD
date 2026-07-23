@@ -173,10 +173,8 @@ export default function TryOutLobby() {
       <header className="mb-8 text-center md:text-left">
         <h1 className="text-3xl font-black text-fg mb-2">Try Out</h1>
         <p className="text-fg-muted">
-          <strong>Unlock</strong> = buka paket permanen (1×).{' '}
-          <strong>Attempt</strong> = tiket tiap mulai (
-          <strong>1.000 koin</strong> standar / <strong>1.500</strong> akbar).
-          Unlock tidak membuat attempt gratis.
+          Simulasi <strong>110 soal</strong> format BKN (30 TWK + 35 TIU + 45 TKP), soal tetap per paket.
+          Biaya: <strong>1.000 koin / attempt</strong>. Saat ini hanya <strong>Paket 1</strong> yang dibuka; paket lain menunggu review kualitas.
         </p>
         {profile && (
           <p className="text-sm text-fg-muted mt-2 flex items-center gap-1.5 justify-center md:justify-start">
@@ -227,7 +225,7 @@ export default function TryOutLobby() {
                         : 'bg-surface-subtle text-fg-muted'
                   }`}>
                     {pkg.isDevelopment ? <Lock size={14} /> : unlocked ? <Unlock size={14} /> : <Lock size={14} />}
-                    {pkg.isDevelopment ? 'Dalam Pengembangan' : unlocked ? 'Terbuka' : 'Terkunci'}
+                    {pkg.isDevelopment ? 'Segera Hadir' : !pkg.isDevelopment && pkg.id === 'paket_tryout_1' ? 'Direkomendasikan' : unlocked ? 'Terbuka' : 'Terkunci'}
                   </div>
                 </div>
 
@@ -237,30 +235,24 @@ export default function TryOutLobby() {
                 <div className="text-xs text-fg-muted font-bold mb-2 space-y-1">
                   <div className="flex justify-between">
                     <span>{pkg.totalQuestions} Soal</span>
-                    <span>Skor Maks: {pkg.totalQuestions * 5}</span>
+                    <span>30 TWK · 35 TIU · 45 TKP</span>
                   </div>
-                  {pkg.unlockCost > 0 && (
-                    <div className="flex justify-between">
-                      <span>Unlock permanen (1×)</span>
-                      <span className="text-fg">{pkg.unlockCost.toLocaleString('id-ID')} koin</span>
-                    </div>
-                  )}
-                  {pkg.attemptCost > 0 && (
+                  {pkg.attemptCost > 0 && !pkg.isDevelopment && (
                     <div className="flex justify-between">
                       <span>Entry / attempt</span>
                       <span className="text-fg">{pkg.attemptCost.toLocaleString('id-ID')} koin</span>
                     </div>
                   )}
-                  {unlocked && pkg.attemptCost > 0 && (
-                    <p className="text-[10px] font-medium text-fg-muted pt-1">
-                      Unlock ✓ · tiap mulai tetap bayar attempt
+                  {!pkg.isDevelopment && (
+                    <p className="text-[10px] font-medium text-success pt-1">
+                      Soal tetap · tiap mulai bayar attempt
                     </p>
                   )}
                 </div>
 
                 {pkg.isDevelopment ? (
                   <Button variant="secondary" className="w-full justify-center opacity-70" disabled>
-                    Segera Hadir
+                    Segera Hadir · Review soal
                   </Button>
                 ) : unlocked ? (
                   <div className="flex flex-col gap-2 mt-2">
