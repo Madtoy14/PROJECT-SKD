@@ -523,37 +523,40 @@ export const fetchQuestionsFromSupabase = async (gameMode: string, packageId?: s
         questions = data;
       }
     } else if (gameMode === 'tryout') {
-      // 110 soal berdasar kategori dari tabel 'soal_tryout' untuk Try Out BKN Standar
-      // Jika packageId diberikan, filter by paket_id; fallback ke semua soal jika tidak ada paket
+      // Paket statis: soal_tryout.paket_id = paket_tryout_N
+      // Urutan: TWK → TIU → TKP; dalam tipe by created_at (bukan random)
       const fetchCategory = async (tipe: string, limit: number) => {
-        if (packageId) {
-          // Opsi A: filter by paket_id — butuh kolom paket_id di tabel soal_tryout
-          const res = await supabase!
-            .from('soal_tryout')
-            .select('*')
-            .eq('tipe', tipe)
-            .eq('paket_id', packageId);
-          if (!res.error && res.data && res.data.length > 0) {
-            return shuffle(res.data).slice(0, limit);
-          }
-          // fallback ke soal umum jika paket belum punya soal
+        if (!packageId) {
+          throw new Error('packageId wajib untuk mode tryout');
         }
-        const { data, error } = await supabase!.rpc('get_random_tryout_soal_by_tipe', { soal_tipe: tipe, limit_count: limit });
-        if (error) {
-          const res = await supabase!.from('soal_tryout').select('*').eq('tipe', tipe);
-          if (res.error) throw res.error;
-          return shuffle(res.data).slice(0, limit);
-        }
-        return data;
+        const res = await supabase!
+          .from('soal_tryout')
+          .select('*')
+          .eq('tipe', tipe)
+          .eq('paket_id', packageId)
+          .order('created_at', { ascending: true })
+          .order('id', { ascending: true })
+          .limit(limit);
+        if (res.error) throw res.error;
+        return res.data || [];
       };
 
       const [twk, tiu, tkp] = await Promise.all([
         fetchCategory('TWK', 30),
         fetchCategory('TIU', 35),
-        fetchCategory('TKP', 45)
+        fetchCategory('TKP', 45),
       ]);
 
-      // Tryout: urutan TWK → TIU → TKP (standar BKN), tapi soal dalam tiap kategori sudah diacak
+      if (twk.length < 30 || tiu.length < 35 || tkp.length < 45) {
+        console.warn('Paket tryout tidak lengkap', {
+          packageId,
+          twk: twk.length,
+          tiu: tiu.length,
+          tkp: tkp.length,
+        });
+      }
+
+      // Statis: TWK → TIU → TKP (format BKN)
       questions = [...twk, ...tiu, ...tkp];
     } else {
       // Default: ambil lalu shuffle
