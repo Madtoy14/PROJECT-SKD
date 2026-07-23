@@ -252,13 +252,13 @@ Aturan: Bahasa Indonesia, ringkas, YAGNI. Server authoritative. Jangan sentuh se
 
 ## Checklist sebelum implement
 
-- [ ] Q1 dijawab  
-- [ ] Q2 dijawab  
-- [ ] Q3 dijawab  
-- [ ] Q4 dijawab  
-- [ ] Wave A plan step disetujui  
-- [ ] Baru coding A1 → A2 → A3 → A4  
-- [ ] Manual check Wave A lolos  
+- [x] Q1 dijawab — potong entry/first answer; gate pre-session only  
+- [x] Q2 dijawab — tryout continuous; survival/latihan per-soal + restore refresh  
+- [x] Q3 dijawab — mutual follow = auto rival; Instagram-style; Wave B  
+- [x] Q4 dijawab — Wave A dulu; PvP score Wave B; #14 di plan-auth  
+- [x] Wave A plan step disetujui  
+- [x] Coding A1 → A2 → A3 (`c74e711`); A4 skip (auth plan terpisah)  
+- [ ] Manual check Wave A lolos (user)  
 - [ ] Baru Wave B / C  
 
 ---
