@@ -138,9 +138,12 @@ BEGIN
     END IF;
 
     BEGIN
-      INSERT INTO public.transactions (user_id, type, item_id, amount, details)
-      VALUES (v_user_id, 'purchase', p_item_id, v_cost,
-              jsonb_build_object('quantity', p_quantity, 'item_type', v_item_type));
+      INSERT INTO public.transactions (
+        user_id, type, category, item_id, amount, balance_after, source, metadata
+      ) VALUES (
+        v_user_id, 'purchase', 'coin', p_item_id, -v_cost, v_new_coins, 'purchase_item',
+        jsonb_build_object('quantity', p_quantity, 'item_type', v_item_type)
+      );
     EXCEPTION WHEN undefined_table OR undefined_column OR others THEN
       NULL;
     END;
@@ -218,9 +221,12 @@ BEGIN
     WHERE id = v_user_id;
 
     BEGIN
-      INSERT INTO public.transactions (user_id, type, item_id, amount, details)
-      VALUES (v_user_id, 'sell', p_item_id, v_reward,
-              jsonb_build_object('old_qty', v_inv_val, 'new_qty', v_new_qty));
+      INSERT INTO public.transactions (
+        user_id, type, category, item_id, amount, balance_after, source, metadata
+      ) VALUES (
+        v_user_id, 'sell', 'coin', p_item_id, v_reward, v_new_coins, 'sell_item',
+        jsonb_build_object('old_qty', v_inv_val, 'new_qty', v_new_qty)
+      );
     EXCEPTION WHEN undefined_table OR undefined_column OR others THEN
       NULL;
     END;

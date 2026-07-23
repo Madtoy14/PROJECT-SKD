@@ -75,10 +75,17 @@ BEGIN
         )
     WHERE id = v_user_id;
 
-    -- Catat transaksi
-    INSERT INTO public.transactions (user_id, type, item_id, amount, details)
-    VALUES (v_user_id, 'sell', p_item_id, v_reward,
-            jsonb_build_object('old_qty', v_inv_val, 'new_qty', v_new_qty));
+    -- Catat transaksi (schema: metadata, bukan details)
+    BEGIN
+        INSERT INTO public.transactions (
+            user_id, type, category, item_id, amount, balance_after, source, metadata
+        ) VALUES (
+            v_user_id, 'sell', 'coin', p_item_id, v_reward, v_new_coins, 'sell_item',
+            jsonb_build_object('old_qty', v_inv_val, 'new_qty', v_new_qty)
+        );
+    EXCEPTION WHEN OTHERS THEN
+        NULL;
+    END;
 
     RETURN jsonb_build_object(
         'success', true,
