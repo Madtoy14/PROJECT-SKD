@@ -4,8 +4,8 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   Swords, Medal, Target, Zap, Trophy, X,
   UserPlus, Trash2, CheckCircle2, SquarePen, Lock,
-  Bot, BarChart2
-} from 'lucide-react';
+    Bot, BarChart2, Settings
+  } from 'lucide-react';
 import { useDuelMatchmaking } from '../context/DuelContext';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters } from '../lib/supabase';
 import { getFollowCounts, getMutualRivals, unfollowUser } from '../lib/supabaseHelpers';
@@ -436,9 +436,21 @@ export default function Profile() {
   if (loading) return <ProfileSkeleton />;
 
   return (
-    <div className="p-4 md:p-8 space-y-8 pb-24 relative max-w-5xl mx-auto min-h-screen">
+      <div className="p-4 md:p-8 space-y-8 pb-24 relative max-w-5xl mx-auto min-h-screen">
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="text-lg font-black text-fg">Profil</h1>
+          <button
+            type="button"
+            onClick={() => navigate('/settings')}
+            className="w-10 h-10 rounded-xl border border-border bg-surface-subtle hover:bg-primary/10 hover:border-primary/30 text-fg flex items-center justify-center transition-colors"
+            aria-label="Pengaturan"
+            title="Pengaturan"
+          >
+            <Settings size={18} />
+          </button>
+        </div>
 
-      {/* Toast Notification */}
+        {/* Toast Notification */}
       <AnimatePresence>
         {inviteToast && (
           <motion.div

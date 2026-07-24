@@ -266,8 +266,8 @@ export default function Auth() {
     mode === 'signup'
       ? 'Daftar dengan email atau Google, lalu lengkapi profil.'
       : mode === 'forgot'
-        ? 'Kami kirim link reset ke emailmu.'
-        : mode === 'reset-password'
+              ? 'Hanya untuk akun yang sudah set password. Login Google? Masuk dulu, lalu buat password di Pengaturan.'
+              : mode === 'reset-password'
           ? 'Masukkan password baru untuk akunmu.'
           : 'Google lebih cepat — atau masuk dengan email.';
 
@@ -576,19 +576,23 @@ export default function Auth() {
                     </div>
                   </div>
                   <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-gradient-to-r from-skd-accent to-yellow-500 text-[#0F0E17] font-black py-3.5 rounded-xl shadow-[0_0_20px_rgba(245,166,35,0.3)] hover:shadow-[0_0_30px_rgba(245,166,35,0.5)] hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-2"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 size={17} className="animate-spin" /> Mengirim...
-                      </>
-                    ) : (
-                      'Kirim link reset'
-                    )}
-                  </button>
-                </form>
+                                      type="submit"
+                                      disabled={loading}
+                                      className="w-full bg-gradient-to-r from-skd-accent to-yellow-500 text-[#0F0E17] font-black py-3.5 rounded-xl shadow-[0_0_20px_rgba(245,166,35,0.3)] hover:shadow-[0_0_30px_rgba(245,166,35,0.5)] hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-2"
+                                    >
+                                      {loading ? (
+                                        <>
+                                          <Loader2 size={17} className="animate-spin" /> Mengirim...
+                                        </>
+                                      ) : (
+                                        'Kirim link reset'
+                                      )}
+                                    </button>
+                                    <p className="text-[11px] text-fg-muted text-center leading-relaxed px-1">
+                                      Belum pernah set password (mis. hanya Google)? Masuk dulu, lalu buka{' '}
+                                      <span className="font-bold text-fg">Pengaturan → Buat password</span>.
+                                    </p>
+                                  </form>
                 <button
                   type="button"
                   onClick={() => switchMode('login')}

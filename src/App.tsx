@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } f
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from './lib/supabase';
 
-import { Home, Trophy, BookOpen, Store, User, BookOpenCheck, Target, Bookmark, Menu, X, LogOut } from 'lucide-react';
+import { Home, Trophy, BookOpen, Store, User, BookOpenCheck, Target, Bookmark, Menu, X, LogOut, Settings as SettingsIcon } from 'lucide-react';
 
 
 import { lazy, Suspense } from 'react';
@@ -22,6 +22,7 @@ const WrongBook = lazy(() => import('./pages/WrongBook'));
 const TryOutLobby = lazy(() => import('./pages/TryOutLobby'));
 const ReviewDetail = lazy(() => import('./pages/ReviewDetail'));
 const Profile = lazy(() => import('./pages/Profile'));
+const Settings = lazy(() => import('./pages/Settings'));
 const Auth = lazy(() => import('./pages/Auth'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Belajar = lazy(() => import('./pages/Belajar'));
@@ -51,10 +52,11 @@ function Navigation() {
   ];
 
   const sidebarItems = [
-    { path: '/catatan-salah', icon: Bookmark, label: 'Catatan Salah' },
-    { path: '/liga', icon: Trophy, label: 'Liga' },
-    { path: '/toko', icon: Store, label: 'Toko' },
-  ];
+      { path: '/catatan-salah', icon: Bookmark, label: 'Catatan Salah' },
+      { path: '/liga', icon: Trophy, label: 'Liga' },
+      { path: '/toko', icon: Store, label: 'Toko' },
+      { path: '/settings', icon: SettingsIcon, label: 'Pengaturan' },
+    ];
 
   const desktopNavOrder = [
     { path: '/', icon: Home, label: 'Home' },
@@ -211,18 +213,31 @@ function Navigation() {
           })}
         </ul>
 
-        {/* Desktop Logout — hanya muncul pas hover */}
-        <div className="px-3 group-hover:px-4 pb-6 pt-2 border-t border-slate-700/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full text-slate-400 hover:bg-white/5 hover:text-red-400 font-medium text-sm font-bold"
-          >
-            <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
-              <LogOut size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
-            </div>
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Logout</span>
-          </button>
-        </div>
+        {/* Desktop Settings + Logout — hanya muncul pas hover */}
+                <div className="px-3 group-hover:px-4 pb-4 pt-2 border-t border-slate-700/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-y-1">
+                  <Link
+                    to="/settings"
+                    className={`flex items-center gap-3 px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full font-medium text-sm font-bold ${
+                      location.pathname === '/settings'
+                        ? 'bg-primary/20 text-white !border-primary'
+                        : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
+                      <SettingsIcon size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
+                    </div>
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Pengaturan</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full text-slate-400 hover:bg-white/5 hover:text-red-400 font-medium text-sm font-bold"
+                  >
+                    <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
+                      <LogOut size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
+                    </div>
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Logout</span>
+                  </button>
+                </div>
 
         {/* Desktop Version */}
         <div className="px-3 group-hover:px-4 pb-3 shrink-0">
@@ -497,7 +512,8 @@ function AppLayout() {
               <Route path="/review/:attemptId" element={<ProtectedRoute authState={authState}><QuizSessionProvider><ReviewDetail /></QuizSessionProvider></ProtectedRoute>} />
               <Route path="/review/:packageId/:attemptId" element={<ProtectedRoute authState={authState}><QuizSessionProvider><ReviewDetail /></QuizSessionProvider></ProtectedRoute>} />
               <Route path="/profil"            element={<ProtectedRoute authState={authState}><Profile /></ProtectedRoute>} />
-              <Route path="/belajar"           element={<ProtectedRoute authState={authState}><Belajar /></ProtectedRoute>} />
+                            <Route path="/settings"          element={<ProtectedRoute authState={authState}><Settings /></ProtectedRoute>} />
+                            <Route path="/belajar"           element={<ProtectedRoute authState={authState}><Belajar /></ProtectedRoute>} />
                             <Route path="/belajar/:modul"     element={<ProtectedRoute authState={authState}><BelajarModul /></ProtectedRoute>} />
                             <Route path="/belajar/:modul/:subbab" element={<ProtectedRoute authState={authState}><BelajarSubBab /></ProtectedRoute>} />
             </Routes>
