@@ -223,41 +223,146 @@ export async function getPendingFriendRequests(userId: string): Promise<any[]> {
 }
 
 /**
- * Send friend request
+ * Instagram-style follow: insert accepted immediately (no pending gate).
+ * Mutual follow = rival (caller re-queries mutuals).
  */
 export async function sendFriendRequest(userId: string, friendId: string): Promise<boolean> {
-  if (!supabase) return false;
+  if (!supabase || !userId || !friendId || userId === friendId) return false;
 
   try {
     const { error } = await supabase
       .from('friends')
-      .insert({
-        user_id: userId,
-        friend_id: friendId,
-        status: 'pending'
-      });
+      .upsert(
+        {
+          user_id: userId,
+          friend_id: friendId,
+          status: 'accepted',
+          accepted_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,friend_id' }
+      );
 
     if (error) throw error;
 
-    // Create notification for recipient
-    await supabase
-      .from('notifications')
-      .insert({
-        user_id: friendId,
-        type: 'friend_request',
-        title: 'Permintaan Pertemanan Baru',
-        message: 'Seseorang ingin menjadi teman Anda!'
-      });
+    // Non-blocking notif
+    void supabase.from('notifications').insert({
+      user_id: friendId,
+      type: 'friend_request',
+      title: 'Pengikut Baru',
+      message: 'Seseorang mulai mengikuti Anda!',
+    });
 
     return true;
   } catch (error) {
-    console.error('Failed to send friend request:', error);
+    console.error('Failed to follow:', error);
     return false;
   }
 }
 
+/** Unfollow: hapus edge user → friend */
+export async function unfollowUser(userId: string, friendId: string): Promise<boolean> {
+  if (!supabase || !userId || !friendId) return false;
+  try {
+    const { error } = await supabase
+      .from('friends')
+      .delete()
+      .eq('user_id', userId)
+      .eq('friend_id', friendId);
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Failed to unfollow:', error);
+    return false;
+  }
+}
+
+/** Count pengikut / mengikuti (status accepted) */
+export async function getFollowCounts(userId: string): Promise<{ followers: number; following: number }> {
+  if (!supabase || !userId) return { followers: 0, following: 0 };
+  try {
+    const [followersRes, followingRes] = await Promise.all([
+      supabase.from('friends').select('id', { count: 'exact', head: true }).eq('friend_id', userId).eq('status', 'accepted'),
+      supabase.from('friends').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'accepted'),
+    ]);
+    return {
+      followers: followersRes.count || 0,
+      following: followingRes.count || 0,
+    };
+  } catch {
+    return { followers: 0, following: 0 };
+  }
+}
+
+/** Apakah saya follow target */
+export async function isFollowing(userId: string, friendId: string): Promise<boolean> {
+  if (!supabase || !userId || !friendId) return false;
+  const { data } = await supabase
+    .from('friends')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('friend_id', friendId)
+    .eq('status', 'accepted')
+    .maybeSingle();
+  return !!data;
+}
+
 /**
- * Accept friend request
+ * Mutual follows = rival list (both edges accepted).
+ * Shape kompatibel UI Profile rival cards.
+ */
+export async function getMutualRivals(userId: string): Promise<Array<{
+  id: string;
+  name: string;
+  username: string;
+  online: boolean;
+  avatar: string;
+  score: number;
+}>> {
+  if (!supabase || !userId) return [];
+  try {
+    const { data: following } = await supabase
+      .from('friends')
+      .select('friend_id')
+      .eq('user_id', userId)
+      .eq('status', 'accepted');
+    if (!following?.length) return [];
+    const followingIds = following.map((f) => f.friend_id);
+
+    const { data: mutuals } = await supabase
+      .from('friends')
+      .select('user_id')
+      .eq('friend_id', userId)
+      .eq('status', 'accepted')
+      .in('user_id', followingIds);
+    if (!mutuals?.length) return [];
+    const mutualIds = mutuals.map((m) => m.user_id);
+
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, username, nickname, score, selected_avatar, last_login')
+      .in('id', mutualIds);
+    if (!profiles) return [];
+
+    const now = Date.now();
+    return profiles.map((p: any) => {
+      const last = p.last_login ? new Date(p.last_login).getTime() : 0;
+      return {
+        id: p.id,
+        name: p.nickname || p.username,
+        username: `@${String(p.username || '').toLowerCase()}`,
+        online: (now - last) / (1000 * 60) <= 15,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.username || p.id)}`,
+        score: p.score || 0,
+      };
+    });
+  } catch (error) {
+    console.error('Failed to fetch mutual rivals:', error);
+    return [];
+  }
+}
+
+/**
+ * Accept friend request (legacy pending rows)
  */
 export async function acceptFriendRequest(requestId: string): Promise<boolean> {
   if (!supabase) return false;

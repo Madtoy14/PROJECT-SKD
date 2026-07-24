@@ -50,7 +50,7 @@ export default function Leaderboard() {
         const { data: { user } } = await supabase!.auth.getUser();
         if (!user) return;
 
-        // Ambil semua yang current user ikuti (user_id = saya)
+                // Ambil semua yang current user ikuti (user_id = saya)
         const { data: following } = await supabase!
           .from('friends')
           .select('friend_id')
@@ -287,7 +287,12 @@ export default function Leaderboard() {
       {selectedPlayerId && (
         <PlayerProfileModal 
           playerId={selectedPlayerId} 
-          onClose={() => setSelectedPlayerId(null)} 
+          onClose={() => setSelectedPlayerId(null)}
+          existingRivalIds={Array.from(mutualFriendIds)}
+          onSocialChange={() => {
+            // force re-fetch mutuals next open
+            setMutualFriendIds(new Set());
+          }}
         />
       )}
     </div>

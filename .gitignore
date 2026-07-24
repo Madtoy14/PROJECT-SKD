@@ -83,3 +83,9 @@ supabase_schema*.sql
 # One-off generators
 scripts/append_*.cjs
 scripts/fix_question_scores.cjs
+
+# Local agent helper scripts / push logs (not product)
+scripts/_git_*.ps1
+scripts/_push_*.txt
+scripts/_commit_*.txt
+scripts/_git_status.ps1

@@ -379,16 +379,10 @@ export default function Result() {
   const circleCircumference = 2 * Math.PI * 120;
   const strokeDashoffset = circleCircumference - (percentage / 100) * circleCircumference;
 
-  // PvP Leaderboard rendering fallback
+  // PvP: hanya 2 player dari liveRanks. Jangan fallback dummy liga.
   const finalRanks = receivedRanks.length > 0
     ? [...receivedRanks].sort((a, b) => b.score - a.score)
-    : [
-      { name: 'Anda', score: score, isMe: true },
-      { name: 'Player44', score: 3200 },
-      { name: 'ASN_Pro', score: 2850 },
-      { name: 'JagoanSkd', score: 1500 },
-      { name: 'Mager', score: 800 }
-    ].sort((a, b) => b.score - a.score);
+    : [{ name: 'Anda', score: score, isMe: true }];
 
   // Dynamic Passing Grade Ambang Batas Calculations based on questions count
   const twkQuestionsCount = quizQuestions?.filter((q: QuizQuestion) => q.category === 'TWK').length || 30;

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useDuelMatchmaking } from '../context/DuelContext';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters } from '../lib/supabase';
+import { getFollowCounts, getMutualRivals, unfollowUser } from '../lib/supabaseHelpers';
 import type { UserProfile, Character } from '../lib/supabase';
 import { ProfileSkeleton } from '../components/LoadingSkeleton';
 import PlayerProfileModal from '../components/PlayerProfileModal';
@@ -246,23 +247,21 @@ export default function Profile() {
           if (!p) return;
           setProfile(p);
           setUsernameInput(p.nickname || p.username);
-          setFriends(p.friends || []);
           setTargetKedinasan(p.target_kedinasan || 'IPDN');
 
           const currentEquipped = chars.find(o => o.id === p.selected_avatar) || chars[0] || null;
           setSelectedAvatar(currentEquipped);
 
-          // Fetch Social Stats
+          // Social: tabel friends only (mutual = rival). No dual-write profiles.friends.
           if (isSupabaseConfigured()) {
-            supabase!.from('friends').select('id', { count: 'exact', head: true })
-              .eq('friend_id', p.id).eq('status', 'accepted')
-              .then(({ count }) => setFollowersCount(count || 0));
-
-            supabase!.from('friends').select('id', { count: 'exact', head: true })
-              .eq('user_id', p.id).eq('status', 'accepted')
-              .then(({ count }) => setFollowingCount(count || 0));
-              
+            getFollowCounts(p.id).then(({ followers, following }) => {
+              setFollowersCount(followers);
+              setFollowingCount(following);
+            });
+            getMutualRivals(p.id).then(list => setFriends(list));
             getUserAnalytics(p.id).then(a => setAnalytics(a));
+          } else {
+            setFriends(p.friends || []);
           }
         })
         .finally(() => setLoading(false));
@@ -315,12 +314,31 @@ export default function Profile() {
     f.username?.toLowerCase().includes(newFriendName.toLowerCase())
   );
 
-  const handleRemoveFriend = (id: number) => {
-    const friend = friends.find(f => f.id === id);
-    const newFriendsList = friends.filter(f => f.id !== id);
-    setFriends(newFriendsList);
-    updateProfile({ friends: newFriendsList });
-    showToast(`Menghapus ${friend?.name ?? 'Rival'} dari daftar.`, 'info');
+  const handleRemoveFriend = async (id: number | string) => {
+    const friend = friends.find(f => String(f.id) === String(id));
+    if (!profile) return;
+    const ok = await unfollowUser(profile.id, String(id));
+    if (!ok) {
+      showToast('Gagal hapus rival.', 'error');
+      return;
+    }
+    setFriends(prev => prev.filter(f => String(f.id) !== String(id)));
+    getFollowCounts(profile.id).then(({ followers, following }) => {
+      setFollowersCount(followers);
+      setFollowingCount(following);
+    });
+    showToast(`Berhenti mengikuti ${friend?.name ?? 'Rival'}.`, 'info');
+  };
+
+  const refreshSocial = async () => {
+    if (!profile) return;
+    const [{ followers, following }, rivals] = await Promise.all([
+      getFollowCounts(profile.id),
+      getMutualRivals(profile.id),
+    ]);
+    setFollowersCount(followers);
+    setFollowingCount(following);
+    setFriends(rivals);
   };
   const handleSearchProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -604,7 +622,7 @@ export default function Profile() {
             <img
               src={selectedAvatar?.image_url || avatarPdh}
               alt="Avatar"
-              className="w-48 h-48 rounded-full border-[6px] border-surface shadow-2xl relative z-10 object-cover"
+              className="w-28 h-28 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-[4px] sm:border-[6px] border-surface shadow-2xl relative z-10 object-cover"
             />
             <div className="absolute top-4 left-4 bg-premium text-primary-fg text-primary-fg font-space font-black text-xs px-3 py-1 rounded-full border border-yellow-300 shadow-md relative z-20">
               {selectedAvatar?.name ? selectedAvatar.name.split('-')[1]?.trim() || selectedAvatar.name : 'Profil'}
@@ -621,7 +639,7 @@ export default function Profile() {
             <div className="inline-flex items-center px-4 py-1.5 bg-coin-subtle border border-yellow-500/30 text-coin rounded-full text-xs font-bold mb-4 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
               Target: {SCHOOLS.find(s => s.id === (profile?.target_kedinasan || 'ipdn'))?.name || 'Sekolah Kedinasan'}
             </div>
-            <h2 className="text-4xl font-black mb-1 tracking-tight text-fg flex flex-wrap items-center gap-2">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-1 tracking-tight text-fg flex flex-wrap items-center gap-2 break-words max-w-full">
               {profile ? (profile.nickname || profile.username) : 'Pejuang SKD'}
             </h2>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 mb-2">
@@ -715,21 +733,21 @@ export default function Profile() {
                 <Zap size={24} className="text-energy" />
                 Statistik Karir
               </h3>
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-2 gap-3 sm:gap-5">
                 {[
                   { label: 'Total Kuis Selesai', value: (profile?.total_quizzes_completed || 0).toLocaleString(), icon: Target, color: 'text-blue-400' },
                   { label: 'Win PvP', value: `${profile?.total_pvp_wins || 0} Menang`, icon: Swords, color: 'text-red-400' },
                   { label: 'Total Jawaban Benar', value: (profile?.total_correct_answers || 0).toLocaleString(), icon: Zap, color: 'text-coin' },
                   { label: 'Skor Survival', value: (profile?.highest_survival_score || 0).toLocaleString(), icon: Trophy, color: 'text-purple-400' },
                 ].map((stat, idx) => (
-                  <div key={idx} className="bg-surface-subtle border border-border rounded-[1.5rem] p-5 backdrop-blur-sm hover:bg-surface-subtle/50 transition-colors group shadow-sm hover:shadow-md">
+                  <div key={idx} className="bg-surface-subtle border border-border rounded-[1.25rem] sm:rounded-[1.5rem] p-3.5 sm:p-5 backdrop-blur-sm hover:bg-surface-subtle/50 transition-colors group shadow-sm hover:shadow-md min-w-0">
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`p-2.5 rounded-xl bg-surface-subtle ${stat.color} group-hover:scale-110 transition-transform`}>
                         <stat.icon size={20} />
                       </div>
-                      <span className="text-xs text-fg-muted font-bold tracking-wide">{stat.label}</span>
+                      <span className="text-[10px] sm:text-xs text-fg-muted font-bold tracking-wide leading-tight">{stat.label}</span>
                     </div>
-                    <div className="text-3xl font-black font-space tracking-tight text-fg">{stat.value}</div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-black font-space tracking-tight text-fg break-words">{stat.value}</div>
                   </div>
                 ))}
               </div>
@@ -759,7 +777,7 @@ export default function Profile() {
                 <div className="flex-1 space-y-4 w-full">
                   <div className="bg-surface shadow-sm border border-border rounded-2xl p-4 space-y-3">
                     <h4 className="text-xs font-black tracking-wider text-[#F5A623] uppercase">Status Kesiapan CAT CPNS BKN</h4>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                       <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
                         <span className="block text-[10px] text-fg-muted font-bold">TWK (Min 65)</span>
                         <span className={`text-xs font-black font-space ${twkScore >= 65 ? 'text-success' : 'text-danger'}`}>
@@ -912,7 +930,7 @@ export default function Profile() {
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-surface shadow-sm border border-border rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+              className="bg-surface shadow-sm border border-border rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[90vh] mx-1"
             >
               <div className="flex justify-between items-center p-4 border-b border-border">
                 <h3 className="font-bold text-lg">Cari Teman</h3>
@@ -1093,22 +1111,7 @@ export default function Profile() {
           playerId={selectedPlayerId} 
           onClose={() => setSelectedPlayerId(null)}
           existingRivalIds={friends.map(f => String(f.id))}
-          onAddRival={(player) => {
-            if (!friends.find(f => String(f.id) === String(player.id))) {
-              const newFriend = {
-                id: player.id,
-                name: player.username,
-                username: `@${player.username.toLowerCase()}`,
-                online: false, // akan di-update dari last_login fetch
-                avatar: player.selected_avatar ? availableCharacters.find(o => o.id === player.selected_avatar)?.image_url || avatarPdh : `https://api.dicebear.com/7.x/avataaars/svg?seed=${player.username}`,
-                score: player.score
-              };
-              const newFriendsList = [...friends, newFriend];
-              setFriends(newFriendsList);
-              updateProfile({ friends: newFriendsList });
-              showToast(`Berhasil menambahkan ${player.username} ke Rival!`, 'success');
-            }
-          }}
+          onSocialChange={() => { void refreshSocial(); }}
         />
       )}
     </div>

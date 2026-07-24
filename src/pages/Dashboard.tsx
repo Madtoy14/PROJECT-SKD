@@ -767,7 +767,7 @@ export default function Dashboard() {
 
               {/* Kolom Kanan: Detail, Tombol & Peluang (Desktop 2-column layout) */}
               <div className="flex flex-col flex-1 w-full items-center md:items-start text-center md:text-left gap-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                   <span className="p-1.5 bg-amber-500/10 text-amber-500 rounded-xl border border-amber-500/20">
                     <Sparkles size={18} className="animate-pulse" />
                   </span>
@@ -916,7 +916,7 @@ export default function Dashboard() {
             </div>
             <div className="flex flex-col flex-1 min-w-[150px]">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-fg leading-none">{profile?.nickname || profile?.username || 'Pejuang'}</p>
+                <p className="text-sm font-semibold text-fg leading-none truncate max-w-[120px] sm:max-w-[180px] md:max-w-none">{profile?.nickname || profile?.username || 'Pejuang'}</p>
                 <div className="px-1.5 py-0.5 bg-premium-subtle rounded text-[9px] text-premium font-bold">Lvl {profile?.level || 1}</div>
                 <RankBadge score={profile?.score || 0} size="sm" />
                 {/* Streak Badge "Hari ke-X" */}
@@ -1077,9 +1077,9 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2">
           {/* Streak Section */}
           <motion.section variants={itemVariants} className="lg:col-span-7 bg-surface rounded-2xl p-5 border border-border shadow-sm flex flex-col">
-            <div className="flex justify-between items-end mb-3">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2 mb-3">
               <div>
-                <h3 className="text-[18px] sm:text-[20px] font-semibold text-fg tracking-tight flex items-center gap-2">
+                <h3 className="text-[15px] sm:text-[18px] md:text-[20px] font-semibold text-fg tracking-tight flex flex-wrap items-center gap-1.5 sm:gap-2">
                   <Flame className="text-streak" size={20} />
                   Streak Harian
                   {/* Hari ke-X badge prominent */}
@@ -1088,7 +1088,7 @@ export default function Dashboard() {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 350, damping: 18 }}
-                    className="ml-1 px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[11px] font-black rounded-full shadow-sm"
+                    className="ml-0 sm:ml-1 px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] sm:text-[11px] font-black rounded-full shadow-sm shrink-0"
                   >
                     Hari ke-{totalStreak + (isStreakClaimed ? 1 : 0)}
                   </motion.span>
@@ -1102,7 +1102,7 @@ export default function Dashboard() {
                   })()}
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-right pb-1 flex-wrap justify-end">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-right pb-1 flex-wrap justify-start sm:justify-end">
                 <button
                   type="button"
                   onClick={handleDailyClaim}
