@@ -186,25 +186,25 @@ function Navigation() {
 
       {/* ── Desktop Sidebar Navigation ── */}
       <nav className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-[88px] hover:w-64 bg-slate-900 border-r border-slate-800 z-50 transition-all duration-300 group overflow-hidden shadow-xl">
-        <div className="h-24 flex items-center justify-center group-hover:justify-start group-hover:px-6 shrink-0 relative w-full">
+        <div className="h-16 flex items-center justify-center group-hover:justify-start group-hover:px-6 shrink-0 relative w-full border-b border-slate-800/60">
           <h1 className="text-[20px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-200 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute left-6 whitespace-nowrap">SKDQuest</h1>
           <h1 className="text-[22px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-200 bg-clip-text text-transparent group-hover:opacity-0 transition-opacity duration-300">SQ</h1>
         </div>
 
-        <ul className="flex-1 px-3 group-hover:px-4 space-y-2 mt-2 w-full">
+        <ul className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-3 group-hover:px-4 space-y-1 py-2 w-full scrollbar-none">
           {desktopNavOrder.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path;
             return (
               <li key={path}>
                 <Link
                   to={path}
-                  className={`flex flex-col group-hover:flex-row items-center group-hover:items-center px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full border-l-[3px] border-transparent ${isActive
+                  className={`flex flex-col group-hover:flex-row items-center group-hover:items-center px-0 group-hover:px-4 py-2.5 rounded-xl transition-all w-full border-l-[3px] border-transparent ${isActive
                     ? 'bg-primary/20 text-white font-bold !border-primary'
                     : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 font-medium'
                     }`}
                 >
                   <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
-                    <Icon size={22} className={`group-hover:!w-5 group-hover:!h-5 transition-all ${isActive ? 'drop-shadow-[0_0_8px_rgba(245,166,35,0.5)]' : ''}`} />
+                    <Icon size={20} className={`group-hover:!w-5 group-hover:!h-5 transition-all ${isActive ? 'drop-shadow-[0_0_8px_rgba(245,166,35,0.5)]' : ''}`} />
                   </div>
                   <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block text-[14px] font-bold">{label}</span>
                 </Link>
@@ -213,34 +213,34 @@ function Navigation() {
           })}
         </ul>
 
-        {/* Desktop Settings + Logout — hanya muncul pas hover */}
-                <div className="px-3 group-hover:px-4 pb-4 pt-2 border-t border-slate-700/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-y-1">
-                  <Link
-                    to="/settings"
-                    className={`flex items-center gap-3 px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full font-medium text-sm font-bold ${
-                      location.pathname === '/settings'
-                        ? 'bg-primary/20 text-white !border-primary'
-                        : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
-                      <SettingsIcon size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
-                    </div>
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Pengaturan</span>
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-3 px-0 group-hover:px-4 py-3 group-hover:py-3.5 rounded-xl transition-all w-full text-slate-400 hover:bg-white/5 hover:text-red-400 font-medium text-sm font-bold"
-                  >
-                    <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
-                      <LogOut size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
-                    </div>
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Logout</span>
-                  </button>
-                </div>
+        {/* Desktop Settings + Logout — ikon terlihat baik saat collapse maupun hover */}
+        <div className="px-3 group-hover:px-4 pb-2 pt-2 border-t border-slate-800 shrink-0 space-y-1">
+          <Link
+            to="/settings"
+            className={`flex flex-col group-hover:flex-row items-center px-0 group-hover:px-4 py-2.5 rounded-xl transition-all w-full font-bold text-sm border-l-[3px] border-transparent ${
+              location.pathname === '/settings'
+                ? 'bg-primary/20 text-white !border-primary'
+                : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+            }`}
+          >
+            <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
+              <SettingsIcon size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
+            </div>
+            <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Pengaturan</span>
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="flex flex-col group-hover:flex-row items-center px-0 group-hover:px-4 py-2.5 rounded-xl transition-all w-full text-slate-400 hover:bg-white/5 hover:text-red-400 font-bold text-sm border-l-[3px] border-transparent"
+          >
+            <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
+              <LogOut size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
+            </div>
+            <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Logout</span>
+          </button>
+        </div>
 
         {/* Desktop Version */}
-        <div className="px-3 group-hover:px-4 pb-3 shrink-0">
+        <div className="px-3 group-hover:px-4 pb-3 pt-1 shrink-0">
           <span className="text-[10px] text-blue-300/40 font-medium block text-center group-hover:text-left transition-all">v1.0.0</span>
         </div>
       </nav>
