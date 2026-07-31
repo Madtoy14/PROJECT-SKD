@@ -25,7 +25,11 @@ dist-ssr
 
 # Agent / session data (sensitive — jangan publikasi)
 .zcode/
-.continue/prompts/*
+.continue/
+.clinerules/
+.cursor/
+.aider*
+dogfood-output/
 
 # Environment variables
 .env
@@ -77,8 +81,12 @@ Soal/
 audit_check_token*.py
 
 
-# Legacy SQL root (kanonis: supabase/migrations + functions/rpc)
+# Legacy SQL root — kanonis ada di supabase/migrations + supabase/functions
+# (file root ini duplikat identik dari migrations, jangan di-track lagi)
 supabase_schema*.sql
+supabase_characters_schema.sql
+supabase_rpc_security_fixes.sql
+supabase_security_fixes.sql
 
 # One-off generators
 scripts/append_*.cjs
