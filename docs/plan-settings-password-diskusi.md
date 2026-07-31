@@ -158,7 +158,7 @@ await supabase.auth.signOut() // hanya tombol Keluar
 - [x] Q1–Q4 dijawab  
 - [x] Q5 UI/UX mobile+desktop dijawab  
 - [x] S1–S5 implement (`Settings.tsx`, route, sidebar, Profile gear, Auth copy)  
-- [ ] Manual cek  
-- [ ] Commit + push + deploy  
+- [ ] Manual cek (user)  
+- [x] Commit + push + deploy (`0501931`, CI success)  
 
 **Handoff:** bilang **gas** / **lanjut implement** untuk coding.

@@ -49,6 +49,8 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
 
   const activeSessionRef = useRef<QuizSession | null>(null);
   const isAutoSavingRef = useRef(false);
+  // JWT user untuk beforeunload keepalive (RLS butuh auth.uid, bukan anon key)
+  const accessTokenRef = useRef<string | null>(null);
   // Debounce timer ref untuk save-on-answer (3 detik)
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Pending update terbaru — mencegah update stale saat request aktif
@@ -61,6 +63,22 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     isAutoSavingRef.current = isAutoSaving;
   }, [isAutoSaving]);
+
+  // Cache access_token di ref — getSession async tidak aman di beforeunload
+  useEffect(() => {
+    if (!supabase) return;
+    let mounted = true;
+    void supabase.auth.getSession().then(({ data }) => {
+      if (mounted) accessTokenRef.current = data.session?.access_token ?? null;
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      accessTokenRef.current = session?.access_token ?? null;
+    });
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const updateSession = useCallback(async (sessionId: string, updates: Partial<QuizSession>) => {
     const updateData: any = {
@@ -90,49 +108,46 @@ export function QuizSessionProvider({ children }: { children: ReactNode }) {
     }
   }, [activeSession]);
 
-  // Sinyal disconnect saat tab ditutup menggunakan sendBeacon
-  // Alasan: async fetch/supabase client tidak dijamin selesai saat beforeunload
-  // sendBeacon adalah satu-satunya cara reliable untuk kirim data saat tab ditutup
+  // Sinyal disconnect saat tab ditutup.
+  // Async supabase client tidak dijamin selesai di beforeunload → fetch keepalive + JWT user.
   useEffect(() => {
     const handleBeforeUnload = () => {
       const session = activeSessionRef.current;
       if (!session) return;
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      if (!supabaseUrl || !supabaseKey) return;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const accessToken = accessTokenRef.current;
+      // RLS quiz_sessions: auth.uid() = user_id → wajib JWT user, bukan anon key
+      if (!supabaseUrl || !supabaseAnonKey || !accessToken) return;
 
-      // PATCH ke Supabase REST API langsung via sendBeacon
-      // Filter: hanya update session milik user ini yang masih active
       const url = `${supabaseUrl}/rest/v1/quiz_sessions?id=eq.${session.id}&status=eq.active`;
       const payload = JSON.stringify({
         status: 'interrupted',
         last_activity_at: new Date().toISOString()
       });
 
-      // sendBeacon tidak support custom method (hanya POST)
-      // Supabase REST butuh PATCH — gunakan fetch keepalive sebagai fallback
-      // keepalive=true menjamin request dikirim meski halaman ditutup
+      // sendBeacon hanya POST; Supabase REST butuh PATCH → fetch keepalive
       try {
         fetch(url, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseAnonKey,
+            'Authorization': `Bearer ${accessToken}`,
             'Prefer': 'return=minimal'
           },
           body: payload,
-          keepalive: true  // kunci: browser kirim request ini meski tab ditutup
+          keepalive: true
         });
       } catch {
         // Silent fail — tidak ada yang bisa dilakukan di beforeunload
       }
     };
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, []); // Aman pakai [] karena session diakses via ref, bukan closure state
+  }, []);
 
   // Save-on-answer dengan debounce 3 detik — menggantikan interval auto-save 30 detik.
   // Dipanggil dari Quiz.tsx setiap kali user memilih jawaban.
