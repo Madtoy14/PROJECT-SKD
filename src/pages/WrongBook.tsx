@@ -8,7 +8,7 @@ import MathCard from '../components/MathCard';
 
 export default function WrongBook() {
   const navigate = useNavigate();
-  const [_profile, setProfile] = useState<UserProfile | null>(null);
+  const [, setProfile] = useState<UserProfile | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [stats, setStats] = useState({ twk: 0, tiu: 0, tkp: 0, total: 0, unresolved: 0 });
   const [loading, setLoading] = useState(true);

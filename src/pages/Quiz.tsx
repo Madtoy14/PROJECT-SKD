@@ -338,7 +338,6 @@ export default function Quiz() {
     }
     return [{ name: 'Anda', score: 0, isMe: true }];
   });
-  const [myRankPosition, setMyRankPosition] = useState(1);
   const totalScoreRef = useRef(0); // keep a ref so setTimeout closures can read latest value
   
   // --- Real-time PvP Supabase Integration ---
@@ -666,11 +665,8 @@ export default function Quiz() {
     
     return () => clearTimeout(t);
   }, [currentQuestionIndex, gameMode, botDifficulty, currentQuestion]);
-  // Sync my rank position when liveRanks changes
-  useEffect(() => {
-    const pos = liveRanks.findIndex(r => r.isMe) + 1;
-    setMyRankPosition(pos);
-  }, [liveRanks]);
+  // Derived my rank position from liveRanks
+  const myRankPosition = liveRanks.findIndex(r => r.isMe) + 1;
   // --- Answer handler ---
   const handleSelect = (optionId: string) => {
     if (isGameOver) return;

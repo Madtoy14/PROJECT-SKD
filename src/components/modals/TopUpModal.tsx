@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Coins, MessageCircle, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Coins, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../ui/Button';
 import { PACKAGES } from '../../lib/coins';
@@ -24,30 +24,48 @@ export function TopUpModal({ isOpen, onClose, onSuccess }: TopUpModalProps) {
     setError(null);
 
     const pkg = PACKAGES.find((p) => p.id === selectedPkg);
-    if (!pkg) return;
+    if (!pkg) {
+      setError('Paket koin tidak ditemukan. Silakan pilih ulang.');
+      setLoading(false);
+      return;
+    }
 
     try {
+      if (!supabase) {
+        throw new Error('Layanan pembayaran belum tersedia. Coba lagi beberapa saat.');
+      }
+
       // Create request via RPC
-      const { data, error: rpcError } = await supabase!.rpc('request_topup', {
+      const { data, error: rpcError } = await supabase.rpc('request_topup', {
+        package_id_val: pkg.id,
         amount_val: pkg.coins,
-        method_val: 'whatsapp'
+        method_val: 'instagram'
       });
 
-      if (rpcError) throw rpcError;
+      if (rpcError) {
+        const rpcMessage = rpcError.message.toLowerCase();
+        if (rpcMessage.includes('maksimal 3') || rpcMessage.includes('pending')) {
+          throw new Error('Anda masih memiliki 3 request top-up yang menunggu. Hubungi admin jika pembayaran sebelumnya sudah selesai.');
+        }
+        if (rpcMessage.includes('autentikasi') || rpcMessage.includes('jwt')) {
+          throw new Error('Sesi login tidak valid. Silakan login ulang lalu coba lagi.');
+        }
+        throw new Error('Permintaan top-up gagal dibuat. Silakan coba lagi atau hubungi admin.');
+      }
 
       const transactionId = data; // the UUID returned by RPC
+      if (!transactionId) {
+        throw new Error('ID transaksi tidak diterima dari server. Silakan coba lagi.');
+      }
       setSuccessId(transactionId);
 
-      // Open WhatsApp automatically
-      const waNumber = '6281234567890'; // Ganti dengan nomor Admin
-      const text = `Halo Admin, saya ingin top-up koin aplikasi SKD.\n\n*ID Transaksi:* ${transactionId}\n*Paket:* ${pkg.coins} Koin\n*Total Tagihan:* Rp${pkg.price.toLocaleString('id-ID')}\n\nMohon instruksi pembayarannya.`;
-      const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
-      window.open(waUrl, '_blank');
+      // Open Instagram automatically
+      window.open('https://instagram.com/skdquest', '_blank', 'noopener,noreferrer');
       
       if (onSuccess) onSuccess();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to request top-up:', err);
-      setError(err.message || 'Gagal membuat permintaan top-up. Pastikan Anda sudah login.');
+      setError(err instanceof Error ? err.message : 'Gagal membuat permintaan top-up. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
@@ -94,7 +112,7 @@ export function TopUpModal({ isOpen, onClose, onSuccess }: TopUpModalProps) {
                 </span>
               </p>
               <p className="text-xs text-fg-muted mb-4 max-w-xs">
-                Lanjutkan percakapan di WhatsApp untuk menyelesaikan pembayaran. Koin akan ditambahkan oleh admin.
+                Lanjutkan percakapan di Instagram @skdquest untuk menyelesaikan pembayaran. Kirimkan ID transaksi ini kepada admin. Koin akan ditambahkan setelah pembayaran dikonfirmasi.
               </p>
               <Button onClick={onClose} className="w-full bg-surface-subtle text-fg hover:bg-border">
                 Tutup
@@ -170,13 +188,13 @@ export function TopUpModal({ isOpen, onClose, onSuccess }: TopUpModalProps) {
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <MessageCircle size={20} className="fill-white/20" />
-                  Konfirmasi via WhatsApp
+                  <ExternalLink size={20} />
+                  Konfirmasi via Instagram
                 </>
               )}
             </Button>
             <p className="text-center text-[10px] text-fg-muted mt-3">
-              Anda akan dialihkan ke WhatsApp untuk instruksi pembayaran. Transaksi diproses secara manual oleh Admin (1-5 menit).
+              Anda akan dialihkan ke Instagram @skdquest untuk instruksi pembayaran. Transaksi diproses secara manual oleh Admin (1-5 menit).
             </p>
           </div>
         )}

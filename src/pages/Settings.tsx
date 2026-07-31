@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Eye, EyeOff, KeyRound, LogOut, Mail, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -19,12 +19,12 @@ export default function Settings() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const loadUser = async () => {
+  const loadUser = useCallback(async (showSpinner = true) => {
     if (!supabase) {
       setLoadingUser(false);
       return;
     }
-    setLoadingUser(true);
+    if (showSpinner) setLoadingUser(true);
     try {
       const { data } = await supabase.auth.getUser();
       const user = data.user;
@@ -34,16 +34,20 @@ export default function Settings() {
       }
       setEmail(user.email || '');
       const ids = (user.identities || []).map((i) => i.provider);
-      setProviders(ids);
-      setHasPassword(ids.includes('email'));
+      const appProviders = (user.app_metadata?.providers as string[]) || [];
+      const allProviders = [...new Set([...ids, ...appProviders])];
+      setProviders(allProviders);
+      setHasPassword(allProviders.includes('email'));
+    } catch (err) {
+      console.error('Gagal mengambil data user:', err);
     } finally {
-      setLoadingUser(false);
+      if (showSpinner) setLoadingUser(false);
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
-    void loadUser();
-  }, []);
+    void loadUser(true);
+  }, [loadUser]);
 
   const handleSavePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,15 +71,37 @@ export default function Settings() {
     }
     setBusy(true);
     try {
-      const { error: err } = await supabase.auth.updateUser({ password });
-      if (err) throw err;
+      // 1. Cek sesi aktif terlebih dahulu
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData?.session) {
+        throw new Error('Sesi Anda telah berakhir. Silakan login ulang terlebih dahulu.');
+      }
+
+      // 2. Wrap updateUser dengan Timeout Guard (10 detik) untuk mencegah gantung
+      const updatePromise = supabase.auth.updateUser({ password });
+      const timeoutPromise = new Promise<{ error: any }>((_, reject) =>
+        setTimeout(() => reject(new Error('Koneksi ke Supabase timeout. Coba klik simpan sekali lagi.')), 10000)
+      );
+
+      const res = (await Promise.race([updatePromise, timeoutPromise])) as { error?: any };
+      if (res?.error) throw res.error;
+
       setPassword('');
       setConfirm('');
-      setSuccess(hasPassword ? 'Password berhasil diubah.' : 'Password siap. Bisa login email lain kali.');
-      // Session tetap; refresh identities (email provider muncul setelah set password)
-      await loadUser();
+      const wasPasswordSet = hasPassword;
+      setHasPassword(true);
+      setSuccess(wasPasswordSet ? 'Password berhasil diubah.' : 'Password siap. Bisa login email lain kali.');
+      // Refresh user info silently in background without causing full-screen spinner
+      void loadUser(false);
     } catch (err: unknown) {
-      setError((err as Error)?.message || 'Gagal menyimpan password.');
+      const msg = (err as { message?: string })?.message || '';
+      if (msg.toLowerCase().includes('same password') || msg.toLowerCase().includes('should be different')) {
+        setError('Password baru tidak boleh sama dengan password lama.');
+      } else if (msg.toLowerCase().includes('password') && (msg.toLowerCase().includes('least') || msg.toLowerCase().includes('short') || msg.toLowerCase().includes('weak'))) {
+        setError(`Password minimal ${MIN_PASSWORD} karakter.`);
+      } else {
+        setError(msg || 'Gagal menyimpan password.');
+      }
     } finally {
       setBusy(false);
     }

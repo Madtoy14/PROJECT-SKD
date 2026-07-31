@@ -254,17 +254,13 @@ export default function Result() {
   const { attemptId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(!attemptId ? false : true);
+  const [error, setError] = useState<string | null>(!attemptId ? 'Attempt ID tidak ditemukan' : null);
   
-    const [resultData, setResultData] = useState<QuizResultData | null>(null);
+  const [resultData, setResultData] = useState<QuizResultData | null>(null);
 
-    useEffect(() => {
-    if (!attemptId) {
-      setError('Attempt ID tidak ditemukan');
-      setLoading(false);
-      return;
-    }
+  useEffect(() => {
+    if (!attemptId) return;
 
     const loadResult = async () => {
       setLoading(true);
