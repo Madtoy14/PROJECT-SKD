@@ -89,3 +89,10 @@ scripts/_git_*.ps1
 scripts/_push_*.txt
 scripts/_commit_*.txt
 scripts/_git_status.ps1
+
+# Large temporary screenshot / source art (use webp in repo)
+src/assets/*.png
+src/assets/login screen.png
+
+# Graphify / agent analysis output (local only)
+graphify-out/

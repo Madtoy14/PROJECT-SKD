@@ -37,7 +37,11 @@ export default function Settings() {
       const appProviders = (user.app_metadata?.providers as string[]) || [];
       const allProviders = [...new Set([...ids, ...appProviders])];
       setProviders(allProviders);
-      setHasPassword(allProviders.includes('email'));
+      // Google-only set password via updateUser doesn't always add 'email' identity;
+      // has_password metadata is the durable signal after first set.
+      setHasPassword(
+        allProviders.includes('email') || user.user_metadata?.has_password === true
+      );
     } catch (err) {
       console.error('Gagal mengambil data user:', err);
     } finally {
@@ -77,8 +81,12 @@ export default function Settings() {
         throw new Error('Sesi Anda telah berakhir. Silakan login ulang terlebih dahulu.');
       }
 
-      // 2. Wrap updateUser dengan Timeout Guard (10 detik) untuk mencegah gantung
-      const updatePromise = supabase.auth.updateUser({ password });
+      // 2. Set password + durable metadata flag (Google-only identity may stay 'google')
+      // Wrap updateUser dengan Timeout Guard (10 detik) untuk mencegah gantung
+      const updatePromise = supabase.auth.updateUser({
+        password,
+        data: { has_password: true },
+      });
       const timeoutPromise = new Promise<{ error: any }>((_, reject) =>
         setTimeout(() => reject(new Error('Koneksi ke Supabase timeout. Coba klik simpan sekali lagi.')), 10000)
       );
