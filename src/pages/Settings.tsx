@@ -37,10 +37,12 @@ export default function Settings() {
       const appProviders = (user.app_metadata?.providers as string[]) || [];
       const allProviders = [...new Set([...ids, ...appProviders])];
       setProviders(allProviders);
-      // Google-only set password via updateUser doesn't always add 'email' identity;
-      // has_password metadata is the durable signal after first set.
+      
+      const localHasPwd = localStorage.getItem(`skd_has_pwd_${user.id}`) === 'true';
       setHasPassword(
-        allProviders.includes('email') || user.user_metadata?.has_password === true
+        allProviders.includes('email') ||
+        user.user_metadata?.has_password === true ||
+        localHasPwd
       );
     } catch (err) {
       console.error('Gagal mengambil data user:', err);
@@ -77,29 +79,33 @@ export default function Settings() {
     try {
       // 1. Cek sesi aktif terlebih dahulu
       const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData?.session) {
+      const currentUser = sessionData?.session?.user;
+      if (!currentUser) {
         throw new Error('Sesi Anda telah berakhir. Silakan login ulang terlebih dahulu.');
       }
 
-      // 2. Set password + durable metadata flag (Google-only identity may stay 'google')
-      // Wrap updateUser dengan Timeout Guard (10 detik) untuk mencegah gantung
-      const updatePromise = supabase.auth.updateUser({
-        password,
-        data: { has_password: true },
-      });
+      // 2. Simpan password (hanya payload password agar GoTrue server cepat & tidak timeout)
+      const updatePromise = supabase.auth.updateUser({ password });
       const timeoutPromise = new Promise<{ error: any }>((_, reject) =>
-        setTimeout(() => reject(new Error('Koneksi ke Supabase timeout. Coba klik simpan sekali lagi.')), 10000)
+        setTimeout(() => reject(new Error('Koneksi ke Supabase timeout. Coba klik simpan sekali lagi.')), 15000)
       );
 
       const res = (await Promise.race([updatePromise, timeoutPromise])) as { error?: any };
       if (res?.error) throw res.error;
+
+      // 3. Simpan penanda lokal & metadata agar status "Email + password" tersimpan permanen
+      try {
+        localStorage.setItem(`skd_has_pwd_${currentUser.id}`, 'true');
+        void supabase.auth.updateUser({ data: { has_password: true } });
+      } catch {
+        /* ignore metadata update failure */
+      }
 
       setPassword('');
       setConfirm('');
       const wasPasswordSet = hasPassword;
       setHasPassword(true);
       setSuccess(wasPasswordSet ? 'Password berhasil diubah.' : 'Password siap. Bisa login email lain kali.');
-      // Refresh user info silently in background without causing full-screen spinner
       void loadUser(false);
     } catch (err: unknown) {
       const msg = (err as { message?: string })?.message || '';
