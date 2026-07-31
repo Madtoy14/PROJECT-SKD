@@ -191,7 +191,7 @@ function Navigation() {
           <h1 className="text-[22px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-200 bg-clip-text text-transparent group-hover:opacity-0 transition-opacity duration-300">SQ</h1>
         </div>
 
-        <ul className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-3 group-hover:px-4 space-y-1 py-2 w-full scrollbar-none">
+        <ul className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-3 group-hover:px-4 space-y-1 py-2 w-full">
           {desktopNavOrder.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path;
             return (
