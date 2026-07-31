@@ -25,6 +25,28 @@ export default function Quest() {
     fetchProfile().then(p => { setProfile(p); setLoading(false); });
   }, []);
 
+  // --- Weekly Quest Reset Check ---
+  useEffect(() => {
+    const checkWeeklyReset = async () => {
+      if (!isSupabaseConfigured() || !supabase) return;
+      try {
+        const { data, error } = await supabase.rpc('reset_weekly_quests');
+        if (error) {
+          console.error('Weekly reset check failed:', error);
+          return;
+        }
+        if (data?.reset) {
+          // Weekly quests direset, refresh profile
+          const fresh = await fetchProfile();
+          if (fresh) setProfile(fresh);
+        }
+      } catch (err) {
+        console.error('Weekly reset error:', err);
+      }
+    };
+    checkWeeklyReset();
+  }, []);
+
   // --- Real-time Midnight Reset Listener ---
   useEffect(() => {
     const todayAtMount = new Date().toDateString();
