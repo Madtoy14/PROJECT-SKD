@@ -1,4 +1,5 @@
 import { ErrorBoundary } from './components/ErrorBoundary';
+import FeedbackWidget from './components/FeedbackWidget';
 
 import { QuizSessionProvider } from './context/QuizSessionContext';
 
@@ -472,6 +473,7 @@ function AppLayout() {
   return (
     <div className="min-h-screen bg-[var(--app-bg)] text-[var(--text-main)] font-syne transition-colors flex flex-col md:flex-row overflow-x-hidden">
       <Navigation />
+      <FeedbackWidget />
       <IncomingDuelRequest />
       <main className={`flex-1 min-w-0 ${!isFullScreen ? 'md:ml-[88px] pt-12 md:pt-0 pb-20 md:pb-0' : ''} min-h-screen transition-all duration-300`}>
         <div className={`w-full h-full ${!isFullScreen ? 'max-w-7xl mx-auto' : ''}`}>
