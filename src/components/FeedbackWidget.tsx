@@ -23,7 +23,7 @@ const CATEGORIES = [
   'Lainnya',
 ];
 
-const FEEDBACK_EF_URL = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '') + '/functions/v1/send-feedback';
+const baseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '') || '';
 
 export default function FeedbackWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,23 +59,36 @@ export default function FeedbackWidget() {
     setSending(true);
     setError('');
     try {
-      const res = await fetch(FEEDBACK_EF_URL, {
+      const payload = {
+        category: category || 'Lainnya',
+        message: message.trim(),
+        user_id: user?.id,
+        email: user?.email,
+        page_path: window.location.pathname,
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+        'Authorization': `Bearer ${(await supabase?.auth.getSession())?.data?.session?.access_token || ''}`,
+      };
+
+      // Try /send-feedback first, fallback to /resend-email
+      let res = await fetch(`${baseUrl}/functions/v1/send-feedback`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${(await supabase?.auth.getSession())?.data?.session?.access_token || ''}`,
-        },
-        body: JSON.stringify({
-          category: category || 'Lainnya',
-          message: message.trim(),
-          user_id: user?.id,
-          email: user?.email,
-          page_path: window.location.pathname,
-        }),
-      });
-      if (!res.ok) {
-        const text = await res.text();
+        headers,
+        body: JSON.stringify(payload),
+      }).catch(() => null);
+
+      if (!res || !res.ok) {
+        res = await fetch(`${baseUrl}/functions/v1/resend-email`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(payload),
+        }).catch(() => null);
+      }
+
+      if (!res || !res.ok) {
+        const text = res ? await res.text() : '';
         throw new Error(text || 'Gagal mengirim');
       }
       setSent(true);
