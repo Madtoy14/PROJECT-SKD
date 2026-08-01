@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
-const ADMIN_EMAIL = Deno.env.get('FEEDBACK_EMAIL') || 'ramadhanakmaludien@gmail.com';
+const ADMIN_EMAIL = Deno.env.get('FEEDBACK_EMAIL') || 'skdquest@gmail.com';
 const FROM_EMAIL = Deno.env.get('FEEDBACK_FROM_EMAIL') || 'feedback@skdquest.vercel.app';
 
 interface FeedbackPayload {
