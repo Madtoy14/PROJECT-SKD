@@ -94,7 +94,7 @@ export default function FeedbackWidget() {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-primary hover:bg-primary-hover text-primary-fg rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-[60] w-14 h-14 bg-primary hover:bg-primary-hover text-primary-fg rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
         aria-label="Bantuan & Feedback"
       >
         {isOpen ? <X size={24} /> : <MessageCircleQuestion size={24} />}
@@ -109,7 +109,7 @@ export default function FeedbackWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="fixed bottom-24 right-6 z-[60] w-[92vw] max-w-sm bg-surface border border-border rounded-2xl shadow-2xl flex flex-col max-h-[70vh] overflow-hidden"
+            className="fixed bottom-36 md:bottom-24 right-4 md:right-6 z-[60] w-[92vw] max-w-sm bg-surface border border-border rounded-2xl shadow-2xl flex flex-col max-h-[70vh] overflow-hidden"
           >
             {/* Header */}
             <div className="px-5 py-4 border-b border-border bg-primary/5 shrink-0">
