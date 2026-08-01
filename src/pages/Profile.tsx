@@ -651,7 +651,7 @@ export default function Profile() {
             <div className="inline-flex items-center px-4 py-1.5 bg-coin-subtle border border-yellow-500/30 text-coin rounded-full text-xs font-bold mb-4 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
               Target: {SCHOOLS.find(s => s.id === (profile?.target_kedinasan || 'ipdn'))?.name || 'Sekolah Kedinasan'}
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-1 tracking-tight text-fg flex flex-wrap items-center gap-2 break-words max-w-full">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-1 tracking-tight text-fg block text-center md:flex md:flex-wrap md:items-center md:gap-2 md:text-left break-words max-w-full">
               {profile ? (profile.nickname || profile.username) : 'Pejuang SKD'}
             </h2>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 mb-2">
@@ -728,8 +728,8 @@ export default function Profile() {
           </div>
         </motion.section>
         {/* Dynamic Rank Card & stats info */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-8">
             {/* Season Rank Card */}
             <motion.section variants={itemVariants}>
               <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
@@ -764,7 +764,10 @@ export default function Profile() {
                 ))}
               </div>
             </motion.section>
+          </div>
 
+          {/* Right Column: Chart, Badges, Rivals */}
+          <div className="space-y-8">
             {/* Analisis Radar Chart & Rekomendasi Belajar */}
             <motion.section variants={itemVariants} className="bg-surface-subtle border border-border rounded-[2rem] p-6 shadow-xl relative overflow-hidden backdrop-blur-md">
               <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -853,9 +856,9 @@ export default function Profile() {
                 ))}
               </div>
             </motion.section>
-          </div>
-          {/* Right Column: Friends / Rivals */}
-          <motion.section variants={itemVariants} className="md:col-span-1 flex flex-col">
+
+            {/* Rivals */}
+            <motion.section variants={itemVariants} className="flex flex-col">
             <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
               <Swords size={24} className="text-red-400" />
               Daftar Rival
@@ -930,6 +933,7 @@ export default function Profile() {
               </div>
             </div>
           </motion.section>
+          </div>
         </div>
       </motion.div>
 
