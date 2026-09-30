@@ -82,7 +82,7 @@ export default function Auth() {
             <div className="text-center mb-8">
               <div className="w-20 h-20 flex items-center justify-center mx-auto mb-5 drop-shadow-xl hover:scale-105 transition-transform duration-300">
                 <img 
-                  src={supabase.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl} 
+                  src={supabase?.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl || ''} 
                   alt="SKDQuest Logo" 
                   className="w-full h-full object-contain"
                 />
