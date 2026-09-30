@@ -54,73 +54,72 @@ export default function Auth() {
 
       {/* Top Right Floating Widget */}
       <div className="absolute top-6 right-6 z-30 hidden lg:flex items-center gap-3 bg-white/20 backdrop-blur-md border border-white/30 text-white px-5 py-2.5 rounded-full shadow-lg">
-        <span className="text-xl">👑</span>
         <div className="text-xs font-medium leading-tight">
           Platform latihan SKD/CAT<br />untuk masa depan yang lebih baik
         </div>
       </div>
 
       <div className="relative z-10 w-full flex flex-col lg:flex-row">
-        
+
         {/* ── Sisi Kiri: Konten & Fitur ── */}
-        <div className="w-full lg:w-3/5 flex flex-col justify-between p-8 sm:p-12 lg:p-16 lg:pr-24">
+        <div className="w-full lg:w-3/5 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:pr-20">
           {/* Logo & Header Kiri */}
-          <div className="flex items-center gap-4 mb-12 lg:mb-0">
-            <img src={logoUrl} alt="Logo" className="w-14 h-14 object-contain drop-shadow-md" />
+          <div className="flex items-center gap-3 sm:gap-4 mb-10 lg:mb-0">
+            <img src={logoUrl} alt="Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-md" />
             <div>
-              <h1 className="text-2xl font-black text-white tracking-tight">SKD<span className="text-blue-500">Quest</span></h1>
-              <p className="text-white/80 text-xs font-medium mt-0.5">Latihan Hari Ini, Langkah Lebih Dekat<br/>Menuju Abdi Negara</p>
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">SKD<span className="text-blue-500">Quest</span></h1>
+              <p className="text-white/80 text-[10px] sm:text-xs font-medium mt-0.5 sm:mt-1">LEVEL UP, Reach Your Dream!</p>
             </div>
           </div>
 
           <div className="flex-1 flex flex-col justify-center max-w-2xl mt-8 lg:mt-0">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black mb-6 tracking-tighter text-white leading-[1.1] drop-shadow-lg">
+            <h1 className="text-3xl sm:text-5xl lg:text-5xl xl:text-6xl font-black mb-4 sm:mb-6 tracking-tight text-white leading-[1.15] drop-shadow-lg">
               Taklukan<br />
               Rintangannya<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 drop-shadow-sm">
                 Raih Mimpimu.
               </span>
             </h1>
-            
-            <p className="text-sm sm:text-base lg:text-lg text-white/90 font-medium leading-relaxed max-w-xl mb-10 drop-shadow">
-              Latihan soal SKD/CAT dengan ribuan soal berkualitas, pembahasan lengkap, dan fitur yang dirancang khusus untuk perjalananmu menjadi ASN.
+
+            <p className="text-xs sm:text-sm lg:text-base text-white/90 font-medium leading-relaxed max-w-xl mb-8 drop-shadow">
+              Persiapkan dirimu dengan ribuan soal SKD/CAT berkualitas. Dilengkapi pembahasan mendalam dan simulasi realistis untuk memuluskan langkahmu menjadi abdi negara.
             </p>
 
             {/* Fitur Icons */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-12">
-              <div className="flex flex-col items-start gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-blue-600/80 backdrop-blur-sm border border-blue-400/30 flex items-center justify-center shadow-lg">
-                  <FileText className="text-white" size={24} />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8 lg:mb-10">
+              <div className="flex flex-col items-start gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-600/80 backdrop-blur-sm border border-blue-400/30 flex items-center justify-center shadow-lg">
+                  <FileText className="text-white" size={20} />
                 </div>
-                <span className="text-white text-xs font-bold leading-tight">Ribuan Soal<br/>Terupdate</span>
+                <span className="text-white text-[11px] sm:text-xs font-bold leading-tight">Ribuan Soal<br />Terupdate</span>
               </div>
-              <div className="flex flex-col items-start gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-600/80 backdrop-blur-sm border border-indigo-400/30 flex items-center justify-center shadow-lg">
-                  <BarChart2 className="text-white" size={24} />
+              <div className="flex flex-col items-start gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600/80 backdrop-blur-sm border border-indigo-400/30 flex items-center justify-center shadow-lg">
+                  <BarChart2 className="text-white" size={20} />
                 </div>
-                <span className="text-white text-xs font-bold leading-tight">Pembahasan<br/>Lengkap</span>
+                <span className="text-white text-[11px] sm:text-xs font-bold leading-tight">Pembahasan<br />Lengkap</span>
               </div>
-              <div className="flex flex-col items-start gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-blue-600/80 backdrop-blur-sm border border-blue-400/30 flex items-center justify-center shadow-lg">
-                  <Target className="text-white" size={24} />
+              <div className="flex flex-col items-start gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-600/80 backdrop-blur-sm border border-blue-400/30 flex items-center justify-center shadow-lg">
+                  <Target className="text-white" size={20} />
                 </div>
-                <span className="text-white text-xs font-bold leading-tight">Simulasi<br/>CAT Realistis</span>
+                <span className="text-white text-[11px] sm:text-xs font-bold leading-tight">Simulasi<br />CAT Realistis</span>
               </div>
-              <div className="flex flex-col items-start gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-blue-700/80 backdrop-blur-sm border border-blue-400/30 flex items-center justify-center shadow-lg">
-                  <Crown className="text-white" size={24} />
+              <div className="flex flex-col items-start gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-700/80 backdrop-blur-sm border border-blue-400/30 flex items-center justify-center shadow-lg">
+                  <Crown className="text-white" size={20} />
                 </div>
-                <span className="text-white text-xs font-bold leading-tight">Sistem Koin<br/>yang Fleksibel</span>
+                <span className="text-white text-[11px] sm:text-xs font-bold leading-tight">Belajar seru<br />Anti bosan</span>
               </div>
             </div>
           </div>
 
           {/* Quote Section */}
-          <div className="mt-auto bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-5 sm:p-6 max-w-xl flex gap-4 items-start shadow-xl">
-            <Quote className="text-white/40 shrink-0 rotate-180" size={32} />
+          <div className="mt-auto bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-5 max-w-lg flex gap-3 sm:gap-4 items-start shadow-xl">
+            <Quote className="text-white/40 shrink-0 rotate-180 mt-1" size={24} />
             <div>
-              <p className="text-white/90 text-sm italic font-medium leading-relaxed mb-2">
-                "Persiapan hari ini adalah investasi untuk masa depan yang kamu impikan."
+              <p className="text-white/90 text-xs sm:text-sm italic font-medium leading-relaxed mb-1.5">
+                "Ad maiora natus sum" <br /> Aku dilahirkan untuk hal-hal yang lebih besar
               </p>
               <p className="text-white/60 text-xs font-bold">— SKDQuest</p>
             </div>
@@ -128,25 +127,25 @@ export default function Auth() {
         </div>
 
         {/* ── Sisi Kanan: Panel Auth ── */}
-        <div className="w-full lg:w-2/5 flex items-center justify-center p-6 sm:p-12 relative z-20">
-          <div className="w-full max-w-md bg-white rounded-[2rem] p-8 sm:p-10 shadow-2xl relative overflow-hidden">
-            
+        <div className="w-full lg:w-2/5 flex items-center justify-center p-4 sm:p-8 lg:p-10 xl:p-12 relative z-20">
+          <div className="w-full max-w-sm lg:max-w-[24rem] xl:max-w-md bg-white rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+
             {/* Dekorasi halus di dalam card */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full opacity-50 pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-50 rounded-tr-full opacity-50 pointer-events-none" />
 
             <div className="relative z-10">
               {/* Header Card */}
-              <div className="text-center mb-8">
-                <img src={logoUrl} alt="Logo" className="w-16 h-16 object-contain mx-auto mb-4 drop-shadow-md" />
-                <h2 className="text-2xl sm:text-3xl font-black mb-2 text-gray-900 tracking-tight">
+              <div className="text-center mb-6 sm:mb-8">
+                <img src={logoUrl} alt="Logo" className="w-12 h-12 sm:w-14 sm:h-14 object-contain mx-auto mb-3 sm:mb-4 drop-shadow-md" />
+                <h2 className="text-xl sm:text-2xl font-black mb-1.5 sm:mb-2 text-gray-900 tracking-tight">
                   Masuk ke <span className="text-blue-600">SKDQuest</span>
                 </h2>
-                <p className="text-blue-600 font-bold text-sm mb-1">
-                  Selamat datang kembali! ✨
+                <p className="text-blue-600 font-bold text-xs sm:text-sm mb-1">
+                  Selamat datang!
                 </p>
-                <p className="text-gray-500 font-medium text-xs leading-relaxed px-4">
-                  Lanjutkan perjalananmu menuju ASN dengan masuk ke akunmu.
+                <p className="text-gray-500 font-medium text-[11px] sm:text-xs leading-relaxed px-2 sm:px-4">
+                  Siap menaklukkan soal-soal hari ini? Mari mulai!
                 </p>
               </div>
 
@@ -168,7 +167,7 @@ export default function Auth() {
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={loading}
-                  className="w-full bg-white border-2 border-gray-100 text-gray-700 font-bold py-3.5 rounded-2xl shadow-sm hover:border-gray-200 hover:bg-gray-50 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-3"
+                  className="w-full bg-white border-2 border-gray-100 text-gray-700 text-sm sm:text-base font-bold py-3 rounded-xl sm:rounded-2xl shadow-sm hover:border-gray-200 hover:bg-gray-50 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-2 sm:gap-3"
                 >
                   {loading ? (
                     <>
