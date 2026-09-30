@@ -71,6 +71,14 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [availableCharacters, setAvailableCharacters] = useState<Character[]>([]);
+
+  const getImageUrl = (filename: string) => {
+    if (supabase) {
+      return supabase.storage.from('background').getPublicUrl(filename).data.publicUrl;
+    }
+    return '';
+  };
+  
   useEffect(() => {
     setLoading(true);
     fetchAvailableCharacters().then(setAvailableCharacters);
@@ -1003,7 +1011,7 @@ export default function Dashboard() {
             >
               {/* Latar Belakang Gambar Full */}
               <div className="absolute inset-0 z-0 pointer-events-none">
-                <img src="https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/Latihan%20Harian.png" alt="Belajar" className="w-full h-full object-cover object-right sm:object-center" />
+                <img src={getImageUrl('Latihan Harian.png')} alt="Belajar" className="w-full h-full object-cover object-right sm:object-center" />
                 {/* Gradient supaya text terbaca, pekat di kiri, transparan di kanan */}
                 <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/90 to-transparent dark:from-surface dark:via-surface/95 dark:to-surface/10" />
               </div>
@@ -1162,13 +1170,13 @@ export default function Dashboard() {
               let imgSource = "";
 
               if (mode.id === 'survival') {
-                imgSource = "https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/survival-mode.png";
+                imgSource = getImageUrl('survival-mode.png');
               } else if (mode.id === 'pvp') {
-                imgSource = "https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/pvp-battle.png";
+                imgSource = getImageUrl('pvp-battle.png');
               } else if (mode.id === 'tryout') {
-                imgSource = "https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/tryout-mode%20.png";
+                imgSource = getImageUrl('tryout-mode .png');
               } else if (mode.id === 'catatan_salah') {
-                imgSource = "https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/catatan%20salah.png";
+                imgSource = getImageUrl('catatan salah.png');
               }
 
               return (
