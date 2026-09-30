@@ -1,11 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
-import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut, Clock, Eye, RefreshCw, Sparkles, PartyPopper } from 'lucide-react';
+import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut, Clock, Eye, RefreshCw, Sparkles, PartyPopper, BarChart2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProfile, resetDailyQuests, syncEnergy, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character, type UserProfile } from '../lib/supabase';
 import RankBadge from '../components/RankBadge';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import avatarPdh from '../assets/avatar_pdh.webp';
+import dailyStudyBanner from '../assets/daily_study_banner.jpg';
+import survivalModeImg from '../assets/survival_mode.jpg';
+import pvpBattleImg from '../assets/pvp_battle.jpg';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 
 
@@ -990,219 +993,368 @@ export default function Dashboard() {
             </div>
           </div>
         </motion.div>
-        {/* ── GAME MODES (MAIN FOCUS) ── */}
-        <motion.section variants={itemVariants} className="space-y-4 pt-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[18px] sm:text-[20px] font-semibold text-fg tracking-tight">Mode Permainan</h2>
-            <span className="text-[12px] text-fg-muted font-medium hidden sm:block">Pilih Mode Permainan</span>
-          </div>
-          <div className="flex flex-col gap-3 md:gap-4">
-            {/* Primary CTA: Latihan Harian */}
-            {GAME_MODES.filter(m => m.id === 'latihan').map(mode => (
-              <motion.div
-                key={mode.id}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setSelectedMode(mode)}
-                className="bg-surface rounded-2xl border-l-[6px] border-l-success border-t border-r border-b border-border transition-all cursor-pointer p-5 sm:p-6 shadow-sm relative overflow-hidden group flex flex-col sm:flex-row items-center sm:justify-between gap-5"
-              >
-                <div className="flex items-center gap-4 w-full sm:w-auto">
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-success-subtle text-success shrink-0">
-                    <mode.icon size={28} />
+        {/* ── LATIHAN & STREAK (ROW 1) ── */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 pt-2">
+          {/* Latihan Harian Banner (xl:col-span-8) */}
+          {GAME_MODES.filter(m => m.id === 'latihan').map(mode => (
+            <motion.section 
+              key={mode.id}
+              variants={itemVariants}
+              whileHover={{ scale: 1.01 }}
+              onClick={() => setSelectedMode(mode)}
+              className="xl:col-span-8 bg-surface rounded-[24px] border-2 border-success/20 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all relative flex flex-col sm:flex-row"
+            >
+              {/* Latar Belakang Gradient (Kiri) */}
+              <div className="absolute inset-0 w-full sm:w-2/3 bg-gradient-to-r from-success/10 via-success/5 to-transparent z-0 pointer-events-none" />
+              
+              <div className="p-6 md:p-8 flex-1 relative z-10 flex flex-col justify-center">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-success text-white flex items-center justify-center shadow-md shrink-0">
+                    <mode.icon size={24} />
                   </div>
-                  <div className="text-left">
-                    <h4 className="font-black text-[22px] text-fg leading-tight">{mode.title}</h4>
-                    <p className="text-[13px] text-fg-muted mt-1 font-medium">{mode.desc}</p>
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-fg bg-surface-subtle px-2.5 py-1 rounded-md w-fit border border-border mt-2.5">
-                      <Zap size={12} className="text-energy" />
-                      <span>{mode.cost} Energi</span>
-                    </div>
+                  <div>
+                    <span className="text-[10px] font-black text-success tracking-widest uppercase bg-success-subtle px-2 py-1 rounded-md border border-success/20">
+                      Mode Utama
+                    </span>
+                    <h3 className="text-2xl md:text-3xl font-black text-fg mt-1 leading-none">{mode.title}</h3>
                   </div>
                 </div>
-                <div className="w-full sm:w-auto relative shrink-0">
-                  <motion.button
-                    animate={{
-                      boxShadow: ['0 0 0px rgba(74, 222, 128, 0)', '0 0 20px rgba(74, 222, 128, 0.4)', '0 0 0px rgba(74, 222, 128, 0)']
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-full sm:w-auto px-8 py-3.5 bg-primary text-primary-fg focus-visible:outline-none focus-visible:ring focus-visible:ring-ring rounded-xl font-bold text-[15px] hover:brightness-110 transition-all z-10 relative"
-                  >
-                    Mulai Sekarang
-                  </motion.button>
-                </div>
-              </motion.div>
-            ))}
-            {/* Secondary Modes */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
-              {GAME_MODES.filter(m => m.id !== 'latihan').map((mode) => {
-                let accentColor = '';
-                if (mode.id === 'survival') accentColor = 'border-l-danger';
-                else if (mode.id === 'pvp') accentColor = 'border-l-info';
-                else if (mode.id === 'tryout') accentColor = 'border-l-premium';
-                return (
-                  <motion.div
-                    key={mode.id}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelectedMode(mode)}
-                    className={`bg-surface rounded-xl border-l-[5px] ${accentColor} border-t border-r border-b border-border transition-all cursor-pointer p-4 shadow-sm flex flex-col gap-2 group relative`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${mode.bg} ${mode.color}`}>
-                        <mode.icon size={20} />
-                      </div>
-                      <div>
-                        <h4 className="font-black text-[15px] text-fg leading-tight group-hover:text-primary transition-colors">{mode.title}</h4>
-                        <div className="absolute top-3 right-3 text-[9px] font-bold text-fg-muted uppercase bg-surface-subtle px-1.5 py-0.5 rounded border border-border">
-                          {mode.badge}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-[12px] text-fg-muted font-medium line-clamp-2 mt-1">
-                      {mode.id === 'catatan_salah' && (profile?.catatan_salah?.length ?? 0) > 0
-                        ? `${profile?.catatan_salah?.length} soal menunggu dipelajari ulang`
-                        : mode.desc}
-                    </p>
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-fg mt-auto pt-2">
-                      {mode.costType === 'energy' ? <Zap size={12} className="text-energy" /> : <Coins size={12} className="text-coin" />}
-                      <span>{mode.cost.toLocaleString()} {mode.costType === 'energy' ? 'Energi' : 'Koin'}</span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </motion.section>
-        {/* ── STREAK + STATS ROW ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2">
-          {/* Streak Section */}
-          <motion.section variants={itemVariants} className="lg:col-span-7 bg-surface rounded-2xl p-5 border border-border shadow-sm flex flex-col">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2 mb-3">
-              <div>
-                <h3 className="text-[15px] sm:text-[18px] md:text-[20px] font-semibold text-fg tracking-tight flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  <Flame className="text-streak" size={20} />
-                  Streak Harian
-                  {/* Hari ke-X badge prominent */}
-                  <motion.span
-                    key={totalStreak}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 18 }}
-                    className="ml-0 sm:ml-1 px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] sm:text-[11px] font-black rounded-full shadow-sm shrink-0"
-                  >
-                    Hari ke-{totalStreak + (isStreakClaimed ? 1 : 0)}
-                  </motion.span>
-                </h3>
-                <p className="text-[13px] text-fg-muted font-medium mt-0.5">
-                  {(() => {
-                    const displayStreak = totalStreak; // totalStreak sudah include hari ini jika claimed
-                    const toMega = displayStreak === 0 ? 30 : (30 - (displayStreak % 30 || 30));
-                    if (isTodayMegaReward) return `${displayStreak} hari · 🏆 MEGA REWARD tercapai!`;
-                    return `${displayStreak} hari beruntun · Mega tiap 30 hari (+${toMega} hari lagi)`;
-                  })()}
+                <p className="text-sm text-fg-muted font-medium mb-6 max-w-sm">
+                  {mode.desc} dengan ribuan soal berkualitas dan pembahasan lengkap.
                 </p>
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-auto">
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-colors w-full sm:w-auto"
+                  >
+                    Mulai Sekarang <ChevronRight size={18} />
+                  </motion.button>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-fg bg-surface-subtle px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
+                      <Zap size={14} className="text-energy" /> {mode.cost} Energi
+                    </div>
+                    <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-fg bg-surface-subtle px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
+                      <BarChart2 size={14} className="text-info" /> Ribuan soal tersedia
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 text-right pb-1 flex-wrap justify-start sm:justify-end">
-                <button
-                  type="button"
-                  onClick={handleDailyClaim}
-                  disabled={isStreakClaimed || isProcessing}
-                  className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded shadow-sm active:scale-95 shrink-0 flex items-center gap-1.5 transition-all ${
-                    isStreakClaimed
-                      ? 'bg-success/15 text-success cursor-default'
-                      : 'bg-primary text-primary-fg hover:opacity-90 animate-pulse'
-                  }`}
-                >
-                  <Flame size={12} />
-                  {isStreakClaimed ? 'Sudah klaim hari ini' : (isProcessing ? 'Memproses...' : 'Klaim Harian')}
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => setShowSpinWheel(true)}
-                  className="text-[10px] font-bold text-premium uppercase tracking-wider bg-premium-subtle px-3 py-1.5 rounded hover:bg-premium-subtle transition-all flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0"
-                >
-                  <Gift size={12} /> Spin Harian 🎡
-                </button>
+              
+              {/* Gambar Ilustrasi (Kanan) */}
+              <div className="hidden sm:block w-2/5 relative z-10 pointer-events-none overflow-hidden">
+                 <div className="absolute inset-0 bg-gradient-to-r from-surface to-transparent w-24 z-10" />
+                 <img src={dailyStudyBanner} alt="Belajar" className="w-full h-full object-cover object-left" />
+              </div>
+            </motion.section>
+          ))}
+
+          {/* Streak Harian (xl:col-span-4) */}
+          <motion.section variants={itemVariants} className="xl:col-span-4 bg-surface rounded-[24px] p-6 border border-border shadow-sm flex flex-col justify-between">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                 <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shrink-0">
+                   <Flame className="text-orange-500" size={26} />
+                 </div>
+                 <div>
+                   <h3 className="text-[18px] font-bold text-fg leading-none mb-1 flex items-center flex-wrap gap-2">
+                     Streak Harian
+                     <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-black rounded-md whitespace-nowrap">
+                       Hari ke-{totalStreak + (isStreakClaimed ? 1 : 0)}
+                     </span>
+                   </h3>
+                   <p className="text-[11px] text-fg-muted font-medium">
+                     {(() => {
+                       const displayStreak = totalStreak;
+                       const toMega = displayStreak === 0 ? 30 : (30 - (displayStreak % 30 || 30));
+                       if (isTodayMegaReward) return `${displayStreak} hari beruntun · 🏆 MEGA REWARD!`;
+                       return `${displayStreak} hari beruntun · Mega tiap 30 hari (+${toMega} hari lagi)`;
+                     })()}
+                   </p>
+                 </div>
               </div>
             </div>
-            {/* Motivational Progress Bar */}
-            <div className="w-full h-2.5 bg-surface-subtle rounded-full overflow-hidden border border-border mb-5">
+
+            <div className="w-full h-3 bg-surface-subtle rounded-full overflow-hidden border border-border mb-6">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${((totalStreak + (isStreakClaimed ? 1 : 0)) / 30) * 100}%` }}
                 transition={{ duration: 1.5, delay: 0.2 }}
-                className="h-full bg-gradient-to-r from-primary to-premium rounded-full"
+                className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full"
               />
             </div>
-            <div className="flex justify-between items-center w-full mt-auto">
+
+            <div className="flex justify-between items-center w-full mb-6 gap-1">
               {weeklyStreakData.map((day, idx) => {
                 const isRewardBox = day.isDay7 || day.isMega;
                 const isToday = day.status === 'current';
                 const canClaimToday = isToday && !isStreakClaimed;
+                
                 if (isRewardBox) {
                   return (
                     <div key={idx} className="flex flex-col items-center gap-1.5">
-                      <div className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all
-                        ${day.status === 'done' ? 'bg-success border-success text-white' :
-                          day.status === 'current' ? 'border-premium bg-premium-subtle text-premium-text shadow-[0_0_12px_rgba(245,166,35,0.4)]' :
+                      <div className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all shrink-0
+                        ${day.status === 'done' ? 'bg-success/10 border-success text-success' :
+                          day.status === 'current' ? 'border-premium bg-premium-subtle text-premium shadow-[0_0_12px_rgba(245,166,35,0.4)]' :
                             'border-border bg-surface-subtle text-fg-muted'}`}
                       >
-                        {day.status === 'done' ? <Check size={16} strokeWidth={3} /> : <Gift size={16} className={day.status === 'future' ? 'opacity-50' : ''} />}
+                        {day.status === 'done' ? <Check size={18} strokeWidth={3} /> : <Gift size={18} className={day.status === 'future' ? 'opacity-50' : ''} />}
                         {canClaimToday && (
                           <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 1.5, repeat: Infinity }}
                             className="absolute inset-0 border-2 border-premium rounded-full pointer-events-none" />
                         )}
                       </div>
-                      <span className={`text-[10px] font-bold ${day.status === 'done' ? 'text-success' : day.status === 'current' ? 'text-premium' : 'text-fg-muted'}`}>
-                        {day.status === 'done' ? '✓' : day.isMega ? '+50🪙' : '+10🪙'}
+                      <span className={`text-[9px] sm:text-[10px] font-bold whitespace-nowrap ${day.status === 'done' ? 'text-success' : day.status === 'current' ? 'text-premium' : 'text-fg-muted'}`}>
+                        {day.status === 'done' ? '+30' : day.isMega ? '+50🪙' : '+10🪙'}
                       </span>
                     </div>
                   );
                 }
+
                 return (
                   <div key={idx} className="flex flex-col items-center gap-1.5">
-                    <div className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all
+                    <div className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all shrink-0
                       ${day.status === 'done' ? 'bg-success border-success text-white' :
-                        day.status === 'current' ? 'border-primary bg-primary-subtle text-primary' :
-                          'border-border bg-surface-subtle text-fg-muted'}`}
+                        day.status === 'current' ? 'border-orange-500 bg-orange-500/10 text-orange-500' :
+                          'border-border bg-surface-subtle text-border/50'}`}
                     >
                       {day.status === 'done' && <Check size={16} strokeWidth={3} />}
                       {day.status === 'current' && !isStreakClaimed && (
-                        <>
-                          <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                          <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }}
-                            className="absolute inset-0 border-2 border-primary rounded-full pointer-events-none" />
-                        </>
+                        <Flame size={18} className="animate-pulse" />
                       )}
                     </div>
-                    <span className={`text-[10px] font-bold ${day.status === 'current' ? 'text-primary' : 'text-fg-muted'}`}>{day.day}</span>
+                    <span className={`text-[9px] sm:text-[10px] font-bold ${day.status === 'current' ? 'text-orange-500' : 'text-fg-muted'}`}>{day.day}</span>
                   </div>
                 );
               })}
             </div>
+            
+            <div className="flex items-center gap-2 mt-auto">
+              <button
+                type="button"
+                onClick={handleDailyClaim}
+                disabled={isStreakClaimed || isProcessing}
+                className={`flex-1 text-xs sm:text-sm font-bold uppercase tracking-wider py-3 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 ${
+                  isStreakClaimed
+                    ? 'bg-success/10 text-success border border-success/20 cursor-default'
+                    : 'bg-primary text-primary-fg hover:bg-primary-hover active:scale-95'
+                }`}
+              >
+                {isStreakClaimed ? <><Check size={16} /> Sudah Klaim</> : (isProcessing ? 'Memproses...' : 'Klaim Sekarang')}
+              </button>
+              <button 
+                type="button"
+                onClick={() => setShowSpinWheel(true)}
+                className="w-12 h-12 flex items-center justify-center text-premium bg-premium-subtle hover:bg-premium/20 rounded-xl transition-all shadow-sm active:scale-95 border border-premium/20 shrink-0"
+                title="Spin Harian"
+              >
+                <Sparkles size={20} />
+              </button>
+            </div>
           </motion.section>
-          {/* Quick Stats */}
-          <motion.section variants={itemVariants} className="lg:col-span-5 flex flex-col">
-            <h3 className="text-[18px] sm:text-[20px] font-semibold text-fg tracking-tight mb-3">Statistik</h3>
-            <div className="grid grid-cols-3 gap-3 flex-1">
-              {[
-                { icon: Activity, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success', value: totalDijawab, label: 'Dijawab', suffix: '' },
-                { icon: Crosshair, color: 'text-info', bg: 'bg-info/', border: 'border-info/20', value: calculatedAkurasi, label: 'Akurasi', suffix: '%' },
-                { icon: Flame, color: 'text-primary', bg: 'bg-primary-subtle', border: 'border-primary/20', value: calculatedCombo, label: 'Combo', suffix: '', prefix: 'x' },
-              ].map((stat, i) => (
-                <motion.div key={i} whileHover={{ y: -4, scale: 1.02 }} className={`bg-surface rounded-2xl p-4 border ${stat.border} shadow-sm flex flex-col items-center justify-center text-center gap-3 relative overflow-hidden group cursor-default transition-shadow hover:shadow-md`}>
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.bg} transition-transform group-hover:scale-110`}>
-                    <stat.icon className={stat.color} size={20} />
+        </div>
+
+        {/* ── MODE PERMAINAN (ROW 2) ── */}
+        <motion.section variants={itemVariants} className="pt-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[18px] sm:text-[20px] font-bold text-fg tracking-tight">Mode Permainan</h2>
+            <span className="text-[11px] sm:text-xs text-info font-bold cursor-pointer hover:underline flex items-center gap-1">
+              Pilih Mode <ChevronRight size={14} className="hidden sm:block" />
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {GAME_MODES.filter(m => m.id !== 'latihan').map((mode) => {
+              // Custom styles matching mockup
+              let bgClass = "bg-surface";
+              let imgSource = "";
+              let imgOverlay = "";
+              
+              if (mode.id === 'survival') {
+                imgSource = survivalModeImg;
+                bgClass = "bg-gradient-to-b from-red-50 to-white dark:from-red-950/30 dark:to-surface";
+                imgOverlay = "bg-gradient-to-t from-white via-white/80 dark:from-surface dark:via-surface/90 to-transparent";
+              } else if (mode.id === 'pvp') {
+                imgSource = pvpBattleImg;
+                bgClass = "bg-gradient-to-b from-blue-50 to-white dark:from-blue-950/30 dark:to-surface";
+                imgOverlay = "bg-gradient-to-t from-white via-white/80 dark:from-surface dark:via-surface/90 to-transparent";
+              } else if (mode.id === 'tryout') {
+                bgClass = "bg-gradient-to-br from-premium-subtle/50 to-surface";
+              } else if (mode.id === 'catatan_salah') {
+                bgClass = "bg-gradient-to-br from-orange-500/10 to-surface";
+              }
+
+              return (
+                <motion.div
+                  key={mode.id}
+                  whileHover={{ y: -4 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setSelectedMode(mode)}
+                  className={`rounded-[20px] border border-border transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col relative overflow-hidden group min-h-[170px] ${bgClass}`}
+                >
+                  {/* Image Background if applicable */}
+                  {imgSource && (
+                    <div className="absolute inset-x-0 top-0 h-[110px] z-0 overflow-hidden">
+                      <img src={imgSource} className="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500" />
+                      <div className={`absolute inset-0 ${imgOverlay}`} />
+                    </div>
+                  )}
+
+                  <div className="p-4 flex flex-col h-full relative z-10">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${mode.bg} ${mode.color}`}>
+                        <mode.icon size={20} />
+                      </div>
+                      <div className="text-[9px] font-bold text-fg-muted uppercase bg-surface/80 backdrop-blur-md px-2 py-1 rounded-md border border-border">
+                        {mode.badge}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-black text-[16px] text-fg leading-tight group-hover:text-primary transition-colors">{mode.title}</h4>
+                      <p className="text-[11px] text-fg-muted font-medium mt-1.5 leading-snug line-clamp-2">
+                        {mode.id === 'catatan_salah' && (profile?.catatan_salah?.length ?? 0) > 0
+                          ? `${profile?.catatan_salah?.length} soal menunggu dipelajari ulang.`
+                          : mode.desc}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-auto pt-4">
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-fg bg-surface/60 px-2.5 py-1 rounded-md">
+                        {mode.costType === 'energy' ? <Zap size={14} className="text-energy" /> : <Coins size={14} className="text-coin" />}
+                        <span>{mode.cost.toLocaleString()} {mode.costType === 'energy' ? 'Energi' : 'Koin'}</span>
+                      </div>
+                      <div className="w-6 h-6 rounded-full bg-surface flex items-center justify-center border border-border text-fg-muted group-hover:bg-primary group-hover:text-white transition-colors">
+                        <ChevronRight size={14} />
+                      </div>
+                    </div>
                   </div>
-                  <div className="relative z-10">
-                    <p className="text-2xl font-black text-fg font-space leading-none mb-1">
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.section>
+
+        {/* ── STATS & QUESTS (ROW 3) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-4">
+          {/* Quick Stats (lg:col-span-7) */}
+          <motion.section variants={itemVariants} className="lg:col-span-7 flex flex-col bg-surface rounded-[24px] p-6 border border-border shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
+                <BarChart2 size={20} className="text-info" /> Statistik Belajar
+              </h3>
+              <select className="bg-surface-subtle border border-border rounded-lg text-xs font-bold text-fg px-2 py-1.5 outline-none cursor-pointer">
+                <option>7 Hari Terakhir</option>
+                <option>30 Hari Terakhir</option>
+                <option>Semua Waktu</option>
+              </select>
+            </div>
+            
+            <p className="text-xs text-fg-muted font-medium mb-5">Lihat perkembangan kemampuanmu</p>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1">
+              {[
+                { icon: Activity, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success/20', value: totalDijawab, label: 'Dijawab', suffix: '', trend: '+12%', isUp: true },
+                { icon: Crosshair, color: 'text-info', bg: 'bg-info/10', border: 'border-info/20', value: calculatedAkurasi, label: 'Akurasi', suffix: '%', trend: '+5%', isUp: true },
+                { icon: Flame, color: 'text-primary', bg: 'bg-primary-subtle', border: 'border-primary/20', value: calculatedCombo, label: 'Combo', suffix: '', prefix: 'x', trend: '+8%', isUp: true },
+                { icon: Clock, color: 'text-danger', bg: 'bg-danger-subtle', border: 'border-danger/20', value: (profile?.catatan_salah?.length ?? 0), label: 'Soal Salah', suffix: '', trend: '-15%', isUp: false },
+              ].map((stat, i) => (
+                <motion.div key={i} whileHover={{ y: -2 }} className={`bg-surface rounded-[20px] p-4 border border-border shadow-sm flex flex-col justify-between group cursor-default transition-shadow hover:shadow-md`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${stat.bg} mb-4`}>
+                    <stat.icon className={stat.color} size={16} />
+                  </div>
+                  <div>
+                    <p className="text-[22px] sm:text-[24px] font-black text-fg font-space leading-none mb-1 tracking-tight">
                       {stat.prefix}<AnimatedCounter end={stat.value} suffix={stat.suffix} />
                     </p>
-                    <p className="text-[11px] text-fg-muted font-bold uppercase tracking-wider">{stat.label}</p>
+                    <p className="text-[9px] text-fg-muted font-bold uppercase tracking-wider">{stat.label}</p>
                   </div>
-                  <div className={`absolute -bottom-4 -right-4 w-16 h-16 rounded-full opacity-20 ${stat.bg}`} />
+                  <div className={`mt-3 text-[10px] font-bold flex items-center gap-0.5 ${stat.isUp ? 'text-success' : 'text-danger'}`}>
+                    {stat.isUp ? '↑' : '↓'} {stat.trend}
+                  </div>
                 </motion.div>
               ))}
+            </div>
+          </motion.section>
+
+          {/* Quest Mingguan (lg:col-span-5) */}
+          <motion.section variants={itemVariants} className="lg:col-span-5 flex flex-col bg-surface rounded-[24px] p-6 border border-border shadow-sm">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
+                <Target size={20} className="text-danger" /> Quest Mingguan
+              </h3>
+              <span className="text-[11px] sm:text-xs text-info font-bold cursor-pointer hover:underline flex items-center gap-1">
+                Lihat Semua <ChevronRight size={14} className="hidden sm:block" />
+              </span>
+            </div>
+
+            <div className="space-y-4 flex-1">
+              {/* Quest 1 */}
+              <div className="flex flex-col gap-2 border-b border-border/50 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-info/10 text-info flex items-center justify-center shrink-0">
+                    <BookOpen size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-bold text-fg leading-none">Kerjakan 100 soal</h4>
+                    <div className="flex items-center gap-1 mt-2">
+                      <div className="flex-1 h-2 bg-surface-subtle rounded-full overflow-hidden">
+                        <div className="h-full bg-info w-[65%]" />
+                      </div>
+                      <span className="text-[10px] text-fg-muted font-bold ml-2">65/100</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 bg-coin-subtle px-2 py-1 rounded-lg border border-coin/20 shrink-0 shadow-sm">
+                    <Coins size={12} className="text-coin fill-yellow-500" />
+                    <span className="text-[10px] font-bold text-coin">+500</span>
+                    <ChevronRight size={14} className="text-fg-muted ml-0.5" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Quest 2 */}
+              <div className="flex flex-col gap-2 border-b border-border/50 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-success-subtle text-success flex items-center justify-center shrink-0">
+                    <Crosshair size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-bold text-fg leading-none">Capai akurasi 80%</h4>
+                    <div className="flex items-center gap-1 mt-2">
+                      <div className="flex-1 h-2 bg-surface-subtle rounded-full overflow-hidden">
+                        <div className="h-full bg-success w-[90%]" />
+                      </div>
+                      <span className="text-[10px] text-fg-muted font-bold ml-2">72/80</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 bg-coin-subtle px-2 py-1 rounded-lg border border-coin/20 shrink-0 shadow-sm">
+                    <Coins size={12} className="text-coin fill-yellow-500" />
+                    <span className="text-[10px] font-bold text-coin">+500</span>
+                    <ChevronRight size={14} className="text-fg-muted ml-0.5" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Quest 3 */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-premium-subtle text-premium flex items-center justify-center shrink-0">
+                    <Trophy size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-bold text-fg leading-none">Main Try Out Mode</h4>
+                    <div className="flex items-center gap-1 mt-2">
+                      <div className="flex-1 h-2 bg-surface-subtle rounded-full overflow-hidden">
+                        <div className="h-full bg-premium w-[0%]" />
+                      </div>
+                      <span className="text-[10px] text-fg-muted font-bold ml-2">0/1</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 bg-coin-subtle px-2 py-1 rounded-lg border border-coin/20 shrink-0 shadow-sm">
+                    <Coins size={12} className="text-coin fill-yellow-500" />
+                    <span className="text-[10px] font-bold text-coin">+1.000</span>
+                    <ChevronRight size={14} className="text-fg-muted ml-0.5" />
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.section>
         </div>
