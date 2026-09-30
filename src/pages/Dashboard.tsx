@@ -1012,11 +1012,11 @@ export default function Dashboard() {
               {/* Latar Belakang Gambar Full */}
               <div className="absolute inset-0 z-0 pointer-events-none">
                 <img src={getImageUrl('Latihan Harian.png')} alt="Belajar" className="w-full h-full object-cover object-right" />
-                {/* Gradient supaya text terbaca, pekat di kiri, memudar di kanan */}
-                <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent sm:w-3/4 dark:from-surface dark:via-surface/90 dark:to-transparent" />
+                {/* Gradasi hanya di 45% paling kiri — sisa 55% tetap jernih untuk karakter */}
+                <div className="absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-surface via-surface/70 to-transparent" />
               </div>
 
-              <div className="p-6 md:p-8 relative z-10 w-full sm:max-w-[60%] flex flex-col justify-center h-full">
+              <div className="p-6 md:p-8 relative z-10 w-full sm:max-w-[50%] flex flex-col justify-center h-full">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-success text-white flex items-center justify-center shadow-md shrink-0">
                     <mode.icon size={24} />
@@ -1190,9 +1190,9 @@ export default function Dashboard() {
                   {/* Image Background */}
                   {imgSource && (
                     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                      <img src={imgSource} className="w-full h-full object-cover object-top opacity-100 group-hover:scale-105 transition-transform duration-700" />
-                      {/* Gradient to make text at the bottom readable */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/70 to-transparent dark:from-surface dark:via-surface/80 dark:to-transparent" />
+                      <img src={imgSource} className="w-full h-full object-cover object-center opacity-100 group-hover:scale-105 transition-transform duration-700" />
+                      {/* Gradasi hanya di bagian bawah 60% agar karakter bagian atas tetap terlihat */}
+                      <div className="absolute bottom-0 inset-x-0 h-[65%] bg-gradient-to-t from-surface via-surface/80 to-transparent" />
                     </div>
                   )}
 
