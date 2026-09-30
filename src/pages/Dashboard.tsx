@@ -1191,8 +1191,8 @@ export default function Dashboard() {
                   {imgSource && (
                     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                       <img src={imgSource} className="w-full h-full object-cover object-[60%_center] opacity-100 group-hover:scale-105 transition-transform duration-700" />
-                      {/* Gradasi bawah agar teks tetap terbaca */}
-                      <div className="absolute bottom-0 inset-x-0 h-[65%] bg-gradient-to-t from-surface via-surface/80 to-transparent" />
+                      {/* Gradasi bawah tipis agar teks terbaca tapi karakter tetap terlihat */}
+                      <div className="absolute bottom-0 inset-x-0 h-[55%] bg-gradient-to-t from-surface/90 via-surface/40 to-transparent" />
                     </div>
                   )}
 
