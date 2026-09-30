@@ -6,9 +6,6 @@ import { fetchProfile, resetDailyQuests, syncEnergy, supabase, isSupabaseConfigu
 import RankBadge from '../components/RankBadge';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import avatarPdh from '../assets/avatar_pdh.webp';
-import dailyStudyBanner from '../assets/daily_study_banner.jpg';
-import survivalModeImg from '../assets/survival_mode.jpg';
-import pvpBattleImg from '../assets/pvp_battle.jpg';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { WEEKLY_QUESTS_METADATA } from './Quest';
 
@@ -53,7 +50,7 @@ const itemVariants: Variants = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 export default function Dashboard() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   // Energy & Coins State
   const [energy, setEnergy] = useState<number | null>(null);
 
@@ -61,10 +58,10 @@ export default function Dashboard() {
   useEffect(() => {
     const todayAtMount = new Date().toDateString();
     const interval = setInterval(() => {
-       if (new Date().toDateString() !== todayAtMount) {
-          // Hari berganti (tepat pukul 00:00), refresh halaman untuk memicu reset quest dan streak
-          window.location.reload();
-       }
+      if (new Date().toDateString() !== todayAtMount) {
+        // Hari berganti (tepat pukul 00:00), refresh halaman untuk memicu reset quest dan streak
+        window.location.reload();
+      }
     }, 10000);
     return () => clearInterval(interval);
   }, []);
@@ -426,9 +423,9 @@ export default function Dashboard() {
   // Supabase Real-time: Custom Room & Friend Duel Lobby
   useEffect(() => {
     if (!activeRoom || !isSupabaseConfigured() || pvpState !== 'waiting_friend') return;
-    
+
     const channel = supabase!.channel(`lobby_${activeRoom}`);
-    
+
     channel.on('presence', { event: 'sync' }, () => {
       const state = channel.presenceState();
       const players = Object.values(state).flat();
@@ -487,27 +484,27 @@ export default function Dashboard() {
   // Global Matchmaking (1v1)
   useEffect(() => {
     if (pvpState !== 'matching' || !isSupabaseConfigured()) return;
-    
+
     const channel = supabase!.channel('global_matchmaking');
     let intervalCountdown: ReturnType<typeof setInterval>;
-    
+
     channel.on('presence', { event: 'sync' }, () => {
       const state = channel.presenceState();
       const allWaiters = Object.values(state).flat() as any[];
-      
+
       // Look for someone else waiting
       const others = allWaiters.filter(p => p.id !== profile?.id);
-      
+
       if (others.length > 0 && opponentName === '') {
         // Match found!
         const opponent = others[0];
         setOpponentName(opponent.name);
         setOpponentLevel(10); // Assume level 10 for display
-        
+
         // We need a common room ID. We can derive it by sorting IDs to be consistent
         const ids = [profile!.id, opponent.id].sort();
         const roomId = `QM_${ids[0]}_${ids[1]}`;
-        
+
         // Start countdown to quiz
         let count = 3;
         setMatchCountdown(count);
@@ -646,7 +643,7 @@ export default function Dashboard() {
     }
     navigate('/auth');
   };
-  
+
   // Kalkulasi statistik pemain secara dinamis dari Supabase Profile
   let totalDijawab = 0;
   let totalBenar = 0;
@@ -663,14 +660,14 @@ export default function Dashboard() {
   const calculatedCombo = profile?.highest_survival_score || 0;
 
   if (loading) return <DashboardSkeleton />;
-  
+
   return (
     <div className="relative">
       {/* === RODA KEBERUNTUNGAN SPIN WHEEL MODAL === */}
       <AnimatePresence>
         {showSpinWheel && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.7 }}
               exit={{ opacity: 0 }}
@@ -678,7 +675,7 @@ export default function Dashboard() {
               className="fixed inset-0 bg-black/80 backdrop-blur-sm"
               data-backdrop="true"
             />
-            
+
             <motion.div
               ref={spinWheelModalRef}
               role="dialog"
@@ -689,7 +686,7 @@ export default function Dashboard() {
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               className="bg-surface border border-border/80 w-full max-w-sm sm:max-w-md md:max-w-xl rounded-[32px] p-5 sm:p-6 shadow-2xl relative z-10 overflow-y-auto max-h-[90vh] custom-scrollbar flex flex-col md:flex-row items-center gap-5 justify-between"
             >
-              <button 
+              <button
                 type="button"
                 disabled={isSpinning}
                 onClick={() => setShowSpinWheel(false)}
@@ -698,11 +695,11 @@ export default function Dashboard() {
               >
                 <X size={18} />
               </button>
-              
+
               {/* Kolom Kiri: Roda Spin dengan LED Ring */}
               <div className="flex flex-col items-center shrink-0">
                 <div className="relative w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center p-2.5 rounded-full bg-gradient-to-b from-amber-500/20 via-primary/10 to-purple-500/20 border-4 border-amber-400/40 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
-                  
+
                   {/* 12 LED Lights */}
                   {Array.from({ length: 12 }).map((_, i) => {
                     const angle = (i * 30) * (Math.PI / 180);
@@ -712,11 +709,10 @@ export default function Dashboard() {
                     return (
                       <div
                         key={i}
-                        className={`absolute w-2 h-2 rounded-full border border-white/40 z-20 transition-all duration-300 ${
-                          isSpinning
+                        className={`absolute w-2 h-2 rounded-full border border-white/40 z-20 transition-all duration-300 ${isSpinning
                             ? (i % 2 === 0 ? 'bg-amber-300 shadow-[0_0_6px_#fde047]' : 'bg-rose-400 shadow-[0_0_6px_#fb7185]')
                             : 'bg-amber-400/80 shadow-[0_0_4px_#f59e0b]'
-                        }`}
+                          }`}
                         style={{
                           transform: `translate(${lx}px, ${ly}px)`,
                         }}
@@ -729,7 +725,7 @@ export default function Dashboard() {
                     <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[18px] border-t-rose-500 drop-shadow-[0_3px_6px_rgba(225,29,72,0.6)]" />
                     <div className="w-2 h-2 rounded-full bg-amber-300 shadow-[0_0_6px_rgba(252,211,77,1)] -mt-3.5 border border-rose-700" />
                   </div>
-                  
+
                   {/* Centre Hub Button */}
                   <div className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-surface shadow-lg border-4 border-amber-400/80 z-20 flex items-center justify-center pointer-events-none">
                     <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center shadow-inner">
@@ -795,8 +791,8 @@ export default function Dashboard() {
                     {isSpinning
                       ? "Memutar Roda..."
                       : hasSpunToday
-                      ? "Beli Putaran (100 Koin)"
-                      : "Putar Sekarang (Gratis)"}
+                        ? "Beli Putaran (100 Koin)"
+                        : "Putar Sekarang (Gratis)"}
                   </span>
                 </button>
 
@@ -907,16 +903,16 @@ export default function Dashboard() {
           {/* Profile & XP Inline */}
           <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="w-10 h-10 rounded-full bg-xp text-primary-fg p-0.5 shadow-sm shrink-0 overflow-hidden">
-                {(()=>{
-                  const currentAvatar = availableCharacters.find(c => c.id === (profile?.selected_avatar || equippedAvatarId));
-                  return (
-                    <img 
-                      src={currentAvatar?.image_url || avatarPdh} 
-                      alt="Avatar" 
-                      className="w-full h-full rounded-full object-cover" 
-                    />
-                  );
-                })()}
+              {(() => {
+                const currentAvatar = availableCharacters.find(c => c.id === (profile?.selected_avatar || equippedAvatarId));
+                return (
+                  <img
+                    src={currentAvatar?.image_url || avatarPdh}
+                    alt="Avatar"
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                );
+              })()}
             </div>
             <div className="flex flex-col flex-1 min-w-[150px]">
               <div className="flex items-center gap-2">
@@ -962,7 +958,7 @@ export default function Dashboard() {
               <ChevronRight className="w-3 h-3 text-fg/70 ml-0.5" />
             </motion.button>
             <div className="flex items-center gap-1.5 ml-auto">
-              
+
               <button
                 onClick={handleLogout}
                 className="w-8 h-8 flex items-center justify-center bg-danger-subtle rounded-full border border-danger/20 text-danger hover:bg-danger-subtle transition-colors cursor-pointer ml-1"
@@ -970,7 +966,7 @@ export default function Dashboard() {
               >
                 <LogOut size={15} />
               </button>
-              <div 
+              <div
                 className="flex items-center gap-1 bg-surface-subtle px-2.5 py-1.5 rounded-full border border-border shadow-sm relative group cursor-pointer"
                 onClick={() => {
                   if ((energy || 0) < 25) {
@@ -998,29 +994,33 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 pt-2">
           {/* Latihan Harian Banner (xl:col-span-8) */}
           {GAME_MODES.filter(m => m.id === 'latihan').map(mode => (
-            <motion.section 
+            <motion.section
               key={mode.id}
               variants={itemVariants}
               whileHover={{ scale: 1.01 }}
               onClick={() => setSelectedMode(mode)}
-              className="xl:col-span-7 bg-surface rounded-[24px] border-2 border-success/20 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all relative flex flex-col sm:flex-row"
+              className="xl:col-span-7 bg-surface rounded-[24px] border border-success/20 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all relative flex flex-col justify-center min-h-[220px]"
             >
-              {/* Latar Belakang Gradient (Kiri) */}
-              <div className="absolute inset-0 w-full sm:w-2/3 bg-gradient-to-r from-success/10 via-success/5 to-transparent z-0 pointer-events-none" />
-              
-              <div className="p-6 md:p-8 flex-1 relative z-10 flex flex-col justify-center">
+              {/* Latar Belakang Gambar Full */}
+              <div className="absolute inset-0 z-0 pointer-events-none">
+                <img src="https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/Latihan%20Harian.png" alt="Belajar" className="w-full h-full object-cover object-right sm:object-center" />
+                {/* Gradient supaya text terbaca, pekat di kiri, transparan di kanan */}
+                <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/90 to-transparent dark:from-surface dark:via-surface/95 dark:to-surface/10" />
+              </div>
+
+              <div className="p-6 md:p-8 relative z-10 w-full sm:w-3/4 flex flex-col justify-center h-full">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-success text-white flex items-center justify-center shadow-md shrink-0">
                     <mode.icon size={24} />
                   </div>
                   <div>
-                    <span className="text-[10px] font-black text-success tracking-widest uppercase bg-success-subtle px-2 py-1 rounded-md border border-success/20">
+                    <span className="text-[10px] font-black text-success tracking-widest uppercase bg-success-subtle/80 backdrop-blur-sm px-2 py-1 rounded-md border border-success/20">
                       Mode Utama
                     </span>
-                    <h3 className="text-2xl md:text-3xl font-black text-fg mt-1 leading-none">{mode.title}</h3>
+                    <h3 className="text-2xl md:text-3xl font-black text-fg mt-1 leading-none drop-shadow-md">{mode.title}</h3>
                   </div>
                 </div>
-                <p className="text-sm text-fg-muted font-medium mb-6 max-w-sm">
+                <p className="text-sm text-fg-muted font-medium mb-6 max-w-sm drop-shadow-sm">
                   {mode.desc} dengan ribuan soal berkualitas dan pembahasan lengkap.
                 </p>
                 <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-auto">
@@ -1031,20 +1031,14 @@ export default function Dashboard() {
                     Mulai Sekarang <ChevronRight size={18} />
                   </motion.button>
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-fg bg-surface-subtle px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-fg bg-surface/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
                       <Zap size={14} className="text-energy" /> {mode.cost} Energi
                     </div>
-                    <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-fg bg-surface-subtle px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
+                    <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-fg bg-surface/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
                       <BarChart2 size={14} className="text-info" /> Ribuan soal tersedia
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Gambar Ilustrasi (Kanan) */}
-              <div className="hidden sm:block w-2/5 relative z-10 pointer-events-none overflow-hidden">
-                 <div className="absolute inset-0 bg-gradient-to-r from-surface to-transparent w-24 z-10" />
-                 <img src={dailyStudyBanner} alt="Belajar" className="w-full h-full object-cover object-left" />
               </div>
             </motion.section>
           ))}
@@ -1053,25 +1047,25 @@ export default function Dashboard() {
           <motion.section variants={itemVariants} className="xl:col-span-5 bg-surface rounded-[24px] p-6 border border-border shadow-sm flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-3">
-                 <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shrink-0">
-                   <Flame className="text-orange-500" size={26} />
-                 </div>
-                 <div>
-                   <h3 className="text-[18px] font-bold text-fg leading-none mb-1 flex items-center flex-wrap gap-2">
-                     Streak Harian
-                     <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-black rounded-md whitespace-nowrap">
-                       Hari ke-{totalStreak + (isStreakClaimed ? 1 : 0)}
-                     </span>
-                   </h3>
-                   <p className="text-[11px] text-fg-muted font-medium">
-                     {(() => {
-                       const displayStreak = totalStreak;
-                       const toMega = displayStreak === 0 ? 30 : (30 - (displayStreak % 30 || 30));
-                       if (isTodayMegaReward) return `${displayStreak} hari beruntun · 🏆 MEGA REWARD!`;
-                       return `${displayStreak} hari beruntun · Mega tiap 30 hari (+${toMega} hari lagi)`;
-                     })()}
-                   </p>
-                 </div>
+                <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shrink-0">
+                  <Flame className="text-orange-500" size={26} />
+                </div>
+                <div>
+                  <h3 className="text-[18px] font-bold text-fg leading-none mb-1 flex items-center flex-wrap gap-2">
+                    Streak Harian
+                    <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-black rounded-md whitespace-nowrap">
+                      Hari ke-{totalStreak + (isStreakClaimed ? 1 : 0)}
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-fg-muted font-medium">
+                    {(() => {
+                      const displayStreak = totalStreak;
+                      const toMega = displayStreak === 0 ? 30 : (30 - (displayStreak % 30 || 30));
+                      if (isTodayMegaReward) return `${displayStreak} hari beruntun · 🏆 MEGA REWARD!`;
+                      return `${displayStreak} hari beruntun · Mega tiap 30 hari (+${toMega} hari lagi)`;
+                    })()}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -1089,7 +1083,7 @@ export default function Dashboard() {
                 const isRewardBox = day.isDay7 || day.isMega;
                 const isToday = day.status === 'current';
                 const canClaimToday = isToday && !isStreakClaimed;
-                
+
                 if (isRewardBox) {
                   return (
                     <div key={idx} className="flex flex-col items-center gap-1.5">
@@ -1128,21 +1122,20 @@ export default function Dashboard() {
                 );
               })}
             </div>
-            
+
             <div className="flex items-center gap-2 mt-auto">
               <button
                 type="button"
                 onClick={handleDailyClaim}
                 disabled={isStreakClaimed || isProcessing}
-                className={`flex-1 text-xs sm:text-sm font-bold uppercase tracking-wider py-3 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 ${
-                  isStreakClaimed
+                className={`flex-1 text-xs sm:text-sm font-bold uppercase tracking-wider py-3 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 ${isStreakClaimed
                     ? 'bg-success/10 text-success border border-success/20 cursor-default'
                     : 'bg-primary text-primary-fg hover:bg-primary-hover active:scale-95'
-                }`}
+                  }`}
               >
                 {isStreakClaimed ? <><Check size={16} /> Sudah Klaim</> : (isProcessing ? 'Memproses...' : 'Klaim Sekarang')}
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => setShowSpinWheel(true)}
                 className="px-4 h-11 sm:h-12 flex items-center justify-center text-premium bg-premium-subtle hover:bg-premium/20 rounded-xl transition-all shadow-sm active:scale-95 border border-premium/20 shrink-0 gap-2"
@@ -1166,22 +1159,16 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {GAME_MODES.filter(m => m.id !== 'latihan').map((mode) => {
               // Custom styles matching mockup
-              let bgClass = "bg-surface";
               let imgSource = "";
-              let imgOverlay = "";
-              
+
               if (mode.id === 'survival') {
-                imgSource = survivalModeImg;
-                bgClass = "bg-gradient-to-b from-red-50 to-white dark:from-red-950/30 dark:to-surface";
-                imgOverlay = "bg-gradient-to-t from-white via-white/80 dark:from-surface dark:via-surface/90 to-transparent";
+                imgSource = "https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/survival-mode.png";
               } else if (mode.id === 'pvp') {
-                imgSource = pvpBattleImg;
-                bgClass = "bg-gradient-to-b from-blue-50 to-white dark:from-blue-950/30 dark:to-surface";
-                imgOverlay = "bg-gradient-to-t from-white via-white/80 dark:from-surface dark:via-surface/90 to-transparent";
+                imgSource = "https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/pvp-battle.png";
               } else if (mode.id === 'tryout') {
-                bgClass = "bg-gradient-to-br from-premium-subtle/50 to-surface";
+                imgSource = "https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/tryout-mode%20.png";
               } else if (mode.id === 'catatan_salah') {
-                bgClass = "bg-gradient-to-br from-orange-500/10 to-surface";
+                imgSource = "https://vctzszllrnwcdhhnwnwe.supabase.co/storage/v1/object/public/background/catatan%20salah.png";
               }
 
               return (
@@ -1190,13 +1177,14 @@ export default function Dashboard() {
                   whileHover={{ y: -4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedMode(mode)}
-                  className={`rounded-[20px] border border-border transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col relative overflow-hidden group min-h-[170px] ${bgClass}`}
+                  className={`rounded-[20px] border border-border transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col relative overflow-hidden group min-h-[170px] bg-surface`}
                 >
-                  {/* Image Background if applicable */}
+                  {/* Image Background */}
                   {imgSource && (
-                    <div className="absolute inset-x-0 top-0 h-[110px] z-0 overflow-hidden">
-                      <img src={imgSource} className="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500" />
-                      <div className={`absolute inset-0 ${imgOverlay}`} />
+                    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                      <img src={imgSource} className="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700" />
+                      {/* Gradient to make text at the bottom readable */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/90 to-transparent dark:from-surface dark:via-surface/95 dark:to-surface/20" />
                     </div>
                   )}
 
@@ -1209,7 +1197,7 @@ export default function Dashboard() {
                         {mode.badge}
                       </div>
                     </div>
-                    
+
                     <div>
                       <h4 className="font-black text-[16px] text-fg leading-tight group-hover:text-primary transition-colors">{mode.title}</h4>
                       <p className="text-[11px] text-fg-muted font-medium mt-1.5 leading-snug line-clamp-2">
@@ -1218,7 +1206,7 @@ export default function Dashboard() {
                           : mode.desc}
                       </p>
                     </div>
-                    
+
                     <div className="flex items-center justify-between mt-auto pt-4">
                       <div className="flex items-center gap-1.5 text-[11px] font-bold text-fg bg-surface/60 px-2.5 py-1 rounded-md">
                         {mode.costType === 'energy' ? <Zap size={14} className="text-energy" /> : <Coins size={14} className="text-coin" />}
@@ -1249,9 +1237,9 @@ export default function Dashboard() {
                 <option>Semua Waktu</option>
               </select>
             </div>
-            
+
             <p className="text-xs text-fg-muted font-medium mb-5">Lihat perkembangan kemampuanmu</p>
-            
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1">
               {[
                 { icon: Activity, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success/20', value: totalDijawab, label: 'Dijawab', suffix: '', trend: '+12%', isUp: true },
@@ -1294,7 +1282,7 @@ export default function Dashboard() {
                 const isClaimed = progress === 999;
                 const displayProgress = isClaimed ? quest.total : progress;
                 const progressPercentage = Math.min((displayProgress / quest.total) * 100, 100);
-                
+
                 return (
                   <div key={quest.id} className={`flex flex-col gap-2 ${idx !== WEEKLY_QUESTS_METADATA.length - 1 ? 'border-b border-border/50 pb-3' : ''}`}>
                     <div className="flex items-center gap-3">
@@ -1310,7 +1298,7 @@ export default function Dashboard() {
                           <span className="text-[10px] text-fg-muted font-bold ml-2">{displayProgress}/{quest.total}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 bg-coin-subtle px-2 py-1 rounded-lg border border-coin/20 shrink-0 shadow-sm cursor-pointer hover:bg-coin/10 transition-colors" onClick={() => navigate('/quests')}>
+                      <div className="flex items-center gap-1 bg-coin-subtle px-2 py-1 rounded-lg border border-coin/20 shrink-0 shadow-sm cursor-pointer hover:bg-coin/10 transition-colors" onClick={() => navigate('/quest')}>
                         <Coins size={12} className="text-coin fill-yellow-500" />
                         <span className="text-[10px] font-bold text-coin">+{quest.reward}</span>
                         <ChevronRight size={14} className="text-fg-muted ml-0.5" />
