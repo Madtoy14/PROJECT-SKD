@@ -1041,7 +1041,7 @@ export default function Dashboard() {
               {/* Gambar Karakter (Kanan) */}
               <div className="flex-1 relative overflow-hidden">
                 {/* Fade tipis hanya di tepi kiri agar menyambung dengan teks */}
-                <div className="absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-surface to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 left-0 w-24 sm:w-36 bg-gradient-to-r from-surface via-surface/80 to-transparent z-10 pointer-events-none" />
                 <img
                   src={getImageUrl('latihan.png')}
                   alt="Karakter Latihan"
@@ -1185,14 +1185,14 @@ export default function Dashboard() {
                   whileHover={{ y: -4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedMode(mode)}
-                  className={`rounded-[20px] border border-border transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col relative overflow-hidden group min-h-[190px] bg-surface`}
+                  className={`rounded-[20px] border border-border transition-all cursor-pointer shadow-sm hover:shadow-md relative overflow-hidden group min-h-[190px] bg-surface`}
                 >
-                  {/* Image Background */}
+                  {/* Image di sisi kanan - seperti referensi */}
                   {imgSource && (
                     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                      <img src={imgSource} className="w-full h-full object-cover object-[60%_center] opacity-100 group-hover:scale-105 transition-transform duration-700" />
-                      {/* Gradasi bawah tebal agar teks terbaca jelas */}
-                      <div className="absolute bottom-0 inset-x-0 h-[85%] bg-gradient-to-t from-surface via-surface/95 to-transparent" />
+                      <img src={imgSource} className="w-full h-full object-cover object-[70%_center] opacity-100 group-hover:scale-105 transition-transform duration-700" />
+                      {/* Gradasi horizontal: solid di kiri (teks), transparan di kanan (gambar terlihat) */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/95 via-[55%] to-surface/30 pointer-events-none" />
                     </div>
                   )}
 
@@ -1207,21 +1207,21 @@ export default function Dashboard() {
                     </div>
 
                     <div>
-                      <h4 className="font-black text-[16px] text-fg leading-tight group-hover:text-primary transition-colors drop-shadow-sm">{mode.title}</h4>
-                      <p className="text-[11px] text-slate-600 font-semibold mt-1.5 leading-snug line-clamp-2">
+                      <h4 className="font-black text-[16px] text-fg leading-tight group-hover:text-primary transition-colors">{mode.title}</h4>
+                      <p className="text-[11px] text-fg-muted font-medium mt-1.5 leading-snug line-clamp-3 max-w-[85%]">
                         {mode.id === 'catatan_salah' && (profile?.catatan_salah?.length ?? 0) > 0
                           ? `${profile?.catatan_salah?.length} soal menunggu dipelajari ulang.`
                           : mode.desc}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between mt-auto pt-4 relative z-20">
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-fg bg-surface/80 px-2.5 py-1 rounded-md shadow-sm border border-border">
+                    <div className="flex items-center justify-between mt-auto pt-4">
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-fg bg-surface/70 backdrop-blur-sm px-2.5 py-1 rounded-md border border-border">
                         {mode.costType === 'energy' ? <Zap size={14} className="text-energy" /> : <Coins size={14} className="text-coin" />}
                         <span>{mode.cost.toLocaleString()} {mode.costType === 'energy' ? 'Energi' : 'Koin'}</span>
                       </div>
-                      <div className="w-6 h-6 rounded-full bg-surface flex items-center justify-center border border-border text-fg-muted group-hover:bg-primary group-hover:text-white transition-colors shadow-sm">
-                        <ChevronRight size={14} />
+                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                        <ChevronRight size={16} />
                       </div>
                     </div>
                   </div>
