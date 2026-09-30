@@ -80,8 +80,12 @@ export default function Auth() {
           <div className="relative z-10">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg bg-gradient-to-br from-skd-accent to-yellow-500 shadow-sm/20">
-                <span className="text-3xl">⚔️</span>
+              <div className="w-20 h-20 flex items-center justify-center mx-auto mb-5 drop-shadow-xl hover:scale-105 transition-transform duration-300">
+                <img 
+                  src={supabase.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl} 
+                  alt="SKDQuest Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               <h2 className="text-2xl font-black mb-2 text-gray-900">Masuk ke Arena</h2>
               <p className="text-gray-700 font-medium text-sm leading-relaxed">
