@@ -10,6 +10,7 @@ import dailyStudyBanner from '../assets/daily_study_banner.jpg';
 import survivalModeImg from '../assets/survival_mode.jpg';
 import pvpBattleImg from '../assets/pvp_battle.jpg';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { WEEKLY_QUESTS_METADATA } from './Quest';
 
 
 
@@ -1002,7 +1003,7 @@ export default function Dashboard() {
               variants={itemVariants}
               whileHover={{ scale: 1.01 }}
               onClick={() => setSelectedMode(mode)}
-              className="xl:col-span-8 bg-surface rounded-[24px] border-2 border-success/20 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all relative flex flex-col sm:flex-row"
+              className="xl:col-span-7 bg-surface rounded-[24px] border-2 border-success/20 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all relative flex flex-col sm:flex-row"
             >
               {/* Latar Belakang Gradient (Kiri) */}
               <div className="absolute inset-0 w-full sm:w-2/3 bg-gradient-to-r from-success/10 via-success/5 to-transparent z-0 pointer-events-none" />
@@ -1048,8 +1049,8 @@ export default function Dashboard() {
             </motion.section>
           ))}
 
-          {/* Streak Harian (xl:col-span-4) */}
-          <motion.section variants={itemVariants} className="xl:col-span-4 bg-surface rounded-[24px] p-6 border border-border shadow-sm flex flex-col justify-between">
+          {/* Streak Harian (xl:col-span-5) */}
+          <motion.section variants={itemVariants} className="xl:col-span-5 bg-surface rounded-[24px] p-6 border border-border shadow-sm flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-3">
                  <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shrink-0">
@@ -1144,10 +1145,11 @@ export default function Dashboard() {
               <button 
                 type="button"
                 onClick={() => setShowSpinWheel(true)}
-                className="w-12 h-12 flex items-center justify-center text-premium bg-premium-subtle hover:bg-premium/20 rounded-xl transition-all shadow-sm active:scale-95 border border-premium/20 shrink-0"
+                className="px-4 h-11 sm:h-12 flex items-center justify-center text-premium bg-premium-subtle hover:bg-premium/20 rounded-xl transition-all shadow-sm active:scale-95 border border-premium/20 shrink-0 gap-2"
                 title="Spin Harian"
               >
                 <Sparkles size={20} />
+                <span className="text-xs sm:text-sm font-bold whitespace-nowrap hidden sm:block">Spin Harian</span>
               </button>
             </div>
           </motion.section>
@@ -1287,74 +1289,36 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-4 flex-1">
-              {/* Quest 1 */}
-              <div className="flex flex-col gap-2 border-b border-border/50 pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-info/10 text-info flex items-center justify-center shrink-0">
-                    <BookOpen size={18} />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-sm font-bold text-fg leading-none">Kerjakan 100 soal</h4>
-                    <div className="flex items-center gap-1 mt-2">
-                      <div className="flex-1 h-2 bg-surface-subtle rounded-full overflow-hidden">
-                        <div className="h-full bg-info w-[65%]" />
+              {WEEKLY_QUESTS_METADATA.map((quest, idx) => {
+                const progress = profile?.quests_progress?.[quest.id] || 0;
+                const isClaimed = progress === 999;
+                const displayProgress = isClaimed ? quest.total : progress;
+                const progressPercentage = Math.min((displayProgress / quest.total) * 100, 100);
+                
+                return (
+                  <div key={quest.id} className={`flex flex-col gap-2 ${idx !== WEEKLY_QUESTS_METADATA.length - 1 ? 'border-b border-border/50 pb-3' : ''}`}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-premium-subtle text-premium flex items-center justify-center shrink-0">
+                        <quest.icon size={18} />
                       </div>
-                      <span className="text-[10px] text-fg-muted font-bold ml-2">65/100</span>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-bold text-fg leading-none">{quest.title}</h4>
+                        <div className="flex items-center gap-1 mt-2">
+                          <div className="flex-1 h-2 bg-surface-subtle rounded-full overflow-hidden">
+                            <div className="h-full bg-premium transition-all" style={{ width: `${progressPercentage}%` }} />
+                          </div>
+                          <span className="text-[10px] text-fg-muted font-bold ml-2">{displayProgress}/{quest.total}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 bg-coin-subtle px-2 py-1 rounded-lg border border-coin/20 shrink-0 shadow-sm cursor-pointer hover:bg-coin/10 transition-colors" onClick={() => navigate('/quests')}>
+                        <Coins size={12} className="text-coin fill-yellow-500" />
+                        <span className="text-[10px] font-bold text-coin">+{quest.reward}</span>
+                        <ChevronRight size={14} className="text-fg-muted ml-0.5" />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 bg-coin-subtle px-2 py-1 rounded-lg border border-coin/20 shrink-0 shadow-sm">
-                    <Coins size={12} className="text-coin fill-yellow-500" />
-                    <span className="text-[10px] font-bold text-coin">+500</span>
-                    <ChevronRight size={14} className="text-fg-muted ml-0.5" />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Quest 2 */}
-              <div className="flex flex-col gap-2 border-b border-border/50 pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-success-subtle text-success flex items-center justify-center shrink-0">
-                    <Crosshair size={18} />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-sm font-bold text-fg leading-none">Capai akurasi 80%</h4>
-                    <div className="flex items-center gap-1 mt-2">
-                      <div className="flex-1 h-2 bg-surface-subtle rounded-full overflow-hidden">
-                        <div className="h-full bg-success w-[90%]" />
-                      </div>
-                      <span className="text-[10px] text-fg-muted font-bold ml-2">72/80</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 bg-coin-subtle px-2 py-1 rounded-lg border border-coin/20 shrink-0 shadow-sm">
-                    <Coins size={12} className="text-coin fill-yellow-500" />
-                    <span className="text-[10px] font-bold text-coin">+500</span>
-                    <ChevronRight size={14} className="text-fg-muted ml-0.5" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Quest 3 */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-premium-subtle text-premium flex items-center justify-center shrink-0">
-                    <Trophy size={18} />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-sm font-bold text-fg leading-none">Main Try Out Mode</h4>
-                    <div className="flex items-center gap-1 mt-2">
-                      <div className="flex-1 h-2 bg-surface-subtle rounded-full overflow-hidden">
-                        <div className="h-full bg-premium w-[0%]" />
-                      </div>
-                      <span className="text-[10px] text-fg-muted font-bold ml-2">0/1</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 bg-coin-subtle px-2 py-1 rounded-lg border border-coin/20 shrink-0 shadow-sm">
-                    <Coins size={12} className="text-coin fill-yellow-500" />
-                    <span className="text-[10px] font-bold text-coin">+1.000</span>
-                    <ChevronRight size={14} className="text-fg-muted ml-0.5" />
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </motion.section>
         </div>

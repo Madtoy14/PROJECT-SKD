@@ -4,13 +4,13 @@ import { Target, CheckCircle2, Flame, Clock, Brain, Coins } from 'lucide-react';
 import { fetchProfile, supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { UserProfile } from '../lib/supabase';
 
-const DAILY_QUESTS_METADATA = [
+export const DAILY_QUESTS_METADATA = [
   { id: 1, title: 'Jawab 10 Soal TWK', total: 10, reward: 100, icon: Brain },
   { id: 2, title: 'Raih Combo 5x', total: 5, reward: 50, icon: Flame },
   { id: 3, title: 'Selesaikan Latihan TIU', total: 1, reward: 150, icon: Clock },
 ];
 
-const WEEKLY_QUESTS_METADATA = [
+export const WEEKLY_QUESTS_METADATA = [
   { id: 4, title: 'Selesaikan 10 Kuis', total: 10, reward: 500, icon: Target },
   { id: 5, title: 'Survival Mode: Jawab 30 Soal', total: 30, reward: 300, icon: Flame },
 ];
