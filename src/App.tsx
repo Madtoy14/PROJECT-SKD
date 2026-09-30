@@ -29,6 +29,7 @@ const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Belajar = lazy(() => import('./pages/Belajar'));
 const BelajarModul = lazy(() => import('./pages/BelajarModul'));
 const BelajarSubBab = lazy(() => import('./pages/BelajarSubBab'));
+const Maintenance = lazy(() => import('./pages/Maintenance'));
 
 import { DuelProvider } from './context/DuelContext';
 import IncomingDuelRequest from './components/IncomingDuelRequest';
@@ -529,6 +530,20 @@ function AppLayout() {
 
 
 function App() {
+  const isMaintenance = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
+
+  if (isMaintenance) {
+    return (
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center bg-bg text-primary">
+          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+        </div>
+      }>
+        <Maintenance />
+      </Suspense>
+    );
+  }
+
   return (
     <ErrorBoundary>
       
