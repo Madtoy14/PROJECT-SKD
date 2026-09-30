@@ -1007,46 +1007,46 @@ export default function Dashboard() {
               variants={itemVariants}
               whileHover={{ scale: 1.01 }}
               onClick={() => setSelectedMode(mode)}
-              className="xl:col-span-7 bg-surface rounded-[24px] border border-success/20 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all relative flex flex-col justify-center min-h-[220px]"
+              className="xl:col-span-7 bg-surface rounded-[24px] border border-success/20 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all relative flex flex-row min-h-[220px]"
             >
-              {/* Latar Belakang Gambar Full */}
-              <div className="absolute inset-0 z-0 pointer-events-none">
-                <img src={getImageUrl('Latihan Harian.png')} alt="Belajar" className="w-full h-full object-cover object-right" />
-                {/* Gradasi hanya di 45% paling kiri — sisa 55% tetap jernih untuk karakter */}
-                <div className="absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-surface via-surface/70 to-transparent" />
-              </div>
-
-              <div className="p-6 md:p-8 relative z-10 w-full sm:max-w-[50%] flex flex-col justify-center h-full">
+              {/* Konten Teks (Kiri) */}
+              <div className="p-6 md:p-8 relative z-10 flex flex-col justify-center w-[52%] shrink-0">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-success text-white flex items-center justify-center shadow-md shrink-0">
                     <mode.icon size={24} />
                   </div>
                   <div>
-                    <span className="text-[10px] font-black text-success tracking-widest uppercase bg-success-subtle/80 backdrop-blur-sm px-2 py-1 rounded-md border border-success/20">
+                    <span className="text-[10px] font-black text-success tracking-widest uppercase bg-success-subtle px-2 py-1 rounded-md border border-success/20">
                       Mode Utama
                     </span>
-                    <h3 className="text-2xl md:text-3xl font-black text-fg mt-1 leading-none drop-shadow-md">{mode.title}</h3>
+                    <h3 className="text-2xl md:text-3xl font-black text-fg mt-1 leading-none">{mode.title}</h3>
                   </div>
                 </div>
-                <p className="text-sm text-fg-muted font-medium mb-6 max-w-sm drop-shadow-sm">
+                <p className="text-sm text-fg-muted font-medium mb-6 max-w-xs">
                   {mode.desc} dengan ribuan soal berkualitas dan pembahasan lengkap.
                 </p>
-                <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-auto">
+                <div className="flex flex-wrap items-center gap-3 mt-auto">
                   <motion.button
                     whileTap={{ scale: 0.95 }}
-                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-colors w-full sm:w-auto"
+                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-colors"
                   >
                     Mulai Sekarang <ChevronRight size={18} />
                   </motion.button>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-fg bg-surface/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
-                      <Zap size={14} className="text-energy" /> {mode.cost} Energi
-                    </div>
-                    <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-fg bg-surface/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
-                      <BarChart2 size={14} className="text-info" /> Ribuan soal tersedia
-                    </div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-fg bg-surface-subtle px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
+                    <Zap size={14} className="text-energy" /> {mode.cost} Energi
                   </div>
                 </div>
+              </div>
+
+              {/* Gambar Karakter (Kanan) — tidak ada gradasi agar karakter terlihat penuh */}
+              <div className="flex-1 relative overflow-hidden">
+                {/* Fade tipis hanya di tepi kiri agar menyambung dengan teks */}
+                <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-surface to-transparent z-10 pointer-events-none" />
+                <img
+                  src={getImageUrl('Latihan Harian.png')}
+                  alt="Karakter Latihan"
+                  className="w-full h-full object-cover object-[60%_center] group-hover:scale-105 transition-transform duration-700"
+                />
               </div>
             </motion.section>
           ))}
@@ -1190,9 +1190,9 @@ export default function Dashboard() {
                   {/* Image Background */}
                   {imgSource && (
                     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                      <img src={imgSource} className="w-full h-full object-cover object-center opacity-100 group-hover:scale-105 transition-transform duration-700" />
-                      {/* Gradasi hanya di bagian bawah 60% agar karakter bagian atas tetap terlihat */}
-                      <div className="absolute bottom-0 inset-x-0 h-[65%] bg-gradient-to-t from-surface via-surface/80 to-transparent" />
+                      <img src={imgSource} className="w-full h-full object-cover object-[center_30%] opacity-100 group-hover:scale-105 transition-transform duration-700" />
+                      {/* Gradasi tipis hanya di paling bawah untuk keterbacaan teks */}
+                      <div className="absolute bottom-0 inset-x-0 h-[50%] bg-gradient-to-t from-surface/95 via-surface/60 to-transparent" />
                     </div>
                   )}
 
