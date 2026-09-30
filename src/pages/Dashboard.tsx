@@ -1043,7 +1043,7 @@ export default function Dashboard() {
                 {/* Fade tipis hanya di tepi kiri agar menyambung dengan teks */}
                 <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-surface to-transparent z-10 pointer-events-none" />
                 <img
-                  src={getImageUrl('Latihan Harian.png')}
+                  src={getImageUrl('latihan.png')}
                   alt="Karakter Latihan"
                   className="w-full h-full object-cover object-[55%_center] group-hover:scale-105 transition-transform duration-700"
                 />
@@ -1170,13 +1170,13 @@ export default function Dashboard() {
               let imgSource = "";
 
               if (mode.id === 'survival') {
-                imgSource = getImageUrl('survival-mode.png');
+                imgSource = getImageUrl('survival.png');
               } else if (mode.id === 'pvp') {
-                imgSource = getImageUrl('pvp-battle.png');
+                imgSource = getImageUrl('pvp.png');
               } else if (mode.id === 'tryout') {
-                imgSource = getImageUrl('tryout-mode .png');
+                imgSource = getImageUrl('tryout.png');
               } else if (mode.id === 'catatan_salah') {
-                imgSource = getImageUrl('catatan salah.png');
+                imgSource = getImageUrl('catatan.png');
               }
 
               return (
