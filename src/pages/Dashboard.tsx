@@ -1038,14 +1038,14 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Gambar Karakter (Kanan) — tidak ada gradasi agar karakter terlihat penuh */}
+              {/* Gambar Karakter (Kanan) */}
               <div className="flex-1 relative overflow-hidden">
                 {/* Fade tipis hanya di tepi kiri agar menyambung dengan teks */}
-                <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-surface to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-surface to-transparent z-10 pointer-events-none" />
                 <img
                   src={getImageUrl('Latihan Harian.png')}
                   alt="Karakter Latihan"
-                  className="w-full h-full object-cover object-[60%_center] group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-full object-cover object-[55%_center] group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
             </motion.section>
@@ -1190,9 +1190,9 @@ export default function Dashboard() {
                   {/* Image Background */}
                   {imgSource && (
                     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                      <img src={imgSource} className="w-full h-full object-cover object-[center_30%] opacity-100 group-hover:scale-105 transition-transform duration-700" />
-                      {/* Gradasi tipis hanya di paling bawah untuk keterbacaan teks */}
-                      <div className="absolute bottom-0 inset-x-0 h-[50%] bg-gradient-to-t from-surface/95 via-surface/60 to-transparent" />
+                      <img src={imgSource} className="w-full h-full object-cover object-[60%_center] opacity-100 group-hover:scale-105 transition-transform duration-700" />
+                      {/* Gradasi bawah agar teks tetap terbaca */}
+                      <div className="absolute bottom-0 inset-x-0 h-[65%] bg-gradient-to-t from-surface via-surface/80 to-transparent" />
                     </div>
                   )}
 
