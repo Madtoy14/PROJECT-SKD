@@ -897,11 +897,19 @@ export default function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Latar Belakang Warna-Warni untuk Efek Glassmorphism */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-slate-50">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[120px]" />
+        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/20 blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[10%] w-[35%] h-[35%] rounded-full bg-indigo-500/20 blur-[120px]" />
+      </div>
+
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="show"
-        className="p-4 md:p-6 space-y-5 max-w-5xl mx-auto pb-8 md:pb-12"
+        className="p-4 md:p-6 space-y-5 max-w-5xl mx-auto pb-8 md:pb-12 relative z-10"
       >
         {/* ── Top Header (Profile, XP, Resources) ── */}
         <motion.div
@@ -1007,10 +1015,10 @@ export default function Dashboard() {
               variants={itemVariants}
               whileHover={{ scale: 1.01 }}
               onClick={() => setSelectedMode(mode)}
-              className="xl:col-span-7 bg-surface rounded-[24px] border border-success/20 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all relative flex flex-row min-h-[220px]"
+              className="xl:col-span-7 bg-white/40 backdrop-blur-xl rounded-[24px] border border-white/60 overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all relative flex flex-row min-h-[220px]"
             >
-              {/* Konten Teks (Kiri) */}
-              <div className="p-6 md:p-8 relative z-10 flex flex-col justify-center w-[52%] shrink-0">
+              {/* Konten Teks */}
+              <div className="p-6 md:p-8 relative z-10 flex flex-col justify-center flex-1">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-success text-white flex items-center justify-center shadow-md shrink-0">
                     <mode.icon size={24} />
@@ -1022,7 +1030,7 @@ export default function Dashboard() {
                     <h3 className="text-2xl md:text-3xl font-black text-fg mt-1 leading-none">{mode.title}</h3>
                   </div>
                 </div>
-                <p className="text-sm text-fg-muted font-medium mb-6 max-w-xs">
+                <p className="text-sm text-fg-muted font-medium mb-6 max-w-md">
                   {mode.desc} dengan ribuan soal berkualitas dan pembahasan lengkap.
                 </p>
                 <div className="flex flex-wrap items-center gap-3 mt-auto">
@@ -1032,21 +1040,10 @@ export default function Dashboard() {
                   >
                     Mulai Sekarang <ChevronRight size={18} />
                   </motion.button>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-fg bg-surface-subtle px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-fg bg-white/50 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/50 whitespace-nowrap">
                     <Zap size={14} className="text-energy" /> {mode.cost} Energi
                   </div>
                 </div>
-              </div>
-
-              {/* Gambar Karakter (Kanan) */}
-              <div className="flex-1 relative overflow-hidden">
-                {/* Fade tipis hanya di tepi kiri agar menyambung dengan teks */}
-                <div className="absolute inset-y-0 left-0 w-24 sm:w-36 bg-gradient-to-r from-surface via-surface/80 to-transparent z-10 pointer-events-none" />
-                <img
-                  src={getImageUrl('latihan.png')}
-                  alt="Karakter Latihan"
-                  className="w-full h-full object-cover object-[85%_center] group-hover:scale-105 transition-transform duration-700"
-                />
               </div>
             </motion.section>
           ))}
@@ -1166,49 +1163,27 @@ export default function Dashboard() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {GAME_MODES.filter(m => m.id !== 'latihan').map((mode) => {
-              // Custom styles matching mockup
-              let imgSource = "";
-
-              if (mode.id === 'survival') {
-                imgSource = getImageUrl('survival.png');
-              } else if (mode.id === 'pvp') {
-                imgSource = getImageUrl('pvp.png');
-              } else if (mode.id === 'tryout') {
-                imgSource = getImageUrl('tryout.png');
-              } else if (mode.id === 'catatan_salah') {
-                imgSource = getImageUrl('catatan.png');
-              }
-
               return (
                 <motion.div
                   key={mode.id}
                   whileHover={{ y: -4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedMode(mode)}
-                  className={`rounded-[20px] border border-border transition-all cursor-pointer shadow-sm hover:shadow-md relative overflow-hidden group min-h-[190px] bg-surface`}
+                  className={`rounded-[20px] border border-white/60 transition-all cursor-pointer shadow-md hover:shadow-lg relative overflow-hidden group min-h-[190px] bg-white/40 backdrop-blur-xl`}
                 >
-                  {/* Image di sisi kanan - seperti referensi */}
-                  {imgSource && (
-                    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                      <img src={imgSource} className="w-full h-full object-cover object-[70%_center] opacity-100 group-hover:scale-105 transition-transform duration-700" />
-                      {/* Gradasi horizontal: solid di kiri (teks), transparan di kanan (gambar terlihat) */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/95 via-[55%] to-surface/30 pointer-events-none" />
-                    </div>
-                  )}
-
                   <div className="p-4 flex flex-col h-full relative z-10">
                     <div className="flex items-center justify-between mb-3">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${mode.bg} ${mode.color}`}>
                         <mode.icon size={20} />
                       </div>
-                      <div className="text-[9px] font-bold text-fg-muted uppercase bg-surface/80 backdrop-blur-md px-2 py-1 rounded-md border border-border">
+                      <div className="text-[9px] font-bold text-fg-muted uppercase bg-white/50 backdrop-blur-md px-2 py-1 rounded-md border border-white/50">
                         {mode.badge}
                       </div>
                     </div>
 
                     <div>
                       <h4 className="font-black text-[16px] text-fg leading-tight group-hover:text-primary transition-colors">{mode.title}</h4>
-                      <p className="text-[11px] text-fg-muted font-medium mt-1.5 leading-snug line-clamp-3 max-w-[85%]">
+                      <p className="text-[11px] text-fg-muted font-medium mt-1.5 leading-snug line-clamp-3">
                         {mode.id === 'catatan_salah' && (profile?.catatan_salah?.length ?? 0) > 0
                           ? `${profile?.catatan_salah?.length} soal menunggu dipelajari ulang.`
                           : mode.desc}
@@ -1216,7 +1191,7 @@ export default function Dashboard() {
                     </div>
 
                     <div className="flex items-center justify-between mt-auto pt-4">
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-fg bg-surface/70 backdrop-blur-sm px-2.5 py-1 rounded-md border border-border">
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-fg bg-white/50 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/50">
                         {mode.costType === 'energy' ? <Zap size={14} className="text-energy" /> : <Coins size={14} className="text-coin" />}
                         <span>{mode.cost.toLocaleString()} {mode.costType === 'energy' ? 'Energi' : 'Koin'}</span>
                       </div>
