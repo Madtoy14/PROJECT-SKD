@@ -897,28 +897,20 @@ export default function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Latar Belakang Warna-Warni untuk Efek Glassmorphism */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-slate-50">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[120px]" />
-        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/20 blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[10%] w-[35%] h-[35%] rounded-full bg-indigo-500/20 blur-[120px]" />
-      </div>
-
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="show"
-        className="p-4 md:p-6 space-y-5 max-w-5xl mx-auto pb-8 md:pb-12 relative z-10"
+        className="p-4 md:p-6 space-y-5 max-w-5xl mx-auto pb-8 md:pb-12"
       >
         {/* ── Top Header (Profile, XP, Resources) ── */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col md:flex-row items-center justify-between gap-4 bg-surface p-3 rounded-2xl border border-border shadow-sm"
+          className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-3 sm:p-4 rounded-2xl border border-border shadow-sm"
         >
           {/* Profile & XP Inline */}
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="w-10 h-10 rounded-full bg-xp text-primary-fg p-0.5 shadow-sm shrink-0 overflow-hidden">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-xp text-primary-fg p-0.5 shadow-sm shrink-0 overflow-hidden">
               {(() => {
                 const currentAvatar = availableCharacters.find(c => c.id === (profile?.selected_avatar || equippedAvatarId));
                 return (
@@ -931,10 +923,10 @@ export default function Dashboard() {
               })()}
             </div>
             <div className="flex flex-col flex-1 min-w-[150px]">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-fg leading-none truncate max-w-[120px] sm:max-w-[180px] md:max-w-none">{profile?.nickname || profile?.username || 'Pejuang'}</p>
-                <div className="px-1.5 py-0.5 bg-premium-subtle rounded text-[9px] text-premium font-bold">Lvl {profile?.level || 1}</div>
-                <RankBadge score={profile?.score || 0} size="sm" />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <p className="text-sm sm:text-base font-semibold text-fg leading-none truncate max-w-[100px] sm:max-w-[160px] md:max-w-none">{profile?.nickname || profile?.username || 'Pejuang'}</p>
+                <div className="px-1.5 py-0.5 bg-premium-subtle rounded text-[9px] text-premium font-bold shrink-0">Lvl {profile?.level || 1}</div>
+                <div className="hidden sm:block shrink-0"><RankBadge score={profile?.score || 0} size="sm" /></div>
                 {/* Streak Badge "Hari ke-X" */}
                 {totalStreak > 0 && (
                   <motion.div
@@ -963,11 +955,11 @@ export default function Dashboard() {
             </div>
           </div>
           {/* Right Side Resources & Theme */}
-          <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto pt-2 md:pt-0 border-t border-border md:border-none">
+          <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t border-border sm:border-none">
             <motion.button
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/liga')}
-              className="inline-flex items-center px-2.5 py-1 gap-1.5 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 shadow-lg text-[10px] sm:text-xs font-black text-white transition-all hover:brightness-110 active:scale-95 cursor-pointer"
+              className="inline-flex items-center px-2.5 sm:px-3 py-1.5 gap-1.5 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 shadow-lg text-[10px] sm:text-xs font-black text-white transition-all hover:brightness-110 active:scale-95 cursor-pointer"
             >
               <Users className="w-3.5 h-3.5 text-fg" />
               <span>Liga</span>
@@ -1015,32 +1007,43 @@ export default function Dashboard() {
               variants={itemVariants}
               whileHover={{ scale: 1.01 }}
               onClick={() => setSelectedMode(mode)}
-              className="xl:col-span-7 bg-white/40 backdrop-blur-xl rounded-[24px] border border-white/60 overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all relative flex flex-row min-h-[220px]"
+              className="xl:col-span-7 bg-surface rounded-[24px] border border-success/20 overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all relative flex flex-col sm:flex-row min-h-[200px]"
             >
+              {/* Gambar Karakter (Mobile: Absolute / Desktop: Flex-1) */}
+              <div className="absolute inset-0 sm:relative sm:flex-1 overflow-hidden pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/90 via-[40%] to-surface/20 sm:via-surface/80 sm:to-transparent z-10" />
+                <img
+                  src={getImageUrl('latihan.png')}
+                  alt="Karakter Latihan"
+                  className="w-full h-full object-cover object-[80%_center] sm:object-[85%_center] opacity-40 sm:opacity-100 group-hover:scale-105 transition-transform duration-700"
+                />
+              </div>
+
               {/* Konten Teks */}
-              <div className="p-6 md:p-8 relative z-10 flex flex-col justify-center flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-success text-white flex items-center justify-center shadow-md shrink-0">
-                    <mode.icon size={24} />
+              <div className="p-5 sm:p-6 md:p-8 relative z-20 flex flex-col justify-center w-full sm:w-[55%] md:w-[52%] shrink-0">
+                <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-success text-white flex items-center justify-center shadow-md shrink-0">
+                    <mode.icon size={20} className="sm:hidden" />
+                    <mode.icon size={24} className="hidden sm:block" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-black text-success tracking-widest uppercase bg-success-subtle px-2 py-1 rounded-md border border-success/20">
+                    <span className="text-[9px] sm:text-[10px] font-black text-success tracking-widest uppercase bg-success-subtle px-2 py-1 rounded-md border border-success/20">
                       Mode Utama
                     </span>
-                    <h3 className="text-2xl md:text-3xl font-black text-fg mt-1 leading-none">{mode.title}</h3>
+                    <h3 className="text-2xl md:text-3xl font-black text-fg mt-1 leading-none drop-shadow-sm">{mode.title}</h3>
                   </div>
                 </div>
-                <p className="text-sm text-fg-muted font-medium mb-6 max-w-md">
+                <p className="text-xs sm:text-sm text-fg-muted font-medium mb-5 sm:mb-6 max-w-[260px] sm:max-w-xs drop-shadow-sm">
                   {mode.desc} dengan ribuan soal berkualitas dan pembahasan lengkap.
                 </p>
-                <div className="flex flex-wrap items-center gap-3 mt-auto">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-auto">
                   <motion.button
                     whileTap={{ scale: 0.95 }}
-                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-colors"
+                    className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-colors text-sm sm:text-base"
                   >
-                    Mulai Sekarang <ChevronRight size={18} />
+                    Mulai Sekarang <ChevronRight size={16} className="sm:hidden" /><ChevronRight size={18} className="hidden sm:block" />
                   </motion.button>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-fg bg-white/50 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/50 whitespace-nowrap">
+                  <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-fg bg-surface-subtle px-3 py-1.5 rounded-lg border border-border whitespace-nowrap">
                     <Zap size={14} className="text-energy" /> {mode.cost} Energi
                   </div>
                 </div>
@@ -1049,8 +1052,8 @@ export default function Dashboard() {
           ))}
 
           {/* Streak Harian (xl:col-span-5) */}
-          <motion.section variants={itemVariants} className="xl:col-span-5 bg-surface rounded-[24px] p-6 border border-border shadow-sm flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-4">
+          <motion.section variants={itemVariants} className="xl:col-span-5 bg-surface rounded-[24px] p-5 sm:p-6 border border-border shadow-sm flex flex-col justify-between">
+            <div className="flex justify-between items-start mb-3 sm:mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shrink-0">
                   <Flame className="text-orange-500" size={26} />
@@ -1163,27 +1166,49 @@ export default function Dashboard() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {GAME_MODES.filter(m => m.id !== 'latihan').map((mode) => {
+              // Custom styles matching mockup
+              let imgSource = "";
+
+              if (mode.id === 'survival') {
+                imgSource = getImageUrl('survival.png');
+              } else if (mode.id === 'pvp') {
+                imgSource = getImageUrl('pvp.png');
+              } else if (mode.id === 'tryout') {
+                imgSource = getImageUrl('tryout.png');
+              } else if (mode.id === 'catatan_salah') {
+                imgSource = getImageUrl('catatan.png');
+              }
+
               return (
                 <motion.div
                   key={mode.id}
                   whileHover={{ y: -4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedMode(mode)}
-                  className={`rounded-[20px] border border-white/60 transition-all cursor-pointer shadow-md hover:shadow-lg relative overflow-hidden group min-h-[190px] bg-white/40 backdrop-blur-xl`}
+                  className={`rounded-[20px] border border-border transition-all cursor-pointer shadow-sm hover:shadow-md relative overflow-hidden group min-h-[190px] bg-surface`}
                 >
-                  <div className="p-4 flex flex-col h-full relative z-10">
+                  {/* Image di sisi kanan - seperti referensi */}
+                  {imgSource && (
+                    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                      <img src={imgSource} className="w-full h-full object-cover object-[80%_center] sm:object-[70%_center] opacity-40 sm:opacity-100 group-hover:scale-105 transition-transform duration-700" />
+                      {/* Gradasi horizontal: solid di kiri (teks), transparan di kanan (gambar terlihat) */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/90 via-[60%] to-surface/20 sm:via-surface/95 sm:via-[55%] sm:to-surface/30 pointer-events-none" />
+                    </div>
+                  )}
+
+                  <div className="p-4 sm:p-5 flex flex-col h-full relative z-10">
                     <div className="flex items-center justify-between mb-3">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${mode.bg} ${mode.color}`}>
                         <mode.icon size={20} />
                       </div>
-                      <div className="text-[9px] font-bold text-fg-muted uppercase bg-white/50 backdrop-blur-md px-2 py-1 rounded-md border border-white/50">
+                      <div className="text-[9px] font-bold text-fg-muted uppercase bg-surface/80 backdrop-blur-md px-2 py-1 rounded-md border border-border">
                         {mode.badge}
                       </div>
                     </div>
 
                     <div>
                       <h4 className="font-black text-[16px] text-fg leading-tight group-hover:text-primary transition-colors">{mode.title}</h4>
-                      <p className="text-[11px] text-fg-muted font-medium mt-1.5 leading-snug line-clamp-3">
+                      <p className="text-[11px] text-fg-muted font-medium mt-1.5 leading-snug line-clamp-3 max-w-[85%]">
                         {mode.id === 'catatan_salah' && (profile?.catatan_salah?.length ?? 0) > 0
                           ? `${profile?.catatan_salah?.length} soal menunggu dipelajari ulang.`
                           : mode.desc}
@@ -1191,11 +1216,11 @@ export default function Dashboard() {
                     </div>
 
                     <div className="flex items-center justify-between mt-auto pt-4">
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-fg bg-white/50 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/50">
+                      <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-fg bg-surface/70 backdrop-blur-sm px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg border border-border">
                         {mode.costType === 'energy' ? <Zap size={14} className="text-energy" /> : <Coins size={14} className="text-coin" />}
                         <span>{mode.cost.toLocaleString()} {mode.costType === 'energy' ? 'Energi' : 'Koin'}</span>
                       </div>
-                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                      <div className="w-8 h-8 sm:w-7 sm:h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shrink-0">
                         <ChevronRight size={16} />
                       </div>
                     </div>
@@ -1209,10 +1234,10 @@ export default function Dashboard() {
         {/* ── STATS & QUESTS (ROW 3) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-4">
           {/* Quick Stats (lg:col-span-7) */}
-          <motion.section variants={itemVariants} className="lg:col-span-7 flex flex-col bg-surface rounded-[24px] p-6 border border-border shadow-sm">
+          <motion.section variants={itemVariants} className="lg:col-span-7 flex flex-col bg-surface rounded-[24px] p-5 sm:p-6 border border-border shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
-                <BarChart2 size={20} className="text-info" /> Statistik Belajar
+              <h3 className="text-[16px] sm:text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
+                <BarChart2 size={18} className="text-info sm:w-5 sm:h-5" /> Statistik Belajar
               </h3>
               <select className="bg-surface-subtle border border-border rounded-lg text-xs font-bold text-fg px-2 py-1.5 outline-none cursor-pointer">
                 <option>7 Hari Terakhir</option>
@@ -1249,10 +1274,10 @@ export default function Dashboard() {
           </motion.section>
 
           {/* Quest Mingguan (lg:col-span-5) */}
-          <motion.section variants={itemVariants} className="lg:col-span-5 flex flex-col bg-surface rounded-[24px] p-6 border border-border shadow-sm">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
-                <Target size={20} className="text-danger" /> Quest Mingguan
+          <motion.section variants={itemVariants} className="lg:col-span-5 flex flex-col bg-surface rounded-[24px] p-5 sm:p-6 border border-border shadow-sm">
+            <div className="flex items-center justify-between mb-4 sm:mb-5">
+              <h3 className="text-[16px] sm:text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
+                <Target size={18} className="text-danger sm:w-5 sm:h-5" /> Quest Mingguan
               </h3>
               <span className="text-[11px] sm:text-xs text-info font-bold cursor-pointer hover:underline flex items-center gap-1">
                 Lihat Semua <ChevronRight size={14} className="hidden sm:block" />
