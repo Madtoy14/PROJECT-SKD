@@ -10,7 +10,7 @@ const Badge: React.FC<BadgeProps> = ({
   children, 
   ...props 
 }) => {
-  const baseClass = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider shrink-0';
+  const baseClass = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide shrink-0';
   
   const variantClasses = {
     default: 'bg-surface-subtle text-fg',
@@ -18,10 +18,10 @@ const Badge: React.FC<BadgeProps> = ({
     warning: 'bg-warning-subtle text-warning-fg',
     danger: 'bg-danger-subtle text-danger-fg',
     info: 'bg-info-subtle text-info-fg',
-    coin: 'bg-amber-50 text-warning hover:scale-105 transition-transform duration-300',
+    coin: 'bg-coin-subtle text-coin',
     premium: 'bg-premium-subtle text-premium-text',
     xp: 'bg-xp-subtle text-xp',
-    energy: 'bg-rose-50 text-destructive hover:scale-105 transition-transform duration-300',
+    energy: 'bg-energy-subtle text-energy',
   };
 
   const combinedClassName = `${baseClass} ${variantClasses[variant]} ${className}`;

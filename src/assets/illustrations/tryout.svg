@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 192" fill="none">
+  <defs>
+    <linearGradient id="trophy" x1="76" y1="45" x2="183" y2="148" gradientUnits="userSpaceOnUse"><stop stop-color="#f8d984"/><stop offset="1" stop-color="#e99a47"/></linearGradient>
+    <filter id="shadow" x="28" y="24" width="201" height="161" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="7"/></filter>
+  </defs>
+  <ellipse cx="128" cy="169" rx="84" ry="10" fill="#304766" opacity=".15" filter="url(#shadow)"/>
+  <path d="M69 47h118v36c0 36-26 64-59 64S69 119 69 83V47Z" fill="url(#trophy)"/>
+  <path d="M69 58H48c0 31 17 48 40 48M187 58h21c0 31-17 48-40 48" stroke="#e6a44a" stroke-width="12" stroke-linecap="round"/>
+  <path d="M128 147v17M96 169h64" stroke="#49618a" stroke-width="10" stroke-linecap="round"/>
+  <path d="m128 62 8 16 18 3-13 12 3 18-16-8-16 8 3-18-13-12 18-3 8-16Z" fill="#fff7d2"/>
+  <path d="M49 34h37M170 31h37" stroke="#83cdec" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="45" cy="38" r="8" fill="#78c6f5"/><circle cx="211" cy="35" r="7" fill="#f5a9bd"/>
+</svg>

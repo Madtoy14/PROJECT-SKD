@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 192" fill="none">
+  <defs>
+    <linearGradient id="target" x1="76" y1="39" x2="185" y2="147" gradientUnits="userSpaceOnUse"><stop stop-color="#ffe29a"/><stop offset="1" stop-color="#ed8851"/></linearGradient>
+    <filter id="shadow" x="25" y="24" width="207" height="157" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="7"/></filter>
+  </defs>
+  <ellipse cx="130" cy="166" rx="82" ry="10" fill="#9e522d" opacity=".18" filter="url(#shadow)"/>
+  <circle cx="128" cy="91" r="61" fill="#fff4d4"/>
+  <circle cx="128" cy="91" r="48" fill="url(#target)"/>
+  <circle cx="128" cy="91" r="30" fill="#fff1bd"/>
+  <circle cx="128" cy="91" r="13" fill="#e9794c"/>
+  <path d="m128 91 67-38" stroke="#49618a" stroke-width="10" stroke-linecap="round"/>
+  <path d="m193 48 18 4-13 14-9-7 4-11Z" fill="#49618a"/>
+  <path d="m44 62 11-9 9 8-8 11-12 2V62ZM63 142l13-5 4 12-12 8-9-7 4-8Z" fill="#f6c969"/>
+  <path d="m174 145 8-12 12 5-1 13-12 5-7-11Z" fill="#78c6f5"/>
+</svg>

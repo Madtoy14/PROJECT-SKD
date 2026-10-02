@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } f
 
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from './lib/supabase';
+import { motion, useReducedMotion } from 'framer-motion';
 
 import { Home, Trophy, BookOpen, Store, User, BookOpenCheck, Target, Bookmark, Menu, X, LogOut, Settings as SettingsIcon } from 'lucide-react';
 
@@ -37,9 +38,26 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 
 
+function MotionActiveIndicator({ layoutId, reducedMotion, axis = 'y', customBg = 'bg-primary-container' }: { layoutId: string; reducedMotion: boolean; axis?: 'x' | 'y', customBg?: string }) {
+  return (
+    <motion.span
+      layoutId={layoutId}
+      aria-hidden="true"
+      initial={false}
+      animate={reducedMotion ? { opacity: 1, scale: 1 } : { opacity: [0.85, 1], scale: [0.98, 1] }}
+      transition={{
+        layout: reducedMotion ? { duration: 0.08 } : { duration: 0.24, ease: [0.2, 0, 0, 1] },
+        default: reducedMotion ? { duration: 0.08 } : { duration: 0.18, ease: [0.2, 0, 0, 1] },
+      }}
+      className={`pointer-events-none absolute inset-0 z-[1] rounded-[var(--m3-shape-medium)] ${customBg} ${axis === 'x' ? 'rounded-full' : ''}`}
+    />
+  );
+}
+
 function Navigation() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const reducedMotion = useReducedMotion() ?? false;
 
   const hideNavPaths = ['/quiz', '/auth', '/onboarding'];
 
@@ -71,6 +89,7 @@ function Navigation() {
     { path: '/profil', icon: User, label: 'Profil' },
   ];
 
+
   const handleLogout = async () => {
     try {
       // Bersihkan PWA cache sebelum logout
@@ -93,16 +112,16 @@ function Navigation() {
 
   return (
     <>
-      {/* ── Mobile Top Bar ── */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-12 bg-surface/95 backdrop-blur-md border-b border-border z-50 flex items-center justify-between px-4">
+      {/* ── Mobile Top App Bar ── */}
+      <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-surface border-b border-border z-50 flex items-center justify-between px-4">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-subtle transition-colors"
+          className="m3-interactive w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-subtle transition-colors m3-focus"
           aria-label="Buka menu navigasi"
         >
           <Menu size={22} className="text-fg" />
         </button>
-        <Link to="/" className="text-base font-bold tracking-tight bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
+        <Link to="/" className="text-base font-bold tracking-tight text-primary">
           SKDQuest
         </Link>
         <div className="w-9" /> {/* spacer */}
@@ -112,15 +131,15 @@ function Navigation() {
       {sidebarOpen && (
         <>
           <div className="fixed inset-0 z-[200] bg-black/50" onClick={() => setSidebarOpen(false)} />
-          <nav className="fixed top-0 left-0 z-[210] h-full w-[85vw] max-w-sm bg-white border-r border-border flex flex-col shadow-2xl overflow-hidden p-6"
+          <nav className="fixed top-0 left-0 z-[210] h-full w-[85vw] max-w-sm bg-surface-container-lowest border-r border-border flex flex-col shadow-lg overflow-hidden p-6"
             style={{ animation: 'slideInLeft 0.2s ease-out' }}
           >
             {/* Sidebar Header */}
             <div className="relative shrink-0 mb-6">
-              <span className="font-bold text-lg bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">SKDQuest</span>
+              <span className="font-bold text-lg text-primary">SKDQuest</span>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="absolute top-0 right-0 w-9 h-9 flex items-center justify-center rounded-lg bg-surface-subtle hover:bg-border transition-colors"
+                 className="m3-interactive absolute top-0 right-0 w-10 h-10 flex items-center justify-center rounded-full bg-surface-subtle hover:bg-border transition-colors m3-focus"
                 aria-label="Tutup menu"
               >
                 <X size={20} className="text-fg" />
@@ -136,12 +155,14 @@ function Navigation() {
                     <Link
                       to={path}
                       onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all text-sm font-bold ${
-                        isActive ? 'bg-primary/10 text-primary' : 'text-fg-muted hover:bg-surface-subtle hover:text-fg'
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`m3-interactive relative flex items-center gap-3 px-4 py-3 rounded-[var(--m3-shape-medium)] transition-all text-sm font-semibold m3-focus ${
+                        isActive ? 'text-primary' : 'text-fg-muted hover:bg-surface-subtle hover:text-fg'
                       }`}
                     >
-                      <Icon size={20} />
-                      {label}
+                      {isActive && <MotionActiveIndicator layoutId="mobile-drawer-nav-indicator" reducedMotion={reducedMotion} />}
+                      <Icon size={20} className="relative z-[3] transition-transform duration-200" />
+                      <span className="relative z-[3]">{label}</span>
                     </Link>
                   </li>
                 );
@@ -169,16 +190,23 @@ function Navigation() {
         </>
       )}
 
-      {/* ── Mobile Bottom Navigation ── */}
-      <nav className={`md:hidden fixed bottom-0 w-full bg-surface/95 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] backdrop-blur-md border-t border-border z-50 transition-all duration-200 pb-[env(safe-area-inset-bottom)] ${sidebarOpen ? 'opacity-0 pointer-events-none' : ''}`}>
-        <ul className="flex justify-around items-center h-16">
+      {/* ── Mobile Navigation Bar ── */}
+      <nav className={`md:hidden fixed bottom-0 w-full bg-surface-container-lowest border-t border-border z-50 transition-all duration-200 pb-[env(safe-area-inset-bottom)] ${sidebarOpen ? 'opacity-0 pointer-events-none' : ''}`}>
+        <ul className="relative z-[2] flex justify-around items-center h-[4.25rem]">
           {mainNav.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path;
             return (
               <li key={path} className="flex-1 h-full">
-                <Link to={path} className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'text-primary' : 'text-fg-muted hover:text-fg'}`}>
-                  <Icon size={22} className={isActive ? 'drop-shadow-[0_0_8px_rgba(245,166,35,0.5)]' : ''} />
-                  <span className="text-[10px] font-bold">{label}</span>
+                <Link
+                  to={path}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`m3-interactive relative flex flex-col items-center justify-center gap-1 w-full h-full text-xs transition-colors ${isActive ? 'text-primary' : 'text-fg-muted hover:text-fg'}`}
+                >
+                  {isActive && <MotionActiveIndicator layoutId="mobile-nav-indicator" reducedMotion={reducedMotion} axis="x" />}
+                  <span className="relative z-[2] flex items-center justify-center h-8 px-4 rounded-full transition-transform duration-200">
+                    <Icon size={20} className="transition-transform duration-200" />
+                  </span>
+                  <span className="relative z-[2] font-semibold">{label}</span>
                 </Link>
               </li>
             );
@@ -186,29 +214,50 @@ function Navigation() {
         </ul>
       </nav>
 
-      {/* ── Desktop Sidebar Navigation ── */}
-      <nav className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-[88px] hover:w-64 bg-slate-900 border-r border-slate-800 z-50 transition-all duration-300 group overflow-hidden shadow-xl">
-        <div className="h-16 flex items-center justify-center group-hover:justify-start group-hover:px-6 shrink-0 relative w-full border-b border-slate-800/60">
-          <h1 className="text-[20px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-200 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute left-6 whitespace-nowrap">SKDQuest</h1>
-          <h1 className="text-[22px] font-bold tracking-tighter bg-gradient-to-r from-primary to-blue-200 bg-clip-text text-transparent group-hover:opacity-0 transition-opacity duration-300">SQ</h1>
+      {/* ── Desktop Navigation Rail ── */}
+      <nav className="group hidden md:flex flex-col sticky top-0 h-screen shrink-0 w-20 hover:w-60 bg-[#EAF2FF] border-r border-[#D4E3FF] z-50 overflow-x-hidden transition-all duration-300 ease-in-out">
+        <div className="h-20 flex flex-col items-center justify-center shrink-0 border-b border-[#D4E3FF]/60 transition-all duration-300 relative overflow-hidden">
+          {/* Collapsed state logo */}
+          <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 opacity-100 group-hover:opacity-0 group-hover:scale-50 pointer-events-none">
+            <img 
+              src={supabase.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl} 
+              alt="SKDQuest Compact" 
+              className="w-10 h-10 object-contain drop-shadow-sm" 
+            />
+          </div>
+          {/* Expanded state logo + text */}
+          <div className="absolute inset-0 flex items-center px-5 transition-all duration-300 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 pointer-events-auto gap-3">
+            <img 
+              src={supabase.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl} 
+              alt="SKDQuest Logo" 
+              className="w-10 h-10 object-contain drop-shadow-sm shrink-0" 
+            />
+            <h1 className="text-xl font-black tracking-tight text-[#1E3A8A] whitespace-nowrap">
+              SKDQuest
+            </h1>
+          </div>
         </div>
 
-        <ul className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-3 group-hover:px-4 space-y-1 py-2 w-full">
+        <ul className="relative flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-2 space-y-1 py-4 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {desktopNavOrder.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path;
             return (
               <li key={path}>
                 <Link
                   to={path}
-                  className={`flex flex-col group-hover:flex-row items-center group-hover:items-center px-0 group-hover:px-4 py-2.5 rounded-xl transition-all w-full border-l-[3px] border-transparent ${isActive
-                    ? 'bg-primary/20 text-white font-bold !border-primary'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 font-medium'
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`m3-interactive relative flex items-center px-4 py-3 rounded-[var(--m3-shape-medium)] transition-all w-full ${isActive
+                    ? 'text-[#1E3A8A] font-bold'
+                    : 'text-[#476086] hover:bg-[#DEEAFF] hover:text-[#1E3A8A] font-medium'
                     }`}
                 >
-                  <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
-                    <Icon size={20} className={`group-hover:!w-5 group-hover:!h-5 transition-all ${isActive ? 'drop-shadow-[0_0_8px_rgba(245,166,35,0.5)]' : ''}`} />
+                  {isActive && <MotionActiveIndicator layoutId="desktop-nav-indicator" reducedMotion={reducedMotion} customBg="bg-[#CFE0FF]" />}
+                  <div className="relative z-[2] flex items-center justify-center shrink-0 w-8 h-6">
+                    <Icon size={20} className="transition-transform duration-200" />
                   </div>
-                  <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block text-[14px] font-bold">{label}</span>
+                  <span className="relative z-[2] text-sm whitespace-nowrap overflow-hidden transition-all duration-300 w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 ml-0 group-hover:ml-3">
+                    {label}
+                  </span>
                 </Link>
               </li>
             );
@@ -216,34 +265,40 @@ function Navigation() {
         </ul>
 
         {/* Desktop Settings + Logout — ikon terlihat baik saat collapse maupun hover */}
-        <div className="px-3 group-hover:px-4 pb-2 pt-2 border-t border-slate-800 shrink-0 space-y-1">
+        <div className="px-2 pb-3 pt-3 border-t border-[#D4E3FF]/60 shrink-0 space-y-1">
           <Link
             to="/settings"
-            className={`flex flex-col group-hover:flex-row items-center px-0 group-hover:px-4 py-2.5 rounded-xl transition-all w-full font-bold text-sm border-l-[3px] border-transparent ${
-              location.pathname === '/settings'
-                ? 'bg-primary/20 text-white !border-primary'
-                : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
-            }`}
+             aria-current={location.pathname === '/settings' ? 'page' : undefined}
+             className={`m3-interactive relative flex items-center px-4 py-3 rounded-[var(--m3-shape-medium)] transition-all w-full font-bold text-sm ${
+               location.pathname === '/settings'
+                 ? 'text-[#1E3A8A]'
+                 : 'text-[#476086] hover:bg-[#DEEAFF] hover:text-[#1E3A8A]'
+             }`}
           >
-            <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
-              <SettingsIcon size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
+            {location.pathname === '/settings' && <MotionActiveIndicator layoutId="desktop-nav-indicator" reducedMotion={reducedMotion} customBg="bg-[#CFE0FF]" />}
+            <div className="relative z-[2] flex items-center justify-center shrink-0 w-8 h-6">
+              <SettingsIcon size={20} />
             </div>
-            <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Pengaturan</span>
+            <span className="relative z-[3] whitespace-nowrap overflow-hidden transition-all duration-300 w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 ml-0 group-hover:ml-3">
+              Pengaturan
+            </span>
           </Link>
           <button
             onClick={handleLogout}
-            className="flex flex-col group-hover:flex-row items-center px-0 group-hover:px-4 py-2.5 rounded-xl transition-all w-full text-slate-400 hover:bg-white/5 hover:text-red-400 font-bold text-sm border-l-[3px] border-transparent"
+            className="m3-interactive flex items-center px-4 py-3 rounded-[var(--m3-shape-medium)] transition-all w-full text-[#476086] hover:bg-[#FFD9D9] hover:text-[#B91C1C] font-bold text-sm"
           >
-            <div className="flex items-center justify-center shrink-0 w-16 group-hover:w-6">
-              <LogOut size={20} className="group-hover:!w-5 group-hover:!h-5 transition-all" />
+            <div className="flex items-center justify-center shrink-0 w-8 h-6">
+              <LogOut size={20} />
             </div>
-            <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden group-hover:block">Logout</span>
+            <span className="whitespace-nowrap overflow-hidden transition-all duration-300 w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 ml-0 group-hover:ml-3">
+              Logout
+            </span>
           </button>
         </div>
 
         {/* Desktop Version */}
-        <div className="px-3 group-hover:px-4 pb-3 pt-1 shrink-0">
-          <span className="text-[10px] text-blue-300/40 font-medium block text-center group-hover:text-left transition-all">v1.0.0</span>
+        <div className="px-6 pb-4 pt-1 shrink-0 overflow-hidden whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center group-hover:text-left">
+          <span className="text-[10px] text-[#718BB2] font-medium block">v1.0.0</span>
         </div>
       </nav>
     </>
@@ -472,11 +527,11 @@ function AppLayout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[var(--app-bg)] text-[var(--text-main)] font-syne transition-colors flex flex-col md:flex-row overflow-x-hidden">
+    <div className="min-h-screen bg-bg text-fg font-syne transition-colors flex flex-col md:flex-row overflow-x-hidden">
       <Navigation />
       <FeedbackWidget />
       <IncomingDuelRequest />
-      <main className={`flex-1 min-w-0 ${!isFullScreen ? 'md:ml-[88px] pt-12 md:pt-0 pb-20 md:pb-0' : ''} min-h-screen transition-all duration-300`}>
+      <main className={`flex-1 min-w-0 ${!isFullScreen ? 'pt-14 md:pt-0 pb-32 md:pb-0' : ''} min-h-screen transition-all duration-300`}>
         <div className={`w-full h-full ${!isFullScreen ? 'max-w-7xl mx-auto' : ''}`}>
           <Suspense fallback={
             <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3 text-primary font-bold">

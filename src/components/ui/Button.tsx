@@ -11,26 +11,26 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = '', variant = 'primary', size = 'md', loading = false, disabled, children, ...props }, ref) => {
     
     // Base classes
-    const baseClass = 'inline-flex items-center justify-center font-bold rounded-lg transition-all duration-300 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg shrink-0 hover:scale-[1.03] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100';
+    const baseClass = 'inline-flex items-center justify-center gap-2 font-semibold rounded-full transition-colors duration-200 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary shrink-0 active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed';
     
     // Size classes
     const sizeClasses = {
-      sm: 'px-3 py-1.5 text-xs',
-      md: 'px-4 py-2 text-sm',
-      lg: 'px-6 py-3 text-base',
+      sm: 'min-h-9 px-4 text-xs',
+      md: 'min-h-10 px-5 text-sm',
+      lg: 'min-h-12 px-6 text-base',
     };
 
     // Variant classes
     const variantClasses = {
-      primary: 'bg-primary text-primary-fg hover:opacity-90 shadow-lg shadow-primary/25',
-      secondary: 'bg-surface-subtle text-fg hover:bg-surface shadow-sm border border-border',
-      outline: 'bg-transparent text-fg hover:bg-surface-subtle border-2 border-border',
+      primary: 'bg-primary text-primary-fg hover:bg-primary-hover',
+      secondary: 'bg-secondary-container text-on-secondary-container hover:bg-surface-container-high',
+      outline: 'bg-transparent text-fg hover:bg-surface-subtle border border-border-strong',
       ghost: 'bg-transparent text-fg hover:bg-surface-subtle',
-      danger: 'bg-danger text-danger-fg hover:opacity-90 shadow-lg shadow-destructive/25',
-      premium: 'bg-premium text-premium-fg hover:opacity-90 shadow-lg shadow-purple-500/25',
-      info: 'bg-info text-info-fg hover:opacity-90 shadow-lg shadow-primary/25',
-      warning: 'bg-warning text-warning-fg hover:opacity-90 shadow-lg shadow-warning/25',
-      success: 'bg-success text-success-fg hover:opacity-90 shadow-lg shadow-success/25',
+      danger: 'bg-danger text-danger-fg hover:bg-danger/90',
+      premium: 'bg-tertiary text-white hover:opacity-90',
+      info: 'bg-info text-white hover:bg-info-hover',
+      warning: 'bg-warning text-white hover:opacity-90',
+      success: 'bg-success text-white hover:opacity-90',
       custom: '', // Allows purely overriding with className while keeping base behaviors
     };
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 192" fill="none">
+  <defs>
+    <linearGradient id="bolt" x1="94" y1="27" x2="166" y2="161" gradientUnits="userSpaceOnUse"><stop stop-color="#fff09a"/><stop offset=".45" stop-color="#f6b45c"/><stop offset="1" stop-color="#df725b"/></linearGradient>
+    <filter id="shadow" x="50" y="19" width="158" height="169" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+  <ellipse cx="128" cy="169" rx="60" ry="10" fill="#a64335" opacity=".18" filter="url(#shadow)"/>
+  <path d="m145 25-68 83h40l-9 59 71-91h-41l7-51Z" fill="url(#bolt)"/>
+  <path d="m145 25-68 83h40l-9 59" stroke="#fff5ba" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>
+  <circle cx="58" cy="78" r="9" fill="#78c6f5"/><circle cx="201" cy="113" r="8" fill="#f5a9bd"/>
+</svg>
