@@ -680,8 +680,8 @@ export default function Dashboard() {
   return (
     <div className="relative min-h-screen isolate bg-[#F7FAFF]">
       {/* ── Global Ambient Background ── */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden transition-all duration-700 ease-in-out">
-        {/* Subtle dot pattern */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden transition-all duration-700 ease-in-out flex justify-center">
+        {/* Subtle dot pattern spans entire viewport width */}
         <div
           className="absolute inset-0 opacity-[0.15] sm:opacity-[0.25] lg:opacity-[0.4] transition-opacity duration-700"
           style={{
@@ -691,15 +691,18 @@ export default function Dashboard() {
           }}
         />
 
-        {/* Ambient Glows */}
-        <div className="absolute -top-[5%] md:-top-[10%] left-[-20%] md:left-[10%] w-[140%] md:w-[80%] h-[clamp(350px,40%,700px)] bg-[#DBEAFE] rounded-full blur-[80px] md:blur-[120px] opacity-60 md:opacity-70 transition-all duration-700" />
-        <div className="absolute top-[10%] md:top-[5%] right-[-30%] md:-right-[10%] w-[100%] md:w-[50%] h-[clamp(250px,35%,600px)] bg-[#CFFAFE] rounded-full blur-[60px] md:blur-[100px] opacity-40 md:opacity-60 transition-all duration-700" />
-        <div className="absolute bottom-[2%] md:bottom-[5%] left-[-20%] md:left-[5%] w-[120%] md:w-[60%] h-[clamp(300px,40%,700px)] bg-[#EDE9FE] rounded-full blur-[80px] md:blur-[120px] opacity-50 md:opacity-80 transition-all duration-700" />
+        {/* Ambient Glows Container - locked to content width */}
+        <div className="relative w-full max-w-6xl h-full">
+          {/* Ambient Glows */}
+          <div className="absolute -top-[5%] md:-top-[10%] left-[-20%] md:left-[10%] w-[140%] md:w-[80%] h-[clamp(350px,40%,700px)] bg-[#DBEAFE] rounded-full blur-[80px] md:blur-[120px] opacity-60 md:opacity-70 transition-all duration-700" />
+          <div className="absolute top-[10%] md:top-[5%] right-[-30%] md:-right-[10%] w-[100%] md:w-[50%] h-[clamp(250px,35%,600px)] bg-[#CFFAFE] rounded-full blur-[60px] md:blur-[100px] opacity-40 md:opacity-60 transition-all duration-700" />
+          <div className="absolute bottom-[2%] md:bottom-[5%] left-[-20%] md:left-[5%] w-[120%] md:w-[60%] h-[clamp(300px,40%,700px)] bg-[#EDE9FE] rounded-full blur-[80px] md:blur-[120px] opacity-50 md:opacity-80 transition-all duration-700" />
 
-        {/* Abstract Decorative Shapes */}
-        <div className="absolute top-[15%] md:top-[10%] -right-[20%] md:-right-[10%] w-[clamp(200px,35%,500px)] aspect-square border-[clamp(15px,3%,50px)] border-[#BFDBFE] rounded-full opacity-[0.15] md:opacity-[0.35] blur-[2px] md:blur-[4px] transition-all duration-700" />
-        <div className="absolute bottom-[10%] right-[-15%] md:right-[5%] w-[clamp(180px,30%,500px)] aspect-square bg-gradient-to-br from-[#DDD6FE] to-transparent rounded-full opacity-30 md:opacity-50 blur-xl md:blur-3xl mix-blend-multiply transition-all duration-700" />
-        <div className="hidden sm:block absolute top-[40%] -left-[10%] w-[clamp(120px,20%,300px)] aspect-[2/5] bg-[#BFDBFE] rounded-[999px] rotate-[25deg] opacity-20 md:opacity-30 blur-lg md:blur-2xl transition-all duration-700" />
+          {/* Abstract Decorative Shapes */}
+          <div className="absolute top-[15%] md:top-[10%] -right-[20%] md:-right-[10%] w-[clamp(200px,35%,500px)] aspect-square border-[clamp(15px,3%,50px)] border-[#BFDBFE] rounded-full opacity-[0.15] md:opacity-[0.35] blur-[2px] md:blur-[4px] transition-all duration-700" />
+          <div className="absolute bottom-[10%] right-[-15%] md:right-[5%] w-[clamp(180px,30%,500px)] aspect-square bg-gradient-to-br from-[#DDD6FE] to-transparent rounded-full opacity-30 md:opacity-50 blur-xl md:blur-3xl mix-blend-multiply transition-all duration-700" />
+          <div className="hidden sm:block absolute top-[40%] -left-[10%] w-[clamp(120px,20%,300px)] aspect-[2/5] bg-[#BFDBFE] rounded-[999px] rotate-[25deg] opacity-20 md:opacity-30 blur-lg md:blur-2xl transition-all duration-700" />
+        </div>
       </div>
 
       {/* === RODA KEBERUNTUNGAN SPIN WHEEL MODAL === */}
