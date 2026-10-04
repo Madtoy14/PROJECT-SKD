@@ -946,8 +946,12 @@ export default function Dashboard() {
           className="m3-card rounded-[var(--m3-shape-large)] p-3 sm:p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
         >
           {/* Profile & XP */}
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary-container p-[2px] shrink-0 overflow-hidden">
+          <div className="flex flex-col gap-2 sm:gap-2.5 w-full sm:w-auto flex-1">
+            
+            {/* 1. Identity & Status Row */}
+            <div className="flex items-center gap-3">
+              {/* Avatar - slightly smaller and perfectly circular */}
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary-container p-[2px] shrink-0 overflow-hidden shadow-sm">
               {(() => {
                 const currentAvatar = availableCharacters.find(c => c.id === (profile?.selected_avatar || equippedAvatarId));
                 return (
@@ -958,26 +962,42 @@ export default function Dashboard() {
                   />
                 );
               })()}
-            </div>
-            <div className="flex flex-col flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <p className="text-sm sm:text-base font-semibold text-fg truncate max-w-[120px] sm:max-w-[160px] md:max-w-none">{profile?.nickname || profile?.username || 'Pejuang'}</p>
-                <div className="px-1.5 py-0.5 bg-primary/20 rounded text-[9px] text-primary-hover font-bold shrink-0 shadow-none filter-none">Lvl {profile?.level || 1}</div>
-                <div className="shrink-0"><RankBadge score={profile?.score || 0} size="sm" /></div>
-                {/* Streak Badge */}
-                {totalStreak > 0 && (
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.6 }}
-                    className="flex items-center gap-1 px-2 py-0.5 bg-streak-subtle border border-streak/30 rounded-full text-[9px] font-semibold text-streak shrink-0 mt-1 sm:mt-0 shadow-none filter-none"
-                    title={`Streak ${totalStreak + (isStreakClaimed ? 1 : 0)} hari belajar berturut-turut!`}
-                  >
-                    <Flame size={9} className="text-orange-400" />
-                    {totalStreak + (isStreakClaimed ? 1 : 0)}h
-                  </motion.div>
-                )}
               </div>
+              
+              <div className="flex flex-wrap items-center gap-2.5 min-w-0">
+                {/* Username */}
+                <p className="text-[15px] sm:text-[17px] font-bold text-fg truncate max-w-[120px] sm:max-w-[160px] md:max-w-none shrink-0 leading-none pb-[1px]">
+                  {profile?.nickname || profile?.username || 'Pejuang'}
+                </p>
+                
+                {/* Compact Badges Group */}
+                <div className="flex items-center gap-2">
+                  {/* Lvl Badge */}
+                  <div className="h-[24px] px-2.5 bg-primary/10 rounded-full text-[10px] sm:text-[11px] text-primary-hover font-bold flex items-center justify-center shrink-0 shadow-none filter-none">
+                    Lvl {profile?.level || 1}
+                  </div>
+                  
+                  {/* Rank Badge (Warrior) */}
+                  <div className="shrink-0 flex items-center shadow-none filter-none">
+                    <RankBadge score={profile?.score || 0} size="sm" />
+                  </div>
+                  
+                  {/* Streak Badge */}
+                  {totalStreak > 0 && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.6 }}
+                      className="h-[24px] px-2.5 bg-orange-50/80 border border-orange-200/50 rounded-full text-[10px] sm:text-[11px] font-bold text-orange-600 flex items-center gap-1 shrink-0 shadow-none filter-none"
+                      title={`Streak ${totalStreak + (isStreakClaimed ? 1 : 0)} hari belajar berturut-turut!`}
+                    >
+                      <Flame size={11} className="text-orange-500 shrink-0" />
+                      {totalStreak + (isStreakClaimed ? 1 : 0)}h
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            </div>
               {/* XP Bar */}
               <div className="flex items-center gap-2 mt-1.5">
                 <div className="flex-1 h-1.5 bg-surface-container rounded-full overflow-hidden">

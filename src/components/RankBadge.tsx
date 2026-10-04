@@ -187,7 +187,7 @@ export default function RankBadge({
   const [modalOpen, setModalOpen] = useState(false);
 
   const sizeMap = {
-    sm: { emoji: 'text-base sm:text-lg', name: 'text-[10px] sm:text-xs', badge: 'px-2 py-0.5 sm:px-2.5 sm:py-1 gap-1 sm:gap-1.5' },
+    sm: { emoji: 'text-base sm:text-[17px]', name: 'text-[10px] sm:text-[11px]', badge: 'h-[24px] px-2 sm:px-2.5 gap-1 sm:gap-1.5 shadow-none filter-none border-none' },
     md: { emoji: 'text-xl', name: 'text-sm', badge: 'px-3 py-1.5 gap-2' },
     lg: { emoji: 'text-3xl', name: 'text-base', badge: 'px-4 py-2 gap-2.5' },
   }[size];
