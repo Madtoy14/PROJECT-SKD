@@ -203,11 +203,11 @@ export default function RankBadge({
 
         <button
           onClick={clickable ? () => setModalOpen(true) : undefined}
-          className={`inline-flex items-center ${sizeMap.badge} rounded-full bg-gradient-to-r ${rank.color} shadow-lg transition-all
+          className={`inline-flex items-center ${sizeMap.badge} rounded-full bg-gradient-to-r ${rank.color} shadow-none filter-none transition-all
             ${clickable ? 'hover:scale-105 hover:brightness-95 focus-visible:outline-none focus-visible:ring focus-visible:ring-ring active:scale-95 cursor-pointer' : 'cursor-default'}`}
         >
           <span className={sizeMap.emoji}>{rank.emoji}</span>
-          <span className={`font-black ${sizeMap.name} text-fg drop-shadow-sm`}>{rank.name}</span>
+          <span className={`font-black ${sizeMap.name} text-fg filter-none`}>{rank.name}</span>
           {clickable && <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-fg/70 ml-0.5" />}
         </button>
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, type Variants, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut, Clock, Eye, RefreshCw, Sparkles, PartyPopper } from 'lucide-react';
+import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut, Clock, Eye, RefreshCw, Sparkles, PartyPopper, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProfile, resetDailyQuests, syncEnergy, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character, type UserProfile } from '../lib/supabase';
 import RankBadge from '../components/RankBadge';
@@ -12,15 +12,19 @@ import { useFocusTrap } from '../hooks/useFocusTrap';
 import { WEEKLY_QUESTS_METADATA } from './Quest';
 import { dashboardIllustrations } from '../assets/illustrations';
 const latihanHarianBg = supabase.storage.from('background').getPublicUrl('Latihan Harian.png').data.publicUrl;
+const survivalCardBg = supabase.storage.from('background').getPublicUrl('survival mode card .png').data.publicUrl;
+const pvpCardBg = supabase.storage.from('background').getPublicUrl('pvp battle card.png').data.publicUrl;
+const tryoutCardBg = supabase.storage.from('background').getPublicUrl('Try Out Mode card.png').data.publicUrl;
+const catatanSalahCardBg = supabase.storage.from('background').getPublicUrl('Buku Catatan Salah card.png').data.publicUrl;
 
 
 
 
 const GAME_MODES = [
-  { id: 'latihan', title: 'Latihan Harian', desc: 'Asah kemampuanmu setiap hari', cost: 2, costType: 'energy', icon: BrainCircuit, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success/30 hover:border-success hover:shadow-sm', badge: 'Santai' },
-  { id: 'survival', title: 'Survival Mode', desc: '1 Kesalahan = Game Over', cost: 3, costType: 'energy', icon: Target, color: 'text-danger', bg: 'bg-danger-subtle', border: 'border-danger/30 hover:border-danger hover:shadow-sm', badge: 'Hardcore' },
-  { id: 'pvp', title: 'PvP Battle', desc: 'Main bareng maks 50 player', cost: 3, costType: 'energy', icon: Swords, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-sm', badge: 'Multiplayer' },
-  { id: 'tryout', title: 'Try Out Mode', desc: '110 soal BKN • beli 1× 1.000 koin', cost: 1000, costType: 'coin', icon: Trophy, color: 'text-premium', bg: 'bg-premium-subtle', border: 'border-premium/30 hover:border-premium hover:shadow-sm', badge: 'Premium' },
+  { id: 'latihan', title: 'Latihan Harian', desc: 'Asah kemampuanmu setiap hari', cost: 2, costType: 'energy', icon: BrainCircuit, color: 'text-success', bg: 'bg-success-subtle', border: 'border-success/30 hover:border-success hover:shadow-card-hover', badge: 'Santai' },
+  { id: 'survival', title: 'Survival Mode', desc: '1 Kesalahan = Game Over', cost: 3, costType: 'energy', icon: Target, color: 'text-danger', bg: 'bg-danger-subtle', border: 'border-danger/30 hover:border-danger hover:shadow-card-hover', badge: 'Hardcore' },
+  { id: 'pvp', title: 'PvP Battle', desc: 'Main bareng maks 50 player', cost: 3, costType: 'energy', icon: Swords, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-card-hover', badge: 'Multiplayer' },
+  { id: 'tryout', title: 'Try Out Mode', desc: '110 soal BKN • beli 1× 1.000 koin', cost: 1000, costType: 'coin', icon: Trophy, color: 'text-premium', bg: 'bg-premium-subtle', border: 'border-premium/30 hover:border-premium hover:shadow-card-hover', badge: 'Premium' },
   { id: 'catatan_salah', title: 'Buku Catatan Salah', desc: 'Latih ulang soal yang pernah salah', cost: 0, costType: 'energy', icon: BookOpen, color: 'text-info', bg: 'bg-info-subtle', border: 'border-info/30 hover:border-info hover:shadow-card', badge: 'Evaluasi' },
 ];
 
@@ -676,26 +680,26 @@ export default function Dashboard() {
   return (
     <div className="relative min-h-screen isolate bg-[#F7FAFF]">
       {/* ── Global Ambient Background ── */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden transition-all duration-700 ease-in-out">
         {/* Subtle dot pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.4]" 
-          style={{ 
-            backgroundImage: 'radial-gradient(#94A3B8 1px, transparent 1px)', 
-            backgroundSize: '24px 24px',
+        <div
+          className="absolute inset-0 opacity-[0.15] sm:opacity-[0.25] lg:opacity-[0.4] transition-opacity duration-700"
+          style={{
+            backgroundImage: 'radial-gradient(#94A3B8 1px, transparent 1px)',
+            backgroundSize: 'clamp(14px, 2vw, 24px) clamp(14px, 2vw, 24px)',
             maskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)'
-          }} 
+          }}
         />
-        
+
         {/* Ambient Glows */}
-        <div className="absolute -top-[10%] left-[10%] w-[80%] h-[60%] bg-[#DBEAFE] rounded-full blur-[120px] opacity-70" />
-        <div className="absolute top-[5%] -right-[10%] w-[50%] h-[50%] bg-[#CFFAFE] rounded-full blur-[100px] opacity-60" />
-        <div className="absolute bottom-[5%] left-[5%] w-[60%] h-[50%] bg-[#EDE9FE] rounded-full blur-[120px] opacity-80" />
+        <div className="absolute -top-[5%] md:-top-[10%] left-[-20%] md:left-[10%] w-[140%] md:w-[80%] h-[clamp(350px,40%,700px)] bg-[#DBEAFE] rounded-full blur-[80px] md:blur-[120px] opacity-60 md:opacity-70 transition-all duration-700" />
+        <div className="absolute top-[10%] md:top-[5%] right-[-30%] md:-right-[10%] w-[100%] md:w-[50%] h-[clamp(250px,35%,600px)] bg-[#CFFAFE] rounded-full blur-[60px] md:blur-[100px] opacity-40 md:opacity-60 transition-all duration-700" />
+        <div className="absolute bottom-[2%] md:bottom-[5%] left-[-20%] md:left-[5%] w-[120%] md:w-[60%] h-[clamp(300px,40%,700px)] bg-[#EDE9FE] rounded-full blur-[80px] md:blur-[120px] opacity-50 md:opacity-80 transition-all duration-700" />
 
         {/* Abstract Decorative Shapes */}
-        <div className="absolute top-[10%] -right-[10%] w-[500px] h-[500px] border-[50px] border-[#BFDBFE] rounded-full opacity-[0.35] blur-[4px]" />
-        <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] bg-gradient-to-br from-[#DDD6FE] to-transparent rounded-full opacity-50 blur-3xl mix-blend-multiply" />
-        <div className="absolute top-[40%] -left-[10%] w-[300px] h-[700px] bg-[#BFDBFE] rounded-[999px] rotate-[25deg] opacity-30 blur-2xl" />
+        <div className="absolute top-[15%] md:top-[10%] -right-[20%] md:-right-[10%] w-[clamp(200px,35%,500px)] aspect-square border-[clamp(15px,3%,50px)] border-[#BFDBFE] rounded-full opacity-[0.15] md:opacity-[0.35] blur-[2px] md:blur-[4px] transition-all duration-700" />
+        <div className="absolute bottom-[10%] right-[-15%] md:right-[5%] w-[clamp(180px,30%,500px)] aspect-square bg-gradient-to-br from-[#DDD6FE] to-transparent rounded-full opacity-30 md:opacity-50 blur-xl md:blur-3xl mix-blend-multiply transition-all duration-700" />
+        <div className="hidden sm:block absolute top-[40%] -left-[10%] w-[clamp(120px,20%,300px)] aspect-[2/5] bg-[#BFDBFE] rounded-[999px] rotate-[25deg] opacity-20 md:opacity-30 blur-lg md:blur-2xl transition-all duration-700" />
       </div>
 
       {/* === RODA KEBERUNTUNGAN SPIN WHEEL MODAL === */}
@@ -719,14 +723,14 @@ export default function Dashboard() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="m3-card w-full max-w-sm sm:max-w-md md:max-w-xl rounded-[var(--m3-shape-extra-large)] p-5 sm:p-6 shadow-lg relative z-10 overflow-y-auto max-h-[90vh] custom-scrollbar flex flex-col md:flex-row items-center gap-5 justify-between"
+              className="m3-card w-full max-w-sm sm:max-w-md md:max-w-xl rounded-[var(--m3-shape-extra-large)] p-5 sm:p-6 shadow-card-strong relative z-10 overflow-y-auto max-h-[90vh] custom-scrollbar flex flex-col md:flex-row items-center gap-5 justify-between"
             >
               <button
                 type="button"
                 disabled={isSpinning}
                 onClick={() => setShowSpinWheel(false)}
                 aria-label="Tutup Roda Keberuntungan"
-                  className="absolute top-4 right-4 p-2 hover:bg-surface-subtle rounded-full transition-colors text-fg disabled:opacity-30 z-30 border border-border"
+                className="absolute top-4 right-4 p-2 hover:bg-surface-subtle rounded-full transition-colors text-fg disabled:opacity-30 z-30 border border-border"
               >
                 <X size={18} />
               </button>
@@ -745,8 +749,8 @@ export default function Dashboard() {
                       <div
                         key={i}
                         className={`absolute w-2 h-2 rounded-full border border-border z-20 transition-all duration-300 ${isSpinning
-                            ? (i % 2 === 0 ? 'bg-warning' : 'bg-danger')
-                            : 'bg-warning'
+                          ? (i % 2 === 0 ? 'bg-warning' : 'bg-danger')
+                          : 'bg-warning'
                           }`}
                         style={{
                           transform: `translate(${lx}px, ${ly}px)`,
@@ -869,7 +873,7 @@ export default function Dashboard() {
               initial={{ scale: 0.7, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.7, opacity: 0, y: 30 }}
-              className="m3-card border-2 border-warning/60 w-full max-w-sm rounded-[var(--m3-shape-extra-large)] p-6 shadow-lg relative z-10 text-center flex flex-col items-center gap-4 overflow-hidden"
+              className="m3-card border-2 border-warning/60 w-full max-w-sm rounded-[var(--m3-shape-extra-large)] p-6 shadow-card-strong relative z-10 text-center flex flex-col items-center gap-4 overflow-hidden"
             >
               <div className="p-3 bg-warning-subtle rounded-full border border-warning/30 text-warning">
                 <PartyPopper size={36} />
@@ -916,7 +920,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: -20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.9 }}
-              className="fixed top-8 left-1/2 -translate-x-1/2 z-50 m3-card text-fg font-semibold px-6 py-3 rounded-full flex items-center gap-3 shadow-md whitespace-nowrap border border-primary/30"
+            className="fixed top-8 left-1/2 -translate-x-1/2 z-50 m3-card text-fg font-semibold px-6 py-3 rounded-full flex items-center gap-3 shadow-md whitespace-nowrap border border-primary/30"
           >
             <Coins size={20} className="text-coin" />
             <span>{toastMessage}</span>
@@ -955,7 +959,7 @@ export default function Dashboard() {
             <div className="flex flex-col flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <p className="text-sm sm:text-base font-semibold text-fg truncate max-w-[120px] sm:max-w-[160px] md:max-w-none">{profile?.nickname || profile?.username || 'Pejuang'}</p>
-                <div className="px-1.5 py-0.5 bg-primary/20 rounded text-[9px] text-primary-hover font-bold shrink-0">Lvl {profile?.level || 1}</div>
+                <div className="px-1.5 py-0.5 bg-primary/20 rounded text-[9px] text-primary-hover font-bold shrink-0 shadow-none filter-none">Lvl {profile?.level || 1}</div>
                 <div className="shrink-0"><RankBadge score={profile?.score || 0} size="sm" /></div>
                 {/* Streak Badge */}
                 {totalStreak > 0 && (
@@ -963,7 +967,7 @@ export default function Dashboard() {
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.6 }}
-                    className="flex items-center gap-1 px-2 py-0.5 bg-streak-subtle border border-streak/30 rounded-full text-[9px] font-semibold text-streak shrink-0 mt-1 sm:mt-0"
+                    className="flex items-center gap-1 px-2 py-0.5 bg-streak-subtle border border-streak/30 rounded-full text-[9px] font-semibold text-streak shrink-0 mt-1 sm:mt-0 shadow-none filter-none"
                     title={`Streak ${totalStreak + (isStreakClaimed ? 1 : 0)} hari belajar berturut-turut!`}
                   >
                     <Flame size={9} className="text-orange-400" />
@@ -1030,13 +1034,13 @@ export default function Dashboard() {
 
         {/* ── ROW 1: LATIHAN HARIAN + STREAK ── */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
-                    {/* Latihan Harian — PRIMARY CARD with 3D Mascot */}
+          {/* Latihan Harian — PRIMARY CARD with 3D Mascot */}
           {GAME_MODES.filter(m => m.id === 'latihan').map(mode => (
             <motion.section
               key={mode.id}
               variants={sectionVariants}
               onClick={() => setSelectedMode(mode)}
-              className="group xl:col-span-7 skd-card skd-interactive cursor-pointer relative overflow-hidden bg-primary-container border-transparent hover:shadow-md"
+              className="group xl:col-span-7 skd-card skd-interactive cursor-pointer relative overflow-hidden bg-primary-container border-transparent hover:shadow-card-hover"
             >
               {/* Soft decorative background layers */}
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
@@ -1086,46 +1090,60 @@ export default function Dashboard() {
           ))}
 
           {/* Streak Harian */}
-          <motion.section variants={sectionVariants} className="xl:col-span-5 skd-card p-5 sm:p-6 flex flex-col justify-between bg-orange-50 border-orange-100/50 relative overflow-hidden">
-            {/* Soft decorative blur */}
-            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-200/30 rounded-full blur-2xl -translate-y-1/3 translate-x-1/3 pointer-events-none" />
+          <motion.section variants={sectionVariants} className="xl:col-span-5 skd-card p-5 sm:p-6 flex flex-col justify-between bg-gradient-to-br from-[#fffcf8] via-[#fff5eb] to-[#fff0e0] border-orange-200/60 relative overflow-hidden">
+            {/* Background Atmosphere & Decorative Fire Motif */}
+            <div className="absolute top-0 right-0 w-[350px] h-[350px] bg-gradient-to-bl from-orange-300/10 to-transparent rounded-full blur-3xl -translate-y-1/4 translate-x-1/4 pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-[200px] h-[200px] bg-red-400/5 rounded-full blur-2xl translate-y-1/3 pointer-events-none" />
+            <Flame className="absolute -right-8 -bottom-4 w-56 h-56 text-orange-500 opacity-5 -rotate-12 pointer-events-none" />
+            <div className="absolute top-6 right-10 w-1 h-16 bg-gradient-to-b from-orange-400/20 to-transparent rounded-full rotate-45 blur-[1px] pointer-events-none" />
+            <div className="absolute top-12 right-20 w-1.5 h-10 bg-gradient-to-b from-orange-300/30 to-transparent rounded-full rotate-12 blur-[1px] pointer-events-none" />
 
-            <div className="relative z-10 flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
-                  <img src={dashboardIllustrations.streak} alt="" aria-hidden="true" className="w-9 h-9 object-contain" />
+            <div className="relative z-10 flex justify-between items-start mb-6">
+              <div className="flex items-center gap-4">
+                {/* Header Icon */}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl sm:rounded-[20px] bg-gradient-to-br from-orange-50 to-orange-100/80 border border-orange-200/50 flex items-center justify-center shrink-0 shadow-none transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-sm">
+                  <TrendingUp 
+                    size={26} 
+                    strokeWidth={2.5} 
+                    className="text-orange-500 transition-transform duration-300 ease-out group-hover:scale-110" 
+                    aria-hidden="true" 
+                  />
                 </div>
                 <div>
-                  <h3 className="text-[18px] font-black text-fg leading-none mb-1.5 flex items-center flex-wrap gap-2">
+                  <h3 className="text-[20px] sm:text-[22px] font-black text-fg leading-none mb-1.5 flex items-center gap-2 tracking-tight">
                     Streak Harian
-                    <span className="px-2 py-0.5 bg-orange-100 text-orange-600 text-[10px] font-bold rounded-md whitespace-nowrap uppercase tracking-wider">
-                      Hari ke-{totalStreak + (isStreakClaimed ? 1 : 0)}
-                    </span>
                   </h3>
-                  <p className="text-[11px] text-fg-muted font-bold">
-                    {(() => {
-                      const displayStreak = totalStreak;
-                      const toMega = displayStreak === 0 ? 30 : (30 - (displayStreak % 30 || 30));
-                      if (isTodayMegaReward) return `${displayStreak} hari beruntun • 🏆 MEGA REWARD!`;
-                      return `${displayStreak} hari beruntun • Mega tiap 30 hari (+${toMega} lagi)`;
-                    })()}
-                  </p>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                    <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-orange-400 text-white text-[10px] font-black rounded-md whitespace-nowrap uppercase tracking-widest shadow-sm self-start">
+                      HARI KE-{totalStreak + (isStreakClaimed ? 1 : 0)}
+                    </span>
+                    <p className="text-[11px] text-orange-800/70 font-bold">
+                      {(() => {
+                        const displayStreak = totalStreak;
+                        const toMega = displayStreak === 0 ? 30 : (30 - (displayStreak % 30 || 30));
+                        if (isTodayMegaReward) return `${displayStreak} hari beruntun • 🏆 MEGA REWARD!`;
+                        return `${displayStreak} hari beruntun • Mega tiap 30 hari`;
+                      })()}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Progress bar */}
-            <div className="relative z-10 w-full h-3 bg-orange-100/50 rounded-full overflow-hidden border border-orange-200/50 mb-5">
+            <div className="relative z-10 w-full h-3.5 bg-orange-200/50 rounded-full overflow-hidden border border-orange-300/30 mb-6 shadow-inner">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${((totalStreak + (isStreakClaimed ? 1 : 0)) / 30) * 100}%` }}
                 transition={prefersReducedMotion ? { duration: 0.1 } : { duration: 0.55, delay: 0.18, ease: [0.2, 0, 0, 1] }}
-                className="h-full bg-orange-500 rounded-full"
-              />
+                className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full relative"
+              >
+                <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-white/40 to-transparent" />
+              </motion.div>
             </div>
 
             {/* Day indicators */}
-            <div className="relative z-10 flex justify-between items-center w-full mb-6 gap-1">
+            <div className="relative z-10 flex justify-between items-center w-full mb-8 gap-1">
               {weeklyStreakData.map((day, idx) => {
                 const isRewardBox = day.isDay7 || day.isMega;
                 const isToday = day.status === 'current';
@@ -1135,18 +1153,19 @@ export default function Dashboard() {
                   return (
                     <div key={idx} className="flex flex-col items-center gap-1.5">
                       <div className={`relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center border-2 transition-all shrink-0 shadow-sm
-                        ${day.status === 'done' ? 'bg-green-50 border-green-200 text-green-500' :
-                          day.status === 'current' ? 'border-orange-400 bg-orange-100 text-orange-500' :
-                            'border-black/5 bg-white text-fg-muted'}`}
+                        ${day.status === 'done' ? 'bg-orange-50 border-orange-200 text-orange-500' :
+                          day.status === 'current' ? 'border-orange-500 bg-orange-100 text-orange-600' :
+                            'border-black/5 bg-white text-orange-300'}`}
                       >
-                        {day.status === 'done' ? <Check size={20} strokeWidth={3} /> : <Gift size={20} className={day.status === 'future' ? 'opacity-50' : ''} />}
+                        <Gift size={20} className={day.status === 'future' ? 'opacity-60' : ''} />
                         {canClaimToday && (
                           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}
-                            className="absolute inset-0 border-2 border-orange-400 rounded-xl pointer-events-none" />
+                            className="absolute inset-0 border-2 border-orange-500 rounded-xl pointer-events-none" />
                         )}
                       </div>
-                      <span className={`text-[9px] sm:text-[10px] font-black whitespace-nowrap ${day.status === 'done' ? 'text-green-500' : day.status === 'current' ? 'text-orange-500' : 'text-fg-muted'}`}>
-                        {day.status === 'done' ? '+30' : day.isMega ? '+50ðŸª™' : '+10ðŸª™'}
+                      <span className={`text-[9px] sm:text-[10px] font-black whitespace-nowrap flex items-center justify-center gap-[2px] ${day.status === 'done' ? 'text-orange-500' : day.status === 'current' ? 'text-orange-600' : 'text-orange-400'}`}>
+                        {day.status === 'done' ? '+30' : day.isMega ? '+50' : '+10'}
+                        {day.status !== 'done' && <Coins size={10} className="fill-yellow-500 text-yellow-600" />}
                       </span>
                     </div>
                   );
@@ -1155,18 +1174,19 @@ export default function Dashboard() {
                 return (
                   <div key={idx} className="flex flex-col items-center gap-1.5">
                     <div className={`relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center border-2 transition-all shrink-0 shadow-sm
-                      ${day.status === 'done' ? 'bg-green-500 border-green-500 text-white' :
-                        day.status === 'current' ? 'border-orange-500 bg-orange-100 text-orange-500' :
-                          'border-transparent bg-white text-fg-muted'}`}
+                      ${day.status === 'done' ? 'bg-orange-50 border-orange-200 text-orange-500' :
+                        day.status === 'current' ? 'border-orange-500 bg-orange-100 text-orange-600' :
+                          'border-transparent bg-white/60 text-slate-300'}`}
                     >
-                      {day.status === 'done' && <Check size={18} strokeWidth={3} />}
-                      {day.status === 'current' && !isStreakClaimed && (
-                        <motion.span initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}>
-                          <Flame size={20} />
+                      {day.status === 'done' && <Flame size={20} strokeWidth={2.5} className="fill-orange-400 text-orange-500" />}
+                      {day.status === 'current' && (
+                        <motion.span initial={{ opacity: 0.5, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
+                          <Flame size={22} strokeWidth={2.5} className="fill-orange-500 drop-shadow-sm text-orange-600" />
                         </motion.span>
                       )}
+                      {day.status === 'future' && <Flame size={20} strokeWidth={2} className="opacity-50 text-slate-300" />}
                     </div>
-                    <span className={`text-[9px] sm:text-[10px] font-black uppercase ${day.status === 'current' ? 'text-orange-500' : 'text-fg-muted'}`}>{day.day}</span>
+                    <span className={`text-[9px] sm:text-[10px] font-black uppercase ${day.status === 'done' ? 'text-orange-500' : day.status === 'current' ? 'text-orange-600' : 'text-fg-muted/70'}`}>{day.day}</span>
                   </div>
                 );
               })}
@@ -1179,8 +1199,8 @@ export default function Dashboard() {
                 onClick={handleDailyClaim}
                 disabled={isStreakClaimed || isProcessing}
                 className={`flex-1 min-h-12 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 ${isStreakClaimed
-                    ? 'bg-green-50 text-green-600 border border-green-200 cursor-default'
-                    : 'bg-orange-500 text-white hover:bg-orange-600 hover:scale-[1.02] active:scale-95'
+                  ? 'bg-green-50 text-green-600 border border-green-200 cursor-default'
+                  : 'bg-gradient-to-b from-orange-500 to-orange-600 text-white hover:brightness-110 border border-orange-600 hover:scale-[1.02] active:scale-95'
                   }`}
               >
                 {isStreakClaimed ? <><Check size={18} strokeWidth={3} /> Sudah Klaim</> : (isProcessing ? 'Memproses...' : 'Klaim Sekarang')}
@@ -1188,10 +1208,10 @@ export default function Dashboard() {
               <button
                 type="button"
                 onClick={() => setShowSpinWheel(true)}
-                className="px-4 min-h-12 flex items-center justify-center text-orange-500 bg-white hover:bg-orange-50 rounded-xl transition-all shadow-sm active:scale-95 border border-orange-100 shrink-0 gap-2 font-bold"
+                className="px-4 min-h-12 flex items-center justify-center text-orange-600 bg-white hover:bg-orange-50 rounded-xl transition-all shadow-sm active:scale-95 border border-orange-200 shrink-0 gap-2 font-bold"
                 title="Spin Harian"
               >
-                <Sparkles size={18} />
+                <Sparkles size={18} strokeWidth={2.5} aria-hidden="true" />
                 <span className="text-xs sm:text-sm whitespace-nowrap hidden sm:block">Spin Harian</span>
               </button>
             </div>
@@ -1228,6 +1248,8 @@ export default function Dashboard() {
                   badge={mode.badge}
                   accentColor={accent.textColor}
                   glowColor={accent.bgColor}
+                  bgImage={mode.id === 'survival' ? survivalCardBg : mode.id === 'pvp' ? pvpCardBg : mode.id === 'tryout' ? tryoutCardBg : mode.id === 'catatan_salah' ? catatanSalahCardBg : undefined}
+                  bgClassName={mode.id === 'survival' ? 'w-full h-full object-cover object-[center_right]' : mode.id === 'pvp' ? 'w-full h-full object-cover object-[center_65%]' : mode.id === 'tryout' ? 'w-full h-full object-cover object-[center_bottom]' : mode.id === 'catatan_salah' ? 'w-full h-full object-cover object-[right_bottom]' : undefined}
                   illustration={dashboardIllustrations[mode.id === 'survival' ? 'survival' : mode.id === 'pvp' ? 'pvp' : mode.id === 'tryout' ? 'tryout' : 'wrongBook']}
                   onClick={() => setSelectedMode(mode)}
                 />
@@ -1239,7 +1261,7 @@ export default function Dashboard() {
         {/* ── ROW 3: STATS & QUESTS ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Statistik Belajar */}
-            <motion.section variants={sectionVariants} className="lg:col-span-7 m3-card p-5 sm:p-6 flex flex-col">
+          <motion.section variants={sectionVariants} className="lg:col-span-7 m3-card p-5 sm:p-6 flex flex-col">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-[16px] sm:text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
                 <div className="w-8 h-8 rounded-[var(--m3-shape-small)] bg-primary-container flex items-center justify-center overflow-hidden">
@@ -1281,7 +1303,7 @@ export default function Dashboard() {
           </motion.section>
 
           {/* Quest Mingguan */}
-            <motion.section variants={sectionVariants} className="lg:col-span-5 m3-card p-5 sm:p-6 flex flex-col">
+          <motion.section variants={sectionVariants} className="lg:col-span-5 m3-card p-5 sm:p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4 sm:mb-5">
               <h3 className="text-[16px] sm:text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
                 <div className="w-8 h-8 rounded-[var(--m3-shape-small)] bg-tertiary-container flex items-center justify-center overflow-hidden">
@@ -1344,7 +1366,7 @@ export default function Dashboard() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="game-mode-title"
-              className="m3-card w-full max-w-md rounded-[var(--m3-shape-extra-large)] shadow-lg relative z-10 max-h-[90vh] overflow-y-auto custom-scrollbar"
+              className="m3-card w-full max-w-md rounded-[var(--m3-shape-extra-large)] shadow-card-strong relative z-10 max-h-[90vh] overflow-y-auto custom-scrollbar"
             >
               <div className={`h-24 ${selectedMode.bg} relative rounded-t-3xl`}>
                 <button type="button" onClick={handleCloseModal} aria-label="Tutup Mode Game" className="absolute top-4 right-4 p-2 bg-surface-container hover:bg-surface-container-high rounded-full text-fg transition-colors">
@@ -1489,7 +1511,7 @@ export default function Dashboard() {
                         <div className="bg-info/10 p-4 rounded-xl border border-info/20">
                           <h4 className="text-sm font-bold text-info mb-2 flex items-center gap-2"><Users size={16} /> {pvpSubMode === 'custom' ? 'Multiplayer Custom Room' : 'Duel Bersama Teman'}</h4>
                           <p className="text-xs text-fg mb-3">Lawan teman-temanmu secara real-time. Siapa yang tercepat dan paling akurat?</p>
-                          <button onClick={pvpSubMode === 'custom' ? handleCreateRoom : handleCreateFriendDuel} className="w-full bg-info text-white hover:bg-info-hover font-bold py-2.5 rounded-lg text-sm transition-colors shadow-lg shadow-blue-500/20">
+                          <button onClick={pvpSubMode === 'custom' ? handleCreateRoom : handleCreateFriendDuel} className="w-full bg-info text-white hover:bg-info-hover font-bold py-2.5 rounded-lg text-sm transition-colors shadow-card-strong shadow-blue-500/20">
                             Buat Room Baru
                           </button>
                         </div>
@@ -1636,7 +1658,7 @@ export default function Dashboard() {
                           </div>
                         </div>
                         {isHost ? (
-                          <button onClick={handleStartHostGame} disabled={playersCount < 2} className="w-full mt-2 bg-info text-white hover:bg-info-hover disabled:opacity-50 font-bold py-3 rounded-xl shadow-lg transition-colors active:scale-95">
+                          <button onClick={handleStartHostGame} disabled={playersCount < 2} className="w-full mt-2 bg-info text-white hover:bg-info-hover disabled:opacity-50 font-bold py-3 rounded-xl shadow-card-strong transition-colors active:scale-95">
                             {playersCount < 2 ? 'Menunggu pemain...' : `Mulai Pertandingan (${playersCount} Pemain)`}
                           </button>
                         ) : (
@@ -1664,7 +1686,7 @@ export default function Dashboard() {
                     </button>
                   </div>
                 )}
-                  <div className="flex items-center justify-between border-t border-border pt-4">
+                <div className="flex items-center justify-between border-t border-border pt-4">
                   <div className="flex items-center gap-1.5 text-sm font-bold text-fg">
                     <span className="text-fg-muted font-normal mr-1">Biaya:</span>
                     {selectedMode.costType === 'energy' ? <><Zap size={16} className="text-energy" /> {selectedMode.cost}</> : <><Coins size={16} className="text-coin" /> {selectedMode.cost.toLocaleString()}</>}

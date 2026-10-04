@@ -215,7 +215,7 @@ function Navigation() {
       </nav>
 
       {/* ── Desktop Navigation Rail ── */}
-      <nav className="group hidden md:flex flex-col sticky top-0 h-screen shrink-0 w-20 hover:w-60 bg-[#EAF2FF] border-r border-[#D4E3FF] z-50 overflow-x-hidden transition-all duration-300 ease-in-out">
+      <nav className="group hidden md:flex flex-col h-[100dvh] shrink-0 w-20 hover:w-60 bg-[#EAF2FF] border-r border-[#D4E3FF] z-50 overflow-x-hidden transition-all duration-300 ease-in-out">
         <div className="h-20 flex flex-col items-center justify-center shrink-0 border-b border-[#D4E3FF]/60 transition-all duration-300 relative overflow-hidden">
           {/* Collapsed state logo */}
           <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 opacity-100 group-hover:opacity-0 group-hover:scale-50 pointer-events-none">
@@ -527,11 +527,11 @@ function AppLayout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg text-fg font-syne transition-colors flex flex-col md:flex-row overflow-x-hidden">
+    <div className="min-h-screen md:h-[100dvh] md:overflow-hidden bg-bg text-fg font-syne transition-colors flex flex-col md:flex-row">
       <Navigation />
       <FeedbackWidget />
       <IncomingDuelRequest />
-      <main className={`flex-1 min-w-0 ${!isFullScreen ? 'pt-14 md:pt-0 pb-32 md:pb-0' : ''} min-h-screen transition-all duration-300`}>
+      <main className={`flex-1 min-w-0 overflow-x-hidden md:overflow-y-auto ${!isFullScreen ? 'pt-14 md:pt-0 pb-32 md:pb-0' : ''} min-h-screen md:min-h-0 md:h-full transition-all duration-300`}>
         <div className={`w-full h-full ${!isFullScreen ? 'max-w-7xl mx-auto' : ''}`}>
           <Suspense fallback={
             <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3 text-primary font-bold">

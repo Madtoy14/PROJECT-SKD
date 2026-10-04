@@ -9,8 +9,10 @@ interface GlassCardProps {
   costType: 'energy' | 'coin';
   badge?: string;
   accentColor?: string;
-  glowColor?: string; // We'll use this as the bgColor class
+  glowColor?: string;
   illustration?: string;
+  bgImage?: string;
+  bgClassName?: string;
   onClick: () => void;
 }
 
@@ -24,6 +26,8 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   accentColor = 'text-primary',
   glowColor = 'bg-surface',
   illustration,
+  bgImage,
+  bgClassName = 'w-full h-full object-cover object-[center_right]',
   onClick,
 }) => {
   return (
@@ -32,12 +36,30 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       className={`skd-card skd-interactive cursor-pointer group w-full text-left skd-focus ${glowColor} border-transparent hover:border-black/5 relative overflow-hidden`}
       onClick={onClick}
     >
-      {/* Subtle background abstract shape */}
-      <div className="absolute -top-12 -right-12 w-40 h-40 bg-white/40 rounded-full blur-2xl opacity-50 pointer-events-none group-hover:scale-110 transition-transform duration-500" />
-      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/30 rounded-full blur-xl opacity-50 pointer-events-none" />
+      {/* Background Image Layer */}
+      {bgImage && (
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+          <img 
+            src={bgImage} 
+            alt="" 
+            aria-hidden="true" 
+            className={`${bgClassName} transition-transform duration-700 group-hover:scale-105`} 
+          />
+          {/* Subtle readability overlay: strong white on left for text, fading to transparent on right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-white/10 md:via-white/50 md:to-transparent" />
+        </div>
+      )}
+
+      {/* Subtle background abstract shape (only visible if no bgImage) */}
+      {!bgImage && (
+        <>
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-white/40 rounded-full blur-2xl opacity-50 pointer-events-none group-hover:scale-110 transition-transform duration-500" />
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/30 rounded-full blur-xl opacity-50 pointer-events-none" />
+        </>
+      )}
 
       <div className="relative p-5 flex flex-col h-full min-h-[190px] overflow-hidden z-10">
-        {illustration && (
+        {illustration && !bgImage && (
           <img src={illustration} alt="" aria-hidden="true" className="pointer-events-none absolute -right-2 -bottom-2 w-28 h-24 object-contain opacity-80 mix-blend-multiply transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-1" />
         )}
         

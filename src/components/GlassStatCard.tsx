@@ -27,7 +27,7 @@ export const GlassStatCard: React.FC<GlassStatCardProps> = ({
 
   return (
     <div
-      className="skd-card skd-card-tonal animate-fade-in-up p-4 sm:p-5 flex flex-col justify-between h-full min-h-[140px] border border-black/5 hover:border-black/10 transition-all hover:-translate-y-1 hover:shadow-md"
+      className="skd-card skd-card-tonal animate-fade-in-up p-4 sm:p-5 flex flex-col justify-between h-full min-h-[140px] border border-black/5 hover:border-black/10 transition-all hover:-translate-y-1 hover:shadow-card-hover"
     >
       <div className={`w-10 h-10 rounded-2xl flex items-center justify-center mb-4 shadow-sm ${bgClass}`}>
         <Icon size={20} className={accentColor} strokeWidth={2.5} />

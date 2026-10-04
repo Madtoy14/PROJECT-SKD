@@ -96,10 +96,9 @@
   
   --color-destructive: var(--skd-error);
   
-  --shadow-sm: var(--skd-elevation-1);
-  --shadow-md: var(--skd-elevation-2);
-  --shadow-lg: var(--skd-elevation-3);
   --shadow-card: var(--skd-elevation-1);
+  --shadow-card-hover: var(--skd-elevation-2);
+  --shadow-card-strong: var(--skd-elevation-3);
 }
 
 :root {
@@ -160,10 +159,10 @@
   --skd-outline: #94a3b8;
   --skd-outline-variant: #e2e8f0;
 
-  /* Restrained elevation, prefer tonal separation */
-  --skd-elevation-1: 0 4px 12px rgba(15, 23, 42, 0.03), 0 1px 3px rgba(15, 23, 42, 0.02);
-  --skd-elevation-2: 0 8px 24px rgba(15, 23, 42, 0.04), 0 2px 6px rgba(15, 23, 42, 0.03);
-  --skd-elevation-3: 0 16px 48px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.04);
+  /* Strong 4px/4px/4px shadow for physical separation */
+  --skd-elevation-1: 4px 4px 4px rgba(35, 65, 110, 0.25);
+  --skd-elevation-2: 6px 6px 6px rgba(35, 65, 110, 0.30);
+  --skd-elevation-3: 8px 8px 8px rgba(35, 65, 110, 0.35);
 
   --skd-shape-extra-small: 4px;
   --skd-shape-small: 8px;
@@ -247,13 +246,11 @@ body {
 .skd-card-tonal, .m3-card-tonal { 
   background: var(--skd-surface-container); 
   border-color: transparent; 
-  box-shadow: none;
 }
 .skd-card-primary, .m3-card-primary { 
   background: var(--skd-primary-container); 
   color: var(--skd-on-primary-container); 
   border-color: transparent; 
-  box-shadow: none;
 }
 
 .skd-label, .m3-label { font-size: var(--skd-type-label); line-height: 1rem; font-weight: 700; letter-spacing: 0.04em; }
