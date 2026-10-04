@@ -1264,24 +1264,60 @@ export default function Dashboard() {
         {/* ── ROW 3: STATS & QUESTS ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Statistik Belajar */}
-          <motion.section variants={sectionVariants} className="lg:col-span-7 m3-card p-5 sm:p-6 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-[16px] sm:text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
-                <div className="w-8 h-8 rounded-[var(--m3-shape-small)] bg-primary-container flex items-center justify-center overflow-hidden">
-                  <img src={dashboardIllustrations.statistics} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
-                </div>
-                Statistik Belajar
-              </h3>
-              <select className="bg-surface-container rounded-[var(--m3-shape-small)] text-xs font-semibold text-fg px-3 py-2 outline-none cursor-pointer border border-border">
-                <option>7 Hari Terakhir</option>
-                <option>30 Hari Terakhir</option>
-                <option>Semua Waktu</option>
-              </select>
+          <motion.section variants={sectionVariants} className="lg:col-span-7 m3-card flex flex-col relative overflow-hidden isolate">
+            
+            {/* ── Data Ambient Background ── */}
+            <div className="absolute inset-0 z-[-1] pointer-events-none">
+              {/* Soft Gradient Base */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#F0F7FF] via-transparent to-[#F5F3FF]" />
+              
+              {/* Subtle Grid Pattern */}
+              <div 
+                className="absolute inset-0 opacity-[0.03]"
+                style={{
+                  backgroundImage: 'linear-gradient(#1E3A8A 1px, transparent 1px), linear-gradient(90deg, #1E3A8A 1px, transparent 1px)',
+                  backgroundSize: '24px 24px',
+                  maskImage: 'radial-gradient(ellipse at top right, black 50%, transparent 80%)'
+                }} 
+              />
+              
+              {/* Abstract Analytics Chart Line */}
+              <svg className="absolute bottom-0 left-0 w-full h-[55%] opacity-[0.05] text-[#2563EB]" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,90 Q15,80 25,65 T60,45 T100,20 L100,100 L0,100 Z" fill="url(#stat-grad)" />
+                <path d="M0,90 Q15,80 25,65 T60,45 T100,20" fill="none" stroke="currentColor" strokeWidth="0.8" />
+                <defs>
+                  <linearGradient id="stat-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
+                    <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              {/* Soft Circular Abstract Shapes */}
+              <div className="absolute -top-[10%] -right-[5%] w-[40%] aspect-square bg-blue-400/10 rounded-full blur-[40px]" />
+              <div className="absolute -bottom-[15%] right-[5%] w-[35%] aspect-square bg-cyan-400/10 rounded-full blur-[30px]" />
+              <div className="absolute -bottom-[20%] left-[20%] w-[50%] aspect-square bg-indigo-400/10 rounded-full blur-[50px]" />
             </div>
 
-            <p className="text-xs text-fg-muted font-medium mb-5">Lihat perkembangan kemampuanmu</p>
+            {/* Content Container */}
+            <div className="p-5 sm:p-6 flex flex-col flex-1 relative z-10">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[16px] sm:text-[18px] font-bold text-fg tracking-tight flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-[var(--m3-shape-small)] bg-primary-container flex items-center justify-center overflow-hidden">
+                    <img src={dashboardIllustrations.statistics} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
+                  </div>
+                  Statistik Belajar
+                </h3>
+                <select className="bg-surface-container rounded-[var(--m3-shape-small)] text-xs font-semibold text-fg px-3 py-2 outline-none cursor-pointer border border-border">
+                  <option>7 Hari Terakhir</option>
+                  <option>30 Hari Terakhir</option>
+                  <option>Semua Waktu</option>
+                </select>
+              </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1">
+              <p className="text-xs text-fg-muted font-medium mb-5">Lihat perkembangan kemampuanmu</p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1">
               {[
                 { icon: Activity, accentColor: 'text-emerald-400', value: totalDijawab, label: 'Dijawab', suffix: '', trend: '+12%', isUp: true },
                 { icon: Crosshair, accentColor: 'text-blue-400', value: calculatedAkurasi, label: 'Akurasi', suffix: '%', trend: '+5%', isUp: true },
@@ -1302,6 +1338,7 @@ export default function Dashboard() {
                   isUp={stat.isUp}
                 />
               ))}
+            </div>
             </div>
           </motion.section>
 
