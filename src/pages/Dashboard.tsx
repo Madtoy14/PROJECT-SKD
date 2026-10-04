@@ -1075,7 +1075,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <p className="text-xs sm:text-sm text-fg-muted font-bold mb-6 max-w-[240px] sm:max-w-sm leading-relaxed">
-                    {mode.desc} dengan ribuan soal berkualitas dan pembahasan lengkap.
+                    Latihan soal setiap hari untuk mengasah kemampuanmu dan meningkatkan skor SKD.
                   </p>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-auto md:mt-0">
                     <motion.button
