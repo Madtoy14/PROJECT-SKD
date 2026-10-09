@@ -220,7 +220,7 @@ function Navigation() {
           {/* Collapsed state logo */}
           <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 opacity-100 group-hover:opacity-0 group-hover:scale-50 pointer-events-none">
             <img 
-              src={supabase.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl} 
+              src={supabase?.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl}
               alt="SKDQuest Compact" 
               className="w-10 h-10 object-contain drop-shadow-sm" 
             />
@@ -228,7 +228,7 @@ function Navigation() {
           {/* Expanded state logo + text */}
           <div className="absolute inset-0 flex items-center px-5 transition-all duration-300 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 pointer-events-auto gap-3">
             <img 
-              src={supabase.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl} 
+              src={supabase?.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl}
               alt="SKDQuest Logo" 
               className="w-10 h-10 object-contain drop-shadow-sm shrink-0" 
             />

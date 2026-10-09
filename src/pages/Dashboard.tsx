@@ -11,11 +11,11 @@ import { GlassStatCard } from '../components/GlassStatCard';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { WEEKLY_QUESTS_METADATA } from './Quest';
 import { dashboardIllustrations } from '../assets/illustrations';
-const latihanHarianBg = supabase.storage.from('background').getPublicUrl('Latihan Harian.png').data.publicUrl;
-const survivalCardBg = supabase.storage.from('background').getPublicUrl('survival mode card .png').data.publicUrl;
-const pvpCardBg = supabase.storage.from('background').getPublicUrl('pvp battle card.png').data.publicUrl;
-const tryoutCardBg = supabase.storage.from('background').getPublicUrl('Try Out Mode card.png').data.publicUrl;
-const catatanSalahCardBg = supabase.storage.from('background').getPublicUrl('Buku Catatan Salah card.png').data.publicUrl;
+const latihanHarianBg = supabase?.storage.from('background').getPublicUrl('Latihan Harian.png').data.publicUrl;
+const survivalCardBg = supabase?.storage.from('background').getPublicUrl('survival mode card .png').data.publicUrl;
+const pvpCardBg = supabase?.storage.from('background').getPublicUrl('pvp battle card.png').data.publicUrl;
+const tryoutCardBg = supabase?.storage.from('background').getPublicUrl('Try Out Mode card.png').data.publicUrl;
+const catatanSalahCardBg = supabase?.storage.from('background').getPublicUrl('Buku Catatan Salah card.png').data.publicUrl;
 
 
 
@@ -1142,7 +1142,6 @@ export default function Dashboard() {
                     <p className="text-[11px] text-orange-800/70 font-bold">
                       {(() => {
                         const displayStreak = totalStreak;
-                        const toMega = displayStreak === 0 ? 30 : (30 - (displayStreak % 30 || 30));
                         if (isTodayMegaReward) return `${displayStreak} hari beruntun • 🏆 MEGA REWARD!`;
                         return `${displayStreak} hari beruntun • Mega tiap 30 hari`;
                       })()}

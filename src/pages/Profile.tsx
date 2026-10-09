@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   Swords, Medal, Target, Zap, Trophy, X,
-  UserPlus, Trash2, CheckCircle2, SquarePen, Lock,
-  Bot, BarChart2, Settings, Flame, Coins, Star, ClipboardList, Handshake, CheckCircle
+  UserPlus, CheckCircle2, SquarePen, Lock,
+  Bot, BarChart2, Settings, Flame, Coins, Star, Handshake, CheckCircle
 } from 'lucide-react';
 import { useDuelMatchmaking } from '../context/DuelContext';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters } from '../lib/supabase';
@@ -12,9 +12,13 @@ import { getFollowCounts, getMutualRivals, unfollowUser } from '../lib/supabaseH
 import type { UserProfile, Character } from '../lib/supabase';
 import { ProfileSkeleton } from '../components/LoadingSkeleton';
 import PlayerProfileModal from '../components/PlayerProfileModal';
-import RankBadge, { RankCard } from '../components/RankBadge';
 import { getUserAnalytics } from '../lib/supabase';
 import { dicebearUrl } from '../lib/constants';
+
+// Helper: resolve avatar image for a player, falling back to a dicebear avatar
+// when the selected character is unknown or Supabase is not configured.
+const resolvePlayerAvatar = (selectedAvatarId: string | undefined, chars: Character[], username: string) =>
+  chars.find(o => o.id === selectedAvatarId)?.image_url || dicebearUrl(username);
 
 // lazy-loaded via React.lazy + Suspense.
 const ProfileCharts = React.lazy(() => import('../components/ProfileCharts'));
@@ -179,7 +183,7 @@ export default function Profile() {
   const isMasterTkp = checkTitle('TKP');
 
   // Compute recommendations
-  let rekomendasiAI = 'Selesaikan kuis untuk mendapatkan analisis detail kemampuan dan rekomendasi belajar Anda.';
+  let rekomendasiAI: string;
   const failedCategories: string[] = [];
   if (getAcc('TWK') > 0 && twkScore < 65) failedCategories.push('TWK (Skor < 65)');
   if (getAcc('TIU') > 0 && tiuScore < 80) failedCategories.push('TIU (Skor < 80)');
@@ -198,7 +202,6 @@ export default function Profile() {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
   const [followModalTab, setFollowModalTab] = useState<'mengikuti' | 'pengikut'>('mengikuti');
-  if (isFollowModalOpen || followModalTab === 'mengikuti') { }
 
   // Form edit states
   const [usernameInput, setUsernameInput] = useState('');
@@ -251,12 +254,13 @@ export default function Profile() {
 
     fetchAvailableCharacters().then(chars => {
       // OVERRIDE: Map existing database character IDs (or defaults) to animal avatars 1-10
-      const mappedChars = Array.from({ length: 10 }, (_, i) => {
+      const mappedChars: Character[] = Array.from({ length: 10 }, (_, i) => {
         const num = i + 1;
         const existingChar = chars[i];
         return {
           id: existingChar ? existingChar.id : String(num),
           name: `Avatar ${num}`,
+          gender: existingChar?.gender ?? 'male',
           image_url: supabase ? supabase.storage.from('avatars').getPublicUrl(`${num}.png`).data.publicUrl : '',
           is_free: existingChar ? existingChar.is_free : (num === 1)
         };
@@ -620,32 +624,35 @@ export default function Profile() {
           {/* LEFT: CHARACTER SHOWCASE */}
           <motion.div 
             variants={itemVariants}
-            className="xl:col-span-5 relative flex flex-col items-center justify-center bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] rounded-[2.5rem] border border-white/60 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] p-8 overflow-hidden min-h-[400px] lg:min-h-[500px]"
+            className="xl:col-span-5 relative flex flex-col items-center bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] rounded-[2.5rem] border border-white/60 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] pt-8 pb-6 px-6 overflow-hidden min-h-[420px] lg:min-h-[520px]"
           >
             {/* Soft background glow */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,transparent_70%)] pointer-events-none" />
             
             {/* Banner element hanging from top (like SKD QUEST flag) */}
-            <div className="absolute top-0 left-8 bg-blue-600 text-white px-4 pb-6 pt-8 rounded-b-2xl shadow-lg border-x-4 border-b-4 border-blue-700 flex flex-col items-center">
-               <Trophy size={24} className="text-yellow-400 mb-2" />
-               <span className="font-black text-sm tracking-widest uppercase writing-vertical-rl rotate-180">SKD QUEST</span>
+            <div className="absolute top-0 left-8 bg-blue-600 text-white px-3 pb-5 pt-7 rounded-b-2xl shadow-lg border-x-4 border-b-4 border-blue-700 flex flex-col items-center z-20">
+               <Trophy size={22} className="text-yellow-400 mb-2" />
+               <span className="font-black text-xs tracking-wide whitespace-nowrap">SKDQuest</span>
             </div>
 
-            {/* Platform / Pedestal */}
-            <div className="absolute bottom-16 lg:bottom-24 w-[280px] h-[60px] bg-black/10 rounded-[100%] blur-xl" />
-            <div className="absolute bottom-16 lg:bottom-24 w-[220px] h-[40px] bg-gradient-to-b from-white/40 to-slate-300/40 rounded-[100%] border border-white/50 shadow-inner z-0" />
+            {/* Character stage: flexible area that centers the avatar */}
+            <div className="relative flex-1 w-full flex items-center justify-center min-h-0">
+              {/* Platform / Pedestal */}
+              <div className="absolute bottom-3 lg:bottom-5 w-[280px] h-[60px] bg-black/10 rounded-[100%] blur-xl" />
+              <div className="absolute bottom-3 lg:bottom-5 w-[220px] h-[40px] bg-gradient-to-b from-white/40 to-slate-300/40 rounded-[100%] border border-white/50 shadow-inner z-0" />
 
-            {/* Avatar Image */}
-            <img 
-              src={selectedAvatar?.image_url || (supabase ? supabase.storage.from('avatars').getPublicUrl('1.png').data.publicUrl : '')} 
-              alt="Character" 
-              className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] lg:w-[360px] lg:h-[360px] object-contain relative z-10 hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
-            />
+              {/* Avatar Image */}
+              <img
+                src={selectedAvatar?.image_url || (supabase ? supabase.storage.from('avatars').getPublicUrl('1.png').data.publicUrl : '')}
+                alt="Character"
+                className="w-[240px] h-[240px] sm:w-[280px] sm:h-[280px] lg:w-[300px] lg:h-[300px] max-w-full object-contain relative z-10 hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
+              />
+            </div>
 
             {/* Change Avatar Button */}
             <button 
               onClick={() => setIsEditProfileOpen(true)}
-              className="absolute bottom-6 relative z-20 bg-white/90 backdrop-blur-md border border-slate-200 text-slate-700 font-bold py-3 px-8 rounded-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.2)] hover:shadow-[0_15px_35px_-10px_rgba(59,130,246,0.3)] hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all flex items-center gap-2 text-sm group"
+              className="relative z-20 mt-2 bg-white/90 backdrop-blur-md border border-slate-200 text-slate-700 font-bold py-3 px-8 rounded-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.2)] hover:shadow-[0_15px_35px_-10px_rgba(59,130,246,0.3)] hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all flex items-center gap-2 text-sm group"
             >
               <Zap size={16} className="text-yellow-500 group-hover:animate-pulse" />
               Ganti Avatar
@@ -709,6 +716,36 @@ export default function Profile() {
                     </div>
                   </div>
                 </div>
+
+                {/* Social Counters: Mengikuti / Pengikut */}
+                <div className="flex items-center gap-6 mt-5 pt-5 border-t border-slate-100 relative z-10">
+                  <button
+                    type="button"
+                    onClick={() => { setFollowModalTab('mengikuti'); setIsFollowModalOpen(true); }}
+                    className="text-center group cursor-pointer"
+                  >
+                    <span className="block text-xl sm:text-2xl font-black text-slate-800 font-space group-hover:text-blue-600 transition-colors">{followingCount}</span>
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider group-hover:text-blue-600 transition-colors">Mengikuti</span>
+                  </button>
+                  <div className="w-px h-8 bg-slate-200" />
+                  <button
+                    type="button"
+                    onClick={() => { setFollowModalTab('pengikut'); setIsFollowModalOpen(true); }}
+                    className="text-center group cursor-pointer"
+                  >
+                    <span className="block text-xl sm:text-2xl font-black text-slate-800 font-space group-hover:text-blue-600 transition-colors">{followersCount}</span>
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider group-hover:text-blue-600 transition-colors">Pengikut</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSearchFriendModal(true)}
+                    className="ml-auto w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all shrink-0"
+                    title="Cari & Tambah Teman"
+                    aria-label="Cari dan tambah teman"
+                  >
+                    <UserPlus size={18} />
+                  </button>
+                </div>
               </div>
             </motion.div>
 
@@ -737,26 +774,26 @@ export default function Profile() {
                {/* Performa Belajar */}
                <div className="bg-white/80 backdrop-blur-xl p-6 lg:p-8 rounded-[2rem] text-slate-800 shadow-xl relative overflow-hidden flex flex-col h-full border border-white">
                   <div className="absolute top-0 right-0 w-48 h-48 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
-                  <div className="flex justify-between items-center mb-8 relative z-10">
+                  <div className="flex justify-between items-center mb-6 relative z-10">
                     <h3 className="font-bold flex items-center gap-3 text-lg"><BarChart2 size={20} className="text-blue-500" /> Performa Belajar</h3>
                     <button className="text-[10px] text-blue-500 hover:text-blue-600 font-bold tracking-widest uppercase">Lihat Semua &gt;</button>
                   </div>
-                  <div className="grid grid-cols-3 gap-3 mt-auto relative z-10">
-                    <div className="text-center group">
+                  <div className="grid grid-cols-3 gap-3 flex-1 items-center relative z-10">
+                    <div className="text-center group flex flex-col items-center justify-center">
                       <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto rounded-full border-[6px] border-slate-100 bg-white flex items-center justify-center mb-3 shadow-inner relative overflow-hidden">
                          <div className="absolute bottom-0 left-0 w-full bg-blue-500/20 transition-all duration-1000" style={{height: '60%'}}></div>
                          <span className="font-black text-xl lg:text-2xl relative z-10 text-slate-800 drop-shadow-sm font-space">{profile?.total_quizzes_completed || 0}</span>
                       </div>
                       <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider group-hover:text-blue-600 transition-colors">Total Soal</span>
                     </div>
-                    <div className="text-center group">
+                    <div className="text-center group flex flex-col items-center justify-center">
                       <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto rounded-full border-[6px] border-slate-100 bg-white flex items-center justify-center mb-3 shadow-inner relative overflow-hidden">
                          <div className="absolute bottom-0 left-0 w-full bg-green-500/20 transition-all duration-1000" style={{height: `${Math.round((getAcc('TWK') + getAcc('TIU') + getAcc('TKP')) / 3 || 0)}%`}}></div>
                          <span className="font-black text-xl lg:text-2xl relative z-10 text-slate-800 drop-shadow-sm font-space">{Math.round((getAcc('TWK') + getAcc('TIU') + getAcc('TKP')) / 3 || 0)}%</span>
                       </div>
                       <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider group-hover:text-green-600 transition-colors">Akurasi</span>
                     </div>
-                    <div className="text-center group">
+                    <div className="text-center group flex flex-col items-center justify-center">
                       <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto rounded-full border-[6px] border-slate-100 bg-white flex items-center justify-center mb-3 shadow-inner relative overflow-hidden">
                          <div className="absolute bottom-0 left-0 w-full bg-orange-500/20 transition-all duration-1000" style={{height: '30%'}}></div>
                          <span className="font-black text-xl lg:text-2xl relative z-10 text-slate-800 drop-shadow-sm font-space">{profile?.highest_survival_score || 0}</span>
@@ -800,6 +837,41 @@ export default function Profile() {
                     <div className="w-px bg-slate-200" />
                     <div className="text-center"><div className="text-[10px] font-black text-slate-400 mb-1">TKP</div><div className={`font-space font-black text-lg ${tkpScore >= 166 ? 'text-green-500' : 'text-red-500'}`}>{tkpScore}</div></div>
                   </div>
+
+                  {/* Status Kesiapan CAT CPNS BKN */}
+                  <div className="mt-4 relative z-10 bg-slate-50 border border-slate-100 rounded-2xl p-4 shadow-inner">
+                    <h4 className="text-[10px] font-black tracking-wider text-amber-500 uppercase mb-3">Status Kesiapan CAT CPNS BKN</h4>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="p-2.5 rounded-xl bg-white border border-slate-100 text-center shadow-sm">
+                        <span className="block text-[10px] text-slate-400 font-bold mb-0.5">TWK (Min 65)</span>
+                        <span className={`text-xs font-black font-space ${twkScore >= 65 ? 'text-green-500' : 'text-red-500'}`}>
+                          {twkScore >= 65 ? 'LULUS' : 'GAGAL'}
+                        </span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-white border border-slate-100 text-center shadow-sm">
+                        <span className="block text-[10px] text-slate-400 font-bold mb-0.5">TIU (Min 80)</span>
+                        <span className={`text-xs font-black font-space ${tiuScore >= 80 ? 'text-green-500' : 'text-red-500'}`}>
+                          {tiuScore >= 80 ? 'LULUS' : 'GAGAL'}
+                        </span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-white border border-slate-100 text-center shadow-sm">
+                        <span className="block text-[10px] text-slate-400 font-bold mb-0.5">TKP (Min 166)</span>
+                        <span className={`text-xs font-black font-space ${tkpScore >= 166 ? 'text-green-500' : 'text-red-500'}`}>
+                          {tkpScore >= 166 ? 'LULUS' : 'GAGAL'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rekomendasi AI */}
+                  <div className="mt-4 relative z-10 bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl p-4">
+                    <h4 className="text-[10px] font-black tracking-wider text-indigo-500 uppercase mb-2 flex items-center gap-2">
+                      <Bot size={14} /> Rekomendasi AI
+                    </h4>
+                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                      {rekomendasiAI}
+                    </p>
+                  </div>
                </div>
             </motion.div>
           </div>
@@ -818,7 +890,7 @@ export default function Profile() {
              </div>
           </div>
           
-          <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-6 pt-2 custom-scrollbar snap-x scroll-smooth -mx-6 px-6 lg:mx-0 lg:px-0">
+          <div className="flex gap-4 overflow-x-auto pb-6 pt-2 custom-scrollbar snap-x scroll-smooth -mx-6 px-6 lg:mx-0 lg:px-0">
             {availableCharacters.map(char => {
                const isUnlocked = char.is_free || profile?.unlocked_avatars?.includes(char.id);
                const isActive = selectedAvatar?.id === char.id;
@@ -826,25 +898,30 @@ export default function Profile() {
                  <div 
                    key={char.id} 
                    onClick={() => isUnlocked ? setSelectedAvatar(char) : showToast('Kostum ini terkunci! Beli di Toko.', 'error')}
-                   className={`snap-center flex-shrink-0 w-36 sm:w-44 rounded-[2rem] overflow-hidden cursor-pointer transition-all duration-300 relative border-4 flex flex-col
-                     ${isActive ? 'border-blue-500 shadow-[0_20px_40px_-15px_rgba(59,130,246,0.5)] -translate-y-4 bg-gradient-to-b from-blue-50 to-blue-100' : 
-                       isUnlocked ? 'border-transparent bg-white hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)]' : 
-                       'border-transparent bg-slate-100 opacity-60 grayscale hover:grayscale-0 transition-all'}
+                   className={`snap-start flex-shrink-0 w-32 sm:w-36 rounded-[1.5rem] overflow-hidden cursor-pointer transition-all duration-300 relative border-2 flex flex-col
+                     ${isActive ? 'border-blue-500 shadow-[0_12px_30px_-10px_rgba(59,130,246,0.5)] -translate-y-1 bg-gradient-to-b from-blue-50 to-blue-100' :
+                       isUnlocked ? 'border-slate-100 bg-white hover:-translate-y-1 hover:shadow-[0_12px_30px_-12px_rgba(0,0,0,0.15)]' :
+                       'border-slate-100 bg-slate-50 opacity-60 grayscale hover:grayscale-0'}
                    `}
                  >
-                   <div className={`aspect-square relative p-4 flex items-center justify-center flex-1 ${isActive ? 'bg-blue-50/50' : 'bg-slate-50'}`}>
-                      {isActive && <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1)_0%,transparent_70%)]"></div>}
-                      <img src={char.image_url} alt={char.name} className="w-full h-full object-contain relative z-10 drop-shadow-xl" />
+                   <div className={`aspect-square relative p-3 flex items-center justify-center flex-shrink-0 ${isActive ? 'bg-blue-50/60' : 'bg-slate-50'}`}>
+                      {isActive && <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.12)_0%,transparent_70%)]"></div>}
+                      <img src={char.image_url} alt={char.name} className="w-full h-full object-contain relative z-10 drop-shadow-lg" />
                       {!isUnlocked && (
                          <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-20">
-                           <Lock className="text-slate-400 drop-shadow-sm" size={32} />
+                           <Lock className="text-slate-400 drop-shadow-sm" size={26} />
+                         </div>
+                      )}
+                      {isActive && (
+                         <div className="absolute top-2 right-2 z-30 bg-blue-500 text-white rounded-full p-1 shadow-md">
+                           <CheckCircle2 size={14} />
                          </div>
                       )}
                    </div>
-                   <div className={`py-4 px-3 text-center flex-shrink-0 ${isActive ? 'bg-blue-500 text-white' : 'bg-white text-slate-800 border-t border-slate-100'}`}>
-                     <h4 className="font-black text-sm uppercase tracking-widest truncate">{char.name}</h4>
+                   <div className={`py-3 px-2 text-center flex-shrink-0 ${isActive ? 'bg-blue-500 text-white' : 'bg-white text-slate-700 border-t border-slate-100'}`}>
+                     <h4 className="font-black text-[11px] uppercase tracking-wider truncate">{char.name}</h4>
                      {isActive && (
-                        <div className="mt-2 inline-flex items-center justify-center bg-white text-blue-600 font-black text-[10px] px-3 py-1 rounded-full tracking-wider shadow-sm">
+                        <div className="mt-1.5 inline-flex items-center justify-center bg-white text-blue-600 font-black text-[9px] px-2.5 py-0.5 rounded-full tracking-wider shadow-sm">
                            AKTIF
                         </div>
                      )}
@@ -889,35 +966,91 @@ export default function Profile() {
             </div>
           </motion.div>
 
-          {/* RIGHT: Aktivitas Terbaru (Recent Activity) */}
+          {/* RIGHT: Rival */}
           <motion.div variants={itemVariants} className="xl:col-span-1 bg-white/80 backdrop-blur-xl border border-white rounded-[2.5rem] shadow-xl p-6 lg:p-8 relative overflow-hidden flex flex-col">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-red-400/10 rounded-full blur-3xl pointer-events-none" />
             
-            <div className="flex items-center justify-between mb-8 relative z-10">
+            <div className="flex items-center justify-between mb-6 relative z-10">
                <h3 className="font-black text-xl flex items-center gap-3 text-slate-800">
-                 <Zap size={20} className="text-blue-500" /> Aktivitas Terbaru
+                 <Swords size={20} className="text-red-500" /> Rival
                </h3>
-               <button className="text-[10px] text-blue-600 font-bold hover:text-blue-800 tracking-widest uppercase">Lihat Semua &gt;</button>
+               <button
+                 type="button"
+                 onClick={() => setSearchFriendModal(true)}
+                 className="text-[10px] text-blue-600 font-bold hover:text-blue-800 tracking-widest uppercase"
+               >
+                 Cari &gt;
+               </button>
             </div>
-            
-            <div className="space-y-4 relative z-10 flex-1">
-              {[
-                { title: 'Menyelesaikan 1 sesi Latihan Harian', desc: '20 soal • Akurasi 75%', time: '2 jam lalu', icon: <ClipboardList size={20} />, color: 'text-blue-600 bg-blue-100', border: 'border-blue-200' },
-                { title: 'Bermain PvP Battle', desc: 'Hasil: Menang', time: '5 jam lalu', icon: <Swords size={20} />, color: 'text-orange-600 bg-orange-100', border: 'border-orange-200' },
-                { title: 'Menyelesaikan Try Out', desc: '110 soal • Skor 328', time: '1 hari lalu', icon: <Target size={20} />, color: 'text-green-600 bg-green-100', border: 'border-green-200' },
-                { title: 'Membuka pencapaian baru', desc: 'Konsisten - Login 7 hari', time: '1 hari lalu', icon: <Trophy size={20} />, color: 'text-yellow-600 bg-yellow-100', border: 'border-yellow-200' }
-              ].map((act, i) => (
-                <div key={i} className="flex gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors group border border-transparent hover:border-slate-100 cursor-default">
-                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl shadow-sm border ${act.color} ${act.border} group-hover:scale-110 transition-transform`}>
-                     {act.icon}
-                   </div>
-                   <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <h4 className="font-bold text-sm text-slate-800 truncate mb-0.5 group-hover:text-blue-600 transition-colors">{act.title}</h4>
-                      <p className="text-xs text-slate-500 truncate font-medium">{act.desc}</p>
-                   </div>
-                   <div className="text-[10px] text-slate-400 font-black uppercase tracking-wider whitespace-nowrap pt-2">{act.time}</div>
+
+            {/* Search Rival */}
+            <div className="relative mb-4 z-10">
+              <UserPlus size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={newFriendName}
+                onChange={(e) => setNewFriendName(e.target.value)}
+                placeholder="Cari rival..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:bg-white transition-colors text-slate-800 placeholder:text-slate-400"
+              />
+            </div>
+
+            {/* Rival List */}
+            <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1 relative z-10 max-h-[420px]">
+              {filteredFriends.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 text-center">
+                  <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                    <Swords size={24} className="text-slate-300" />
+                  </div>
+                  <p className="text-slate-400 text-xs font-bold">Belum ada rival terdaftar atau ditemukan.</p>
                 </div>
-              ))}
+              ) : (
+                filteredFriends.map((friend) => (
+                  <div key={friend.id} className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 hover:bg-white transition-colors group gap-2 overflow-hidden">
+                    <div className="flex items-center gap-3 cursor-pointer min-w-0 flex-1" onClick={() => setSelectedPlayerId(String(friend.id))}>
+                      <div className="relative flex-shrink-0">
+                        <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full bg-white shadow-sm object-cover border border-slate-100" />
+                        <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${friend.online ? 'bg-green-500' : 'bg-slate-400'}`} />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-xs truncate text-slate-800 group-hover:text-blue-600 transition-colors">{friend.name}</h4>
+                        <p className="text-[10px] font-space text-slate-400 truncate">{friend.username}</p>
+                      </div>
+                    </div>
+                    <div className={`flex-shrink-0 flex items-center gap-1 transition-opacity ${inviteStatus === 'inviting' && targetId === String(friend.id)
+                        ? 'opacity-100'
+                        : 'opacity-0 group-hover:opacity-100'
+                      }`}>
+                      <button
+                        disabled={inviteStatus === 'inviting'}
+                        onClick={(e) => { e.stopPropagation(); sendInvite(String(friend.id), friend.name); }}
+                        className={`px-2.5 py-1.5 font-black rounded-lg text-[10px] transition-colors whitespace-nowrap ${inviteStatus === 'inviting' && targetId === String(friend.id)
+                            ? 'bg-yellow-400 text-yellow-950 animate-pulse'
+                            : 'bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed'
+                          }`}
+                      >
+                        {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Tunggu' : 'Duel'}
+                      </button>
+                      {inviteStatus === 'inviting' && targetId === String(friend.id) && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); cancelInvite(); }}
+                          className="px-2.5 py-1.5 font-black rounded-lg text-[10px] bg-red-500 hover:bg-red-600 text-white transition-colors whitespace-nowrap"
+                        >
+                          Batal
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleRemoveFriend(friend.id); }}
+                        className="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors flex-shrink-0"
+                        title="Hapus rival"
+                        aria-label="Hapus rival"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </motion.div>
         </div>
@@ -982,7 +1115,7 @@ export default function Profile() {
                   >
                     <div className="flex items-center gap-4">
                       <img
-                        src={searchFriendResult.selected_avatar ? availableCharacters.find(o => o.id === searchFriendResult.selected_avatar)?.image_url || avatarPdh : dicebearUrl(searchFriendResult.username)}
+                        src={searchFriendResult.selected_avatar ? resolvePlayerAvatar(searchFriendResult.selected_avatar, availableCharacters, searchFriendResult.username) : dicebearUrl(searchFriendResult.username)}
                         alt={searchFriendResult.username}
                         className="w-14 h-14 rounded-full bg-surface shadow-sm object-cover border border-border"
                       />
@@ -1057,7 +1190,7 @@ export default function Profile() {
                             return (
                               <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-surface-subtle p-3 rounded-xl border border-border cursor-pointer hover:bg-surface-subtle/50 transition-colors group">
                                 <img
-                                  src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : dicebearUrl(p.username)}
+                                  src={p.selected_avatar ? resolvePlayerAvatar(p.selected_avatar, availableCharacters, p.username) : dicebearUrl(p.username)}
                                   alt={p.username}
                                   className="w-10 h-10 rounded-full bg-surface shadow-sm object-cover"
                                 />
@@ -1086,7 +1219,7 @@ export default function Profile() {
                             return (
                               <div key={item.id} onClick={() => setSelectedPlayerId(p.id)} className="flex items-center gap-3 bg-surface-subtle p-3 rounded-xl border border-border cursor-pointer hover:bg-surface-subtle/50 transition-colors group">
                                 <img
-                                  src={p.selected_avatar ? availableCharacters.find(o => o.id === p.selected_avatar)?.image_url || avatarPdh : dicebearUrl(p.username)}
+                                  src={p.selected_avatar ? resolvePlayerAvatar(p.selected_avatar, availableCharacters, p.username) : dicebearUrl(p.username)}
                                   alt={p.username}
                                   className="w-10 h-10 rounded-full bg-surface shadow-sm object-cover"
                                 />
