@@ -1009,7 +1009,6 @@ export default function Dashboard() {
                 </div>
                 <p className="text-[10px] text-fg-muted font-medium w-16">{(profile?.score || 0) % 1000}/1K XP</p>
               </div>
-            </div>
           </div>
 
           {/* Right Side Resources */}

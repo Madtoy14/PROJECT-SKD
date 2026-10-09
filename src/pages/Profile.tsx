@@ -4,30 +4,40 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   Swords, Medal, Target, Zap, Trophy, X,
   UserPlus, Trash2, CheckCircle2, SquarePen, Lock,
-    Bot, BarChart2, Settings
-  } from 'lucide-react';
+  Bot, BarChart2, Settings, Flame, Coins, Star, ClipboardList, Handshake, CheckCircle
+} from 'lucide-react';
 import { useDuelMatchmaking } from '../context/DuelContext';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters } from '../lib/supabase';
 import { getFollowCounts, getMutualRivals, unfollowUser } from '../lib/supabaseHelpers';
 import type { UserProfile, Character } from '../lib/supabase';
 import { ProfileSkeleton } from '../components/LoadingSkeleton';
 import PlayerProfileModal from '../components/PlayerProfileModal';
-import avatarPdh from '../assets/avatar_pdh.webp';
 import RankBadge, { RankCard } from '../components/RankBadge';
 import { getUserAnalytics } from '../lib/supabase';
 import { dicebearUrl } from '../lib/constants';
 
-// ponytail: chart.js (~630KB) lazy-loaded via React.lazy + Suspense.
-// ProfileCharts wrapper owns ChartJS.register; pass typed data as props.
+// lazy-loaded via React.lazy + Suspense.
 const ProfileCharts = React.lazy(() => import('../components/ProfileCharts'));
 
+export const getBadgeIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'check': return <CheckCircle size={24} />;
+    case 'flame': return <Flame size={24} />;
+    case 'zap': return <Zap size={24} />;
+    case 'medal': return <Medal size={24} />;
+    case 'trophy': return <Trophy size={24} />;
+    case 'handshake': return <Handshake size={24} />;
+    default: return <Star size={24} />;
+  }
+};
+
 const ALL_BADGES_DATA = [
-  { id: 1, name: 'Pawang TWK', icon: '📜', desc: 'Total >100 jawaban benar.' },
-  { id: 2, name: 'Veteran Silogisme', icon: '✨', desc: 'Skor Survival >10.' },
-  { id: 3, name: 'Speed Runner', icon: '⚡', desc: 'Menyelesaikan >10 Kuis.' },
-  { id: 4, name: 'Master TIU', icon: '🎓', desc: 'Total >500 jawaban benar.' },
-  { id: 5, name: 'Legendary TKP', icon: '🏆', desc: 'Menyelesaikan >50 Kuis.' },
-  { id: 6, name: 'Dewa Analogi', icon: '🤝', desc: 'Memenangkan >5 match PvP.' },
+  { id: 1, name: 'Pawang TWK', icon: 'check', desc: 'Total >100 jawaban benar.' },
+  { id: 2, name: 'Veteran Silogisme', icon: 'flame', desc: 'Skor Survival >10.' },
+  { id: 3, name: 'Speed Runner', icon: 'zap', desc: 'Menyelesaikan >10 Kuis.' },
+  { id: 4, name: 'Master TIU', icon: 'medal', desc: 'Total >500 jawaban benar.' },
+  { id: 5, name: 'Legendary TKP', icon: 'trophy', desc: 'Menyelesaikan >50 Kuis.' },
+  { id: 6, name: 'Dewa Analogi', icon: 'handshake', desc: 'Memenangkan >5 match PvP.' },
 ];
 
 const SCHOOLS = [
@@ -240,7 +250,18 @@ export default function Profile() {
     setLoading(true);
 
     fetchAvailableCharacters().then(chars => {
-      setAvailableCharacters(chars);
+      // OVERRIDE: Map existing database character IDs (or defaults) to animal avatars 1-10
+      const mappedChars = Array.from({ length: 10 }, (_, i) => {
+        const num = i + 1;
+        const existingChar = chars[i];
+        return {
+          id: existingChar ? existingChar.id : String(num),
+          name: `Avatar ${num}`,
+          image_url: supabase ? supabase.storage.from('avatars').getPublicUrl(`${num}.png`).data.publicUrl : '',
+          is_free: existingChar ? existingChar.is_free : (num === 1)
+        };
+      });
+      setAvailableCharacters(mappedChars);
 
       fetchProfile()
         .then(p => {
@@ -249,7 +270,7 @@ export default function Profile() {
           setUsernameInput(p.nickname || p.username);
           setTargetKedinasan(p.target_kedinasan || 'IPDN');
 
-          const currentEquipped = chars.find(o => o.id === p.selected_avatar) || chars[0] || null;
+          const currentEquipped = mappedChars.find(o => o.id === p.selected_avatar) || mappedChars[0] || null;
           setSelectedAvatar(currentEquipped);
 
           // Social: tabel friends only (mutual = rival). No dual-write profiles.friends.
@@ -436,8 +457,12 @@ export default function Profile() {
   if (loading) return <ProfileSkeleton />;
 
   return (
-      <div className="p-4 md:p-8 space-y-8 pb-24 relative max-w-5xl mx-auto min-h-screen">
-        <div className="flex items-center justify-between gap-2">
+      <div className="min-h-screen bg-[#F4F7FC] pb-32 font-sans text-slate-800 relative overflow-x-hidden selection:bg-blue-500/20">
+        <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-[#E2E8F0]/80 to-transparent pointer-events-none" />
+        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-blue-300/10 blur-[120px] pointer-events-none" />
+        <div className="absolute top-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-indigo-300/10 blur-[120px] pointer-events-none" />
+        
+        <div className="max-w-[1400px] mx-auto p-4 md:p-6 lg:p-8 relative z-10 space-y-8">
           <h1 className="text-lg font-black text-fg">Profil</h1>
           <button
             type="button"
@@ -512,11 +537,11 @@ export default function Profile() {
                     </select>
                   </div>
                 </div>
-                {/* Avatar / Seragam Karakter */}
+                {/* Avatar Selection */}
                 <div>
-                  <h4 className="text-sm font-bold text-fg-muted mb-3 mt-6">PILIH KARAKTER PRIA</h4>
+                  <h4 className="text-sm font-bold text-fg-muted mb-3 mt-6">PILIH AVATAR</h4>
                   <div className="grid grid-cols-5 gap-3">
-                    {availableCharacters.filter(c => c.gender === 'male').map(opt => {
+                    {availableCharacters.map(opt => {
                       const isUnlocked = opt.is_free || profile?.unlocked_avatars?.includes(opt.id);
                       return (
                         <div
@@ -525,7 +550,7 @@ export default function Profile() {
                             if (isUnlocked) {
                               setSelectedAvatar(opt);
                             } else {
-                              showToast(`Kostum "${opt.name}" terkunci!`, 'error');
+                              showToast(`Avatar "${opt.name}" terkunci! Beli di Toko.`, 'error');
                             }
                           }}
                           className={`cursor-pointer rounded-2xl border-2 transition-all p-1.5 flex flex-col items-center gap-1 relative ${selectedAvatar?.id === opt.id
@@ -534,47 +559,14 @@ export default function Profile() {
                             }`}
                         >
                           <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-surface shadow-sm">
-                            <img src={opt.image_url} alt={opt.name} className="w-full h-full object-cover" />
+                            <img src={opt.image_url} alt={opt.name} className="w-full h-full object-contain p-1" />
                             {!isUnlocked && (
                               <div className="absolute inset-0 bg-overlay backdrop-blur-sm flex items-center justify-center">
                                 <Lock size={16} className="text-fg" />
                               </div>
                             )}
                           </div>
-                          <span className="text-[8px] font-bold text-center leading-tight">{opt.name.split('-')[1]?.trim() || opt.name}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <h4 className="text-sm font-bold text-fg-muted mb-3 mt-6">PILIH KARAKTER WANITA</h4>
-                  <div className="grid grid-cols-5 gap-3">
-                    {availableCharacters.filter(c => c.gender === 'female').map(opt => {
-                      const isUnlocked = opt.is_free || profile?.unlocked_avatars?.includes(opt.id);
-                      return (
-                        <div
-                          key={opt.id}
-                          onClick={() => {
-                            if (isUnlocked) {
-                              setSelectedAvatar(opt);
-                            } else {
-                              showToast(`Kostum "${opt.name}" terkunci!`, 'error');
-                            }
-                          }}
-                          className={`cursor-pointer rounded-2xl border-2 transition-all p-1.5 flex flex-col items-center gap-1 relative ${selectedAvatar?.id === opt.id
-                              ? 'border-primary bg-primary/10 shadow-sm'
-                              : isUnlocked ? 'border-border hover:border-primary bg-surface-subtle' : 'border-border opacity-50'
-                            }`}
-                        >
-                          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-surface shadow-sm">
-                            <img src={opt.image_url} alt={opt.name} className="w-full h-full object-cover" />
-                            {!isUnlocked && (
-                              <div className="absolute inset-0 bg-overlay backdrop-blur-sm flex items-center justify-center">
-                                <Lock size={16} className="text-fg" />
-                              </div>
-                            )}
-                          </div>
-                          <span className="text-[8px] font-bold text-center leading-tight">{opt.name.split('-')[1]?.trim() || opt.name}</span>
+                          <span className="text-[8px] font-bold text-center leading-tight">{opt.name}</span>
                         </div>
                       );
                     })}
@@ -594,7 +586,7 @@ export default function Profile() {
                             ${isPinned ? 'border-primary bg-primary/10' : 'border-border hover:border-primary'}
                           `}
                         >
-                          {badge.icon}
+                          {getBadgeIcon(badge.icon as string)}
                           {isPinned && <CheckCircle2 size={14} className="absolute -top-2 -right-2 text-primary bg-surface shadow-sm rounded-full" />}
                         </div>
                       )
@@ -618,323 +610,318 @@ export default function Profile() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="space-y-8"
+        className="space-y-6 lg:space-y-8"
       >
-        {/* Main Hero Card (Identity and Avatar) */}
-        <motion.section
-          variants={itemVariants}
-          className="relative bg-surface border border-border rounded-[2.5rem] p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 overflow-hidden group shadow-lg hover:shadow-xl transition-all"
-        >
-          {/* Neon background decorations */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl opacity-30 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl opacity-20 pointer-events-none" />
-          {/* Avatar Picture with Equipped Dress */}
-          <div className="relative group/avatar">
-            <div className="absolute -inset-1.5 bg-xp text-primary-fg rounded-full blur opacity-25 group-hover/avatar:opacity-40 transition-opacity" />
-            <img
-              src={selectedAvatar?.image_url || avatarPdh}
-              alt="Avatar"
-              className="w-28 h-28 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-[4px] sm:border-[6px] border-surface shadow-2xl relative z-10 object-cover"
+        {/* ============================================================== */}
+        {/* 1. MAIN HERO SECTION (CHARACTER SHOWCASE + PROFILE INFO)         */}
+        {/* ============================================================== */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+          
+          {/* LEFT: CHARACTER SHOWCASE */}
+          <motion.div 
+            variants={itemVariants}
+            className="xl:col-span-5 relative flex flex-col items-center justify-center bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] rounded-[2.5rem] border border-white/60 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] p-8 overflow-hidden min-h-[400px] lg:min-h-[500px]"
+          >
+            {/* Soft background glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,transparent_70%)] pointer-events-none" />
+            
+            {/* Banner element hanging from top (like SKD QUEST flag) */}
+            <div className="absolute top-0 left-8 bg-blue-600 text-white px-4 pb-6 pt-8 rounded-b-2xl shadow-lg border-x-4 border-b-4 border-blue-700 flex flex-col items-center">
+               <Trophy size={24} className="text-yellow-400 mb-2" />
+               <span className="font-black text-sm tracking-widest uppercase writing-vertical-rl rotate-180">SKD QUEST</span>
+            </div>
+
+            {/* Platform / Pedestal */}
+            <div className="absolute bottom-16 lg:bottom-24 w-[280px] h-[60px] bg-black/10 rounded-[100%] blur-xl" />
+            <div className="absolute bottom-16 lg:bottom-24 w-[220px] h-[40px] bg-gradient-to-b from-white/40 to-slate-300/40 rounded-[100%] border border-white/50 shadow-inner z-0" />
+
+            {/* Avatar Image */}
+            <img 
+              src={selectedAvatar?.image_url || (supabase ? supabase.storage.from('avatars').getPublicUrl('1.png').data.publicUrl : '')} 
+              alt="Character" 
+              className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] lg:w-[360px] lg:h-[360px] object-contain relative z-10 hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
             />
-            <div className="absolute top-4 left-4 bg-premium text-primary-fg text-primary-fg font-space font-black text-xs px-3 py-1 rounded-full border border-yellow-300 shadow-md relative z-20">
-              {selectedAvatar?.name ? selectedAvatar.name.split('-')[1]?.trim() || selectedAvatar.name : 'Profil'}
-            </div>
-            <button
+
+            {/* Change Avatar Button */}
+            <button 
               onClick={() => setIsEditProfileOpen(true)}
-              className="absolute bottom-4 right-0 md:bottom-6 md:-right-2 bg-primary text-primary-fg p-2.5 rounded-full shadow-[0_0_15px_rgba(245,166,35,0.4)] hover:shadow-[0_0_25px_rgba(245,166,35,0.8)] transition-all z-30 group-hover:scale-110"
+              className="absolute bottom-6 relative z-20 bg-white/90 backdrop-blur-md border border-slate-200 text-slate-700 font-bold py-3 px-8 rounded-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.2)] hover:shadow-[0_15px_35px_-10px_rgba(59,130,246,0.3)] hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all flex items-center gap-2 text-sm group"
             >
-              <SquarePen size={20} />
+              <Zap size={16} className="text-yellow-500 group-hover:animate-pulse" />
+              Ganti Avatar
             </button>
-          </div>
-          {/* User Details */}
-          <div className="flex-1 text-center md:text-left w-full">
-            <div className="inline-flex items-center px-4 py-1.5 bg-coin-subtle border border-yellow-500/30 text-coin rounded-full text-xs font-bold mb-4 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
-              Target: {SCHOOLS.find(s => s.id === (profile?.target_kedinasan || 'ipdn'))?.name || 'Sekolah Kedinasan'}
-            </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-1 tracking-tight text-fg block text-center md:flex md:flex-wrap md:items-center md:gap-2 md:text-left break-words max-w-full">
-              {profile ? (profile.nickname || profile.username) : 'Pejuang SKD'}
-            </h2>
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 mb-2">
-              {isMasterTwk && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 shadow-[0_0_10px_rgba(139,92,246,0.2)]">
-                  ⭐ MASTER TWK
-                </span>
-              )}
-              {isMasterTiu && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]">
-                  ⚡ MASTER TIU
-                </span>
-              )}
-              {isMasterTkp && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30 shadow-[0_0_10px_rgba(249,115,22,0.2)]">
-                  🔥 MASTER TKP
-                </span>
-              )}
-              {!isMasterTwk && !isMasterTiu && !isMasterTkp && (
-                <span className="text-[10px] text-fg-muted italic">Selesaikan 50+ soal akurasi &gt;= 80% untuk gelar</span>
-              )}
-            </div>
-            <p className="text-fg-muted mb-3 font-space">
-              @{profile ? profile.username.toLowerCase().replace(/\s/g, '') : 'pejuang_skd'}
-            </p>
+          </motion.div>
 
-            {/* Rank Badge */}
-            <div className="mb-4">
-              <RankBadge score={profile ? profile.score : 1250} size="md" />
-            </div>
-            {/* Follower Stats */}
-            <div className="flex gap-4 sm:gap-6 justify-center md:justify-start mb-6 items-center">
-              <div
-                className="text-center cursor-pointer group"
-                onClick={() => { setFollowModalTab('mengikuti'); setIsFollowModalOpen(true); }}
-              >
-                <span className="block text-2xl font-black font-space group-hover:text-primary group-hover:scale-105 transition-all text-fg">{followingCount}</span>
-                <span className="text-[10px] text-fg-muted font-bold uppercase tracking-wider group-hover:text-fg transition-colors">Mengikuti</span>
-              </div>
-              <div className="w-px h-8 bg-surface-subtle" />
-              <div
-                className="text-center cursor-pointer group"
-                onClick={() => { setFollowModalTab('pengikut'); setIsFollowModalOpen(true); }}
-              >
-                <span className="block text-2xl font-black font-space group-hover:text-primary group-hover:scale-105 transition-all text-fg">{followersCount}</span>
-                <span className="text-[10px] text-fg-muted font-bold uppercase tracking-wider group-hover:text-fg transition-colors">Pengikut</span>
-              </div>
-              <div className="w-px h-8 bg-surface-subtle" />
-              <button
-                onClick={() => setSearchFriendModal(true)}
-                className="w-12 h-12 rounded-full bg-surface-subtle border border-border flex items-center justify-center hover:bg-premium-subtle hover:border-premium hover:text-premium transition-all"
-                title="Cari & Tambah Teman"
-              >
-                <UserPlus size={20} />
-              </button>
-            </div>
-            {/* Level Experience Bar */}
-            <div className="space-y-2 max-w-md">
-              <div className="flex justify-between text-sm font-bold">
-                <span className="text-primary">Level {profile ? profile.level : 14}</span>
-                <span className="text-fg-muted font-space">
-                  {currentXPProgress.toLocaleString()} / {levelXPRequired.toLocaleString()} XP
-                </span>
-              </div>
-              <div className="h-4 w-full bg-surface shadow-sm rounded-full overflow-hidden border border-border shadow-inner">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercent}%` }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="h-full bg-gradient-to-r from-skd-accent to-yellow-500 rounded-full shadow-[0_0_10px_rgba(245,166,35,0.4)]"
-                />
-              </div>
-            </div>
-          </div>
-        </motion.section>
-        {/* Dynamic Rank Card & stats info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-8">
-            {/* Season Rank Card */}
-            <motion.section variants={itemVariants}>
-              <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
-                <Trophy size={24} className="text-primary" />
-                Rank Musim Ini
-              </h3>
-              <RankCard score={profile ? profile.score : 1250} />
-            </motion.section>
+          {/* RIGHT: PLAYER IDENTITY & STATS */}
+          <div className="xl:col-span-7 flex flex-col gap-6 lg:gap-8">
+            
+            {/* Profile Identity Card */}
+            <motion.div variants={itemVariants} className="bg-white/70 backdrop-blur-xl p-6 lg:p-8 rounded-[2.5rem] border border-white shadow-xl relative overflow-hidden flex flex-col sm:flex-row gap-6 sm:items-center justify-between">
+              {/* Subtle background flair */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="flex-1 relative z-10">
+                <div className="inline-flex items-center px-4 py-1.5 bg-yellow-400 text-yellow-950 rounded-full text-xs font-black tracking-widest mb-4 shadow-sm border border-yellow-300">
+                  TARGET: {SCHOOLS.find(s => s.id === (profile?.target_kedinasan || 'ipdn'))?.name || 'SEKOLAH KEDINASAN'}
+                </div>
+                
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-800 uppercase tracking-tight mb-1 drop-shadow-sm">
+                  {profile ? (profile.nickname || profile.username) : 'PEJUANG SKD'}
+                  <button onClick={() => setIsEditProfileOpen(true)} className="inline-block ml-3 bg-slate-100 hover:bg-blue-100 text-slate-500 hover:text-blue-600 p-2 rounded-full transition-colors align-middle">
+                     <SquarePen size={18} />
+                  </button>
+                </h1>
+                
+                <p className="text-slate-500 font-bold flex items-center gap-3 mb-6 flex-wrap">
+                  @{profile ? profile.username.toLowerCase().replace(/\s/g, '') : 'pejuang_skd'}
+                  {isMasterTwk && <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-black tracking-wider shadow-sm inline-flex items-center gap-1"><Star size={10} /> MASTER TWK</span>}
+                  {isMasterTiu && <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-black tracking-wider shadow-sm inline-flex items-center gap-1"><Zap size={10} /> MASTER TIU</span>}
+                  {isMasterTkp && <span className="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-black tracking-wider shadow-sm inline-flex items-center gap-1"><Flame size={10} /> MASTER TKP</span>}
+                </p>
 
-            {/* Career Statistics */}
-            <motion.section variants={itemVariants}>
-              <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
-                <Zap size={24} className="text-energy" />
-                Statistik Karir
-              </h3>
-              <div className="grid grid-cols-2 gap-3 sm:gap-5">
-                {[
-                  { label: 'Total Kuis Selesai', value: (profile?.total_quizzes_completed || 0).toLocaleString(), icon: Target, color: 'text-blue-400' },
-                  { label: 'Win PvP', value: `${profile?.total_pvp_wins || 0} Menang`, icon: Swords, color: 'text-red-400' },
-                  { label: 'Total Jawaban Benar', value: (profile?.total_correct_answers || 0).toLocaleString(), icon: Zap, color: 'text-coin' },
-                  { label: 'Skor Survival', value: (profile?.highest_survival_score || 0).toLocaleString(), icon: Trophy, color: 'text-purple-400' },
-                ].map((stat, idx) => (
-                  <div key={idx} className="bg-surface-subtle border border-border rounded-[1.25rem] sm:rounded-[1.5rem] p-3.5 sm:p-5 backdrop-blur-sm hover:bg-surface-subtle/50 transition-colors group shadow-sm hover:shadow-md min-w-0">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`p-2.5 rounded-xl bg-surface-subtle ${stat.color} group-hover:scale-110 transition-transform`}>
-                        <stat.icon size={20} />
-                      </div>
-                      <span className="text-[10px] sm:text-xs text-fg-muted font-bold tracking-wide leading-tight">{stat.label}</span>
+                {/* Level & Rank Integration */}
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center w-full max-w-lg">
+                  {/* Rank Badge */}
+                  <div className="flex items-center gap-3 bg-slate-800 text-white pl-2 pr-5 py-2 rounded-2xl shadow-lg border border-slate-700 shrink-0">
+                    <div className="w-10 h-10 bg-slate-700 rounded-xl flex items-center justify-center border border-slate-600">
+                      <Swords size={20} className="text-yellow-400" />
                     </div>
-                    <div className="text-xl sm:text-2xl md:text-3xl font-black font-space tracking-tight text-fg break-words">{stat.value}</div>
-                  </div>
-                ))}
-              </div>
-            </motion.section>
-          </div>
-
-          {/* Right Column: Chart, Badges, Rivals */}
-          <div className="space-y-8">
-            {/* Analisis Radar Chart & Rekomendasi Belajar */}
-            <motion.section variants={itemVariants} className="bg-surface-subtle border border-border rounded-[2rem] p-6 shadow-xl relative overflow-hidden backdrop-blur-md">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#F5A623]/5 rounded-full blur-3xl pointer-events-none" />
-
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-fg">
-                <BarChart2 size={24} className="text-primary" />
-                Analisis Kemampuan & Rekomendasi AI
-              </h3>
-
-              <Suspense fallback={<div className="w-full min-h-[220px] flex items-center justify-center text-fg-muted text-sm">Memuat grafik...</div>}>
-                <ProfileCharts
-                  radarData={radarData}
-                  radarOptions={radarOptions}
-                  lineData={lineData}
-                  lineOptions={lineOptions}
-                />
-              </Suspense>
-
-              <div className="flex flex-col items-center gap-8">
-                {/* Recommendation Texts */}
-                <div className="flex-1 space-y-4 w-full">
-                  <div className="bg-surface shadow-sm border border-border rounded-2xl p-4 space-y-3">
-                    <h4 className="text-xs font-black tracking-wider text-[#F5A623] uppercase">Status Kesiapan CAT CPNS BKN</h4>
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-                      <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
-                        <span className="block text-[10px] text-fg-muted font-bold">TWK (Min 65)</span>
-                        <span className={`text-xs font-black font-space ${twkScore >= 65 ? 'text-success' : 'text-danger'}`}>
-                          {twkScore >= 65 ? 'LULUS' : 'GAGAL'}
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
-                        <span className="block text-[10px] text-fg-muted font-bold">TIU (Min 80)</span>
-                        <span className={`text-xs font-black font-space ${tiuScore >= 80 ? 'text-success' : 'text-danger'}`}>
-                          {tiuScore >= 80 ? 'LULUS' : 'GAGAL'}
-                        </span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-surface-subtle border border-border text-center">
-                        <span className="block text-[10px] text-fg-muted font-bold">TKP (Min 166)</span>
-                        <span className={`text-xs font-black font-space ${tkpScore >= 166 ? 'text-success' : 'text-danger'}`}>
-                          {tkpScore >= 166 ? 'LULUS' : 'GAGAL'}
-                        </span>
-                      </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Rank Saat Ini</div>
+                      <div className="font-black text-sm">Warrior <span className="text-slate-500 ml-1">&gt;</span></div>
                     </div>
                   </div>
-
-                  <div className="space-y-1.5 text-xs text-fg-muted leading-relaxed font-medium">
-                    <p className="flex items-start gap-2">
-                      <Bot className="text-[#F5A623] shrink-0" size={16} />
-                      <span>{rekomendasiAI}</span>
-                    </p>
+                  
+                  {/* Level Progress */}
+                  <div className="flex-1 w-full bg-slate-100/80 p-3.5 rounded-2xl border border-slate-200">
+                    <div className="flex justify-between items-center text-xs font-black text-slate-600 mb-2">
+                      <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md">LEVEL {profile?.level || 1}</span>
+                      <span className="text-slate-500 font-space">{currentXPProgress.toLocaleString()} / {levelXPRequired.toLocaleString()} XP</span>
+                    </div>
+                    <div className="h-3 w-full bg-slate-200 rounded-full overflow-hidden shadow-inner border border-slate-300">
+                      <motion.div 
+                        initial={{width:0}} 
+                        animate={{width:`${progressPercent}%`}} 
+                        className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full relative"
+                      >
+                         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4yIi8+PC9zdmc+')] opacity-50 mix-blend-overlay"></div>
+                      </motion.div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </motion.section>
+            </motion.div>
 
-            {/* Lencana Kehormatan */}
-            <motion.section variants={itemVariants}>
-              <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
-                <Medal size={24} className="text-primary" />
-                Lencana Kehormatan
-              </h3>
+            {/* Horizontal Stats Strip */}
+            <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+               {[
+                 { label: 'Hari Streak', value: profile?.streak || 0, icon: <Flame size={24} />, color: 'from-orange-400 to-red-500', shadow: 'shadow-orange-200' },
+                 { label: 'Energi', value: `${profile?.energy || 0} / 25`, icon: <Zap size={24} />, color: 'from-yellow-400 to-amber-500', shadow: 'shadow-yellow-200' },
+                 { label: 'Koin', value: (profile?.coins || 0).toLocaleString(), icon: <Coins size={24} />, color: 'from-yellow-500 to-yellow-600', shadow: 'shadow-yellow-300' },
+                 { label: 'Soal Selesai', value: profile?.total_quizzes_completed || 0, icon: <Star size={24} />, color: 'from-blue-400 to-indigo-500', shadow: 'shadow-blue-200' },
+               ].map((stat, i) => (
+                 <div key={i} className="bg-white/80 backdrop-blur-md p-5 rounded-[2rem] border border-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col items-center justify-center gap-2 group">
+                   <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} text-white flex items-center justify-center shadow-lg ${stat.shadow} group-hover:scale-110 transition-transform duration-300`}>
+                     {stat.icon}
+                   </div>
+                   <div className="text-center">
+                     <div className="text-2xl font-black text-slate-800 font-space">{stat.value}</div>
+                     <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{stat.label}</div>
+                   </div>
+                 </div>
+               ))}
+            </motion.div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {dynamicBadges.map((badge) => (
-                  <div
-                    key={badge.id}
-                    className="bg-surface-subtle border border-border rounded-[1.5rem] p-4 flex flex-col items-center text-center backdrop-blur-sm hover:bg-surface-subtle/50 transition-all duration-300 shadow-sm"
-                  >
-                    {badge.unlocked ? (
-                      <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-2 border-yellow-500/50 shadow-[0_0_20px_rgba(234,179,8,0.25)] hover:scale-110 transition-all duration-300 mb-3">
-                        {badge.icon}
-                      </div>
-                    ) : (
-                      <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl bg-surface-subtle border-2 border-border text-fg opacity-40 grayscale relative mb-3">
-                        <span className="blur-[0.5px]">{badge.icon}</span>
-                        <div className="absolute -top-1 -right-1 bg-black/80 border border-border p-0.5 rounded-full text-white/60">
-                          <Lock size={10} />
-                        </div>
-                      </div>
-                    )}
-
-                    <h4 className="font-bold text-fg text-xs mb-1 font-space">{badge.name}</h4>
-                    <p className="text-fg-muted text-[9px] leading-snug max-w-[130px]">{badge.desc}</p>
+            {/* Performance & Analysis Blocks */}
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full flex-1">
+               {/* Performa Belajar */}
+               <div className="bg-white/80 backdrop-blur-xl p-6 lg:p-8 rounded-[2rem] text-slate-800 shadow-xl relative overflow-hidden flex flex-col h-full border border-white">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="flex justify-between items-center mb-8 relative z-10">
+                    <h3 className="font-bold flex items-center gap-3 text-lg"><BarChart2 size={20} className="text-blue-500" /> Performa Belajar</h3>
+                    <button className="text-[10px] text-blue-500 hover:text-blue-600 font-bold tracking-widest uppercase">Lihat Semua &gt;</button>
                   </div>
-                ))}
-              </div>
-            </motion.section>
-
-            {/* Rivals */}
-            <motion.section variants={itemVariants} className="flex flex-col">
-            <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
-              <Swords size={24} className="text-red-400" />
-              Daftar Rival
-            </h3>
-
-            <div className="bg-surface-subtle border border-border rounded-[1.5rem] p-5 backdrop-blur-sm shadow-sm flex flex-col flex-1 max-h-[500px]">
-
-              {/* Filter Friend Form */}
-              <div className="mb-4 flex gap-2">
-                <div className="relative flex-1">
-                  <UserPlus size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-muted" />
-                  <input
-                    type="text"
-                    value={newFriendName}
-                    onChange={(e) => setNewFriendName(e.target.value)}
-                    placeholder="Cari rival..."
-                    className="w-full bg-surface shadow-sm border border-border rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-primary/50 transition-colors text-fg"
-                  />
-                </div>
-              </div>
-              {/* Friends List Container */}
-              <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
-                {filteredFriends.length === 0 ? (
-                  <p className="text-fg-muted text-xs text-center py-8">Belum ada rival terdaftar atau ditemukan.</p>
-                ) : (
-                  filteredFriends.map((friend) => (
-                    <div key={friend.id} className="flex items-center justify-between p-3 rounded-xl bg-surface-subtle border border-border hover:border-border transition-colors group gap-2 overflow-hidden">
-                      {/* Kiri: Avatar + Nama — flex-1 + min-w-0 agar bisa truncate */}
-                      <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity min-w-0 flex-1" onClick={() => setSelectedPlayerId(String(friend.id))}>
-                        <div className="relative flex-shrink-0">
-                          <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full bg-surface shadow-sm" />
-                          <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-surface ${friend.online ? 'bg-success' : 'bg-gray-500'}`} />
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="font-bold text-xs truncate text-fg">{friend.name}</h4>
-                          <p className="text-[10px] font-space text-fg-muted truncate">{friend.username}</p>
-                        </div>
+                  <div className="grid grid-cols-3 gap-3 mt-auto relative z-10">
+                    <div className="text-center group">
+                      <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto rounded-full border-[6px] border-slate-100 bg-white flex items-center justify-center mb-3 shadow-inner relative overflow-hidden">
+                         <div className="absolute bottom-0 left-0 w-full bg-blue-500/20 transition-all duration-1000" style={{height: '60%'}}></div>
+                         <span className="font-black text-xl lg:text-2xl relative z-10 text-slate-800 drop-shadow-sm font-space">{profile?.total_quizzes_completed || 0}</span>
                       </div>
-                      {/* Kanan: Action buttons — flex-shrink-0 agar tidak stretch */}
-                      <div className={`flex-shrink-0 flex items-center gap-1 transition-opacity ${inviteStatus === 'inviting' && targetId === String(friend.id)
-                          ? 'opacity-100'
-                          : 'opacity-0 group-hover:opacity-100'
-                        }`}>
-                        <button
-                          disabled={inviteStatus === 'inviting'}
-                          onClick={(e) => { e.stopPropagation(); sendInvite(String(friend.id), friend.name); }}
-                          className={`px-2.5 py-1.5 font-black rounded-lg text-[10px] transition-colors whitespace-nowrap ${inviteStatus === 'inviting' && targetId === String(friend.id)
-                              ? 'bg-yellow-500 text-primary-fg animate-pulse'
-                              : 'bg-primary hover:bg-slate-800 text-primary-fg disabled:opacity-50 disabled:cursor-not-allowed'
-                            }`}
-                        >
-                          {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Tunggu' : 'Duel'}
-                        </button>
-                        {inviteStatus === 'inviting' && targetId === String(friend.id) && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); cancelInvite(); }}
-                            className="px-2.5 py-1.5 font-black rounded-lg text-[10px] bg-danger hover:bg-red-600 text-white transition-colors whitespace-nowrap"
-                          >
-                            Batal
-                          </button>
-                        )}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleRemoveFriend(friend.id); }}
-                          className="p-1.5 bg-danger-subtle hover:bg-danger-subtle text-danger rounded-lg transition-colors flex-shrink-0"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
+                      <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider group-hover:text-blue-600 transition-colors">Total Soal</span>
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </motion.section>
+                    <div className="text-center group">
+                      <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto rounded-full border-[6px] border-slate-100 bg-white flex items-center justify-center mb-3 shadow-inner relative overflow-hidden">
+                         <div className="absolute bottom-0 left-0 w-full bg-green-500/20 transition-all duration-1000" style={{height: `${Math.round((getAcc('TWK') + getAcc('TIU') + getAcc('TKP')) / 3 || 0)}%`}}></div>
+                         <span className="font-black text-xl lg:text-2xl relative z-10 text-slate-800 drop-shadow-sm font-space">{Math.round((getAcc('TWK') + getAcc('TIU') + getAcc('TKP')) / 3 || 0)}%</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider group-hover:text-green-600 transition-colors">Akurasi</span>
+                    </div>
+                    <div className="text-center group">
+                      <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto rounded-full border-[6px] border-slate-100 bg-white flex items-center justify-center mb-3 shadow-inner relative overflow-hidden">
+                         <div className="absolute bottom-0 left-0 w-full bg-orange-500/20 transition-all duration-1000" style={{height: '30%'}}></div>
+                         <span className="font-black text-xl lg:text-2xl relative z-10 text-slate-800 drop-shadow-sm font-space">{profile?.highest_survival_score || 0}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider group-hover:text-orange-600 transition-colors">Skor Survival</span>
+                    </div>
+                  </div>
+               </div>
+
+               {/* Analisis SKD */}
+               <div className="bg-white/80 backdrop-blur-xl p-6 lg:p-8 rounded-[2rem] text-slate-800 shadow-xl relative overflow-hidden flex flex-col h-full border border-white">
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="flex justify-between items-center mb-6 relative z-10">
+                     <h3 className="font-bold flex items-center gap-3 text-lg"><Target size={20} className="text-indigo-500" /> Analisis SKD</h3>
+                     <button className="text-[10px] text-indigo-500 hover:text-indigo-600 font-bold tracking-widest uppercase">&gt;</button>
+                  </div>
+                  <div className="flex-1 w-full min-h-[160px] relative z-10">
+                     <Suspense fallback={<div className="flex items-center justify-center h-full text-xs text-slate-400">Memuat Grafik...</div>}>
+                       <ProfileCharts 
+                          radarData={radarData} 
+                          radarOptions={{
+                             ...radarOptions, 
+                             scales: {
+                               r: {
+                                 angleLines: { color: 'rgba(0,0,0,0.05)' },
+                                 grid: { color: 'rgba(0,0,0,0.05)' },
+                                 pointLabels: { color: '#64748b', font: { size: 11, weight: 'bold' } },
+                                 ticks: { display: false, min: 0, max: 100 }
+                               }
+                             },
+                          }} 
+                          lineData={lineData} 
+                          lineOptions={lineOptions} 
+                       />
+                     </Suspense>
+                  </div>
+                  <div className="flex justify-between mt-6 px-4 relative z-10 bg-slate-50 p-3 rounded-2xl border border-slate-100 shadow-inner">
+                    <div className="text-center"><div className="text-[10px] font-black text-slate-400 mb-1">TWK</div><div className={`font-space font-black text-lg ${twkScore >= 65 ? 'text-green-500' : 'text-red-500'}`}>{twkScore}</div></div>
+                    <div className="w-px bg-slate-200" />
+                    <div className="text-center"><div className="text-[10px] font-black text-slate-400 mb-1">TIU</div><div className={`font-space font-black text-lg ${tiuScore >= 80 ? 'text-green-500' : 'text-red-500'}`}>{tiuScore}</div></div>
+                    <div className="w-px bg-slate-200" />
+                    <div className="text-center"><div className="text-[10px] font-black text-slate-400 mb-1">TKP</div><div className={`font-space font-black text-lg ${tkpScore >= 166 ? 'text-green-500' : 'text-red-500'}`}>{tkpScore}</div></div>
+                  </div>
+               </div>
+            </motion.div>
           </div>
         </div>
+
+        {/* ============================================================== */}
+        {/* 2. AVATAR COLLECTION                                             */}
+        {/* ============================================================== */}
+        <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-md rounded-[2.5rem] border border-white shadow-xl p-6 lg:p-8 relative mt-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+             <div>
+               <h3 className="font-black text-2xl flex items-center gap-3 text-slate-800 mb-2">
+                 <Star className="text-yellow-500" size={28} /> Koleksi Avatar
+               </h3>
+               <p className="text-sm font-bold text-slate-500">Pilih karakter yang akan menemani perjalanan belajarmu.</p>
+             </div>
+          </div>
+          
+          <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-6 pt-2 custom-scrollbar snap-x scroll-smooth -mx-6 px-6 lg:mx-0 lg:px-0">
+            {availableCharacters.map(char => {
+               const isUnlocked = char.is_free || profile?.unlocked_avatars?.includes(char.id);
+               const isActive = selectedAvatar?.id === char.id;
+               return (
+                 <div 
+                   key={char.id} 
+                   onClick={() => isUnlocked ? setSelectedAvatar(char) : showToast('Kostum ini terkunci! Beli di Toko.', 'error')}
+                   className={`snap-center flex-shrink-0 w-36 sm:w-44 rounded-[2rem] overflow-hidden cursor-pointer transition-all duration-300 relative border-4 flex flex-col
+                     ${isActive ? 'border-blue-500 shadow-[0_20px_40px_-15px_rgba(59,130,246,0.5)] -translate-y-4 bg-gradient-to-b from-blue-50 to-blue-100' : 
+                       isUnlocked ? 'border-transparent bg-white hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)]' : 
+                       'border-transparent bg-slate-100 opacity-60 grayscale hover:grayscale-0 transition-all'}
+                   `}
+                 >
+                   <div className={`aspect-square relative p-4 flex items-center justify-center flex-1 ${isActive ? 'bg-blue-50/50' : 'bg-slate-50'}`}>
+                      {isActive && <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1)_0%,transparent_70%)]"></div>}
+                      <img src={char.image_url} alt={char.name} className="w-full h-full object-contain relative z-10 drop-shadow-xl" />
+                      {!isUnlocked && (
+                         <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-20">
+                           <Lock className="text-slate-400 drop-shadow-sm" size={32} />
+                         </div>
+                      )}
+                   </div>
+                   <div className={`py-4 px-3 text-center flex-shrink-0 ${isActive ? 'bg-blue-500 text-white' : 'bg-white text-slate-800 border-t border-slate-100'}`}>
+                     <h4 className="font-black text-sm uppercase tracking-widest truncate">{char.name}</h4>
+                     {isActive && (
+                        <div className="mt-2 inline-flex items-center justify-center bg-white text-blue-600 font-black text-[10px] px-3 py-1 rounded-full tracking-wider shadow-sm">
+                           AKTIF
+                        </div>
+                     )}
+                   </div>
+                 </div>
+               )
+            })}
+          </div>
+        </motion.div>
+
+        {/* ============================================================== */}
+        {/* 3. ACHIEVEMENTS & RECENT ACTIVITY                              */}
+        {/* ============================================================== */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8 mt-8">
+          
+          {/* LEFT: Pencapaian (Achievements) */}
+          <motion.div variants={itemVariants} className="xl:col-span-2 bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-xl p-6 lg:p-8 flex flex-col relative overflow-hidden border border-white">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 relative z-10">
+               <div>
+                 <h3 className="font-black text-xl flex items-center gap-3 text-slate-800 mb-2">
+                   <Trophy size={24} className="text-yellow-500" /> Pencapaian
+                 </h3>
+                 <p className="text-sm font-bold text-slate-500">Kumpulkan pencapaian untuk menunjukkan progresmu.</p>
+               </div>
+               <button className="text-xs text-blue-500 font-bold hover:text-blue-600 tracking-widest uppercase bg-blue-50 px-4 py-2 rounded-xl transition-colors">Lihat Semua &gt;</button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+              {dynamicBadges.map(badge => (
+                 <div key={badge.id} className={`flex items-center gap-4 p-4 rounded-[1.5rem] border-2 transition-all group ${badge.unlocked ? 'border-yellow-200 bg-yellow-50 hover:bg-yellow-100 hover:border-yellow-300' : 'border-slate-100 bg-slate-50 opacity-60 grayscale hover:grayscale-0'}`}>
+                    <div className={`w-16 h-16 flex-shrink-0 rounded-2xl flex items-center justify-center shadow-sm border border-white ${badge.unlocked ? 'bg-gradient-to-br from-yellow-200 to-yellow-400 text-yellow-800 shadow-[0_0_20px_rgba(234,179,8,0.3)]' : 'bg-slate-200 text-slate-500'}`}>
+                       {getBadgeIcon(badge.icon as string)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                       <h4 className="font-black text-sm text-slate-800 truncate mb-1 group-hover:text-yellow-600 transition-colors">{badge.name}</h4>
+                       <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">{badge.desc}</p>
+                    </div>
+                 </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* RIGHT: Aktivitas Terbaru (Recent Activity) */}
+          <motion.div variants={itemVariants} className="xl:col-span-1 bg-white/80 backdrop-blur-xl border border-white rounded-[2.5rem] shadow-xl p-6 lg:p-8 relative overflow-hidden flex flex-col">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="flex items-center justify-between mb-8 relative z-10">
+               <h3 className="font-black text-xl flex items-center gap-3 text-slate-800">
+                 <Zap size={20} className="text-blue-500" /> Aktivitas Terbaru
+               </h3>
+               <button className="text-[10px] text-blue-600 font-bold hover:text-blue-800 tracking-widest uppercase">Lihat Semua &gt;</button>
+            </div>
+            
+            <div className="space-y-4 relative z-10 flex-1">
+              {[
+                { title: 'Menyelesaikan 1 sesi Latihan Harian', desc: '20 soal • Akurasi 75%', time: '2 jam lalu', icon: <ClipboardList size={20} />, color: 'text-blue-600 bg-blue-100', border: 'border-blue-200' },
+                { title: 'Bermain PvP Battle', desc: 'Hasil: Menang', time: '5 jam lalu', icon: <Swords size={20} />, color: 'text-orange-600 bg-orange-100', border: 'border-orange-200' },
+                { title: 'Menyelesaikan Try Out', desc: '110 soal • Skor 328', time: '1 hari lalu', icon: <Target size={20} />, color: 'text-green-600 bg-green-100', border: 'border-green-200' },
+                { title: 'Membuka pencapaian baru', desc: 'Konsisten - Login 7 hari', time: '1 hari lalu', icon: <Trophy size={20} />, color: 'text-yellow-600 bg-yellow-100', border: 'border-yellow-200' }
+              ].map((act, i) => (
+                <div key={i} className="flex gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors group border border-transparent hover:border-slate-100 cursor-default">
+                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl shadow-sm border ${act.color} ${act.border} group-hover:scale-110 transition-transform`}>
+                     {act.icon}
+                   </div>
+                   <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <h4 className="font-bold text-sm text-slate-800 truncate mb-0.5 group-hover:text-blue-600 transition-colors">{act.title}</h4>
+                      <p className="text-xs text-slate-500 truncate font-medium">{act.desc}</p>
+                   </div>
+                   <div className="text-[10px] text-slate-400 font-black uppercase tracking-wider whitespace-nowrap pt-2">{act.time}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
       </motion.div>
 
       {/* Search Friend Modal */}
