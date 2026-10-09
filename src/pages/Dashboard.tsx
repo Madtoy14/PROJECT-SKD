@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, type Variants, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Zap, Coins, Swords, BrainCircuit, Target, Trophy, Check, Flame, Activity, Crosshair, Gift, X, Users, Loader2, ChevronRight, UserPlus, Copy, BookOpen, LogOut, Clock, Eye, RefreshCw, Sparkles, PartyPopper, TrendingUp } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { fetchProfile, resetDailyQuests, syncEnergy, supabase, isSupabaseConfigured, fetchAvailableCharacters, type Character, type UserProfile } from '../lib/supabase';
+import { getAvatarUrl } from '../lib/avatar';
 import RankBadge from '../components/RankBadge';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import avatarPdh from '../assets/avatar_pdh.webp';
@@ -113,7 +114,7 @@ export default function Dashboard() {
         setEnergyTimer((p.energy ?? 25) >= 25 ? 0 : 150);
         setProfile(p);
         setGlobalCoins(p.coins);
-        setEquippedAvatarId(p.selected_avatar || 'stmkg');
+        setEquippedAvatarId(p.selected_avatar || '1');
         setLastSpinDate(normalizeSpinDate(p.last_spin_date) || p.last_spin_date || null);
 
         void syncEnergy().then((r) => {
@@ -137,6 +138,21 @@ export default function Dashboard() {
         }
       })
       .finally(() => setLoading(false));
+  }, []);
+
+  // Listen to profile updates (e.g. avatar change in Profile page)
+  useEffect(() => {
+    const handleProfileUpdated = (e: Event) => {
+      const updated = (e as CustomEvent).detail;
+      if (updated) {
+        setProfile((prev: any) => ({ ...prev, ...updated }));
+        if (updated.selected_avatar) {
+          setEquippedAvatarId(updated.selected_avatar);
+        }
+      }
+    };
+    window.addEventListener('skd:profile-updated', handleProfileUpdated);
+    return () => window.removeEventListener('skd:profile-updated', handleProfileUpdated);
   }, []);
   // Streak State (real calendar, not simulated)
   const [totalStreak, setTotalStreak] = useState(0);
@@ -678,7 +694,7 @@ export default function Dashboard() {
   if (loading) return <DashboardSkeleton />;
 
   return (
-    <div className="relative min-h-screen isolate bg-[#F7FAFF]">
+    <div className="relative min-h-screen isolate bg-bg">
       {/* ── Global Ambient Background ── */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden transition-all duration-700 ease-in-out flex justify-center">
         {/* Subtle dot pattern spans entire viewport width */}
@@ -694,9 +710,9 @@ export default function Dashboard() {
         {/* Ambient Glows Container - locked to content width */}
         <div className="relative w-full max-w-6xl h-full">
           {/* Ambient Glows */}
-          <div className="absolute -top-[5%] md:-top-[10%] left-[-20%] md:left-[10%] w-[140%] md:w-[80%] h-[clamp(350px,40%,700px)] bg-[#DBEAFE] rounded-full blur-[80px] md:blur-[120px] opacity-60 md:opacity-70 transition-all duration-700" />
-          <div className="absolute top-[10%] md:top-[5%] right-[-30%] md:-right-[10%] w-[100%] md:w-[50%] h-[clamp(250px,35%,600px)] bg-[#CFFAFE] rounded-full blur-[60px] md:blur-[100px] opacity-40 md:opacity-60 transition-all duration-700" />
-          <div className="absolute bottom-[2%] md:bottom-[5%] left-[-20%] md:left-[5%] w-[120%] md:w-[60%] h-[clamp(300px,40%,700px)] bg-[#EDE9FE] rounded-full blur-[80px] md:blur-[120px] opacity-50 md:opacity-80 transition-all duration-700" />
+          <div className="absolute -top-[5%] md:-top-[10%] left-[-20%] md:left-[10%] w-[140%] md:w-[80%] h-[clamp(350px,40%,700px)] bg-orange-100 rounded-full blur-[80px] md:blur-[120px] opacity-60 md:opacity-70 transition-all duration-700" />
+          <div className="absolute top-[10%] md:top-[5%] right-[-30%] md:-right-[10%] w-[100%] md:w-[50%] h-[clamp(250px,35%,600px)] bg-violet-100 rounded-full blur-[60px] md:blur-[100px] opacity-40 md:opacity-60 transition-all duration-700" />
+          <div className="absolute bottom-[2%] md:bottom-[5%] left-[-20%] md:left-[5%] w-[120%] md:w-[60%] h-[clamp(300px,40%,700px)] bg-amber-100 rounded-full blur-[80px] md:blur-[120px] opacity-50 md:opacity-80 transition-all duration-700" />
 
           {/* Abstract Decorative Shapes */}
           <div className="absolute top-[15%] md:top-[10%] -right-[20%] md:-right-[10%] w-[clamp(200px,35%,500px)] aspect-square border-[clamp(15px,3%,50px)] border-[#BFDBFE] rounded-full opacity-[0.15] md:opacity-[0.35] blur-[2px] md:blur-[4px] transition-all duration-700" />
@@ -950,25 +966,32 @@ export default function Dashboard() {
             
             {/* 1. Identity & Status Row */}
             <div className="flex items-center gap-3">
-              {/* Avatar - slightly smaller and perfectly circular */}
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary-container p-[2px] shrink-0 overflow-hidden shadow-sm">
-              {(() => {
-                const currentAvatar = availableCharacters.find(c => c.id === (profile?.selected_avatar || equippedAvatarId));
-                return (
-                  <img
-                    src={currentAvatar?.image_url || avatarPdh}
-                    alt="Avatar"
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                );
-              })()}
-              </div>
+              {/* Avatar - slightly smaller and perfectly circular, links to profile */}
+              <Link
+                to="/profil"
+                title="Lihat Profil"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary-container p-[2px] shrink-0 overflow-hidden shadow-sm hover:ring-2 hover:ring-primary/50 transition-all cursor-pointer block"
+              >
+                <img
+                  src={getAvatarUrl(profile?.selected_avatar || equippedAvatarId, availableCharacters, avatarPdh)}
+                  alt={profile?.nickname || profile?.username || 'Avatar'}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = avatarPdh;
+                  }}
+                  className="w-full h-full rounded-full object-cover"
+                />
+              </Link>
               
               <div className="flex flex-wrap items-center gap-2.5 min-w-0">
                 {/* Username */}
-                <p className="text-[15px] sm:text-[17px] font-bold text-fg truncate max-w-[120px] sm:max-w-[160px] md:max-w-none shrink-0 leading-none pb-[1px]">
+                <Link
+                  to="/profil"
+                  title="Lihat Profil"
+                  className="text-[15px] sm:text-[17px] font-bold text-fg hover:text-primary transition-colors truncate max-w-[120px] sm:max-w-[160px] md:max-w-none shrink-0 leading-none pb-[1px]"
+                >
                   {profile?.nickname || profile?.username || 'Pejuang'}
-                </p>
+                </Link>
                 
                 {/* Compact Badges Group */}
                 <div className="flex items-center gap-2">

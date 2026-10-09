@@ -317,6 +317,9 @@ export async function getMutualRivals(userId: string): Promise<Array<{
   online: boolean;
   avatar: string;
   score: number;
+  level: number;
+  streak: number;
+  pvpWins: number;
 }>> {
   if (!supabase || !userId) return [];
   try {
@@ -339,7 +342,7 @@ export async function getMutualRivals(userId: string): Promise<Array<{
 
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, username, nickname, score, selected_avatar, last_login')
+      .select('id, username, nickname, score, level, streak, total_pvp_wins, selected_avatar, last_login')
       .in('id', mutualIds);
     if (!profiles) return [];
 
@@ -353,6 +356,9 @@ export async function getMutualRivals(userId: string): Promise<Array<{
         online: (now - last) / (1000 * 60) <= 15,
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.username || p.id)}`,
         score: p.score || 0,
+        level: p.level || 1,
+        streak: p.streak || 0,
+        pvpWins: p.total_pvp_wins || 0,
       };
     });
   } catch (error) {

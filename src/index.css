@@ -5,7 +5,7 @@
   --font-syne: "Poppins", "Segoe UI", sans-serif;
   --font-space: "Space Mono", ui-monospace, monospace;
 
-  /* Bright Gamified Material system roles. */
+  /* Warm playful system roles. */
   --color-primary: var(--skd-primary);
   --color-primary-hover: var(--skd-primary-hover);
   --color-primary-active: var(--skd-primary-active);
@@ -105,17 +105,17 @@
   color-scheme: light;
 
   /* SKDQuest Bright Gamified Material */
-  --skd-primary: #3b82f6;
+  --skd-primary: #6366f1;
   --skd-on-primary: #ffffff;
-  --skd-primary-hover: #2563eb;
-  --skd-primary-active: #1d4ed8;
-  --skd-primary-container: #eff6ff;
-  --skd-on-primary-container: #1e3a8a;
+  --skd-primary-hover: #4f46e5;
+  --skd-primary-active: #4338ca;
+  --skd-primary-container: #eef2ff;
+  --skd-on-primary-container: #3730a3;
 
   --skd-secondary: #8b5cf6;
   --skd-on-secondary: #ffffff;
   --skd-secondary-container: #f5f3ff;
-  --skd-on-secondary-container: #4c1d95;
+  --skd-on-secondary-container: #5b21b6;
 
   --skd-tertiary: #f97316;
   --skd-on-tertiary: #ffffff;
@@ -142,27 +142,27 @@
   --skd-error-container: #fef2f2;
   --skd-on-error-container: #7f1d1d;
 
-  --skd-background: #f8fafc;
-  --skd-on-background: #0f172a;
+  --skd-background: #fffaf2;
+  --skd-on-background: #1e293b;
 
   --skd-surface: #ffffff;
-  --skd-on-surface: #0f172a;
-  --skd-surface-variant: #f1f5f9;
-  --skd-on-surface-variant: #475569;
+  --skd-on-surface: #1e293b;
+  --skd-surface-variant: #fff7ed;
+  --skd-on-surface-variant: #64748b;
 
   --skd-surface-container-lowest: #ffffff;
-  --skd-surface-container-low: #f8fafc;
-  --skd-surface-container: #f1f5f9;
-  --skd-surface-container-high: #e2e8f0;
-  --skd-surface-container-highest: #cbd5e1;
+  --skd-surface-container-low: #fffdf9;
+  --skd-surface-container: #fff7ed;
+  --skd-surface-container-high: #ffedd5;
+  --skd-surface-container-highest: #fed7aa;
 
-  --skd-outline: #94a3b8;
-  --skd-outline-variant: #e2e8f0;
+  --skd-outline: #cbd5e1;
+  --skd-outline-variant: #f1e8dc;
 
   /* Strong 4px/4px/4px shadow for physical separation */
-  --skd-elevation-1: 4px 4px 4px rgba(35, 65, 110, 0.25);
-  --skd-elevation-2: 6px 6px 6px rgba(35, 65, 110, 0.30);
-  --skd-elevation-3: 8px 8px 8px rgba(35, 65, 110, 0.35);
+  --skd-elevation-1: 0 8px 24px rgba(91, 72, 48, 0.08);
+  --skd-elevation-2: 0 14px 32px rgba(91, 72, 48, 0.13);
+  --skd-elevation-3: 0 20px 44px rgba(91, 72, 48, 0.16);
 
   --skd-shape-extra-small: 4px;
   --skd-shape-small: 8px;

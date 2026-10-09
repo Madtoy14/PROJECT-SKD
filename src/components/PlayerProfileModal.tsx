@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Trophy, Swords, Shield, Star, Target, Activity, CheckCircle2, UserPlus, UserCheck } from 'lucide-react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import type { UserProfile, Character } from '../lib/supabase';
+import { supabase, isSupabaseConfigured, type UserProfile, type Character } from '../lib/supabase';
 import { dicebearUrl } from '../lib/constants';
+import { getAvatarUrl } from '../lib/avatar';
 import { sendFriendRequest, unfollowUser, isFollowing } from '../lib/supabaseHelpers';
 
 interface PlayerProfileModalProps {
@@ -122,7 +122,11 @@ export default function PlayerProfileModal({
     });
   }
   const akurasiTotal = totalDijawab > 0 ? Math.round((totalBenar / totalDijawab) * 100) : 0;
-  const avatarUrl = character?.image_url || dicebearUrl(profile?.username || 'Guest');
+  const avatarUrl = getAvatarUrl(
+    profile?.selected_avatar,
+    character ? [character] : undefined,
+    dicebearUrl(profile?.username || 'Guest')
+  );
   const isSelf = !!myId && !!profile && myId === profile.id;
   const showFollow = !!myId && !!profile && !isSelf;
 
@@ -200,7 +204,15 @@ export default function PlayerProfileModal({
                   <div className="absolute -top-9 left-4">
                     <div className="relative">
                       <div className="w-16 h-16 rounded-full bg-surface shadow-sm border-[3px] border-surface overflow-hidden">
-                        <img src={avatarUrl} alt={profile.username} className="w-full h-full object-cover" />
+                        <img
+                          src={avatarUrl}
+                          alt={profile.username}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = dicebearUrl(profile.username || 'Guest');
+                          }}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div
                         className={`absolute bottom-0.5 right-0.5 w-4 h-4 rounded-full border-[3px] border-surface ${isOnline ? 'bg-success' : 'bg-gray-500'}`}

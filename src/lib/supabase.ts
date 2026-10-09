@@ -673,16 +673,42 @@ export const fetchQuestionsFromSupabase = async (gameMode: string, packageId?: s
 
 // 7. Ambil Daftar Karakter
 export const fetchAvailableCharacters = async (): Promise<Character[]> => {
+  const getAvatarUrl = (num: number) =>
+    supabase ? supabase.storage.from('avatars').getPublicUrl(`${num}.png`).data.publicUrl : '';
+
   if (!isSupabaseConfigured()) {
-    return [];
+    return Array.from({ length: 10 }, (_, i) => ({
+      id: String(i + 1),
+      name: `Avatar ${i + 1}`,
+      gender: i < 5 ? ('male' as const) : ('female' as const),
+      image_url: getAvatarUrl(i + 1),
+      is_free: i === 0,
+    }));
   }
   try {
     const { data, error } = await supabase!.from('characters').select('*').order('id', { ascending: true });
     if (error) throw error;
-    return data as Character[];
+    const chars = (data || []) as Character[];
+    return Array.from({ length: 10 }, (_, i) => {
+      const num = i + 1;
+      const existingChar = chars[i];
+      return {
+        id: existingChar ? existingChar.id : String(num),
+        name: `Avatar ${num}`,
+        gender: existingChar?.gender ?? (num <= 5 ? 'male' : 'female'),
+        image_url: getAvatarUrl(num),
+        is_free: existingChar ? existingChar.is_free : (num === 1),
+      };
+    });
   } catch (err) {
     console.error('Gagal mengambil daftar karakter:', err);
-    return [];
+    return Array.from({ length: 10 }, (_, i) => ({
+      id: String(i + 1),
+      name: `Avatar ${i + 1}`,
+      gender: i < 5 ? ('male' as const) : ('female' as const),
+      image_url: getAvatarUrl(i + 1),
+      is_free: i === 0,
+    }));
   }
 };
 

@@ -215,24 +215,15 @@ function Navigation() {
       </nav>
 
       {/* ── Desktop Navigation Rail ── */}
-      <nav className="group hidden md:flex flex-col h-[100dvh] shrink-0 w-20 hover:w-60 bg-[#EAF2FF] border-r border-[#D4E3FF] z-50 overflow-x-hidden transition-all duration-300 ease-in-out">
-        <div className="h-20 flex flex-col items-center justify-center shrink-0 border-b border-[#D4E3FF]/60 transition-all duration-300 relative overflow-hidden">
-          {/* Collapsed state logo */}
-          <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 opacity-100 group-hover:opacity-0 group-hover:scale-50 pointer-events-none">
+      <nav className="group hidden md:flex flex-col h-[100dvh] shrink-0 w-20 hover:w-60 bg-surface border-r border-border z-50 overflow-x-hidden transition-all duration-300 ease-in-out">
+        <div className="h-20 flex items-center justify-center shrink-0 border-b border-border px-5 relative overflow-hidden transition-all duration-300 group-hover:justify-start">
+          <div className="flex items-center gap-3 pointer-events-none">
             <img 
               src={supabase?.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl}
               alt="SKDQuest Compact" 
               className="w-10 h-10 object-contain drop-shadow-sm" 
             />
-          </div>
-          {/* Expanded state logo + text */}
-          <div className="absolute inset-0 flex items-center px-5 transition-all duration-300 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 pointer-events-auto gap-3">
-            <img 
-              src={supabase?.storage.from('Logo').getPublicUrl('Logo.png').data.publicUrl}
-              alt="SKDQuest Logo" 
-              className="w-10 h-10 object-contain drop-shadow-sm shrink-0" 
-            />
-            <h1 className="text-xl font-black tracking-tight text-[#1E3A8A] whitespace-nowrap">
+            <h1 className="text-xl font-black tracking-tight text-primary whitespace-nowrap overflow-hidden transition-all duration-300 w-0 opacity-0 group-hover:w-auto group-hover:opacity-100">
               SKDQuest
             </h1>
           </div>
@@ -247,11 +238,11 @@ function Navigation() {
                   to={path}
                   aria-current={isActive ? 'page' : undefined}
                   className={`m3-interactive relative flex items-center px-4 py-3 rounded-[var(--m3-shape-medium)] transition-all w-full ${isActive
-                    ? 'text-[#1E3A8A] font-bold'
-                    : 'text-[#476086] hover:bg-[#DEEAFF] hover:text-[#1E3A8A] font-medium'
+                    ? 'text-primary font-bold'
+                    : 'text-fg-muted hover:bg-primary-container hover:text-primary font-medium'
                     }`}
                 >
-                  {isActive && <MotionActiveIndicator layoutId="desktop-nav-indicator" reducedMotion={reducedMotion} customBg="bg-[#CFE0FF]" />}
+                  {isActive && <MotionActiveIndicator layoutId="desktop-nav-indicator" reducedMotion={reducedMotion} customBg="bg-primary-container" />}
                   <div className="relative z-[2] flex items-center justify-center shrink-0 w-8 h-6">
                     <Icon size={20} className="transition-transform duration-200" />
                   </div>
@@ -265,17 +256,17 @@ function Navigation() {
         </ul>
 
         {/* Desktop Settings + Logout — ikon terlihat baik saat collapse maupun hover */}
-        <div className="px-2 pb-3 pt-3 border-t border-[#D4E3FF]/60 shrink-0 space-y-1">
+        <div className="px-2 pb-3 pt-3 border-t border-border shrink-0 space-y-1">
           <Link
             to="/settings"
              aria-current={location.pathname === '/settings' ? 'page' : undefined}
              className={`m3-interactive relative flex items-center px-4 py-3 rounded-[var(--m3-shape-medium)] transition-all w-full font-bold text-sm ${
                location.pathname === '/settings'
-                 ? 'text-[#1E3A8A]'
-                 : 'text-[#476086] hover:bg-[#DEEAFF] hover:text-[#1E3A8A]'
+                 ? 'text-primary'
+                 : 'text-fg-muted hover:bg-primary-container hover:text-primary'
              }`}
           >
-            {location.pathname === '/settings' && <MotionActiveIndicator layoutId="desktop-nav-indicator" reducedMotion={reducedMotion} customBg="bg-[#CFE0FF]" />}
+            {location.pathname === '/settings' && <MotionActiveIndicator layoutId="desktop-nav-indicator" reducedMotion={reducedMotion} customBg="bg-primary-container" />}
             <div className="relative z-[2] flex items-center justify-center shrink-0 w-8 h-6">
               <SettingsIcon size={20} />
             </div>
@@ -285,7 +276,7 @@ function Navigation() {
           </Link>
           <button
             onClick={handleLogout}
-            className="m3-interactive flex items-center px-4 py-3 rounded-[var(--m3-shape-medium)] transition-all w-full text-[#476086] hover:bg-[#FFD9D9] hover:text-[#B91C1C] font-bold text-sm"
+            className="m3-interactive flex items-center px-4 py-3 rounded-[var(--m3-shape-medium)] transition-all w-full text-fg-muted hover:bg-danger/10 hover:text-danger font-bold text-sm"
           >
             <div className="flex items-center justify-center shrink-0 w-8 h-6">
               <LogOut size={20} />
@@ -297,8 +288,8 @@ function Navigation() {
         </div>
 
         {/* Desktop Version */}
-        <div className="px-6 pb-4 pt-1 shrink-0 overflow-hidden whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center group-hover:text-left">
-          <span className="text-[10px] text-[#718BB2] font-medium block">v1.0.0</span>
+        <div className="px-6 pb-4 pt-1 shrink-0 overflow-hidden whitespace-nowrap text-left opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <span className="text-[10px] text-fg-muted font-medium block">v1.0.0</span>
         </div>
       </nav>
     </>

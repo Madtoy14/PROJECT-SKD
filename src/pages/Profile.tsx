@@ -8,17 +8,18 @@ import {
 } from 'lucide-react';
 import { useDuelMatchmaking } from '../context/DuelContext';
 import { fetchProfile, updateProfile, supabase, isSupabaseConfigured, fetchAvailableCharacters } from '../lib/supabase';
-import { getFollowCounts, getMutualRivals, unfollowUser } from '../lib/supabaseHelpers';
+import { getFollowCounts, getMutualRivals, unfollowUser, sendFriendRequest } from '../lib/supabaseHelpers';
 import type { UserProfile, Character } from '../lib/supabase';
 import { ProfileSkeleton } from '../components/LoadingSkeleton';
 import PlayerProfileModal from '../components/PlayerProfileModal';
 import { getUserAnalytics } from '../lib/supabase';
 import { dicebearUrl } from '../lib/constants';
+import { getAvatarUrl } from '../lib/avatar';
 
 // Helper: resolve avatar image for a player, falling back to a dicebear avatar
 // when the selected character is unknown or Supabase is not configured.
 const resolvePlayerAvatar = (selectedAvatarId: string | undefined, chars: Character[], username: string) =>
-  chars.find(o => o.id === selectedAvatarId)?.image_url || dicebearUrl(username);
+  getAvatarUrl(selectedAvatarId, chars, dicebearUrl(username));
 
 // lazy-loaded via React.lazy + Suspense.
 const ProfileCharts = React.lazy(() => import('../components/ProfileCharts'));
@@ -274,7 +275,10 @@ export default function Profile() {
           setUsernameInput(p.nickname || p.username);
           setTargetKedinasan(p.target_kedinasan || 'IPDN');
 
-          const currentEquipped = mappedChars.find(o => o.id === p.selected_avatar) || mappedChars[0] || null;
+          const currentEquipped =
+            mappedChars.find(o => o.id === p.selected_avatar) ||
+            mappedChars.find((_, idx) => String(idx + 1) === p.selected_avatar) ||
+            mappedChars[0] || null;
           setSelectedAvatar(currentEquipped);
 
           // Social: tabel friends only (mutual = rival). No dual-write profiles.friends.
@@ -393,6 +397,17 @@ export default function Profile() {
     setIsSearchingFriend(false);
   };
 
+  const handleFollowBack = async (targetId: string) => {
+    if (!profile) return;
+    const ok = await sendFriendRequest(profile.id, targetId);
+    if (ok) {
+      await refreshSocial();
+      showToast('Sekarang mengikuti pemain ini.', 'success');
+    } else {
+      showToast('Gagal mengikuti pemain.', 'error');
+    }
+  };
+
   useEffect(() => {
     if (isFollowModalOpen && profile) {
       setIsFollowListLoading(true);
@@ -452,6 +467,9 @@ export default function Profile() {
     setProfile(updatedProfile);
     setIsEditProfileOpen(false);
     showToast('Profil berhasil diperbarui!', 'success');
+    if (updatedProfile) {
+      window.dispatchEvent(new CustomEvent('skd:profile-updated', { detail: updatedProfile }));
+    }
   };
   // Dynamic Level XP Progression
   const levelXPRequired = profile ? profile.level * 1000 : 15000;
@@ -461,10 +479,10 @@ export default function Profile() {
   if (loading) return <ProfileSkeleton />;
 
   return (
-      <div className="min-h-screen bg-[#F4F7FC] pb-32 font-sans text-slate-800 relative overflow-x-hidden selection:bg-blue-500/20">
-        <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-[#E2E8F0]/80 to-transparent pointer-events-none" />
-        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-blue-300/10 blur-[120px] pointer-events-none" />
-        <div className="absolute top-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-indigo-300/10 blur-[120px] pointer-events-none" />
+      <div className="min-h-screen bg-bg pb-32 font-sans text-fg relative overflow-x-hidden selection:bg-primary/20">
+        <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-orange-100/70 to-transparent pointer-events-none" />
+        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-amber-200/20 blur-[120px] pointer-events-none" />
+        <div className="absolute top-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-violet-200/20 blur-[120px] pointer-events-none" />
         
         <div className="max-w-[1400px] mx-auto p-4 md:p-6 lg:p-8 relative z-10 space-y-8">
           <h1 className="text-lg font-black text-fg">Profil</h1>
@@ -1006,30 +1024,27 @@ export default function Profile() {
                 </div>
               ) : (
                 filteredFriends.map((friend) => (
-                  <div key={friend.id} className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 hover:bg-white transition-colors group gap-2 overflow-hidden">
+                  <div key={friend.id} className="relative flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-primary/30 hover:bg-white transition-colors group gap-2 overflow-hidden">
                     <div className="flex items-center gap-3 cursor-pointer min-w-0 flex-1" onClick={() => setSelectedPlayerId(String(friend.id))}>
                       <div className="relative flex-shrink-0">
                         <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full bg-white shadow-sm object-cover border border-slate-100" />
                         <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${friend.online ? 'bg-green-500' : 'bg-slate-400'}`} />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="font-bold text-xs truncate text-slate-800 group-hover:text-blue-600 transition-colors">{friend.name}</h4>
-                        <p className="text-[10px] font-space text-slate-400 truncate">{friend.username}</p>
+                        <h4 className="font-bold text-xs truncate text-slate-800 group-hover:text-primary transition-colors">{friend.name}</h4>
+                        <p className="text-[10px] font-space text-slate-400 truncate">{friend.username} · Lv.{friend.level} · {friend.streak} streak</p>
                       </div>
                     </div>
-                    <div className={`flex-shrink-0 flex items-center gap-1 transition-opacity ${inviteStatus === 'inviting' && targetId === String(friend.id)
-                        ? 'opacity-100'
-                        : 'opacity-0 group-hover:opacity-100'
-                      }`}>
+                    <div className="flex-shrink-0 flex items-center gap-1">
                       <button
                         disabled={inviteStatus === 'inviting'}
                         onClick={(e) => { e.stopPropagation(); sendInvite(String(friend.id), friend.name); }}
                         className={`px-2.5 py-1.5 font-black rounded-lg text-[10px] transition-colors whitespace-nowrap ${inviteStatus === 'inviting' && targetId === String(friend.id)
                             ? 'bg-yellow-400 text-yellow-950 animate-pulse'
-                            : 'bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed'
+                            : 'bg-primary hover:bg-primary-hover text-primary-fg disabled:opacity-50 disabled:cursor-not-allowed'
                           }`}
                       >
-                        {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Tunggu' : 'Duel'}
+                        {inviteStatus === 'inviting' && targetId === String(friend.id) ? 'Tunggu' : 'Tantang'}
                       </button>
                       {inviteStatus === 'inviting' && targetId === String(friend.id) && (
                         <button
@@ -1194,9 +1209,10 @@ export default function Profile() {
                                   alt={p.username}
                                   className="w-10 h-10 rounded-full bg-surface shadow-sm object-cover"
                                 />
-                                <div>
+                                <div className="min-w-0 flex-1">
                                   <h4 className="font-bold text-sm text-fg group-hover:text-primary transition-colors">@{p.username}</h4>
                                   <p className="text-[10px] text-premium font-bold">Skor: {p.score}</p>
+                                  <button type="button" onClick={(e) => { e.stopPropagation(); void handleFollowBack(p.id); }} className="mt-1 text-[10px] font-bold text-primary border border-primary/20 bg-primary/10 hover:bg-primary hover:text-primary-fg rounded-lg px-2 py-1">Ikuti balik</button>
                                 </div>
                               </div>
                             );
@@ -1223,9 +1239,10 @@ export default function Profile() {
                                   alt={p.username}
                                   className="w-10 h-10 rounded-full bg-surface shadow-sm object-cover"
                                 />
-                                <div>
+                                <div className="min-w-0 flex-1">
                                   <h4 className="font-bold text-sm text-fg group-hover:text-primary transition-colors">@{p.username}</h4>
                                   <p className="text-[10px] text-premium font-bold">Skor: {p.score}</p>
+                                  <button type="button" onClick={(e) => { e.stopPropagation(); void handleFollowBack(p.id); }} className="mt-1 text-[10px] font-bold text-primary border border-primary/20 bg-primary/10 hover:bg-primary hover:text-primary-fg rounded-lg px-2 py-1">Ikuti balik</button>
                                 </div>
                               </div>
                             );
